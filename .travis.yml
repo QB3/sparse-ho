@@ -19,7 +19,7 @@ install:
   - python setup.py build_ext --inplace
   - pip install -e .
 script:
-  - pytest -lv --cov-report term-missing sparse-ho --cov=sparse-ho --cov-config .coveragerc
+  - pytest -lv --cov-report term-missing sparse_ho --cov=sparse_ho --cov-config .coveragerc
   # - flake8 --count clar
 after_success:
   - codecov
