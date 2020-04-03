@@ -1,0 +1,15 @@
+name: sparse-ho-env
+
+dependencies:
+    - ipython
+    - numpy>=1.12
+    - scipy>=0.18.0
+    - scikit-learn>=0.21
+    - numba
+    - seaborn>=0.7
+    - matplotlib>=2.0.0
+    - pip
+
+    - pip:
+        - download
+        - hyperopt
