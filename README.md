@@ -1,5 +1,7 @@
-Implicit Forward
+sparse-ho
 =====
+
+|image0| |image1|
 
 This package implements the implicit forward differentiation algorithm, a fast algorithm to compute the Jacobian of the Lasso.
 
@@ -65,3 +67,30 @@ What is needed is in the implicit_forward/expes folder:
     run main_mcp_pred.py
     ipython -i plot_mcp_pred.py
     ```
+
+
+
+Cite
+====
+
+If you use this code, please cite:
+
+::
+
+@article{bertrand2020implicit,
+  title={Implicit differentiation of Lasso-type models for hyperparameter optimization},
+  author={Bertrand, Quentin and Klopfenstein, Quentin and Blondel, Mathieu and Vaiter, Samuel and Gramfort, Alexandre and Salmon, Joseph},
+  journal={arXiv preprint arXiv:2002.08943},
+  year={2020}
+}
+
+
+
+ArXiv links:
+
+- https://arxiv.org/pdf/2002.08943.pdf
+
+.. |image0| image:: https://travis-ci.org/QB3/sparse-ho.svg?branch=master
+   :target: https://travis-ci.org/QB3/sparse-ho/
+.. |image1| image:: https://codecov.io/gh/QB3/sparse-ho/branch/master/graphs/badge.svg?branch=master
+   :target: https://codecov.io/gh/mathurinm/QB3/sparse-ho
