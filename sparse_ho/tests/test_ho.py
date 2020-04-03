@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 
-from my_data.synthetic import get_synt_data
+from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.ho import get_val_grad, grad_search

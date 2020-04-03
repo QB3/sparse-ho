@@ -1,7 +1,6 @@
 # This files contains the functions for the Lasso, MCP and adaptive lasso
 # hyperparameter setting
 
-import time
 import numpy as np
 from numpy.linalg import norm
 
@@ -9,7 +8,6 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.backward import get_beta_jac_backward
-from sparse_ho.cvxpylayers import get_beta_jac_cvxpy
 
 
 def grad_search(
@@ -293,10 +291,6 @@ def get_val_grad(
                 X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
                 tol=tol, maxit=maxit, model=model, compute_jac=False)
             jac = None
-        elif method == "cvxpylayer":
-            mask, dense, jac = get_beta_jac_cvxpy(
-                X_train, y_train, log_alpha, X_val, y_val, mask0=mask0,
-                dense0=dense0, model=model)
         else:
             raise ValueError('No method called %s' % method)
         # value of the objective function on the validation loss
@@ -310,7 +304,7 @@ def get_val_grad(
             y_test - X_test[:, mask] @ dense) ** 2 / X_test.shape[0]
 
         if method in (
-                "implicit", "backward", "hyperopt", "cvxpylayer"):
+                "implicit", "backward", "hyperopt"):
             grad = jac
         else:
             if model in ("lasso", "mcp"):
@@ -402,7 +396,7 @@ def get_val_grad(
             monitor(val, None, log_alpha, rmse=rmse)
             return val
         if method in (
-                "implicit", "backward", "hyperopt", "cvxpylayer"):
+                "implicit", "backward", "hyperopt"):
             grad = jac
         elif model == "lasso":
             grad = 2 * jac.T @ X_train[:, mask].T @ (
