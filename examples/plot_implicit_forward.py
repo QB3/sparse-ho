@@ -5,7 +5,7 @@ import seaborn as sns
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor, WarmStart
 from sparse_ho.grid_search import grid_searchCV
-from sparse_ho.bayesian import hyperopt_lasso
+# from sparse_ho.bayesian import hyperopt_lasso
 
 from sparse_ho.datasets.real import (
         get_20newsgroup, get_finance, get_rcv1)
