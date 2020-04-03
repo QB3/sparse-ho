@@ -12,21 +12,20 @@ Install
 =====
 To be able to run the experiments  you should install the conda environment:
 
-```bash
-conda env create -f environment.yml
-conda activate sparse-ho-env
-```
+::
+    conda env create -f environment.yml
+    conda activate sparse-ho-env
+
 (you may need to open  fresh new terminal).
 
 To be able to run the code you first need to run, in this folder (root folder):
-```bash
-pip install -e .
-```
+::
+    pip install -e .
+
 
 You should now be able to run a friendly example which reproduces Figure 1:
-```bash
-ipython -i examples/plot_time_to_compute_single_gradient.py
-```
+::
+    ipython -i examples/plot_time_to_compute_single_gradient.py
 
 If you want to compare methods to solve the whole hyperparameter optimization
 problem, you can run the friendly example:
