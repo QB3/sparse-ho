@@ -1,0 +1,25 @@
+
+dist: xenial
+language: python
+python: 3.6
+
+before_install:
+  - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda3.sh
+  - chmod +x miniconda3.sh
+  - ./miniconda3.sh -b -p /home/travis/miniconda3
+  - export PATH=/home/travis/miniconda3/bin:$PATH
+  - conda update --yes --quiet conda
+install:
+  - conda env create --file environment.yml python=3.6
+  - source activate sparse-ho-env
+  - conda install --yes --quiet pytest pytest-cov coverage
+  - pip install pytest-env
+  - pip install flake8 check-manifest
+  - pip install codecov
+  - python setup.py build_ext --inplace
+  - pip install -e .
+script:
+  - pytest -lv --cov-report term-missing clar --cov=clar --cov-config .coveragerc
+  # - flake8 --count clar
+after_success:
+  - codecov
