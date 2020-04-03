@@ -77,12 +77,12 @@ If you use this code, please cite:
 
 ::
 
-@article{bertrand2020implicit,
-  title={Implicit differentiation of Lasso-type models for hyperparameter optimization},
-  author={Bertrand, Quentin and Klopfenstein, Quentin and Blondel, Mathieu and Vaiter, Samuel and Gramfort, Alexandre and Salmon, Joseph},
-  journal={arXiv preprint arXiv:2002.08943},
-  year={2020}
-}
+    @article{bertrand2020implicit,
+    title={Implicit differentiation of Lasso-type models for hyperparameter optimization},
+    author={Bertrand, Quentin and Klopfenstein, Quentin and Blondel, Mathieu and Vaiter, Samuel and Gramfort, Alexandre and Salmon, Joseph},
+    journal={arXiv preprint arXiv:2002.08943},
+    year={2020}
+    }
 
 
 
