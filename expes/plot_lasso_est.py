@@ -3,7 +3,7 @@ import numpy as np
 import pandas
 import seaborn as sns
 import matplotlib.pyplot as plt
-from implicit_forward.utils_plot import configure_plt
+from sparse_ho.utils_plot import configure_plt
 
 configure_plt()
 fontsize = 22

@@ -8,12 +8,13 @@ import numpy as np
 from numpy.linalg import norm
 from joblib import Parallel, delayed
 import pandas
-from implicit_forward.lasso import (
-        Monitor, WarmStart, grid_searchCV, line_search)
-from implicit_forward.bayesian import hyperopt_lasso
+from sparse_ho.utils import Monitor, WarmStart
+from sparse_ho.grid_search import grid_searchCV
+from sparse_ho.ho import grad_search
+from sparse_ho.bayesian import hyperopt_lasso
 from itertools import product
 
-from implicit_forward.datasets.real import get_data
+from sparse_ho.datasets.real import get_data
 
 
 dataset_names = ["rcv1"]
@@ -79,7 +80,7 @@ def parallel_function(
                 y_test, tol, max_evals=n_outer, method=method)
         else:
             # do line search to find the optimal lambda
-            log_alpha, val, grad = line_search(
+            log_alpha, val, grad = grad_search(
                 X_train, y_train, log_alpha0, X_val, y_val, X_test,
                 y_test, tol, monitor, method=method, maxit=10000,
                 n_outer=n_outer, warm_start=warm_start, niter_jac=100)

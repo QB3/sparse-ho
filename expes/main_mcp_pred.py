@@ -10,11 +10,12 @@ from joblib import Parallel, delayed
 import pandas
 import scipy
 
-from implicit_forward.lasso import (
-        Monitor, WarmStart, grid_searchMCP, line_search)
+from sparse_ho.ho import grad_search
+from sparse_ho.utils import Monitor, WarmStart
+from sparse_ho.grid_search import grid_searchMCP
 from itertools import product
 
-from my_data.real import get_data
+from sparse_ho.datasets.real import get_data
 
 
 dataset_names = ["rcv1"]
@@ -93,7 +94,7 @@ def parallel_function(
                 tol, max_evals=n_outer, method=method)
         else:
             # do line search to find the optimal lambda
-            log_alpha, val, grad = line_search(
+            log_alpha, val, grad = grad_search(
                 X_train, y_train, log_alpha0_mcp, X_val, y_val, X_test, y_test,
                 tol, monitor, method=method, maxit=10000, n_outer=n_outer,
                 warm_start=warm_start, niter_jac=100, model="mcp", t_max=t_max)

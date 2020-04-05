@@ -9,12 +9,12 @@ from sklearn.utils import check_random_state
 from scipy.linalg import toeplitz
 from sklearn.utils import check_random_state
 
-from implicit_forward.datasets.synthetic import get_synt_data
-from implicit_forward.lasso import (
+from sparse_ho.datasets.synthetic import get_synt_data
+from sparse_ho.lasso import (
         Monitor, grid_searchCV, get_val_grad, line_search, WarmStart)
-from implicit_forward.bayesian import hyperopt_lasso
-from implicit_forward.utils import iou_beta
-from implicit_forward.utils import my_lasso
+from sparse_ho.bayesian import hyperopt_lasso
+from sparse_ho.utils import iou_beta
+from sparse_ho.utils import my_lasso
 
 def err_cv(X, y, beta_hat):
     n_samples, _ = X.shape

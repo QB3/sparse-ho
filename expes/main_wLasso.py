@@ -4,12 +4,12 @@ from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 import pandas
 from sklearn.linear_model import Lasso, LassoCV
-from implicit_forward.lasso import Monitor, grid_searchCV, get_val_grad, line_search, WarmStart
-from implicit_forward.bayesian import hyperopt_lasso
+from sparse_ho.lasso import Monitor, grid_searchCV, get_val_grad, line_search, WarmStart
+from sparse_ho.bayesian import hyperopt_lasso
 from itertools import product
-from implicit_forward.utils import my_lasso, iou_beta
+from sparse_ho.utils import my_lasso, iou_beta
 from sklearn.utils import check_random_state
-from implicit_forward.datasets.synthetic import get_synt_data
+from sparse_ho.datasets.synthetic import get_synt_data
 
 
 def err_cv(X, y, beta_hat):
