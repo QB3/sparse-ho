@@ -1,3 +1,13 @@
+"""
+Method comparison on Lasso
+==========================
+
+The aim of this example is to demonstrate on a simple
+dateset how methods compare.
+
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -27,7 +37,6 @@ n_samples, n_features = X_train.shape
 alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
 maxit = 1000
 n_alpha = 100
-# n_alpha = 100
 p_alphas = np.geomspace(1, 0.0001, n_alpha)
 log_alphas = np.log(alpha_max * p_alphas)
 
