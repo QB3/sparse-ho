@@ -5,6 +5,7 @@ sparse-ho
 
 sparse-ho stands for "sparse hyperparameter optimization". This code aims to offer
 a efficient solution to the problem of hyperparameter setting for sparse models such as Lasso.
+Contrarily to grid search, the proposed method can handle efficiently many hyperparameters.
 
 This package implements the implicit forward differentiation algorithm, a fast algorithm to
 compute the Jacobian of the Lasso as described in `this paper <https://arxiv.org/pdf/2002.08943.pdf>`_.
