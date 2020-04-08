@@ -20,6 +20,6 @@ install:
   - pip install -e .
 script:
   - make test-code
-  # - make pep
+  - make pep
 after_success:
   - codecov
