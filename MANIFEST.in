@@ -1,0 +1,21 @@
+include *.rst
+include *.md
+include *.in
+include LICENSE
+include sparse_ho/__init__.py
+
+recursive-include examples *.py
+recursive-include examples *.txt
+
+recursive-include sparse_ho *.py
+
+### Exclude
+
+exclude Makefile
+exclude .coveragerc
+exclude *.yml
+exclude .mailmap
+recursive-exclude sparse_ho *.pyc
+
+recursive-exclude doc *
+recursive-exclude expes *
