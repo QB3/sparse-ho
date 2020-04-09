@@ -4,7 +4,8 @@ from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 from numba import njit
 
-from sparse_ho.utils import init_dbeta0_new, init_dbeta0_new_p
+from sparse_ho.utils import (
+    init_dbeta0_new, init_dbeta0_new_p, mcp_dx, mcp_dalpha, mcp_dgamma)
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
@@ -121,7 +122,6 @@ def get_only_jac(
                 _update_only_jac_sparse_p(
                     Xs.data, Xs.indptr, Xs.indices, n_samples,
                     n_features, dbeta, dr, L, alpha[mask], sign_beta)
-                    # n_features, dbeta, dr, L, alpha, sign_beta)
             else:
                 _update_only_jac_p(Xs, dbeta, dr, L, alpha[mask], sign_beta)
         print(norm(dbeta - dbeta_old))

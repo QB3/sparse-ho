@@ -365,7 +365,7 @@ def get_val_grad(
                 dense0=dense0, jac0=jac0, tol=tol, maxit=maxit)
             mask2, dense2, jac2 = get_beta_jac_backward(
                 X_train, y_train2, log_alpha, X_val, y_val,
-                mask0=mask02, dense0=dense02, jac0=jac02, tol=tol, maxit=maxit)
+                mask0=mask2, dense0=dense2, jac0=jac2, tol=tol, maxit=maxit)
         elif method == "hyperopt":
             mask, dense = get_beta_jac_iterdiff(
                 X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,

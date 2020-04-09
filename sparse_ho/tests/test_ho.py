@@ -49,6 +49,7 @@ dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = ["lasso", "wlasso"]
 
+
 def test_beta_jac():
     #########################################################################
     # check that the methods computing the full Jacobian compute the same sol
@@ -79,10 +80,10 @@ def test_beta_jac():
 
 
 def test_val_grad():
-        #######################################################################
-        # Not all methods computes the full Jacobian, but all
-        # compute the gradients
-        # check that the gradient returned by all methods are the same
+    #######################################################################
+    # Not all methods computes the full Jacobian, but all
+    # compute the gradients
+    # check that the gradient returned by all methods are the same
     for model in models:
         monitor = Monitor()
         warm_start = WarmStart()
@@ -108,30 +109,23 @@ def test_val_grad():
         monitor = Monitor()
         warm_start = WarmStart()
         value4, gradient4 = get_val_grad(
-                X_train_s, y_train, dict_log_alpha[model], X_val, y_val, X_test,
-                y_test, tol, monitor, warm_start, method="implicit",
+                X_train_s, y_train, dict_log_alpha[model], X_val, y_val,
+                X_test, y_test, tol, monitor, warm_start, method="implicit",
                 model=model)
 
         monitor = Monitor()
         warm_start = WarmStart()
         value5, gradient5 = get_val_grad(
-                X_train_s, y_train, dict_log_alpha[model], X_val, y_val, X_test,
-                y_test, tol, monitor, warm_start, method="forward",
+                X_train_s, y_train, dict_log_alpha[model], X_val, y_val,
+                X_test, y_test, tol, monitor, warm_start, method="forward",
                 model=model)
 
         monitor = Monitor()
         warm_start = WarmStart()
         value6, gradient6 = get_val_grad(
-                X_train_s, y_train, dict_log_alpha[model], X_val, y_val, X_test,
-                y_test, tol, monitor, warm_start, method="implicit_forward",
-                model=model, tol_jac=tol)
-
-        # monitor = Monitor()
-        # warm_start = WarmStart()
-        # value3, gradient3 = get_val_grad(
-        #         X_train, y_train, dict_log_alpha[model], X_val, y_val, X_test,
-        #         y_test, tol, monitor, warm_start, method="forward",
-        #         model=model)
+                X_train_s, y_train, dict_log_alpha[model], X_val, y_val,
+                X_test, y_test, tol, monitor, warm_start,
+                method="implicit_forward", model=model, tol_jac=tol)
 
         assert np.allclose(value1, value2)
         assert np.allclose(gradient1, gradient2)
@@ -149,8 +143,8 @@ def test_val_grad():
             monitor = Monitor()
             warm_start = WarmStart()
             value4, gradient4 = get_val_grad(
-                    X_train, y_train, log_alpha, X_val, y_val, X_test, y_test, tol,
-                    monitor, warm_start, method="backward")
+                    X_train, y_train, log_alpha, X_val, y_val, X_test, y_test,
+                    tol, monitor, warm_start, method="backward")
 
             assert np.allclose(value3, value4)
             assert np.allclose(gradient3, gradient4)
@@ -158,8 +152,8 @@ def test_val_grad():
 
 def test_grad_search():
     for model in models:
-    #########################################################################
-    # check that the paths are the same in the line search
+        ######################################################################
+        # check that the paths are the same in the line search
         n_outer = 5
         monitor1 = Monitor()
         warm_start = WarmStart()
@@ -195,17 +189,6 @@ def test_grad_search():
             n_outer=n_outer, warm_start=warm_start, niter_jac=10000,
             tol_jac=tol, model=model)
 
-        # need to regularize the solution in this case:
-        # this means tha the solutions returned are different
-        # monitor5 = Monitor()
-        # warm_start = WarmStart()
-        # grad_search(
-        #     X_train_s, y_train, dict_log_alpha[model], X_val, y_val,
-        #     X_test, y_test,
-        #     tol, monitor5, method="implicit", maxit=10000,
-        #     n_outer=n_outer,
-        #     warm_start=warm_start, niter_jac=10000, tol_jac=tol, model=model)
-
         monitor5 = Monitor()
         warm_start = WarmStart()
         grad_search(
@@ -214,7 +197,6 @@ def test_grad_search():
             tol, monitor5, method="implicit_forward", maxit=1000,
             n_outer=n_outer,
             warm_start=warm_start, niter_jac=10000, tol_jac=tol, model=model)
-
 
         assert np.allclose(
             np.array(monitor1.log_alphas), np.array(monitor2.log_alphas))
@@ -268,8 +250,8 @@ def test_grid_search():
         tol, monitor, sk=False)
     monitor_sparse = Monitor()
     grid_searchCV(
-        X_train_s, y_train, log_alphas, X_test_s, y_test, X_test_s, y_test, tol,
-        monitor_sparse, sk=False)
+        X_train_s, y_train, log_alphas, X_test_s, y_test, X_test_s, y_test,
+        tol, monitor_sparse, sk=False)
 
     assert np.allclose(monitor.objs, monitor_sparse.objs)
 

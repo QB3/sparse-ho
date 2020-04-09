@@ -17,20 +17,17 @@ from sparse_ho.utils import Monitor, WarmStart
 from sparse_ho.grid_search import grid_searchCV
 # from sparse_ho.bayesian import hyperopt_lasso
 
-from sparse_ho.datasets.real import (
-        get_20newsgroup, get_finance, get_rcv1)
+from sparse_ho.datasets.real import get_20newsgroup
 from expes.utils import configure_plt
 
 
+# from sparse_ho.datasets.real import get_leukemia
 # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
+
+# from sparse_ho.datasets.real import get_finance
 # X_train, X_val, X_test, y_train, y_val, y_test = get_finance()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_climate()
+
 X_train, X_val, X_test, y_train, y_val, y_test = get_20newsgroup()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-# X_train, X_val, y_train, y_val = get_meg(force_fixed=False)
-# X_train = X_train[:, :1000]
-# X_test = X_test[:, :1000]
-# X_val = X_val[:, :1000]
 
 n_samples, n_features = X_train.shape
 
@@ -100,7 +97,7 @@ dict_legend["implicit"] = "implicit"
 dict_legend["grid_search"] = "grid search"
 
 
-# configure_plt()
+configure_plt()
 current_palette = sns.color_palette("colorblind")
 plt.figure()
 for method in methods:

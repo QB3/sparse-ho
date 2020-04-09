@@ -1,8 +1,6 @@
-from itertools import product
 import numpy as np
 import pandas
 import seaborn as sns
-import importlib
 import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
@@ -92,14 +90,14 @@ for idx, dataset in enumerate(dataset_names):
         min_objs = np.minimum(min_objs, obj.min())
         # obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
 
-
     lines = []
 
     plt.figure()
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
         marker = dict_markers[method]
-        objs_test = [np.min(objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
+        objs_test = [np.min(
+            objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
         axarr2.flat[idx].semilogy(
             time, objs_test, color=dict_color[method],
             label="%s" % (dict_method[method]),
@@ -125,16 +123,16 @@ for idx, dataset in enumerate(dataset_names):
     axarr2.flat[idx].tick_params(labelsize=fontsize)
     axarr.flat[idx].tick_params(labelsize=fontsize)
 
-
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            axarr.flat[idx].semilogy(time, (obj-min_objs),
-            color=dict_color[method], label="%s" % (dict_method[method]),
-            marker=marker, markersize=markersize,
-            markevery=dict_markevery[dataset]))
+            axarr.flat[idx].semilogy(
+                time, (obj-min_objs),
+                color=dict_color[method], label="%s" % (dict_method[method]),
+                marker=marker, markersize=markersize,
+                markevery=dict_markevery[dataset]))
     if dataset == "rcv1":
         axarr.flat[idx].set_xlim(0, 1.3)
         axarr.flat[idx].set_xticks((0, 0.5, 1))
@@ -157,8 +155,8 @@ axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
 fig.tight_layout()
 fig.show()
 
-axarr2.flat[0].set_ylabel("Loss on test set", fontsize=fontsize
-)
+axarr2.flat[0].set_ylabel(
+    "Loss on test set", fontsize=fontsize)
 fig2.tight_layout()
 fig2.show()
 
@@ -175,6 +173,6 @@ fig3.show()
 
 fig4 = plt.figure(figsize=[18, 4])
 fig4.legend([l[0] for l in lines], labels,
-            ncol=3, loc='upper center', fontsize=fontsize-4)  # , frameon=False)
+            ncol=3, loc='upper center', fontsize=fontsize-4)
 fig4.tight_layout()
 fig4.show()

@@ -13,6 +13,7 @@ import scipy
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor, WarmStart
 from sparse_ho.grid_search import grid_searchMCP
+from sparse_ho.bayesian import hyperopt_lasso
 from itertools import product
 
 from sparse_ho.datasets.real import get_data
@@ -62,8 +63,6 @@ def parallel_function(
         X_train[:, idx_nz], axis=0).min() ** 2 / n_samples
 
     log_alpha0_mcp = np.array([log_alpha0, np.log(2 / L_min)])
-    log_alpha_min = np.log(alpha_max / 100)
-    log_alpha_max = np.log(alpha_max)
 
     list_log_alphas = np.log(alpha_max * np.geomspace(1, 0.0001, 100))
     list_log_gammas = np.log(np.geomspace(1.1 / L_min, 1000 / L_min, 5))
@@ -82,9 +81,8 @@ def parallel_function(
         warm_start = WarmStart()
 
         if method == 'grid_search':
-            n_alpha = 100
-            p_alphas = np.geomspace(1, 0.0001, n_alpha)
-            log_alphas = np.log(alpha_max * p_alphas)
+            # n_alpha = 100
+            # p_alphas = np.geomspace(1, 0.0001, n_alpha)
             grid_searchMCP(
                     X_train, y_train, list_log_alphas, list_log_gammas,
                     X_val, y_val, X_test, y_test, tol, monitor=monitor)

@@ -35,7 +35,7 @@ def hyperopt_lasso(
             return value
 
     if method == "bayesian":
-        best = fmin(objective, space, algo=tpe.suggest, max_evals=max_evals)
+        fmin(objective, space, algo=tpe.suggest, max_evals=max_evals)
     elif method == "random":
-        best = fmin(objective, space, algo=rand.suggest, max_evals=max_evals)
+        fmin(objective, space, algo=rand.suggest, max_evals=max_evals)
     return monitor

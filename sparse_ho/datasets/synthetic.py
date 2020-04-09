@@ -57,7 +57,7 @@ def get_synt_data(
     sigma_star = norm(Y, ord='fro') / (norm(noise, ord='fro') * SNR)
     noise *= sigma_star
     Y += noise
-    B_dns = B_star[supp, :]
+    # B_dns = B_star[supp, :]
     if n_times == 1:
         return X, Y[:, 0], B_star[:, 0], noise, sigma_star
     else:
@@ -96,7 +96,7 @@ def get_toeplitz_dictionary(
 
     Maths formula:
     S = toepltiz(\rho ** [|0, n_features-1|], \rho ** [|0, n_features-1|])
-    X[:, i] \sim \mathcal{N}(0, S).
+    X[:, i] sim mathcal{N}(0, S).
 
     Parameters
     ----------
@@ -144,7 +144,7 @@ def get_synthetic_data(
 
 
 def rescale(X, Y):
-    n_samples, n_features, n_times = *X.shape, Y.shape[1]
+    # n_samples, n_features, n_times = *X.shape, Y.shape[1]
     alpha_max = norm(X.T @ Y, axis=1).max()  # compute alpha_max
     alpha_max *= 0.01
     X /= alpha_max

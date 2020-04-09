@@ -20,7 +20,7 @@ def get_beta_jac_t_v_implicit(
         clf = Lasso(
             alpha=alpha, fit_intercept=False, warm_start=True, tol=tol,
             max_iter=10000)
-        clf.fit(X, y)
+        clf.fit(X_train, y_train)
         coef_ = clf.coef_
         mask = coef_ != 0
         dense = coef_[mask]
@@ -67,9 +67,7 @@ def get_beta_jac_t_v_implicit(
             # mat_to_inv += reg_amount * identity(size_mat)
             sol = cg(
                 mat_to_inv, - n_samples * v,
-                # x0=sol0, tol=tol, maxiter=1e5)
                 x0=sol0, tol=1e-15, maxiter=1e5)
-                # x0=sol0, atol=1e-3)
             # sol = cg(
             #     mat_to_inv, - alpha * n_samples * v,
             #     x0=sol0, atol=1e-3)

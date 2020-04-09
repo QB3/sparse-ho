@@ -1,4 +1,3 @@
-from itertools import product
 import numpy as np
 import pandas
 import seaborn as sns
@@ -17,7 +16,6 @@ dict_label['grid_search'] = 'Grid-search'
 dict_label['bayesian'] = 'Bayesian'
 dict_label['random'] = 'Random-search'
 dict_label['hyperopt'] = 'Random-search'
-
 
 fontsize = 22
 
@@ -102,7 +100,8 @@ for idx, dataset in enumerate(dataset_names):
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
         marker = dict_markers[method]
-        objs_test = [np.min(objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
+        objs_test = [
+            np.min(objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
         try:
             markevery = dict_markevery[dataset, method]
         except:
@@ -136,10 +135,11 @@ for idx, dataset in enumerate(dataset_names):
 
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            axarr.flat[idx].semilogy(time, (obj-min_objs),
-            color=dict_color[method], label="%s" % (dict_label[method]),
-            marker=marker, markersize=10,
-            markevery=markevery))
+            axarr.flat[idx].semilogy(
+                time, (obj-min_objs),
+                color=dict_color[method], label="%s" % (dict_label[method]),
+                marker=marker, markersize=10,
+                markevery=markevery))
     if dataset == "rcv1":
         axarr.flat[idx].set_xlim(0, 5)
         axarr.flat[idx].set_ylim(0.0001, 1)
@@ -172,7 +172,8 @@ for method in methods:
 
 fig3 = plt.figure(figsize=[18, 4])
 fig3.legend([l[0] for l in lines], labels,
-            ncol=methods.shape[0], loc='upper center', fontsize=fontsize)  # , frameon=False)
+            ncol=methods.shape[0], loc='upper center',
+            fontsize=fontsize)  # , frameon=False)
 fig3.tight_layout()
 
 fig3.show()
