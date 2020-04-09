@@ -1,4 +1,3 @@
-from itertools import product
 import numpy as np
 import pandas
 import seaborn as sns
@@ -22,16 +21,14 @@ dict_color_alasso = {}
 dict_color_alasso["implicit_forward"] = current_palette[9]
 dict_color_alasso["forward"] = current_palette[7]
 
-
-
 current_palette = sns.color_palette("colorblind")
 
 df = pandas.read_pickle("%s.pkl" % "results_alasso")
 df_lasso = df.loc[df['Model'] == "lasso"]
 df_alasso = df.loc[df['Model'] == "alasso"]
 
-dict_method_lasso={}
-dict_method_alasso={}
+dict_method_lasso = {}
+dict_method_alasso = {}
 dict_method_lasso["implicit_forward"] = "Lasso Imp. F. iterdiff. (ours)"
 dict_method_lasso["forward"] = "Lasso F. iterdiff"
 dict_method_alasso["implicit_forward"] = "aLasso Imp. F. iterdiff. (ours)"
@@ -55,25 +52,40 @@ dict_filling_alasso = {}
 dict_filling_alasso["forward"] = 'none'
 dict_filling_alasso["implicit_forward"] = 'full'
 
-dict_markevery = [(1,2), 2]
+dict_markevery = [(1, 2), 2]
 markersize = []
 plt.close('all')
-fig, axarr = plt.subplots(1, 2, sharex=False, sharey=False, figsize=[10,4],)
-df_median_lasso = df_lasso.groupby(['Model', 'method', 'p'], as_index=False).mean()
-df_median_alasso = df_alasso.groupby(['Model', 'method', 'p'], as_index=False).mean()
+fig, axarr = plt.subplots(1, 2, sharex=False, sharey=False, figsize=[10, 4],)
+df_median_lasso = df_lasso.groupby(
+    ['Model', 'method', 'p'], as_index=False).mean()
+df_median_alasso = df_alasso.groupby(
+    ['Model', 'method', 'p'], as_index=False).mean()
 lines = []
 
 
 labels = ["implicit_forward", "forward"]
 plt.figure()
 for i in range(np.size(labels)):
-    df_temp = df_median_lasso[df_median_lasso['method'].eq(labels[i])]
-    lines.append(axarr.flat[0].plot(df_temp['p'], df_temp['Error est'], label=dict_method_lasso[labels[i]], c=dict_color_lasso[labels[i]], markersize=10, marker=dict_markers_lasso[labels[i]], markevery=dict_markevery[i],fillstyle=dict_filling_lasso[labels[i]], markeredgewidth=2))
+    df_temp = df_median_lasso[
+        df_median_lasso['method'].eq(labels[i])]
+    lines.append(
+        axarr.flat[0].plot(
+            df_temp['p'], df_temp['Error est'],
+            label=dict_method_lasso[labels[i]], c=dict_color_lasso[labels[i]],
+            markersize=10, marker=dict_markers_lasso[labels[i]],
+            markevery=dict_markevery[i],
+            fillstyle=dict_filling_lasso[labels[i]],
+            markeredgewidth=2))
 
 
 for i in range(np.size(labels)):
     df_temp = df_median_alasso[df_median_alasso['method'].eq(labels[i])]
-    lines.append(axarr.flat[0].plot(df_temp['p'], df_temp['Error est'], label=dict_method_alasso[labels[i]], c=dict_color_alasso[labels[i]], markersize=10, marker=dict_markers_alasso[labels[i]], markevery=dict_markevery[i],fillstyle=dict_filling_alasso[labels[i]], markeredgewidth=2))
+    lines.append(axarr.flat[0].plot(
+        df_temp['p'], df_temp['Error est'],
+        label=dict_method_alasso[labels[i]],
+        c=dict_color_alasso[labels[i]], markersize=10,
+        marker=dict_markers_alasso[labels[i]], markevery=dict_markevery[i],
+        fillstyle=dict_filling_alasso[labels[i]], markeredgewidth=2))
 
 axarr.flat[0].set_ylabel("MSE", fontsize=fontsize)
 axarr.flat[0].set_xlabel("Number of features (p)", fontsize=fontsize)
@@ -82,11 +94,20 @@ axarr.flat[0].set_xticks((200., 2500, 5000, 7500, 10000))
 
 for i in range(np.size(labels)):
     df_temp = df_median_lasso[df_median_lasso['method'].eq(labels[i])]
-    axarr.flat[1].semilogy(df_temp['p'], df_temp['time'], label=dict_method_lasso[labels[i]], c=dict_color_lasso[labels[i]], markersize=10, marker=dict_markers_lasso[labels[i]], markevery=dict_markevery[i],fillstyle=dict_filling_lasso[labels[i]], markeredgewidth=2)
+    axarr.flat[1].semilogy(
+        df_temp['p'], df_temp['time'], label=dict_method_lasso[labels[i]],
+        c=dict_color_lasso[labels[i]], markersize=10,
+        marker=dict_markers_lasso[labels[i]], markevery=dict_markevery[i],
+        fillstyle=dict_filling_lasso[labels[i]], markeredgewidth=2)
 
 for i in range(np.size(labels)):
     df_temp = df_median_alasso[df_median_alasso['method'].eq(labels[i])]
-    axarr.flat[1].semilogy(df_temp['p'], df_temp['time'], label=dict_method_alasso[labels[i]], c=dict_color_alasso[labels[i]], markersize=10, marker=dict_markers_alasso[labels[i]], markevery=dict_markevery[i],fillstyle=dict_filling_alasso[labels[i]], markeredgewidth=2)
+    axarr.flat[1].semilogy(
+        df_temp['p'], df_temp['time'],
+        label=dict_method_alasso[labels[i]], c=dict_color_alasso[labels[i]],
+        markersize=10, marker=dict_markers_alasso[labels[i]],
+        markevery=dict_markevery[i], fillstyle=dict_filling_alasso[labels[i]],
+        markeredgewidth=2)
 axarr.flat[1].set_ylabel("Time (s)", fontsize=fontsize)
 axarr.flat[1].set_xlabel("Number of features (p)", fontsize=fontsize)
 axarr.flat[1].set_xticks((200., 2500, 5000, 7500, 10000))
@@ -96,8 +117,13 @@ fig.tight_layout()
 fig.show()
 
 
-labels = ["Lasso Imp. F. Iterdiff. (ours)","Lasso F. Iterdiff.", "wLasso Imp. F. Iterdiff. (ours)", "wLasso F. Iterdiff.",]
+labels = [
+    "Lasso Imp. F. Iterdiff. (ours)", "Lasso F. Iterdiff.",
+    "wLasso Imp. F. Iterdiff. (ours)", "wLasso F. Iterdiff."]
+
 fig_legend = plt.figure(figsize=[18, 4])
-fig_legend.legend([l[0] for l in lines], labels, ncol= 2, loc="upper center", fontsize=fontsize)
+fig_legend.legend(
+    [l[0] for l in lines], labels, ncol=2, loc="upper center",
+    fontsize=fontsize)
 fig_legend.tight_layout()
 fig_legend.show()
