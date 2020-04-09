@@ -75,7 +75,7 @@ def get_beta_jac_t_v_implicit(
                 jac = sol[0]
             else:
                 raise ValueError('cg did not converge.')
-        except:
+        except Exception:
             print("Matrix to invert was badly conditioned")
             size_mat = mask.sum()
             reg_amount = 1e-7 * norm(X_train[:, mask].todense(), ord=2) ** 2
@@ -92,7 +92,7 @@ def get_beta_jac_t_v_implicit(
                 - n_samples * v,
                 sym_pos=True, assume_a='pos')
             # import ipdb; ipdb.set_trace()
-        except:
+        except Exception:
             print("Matrix to invert was badly conditioned")
             size_mat = mask.sum()
             reg_amount = 1e-9 * norm(X_train[:, mask], ord=2) ** 2

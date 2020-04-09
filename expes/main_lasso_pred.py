@@ -56,7 +56,7 @@ def parallel_function(
 
     try:
         n_outer = dict_n_outers[dataset_name, method]
-    except:
+    except Exception:
         n_outer = 50
 
     if dataset_name == "rcv1":

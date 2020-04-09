@@ -104,7 +104,7 @@ def grad_search(
         tol = seq_tol[i]
         try:
             old_tol = seq_tol[i-1]
-        except:
+        except Exception:
             old_tol = seq_tol[0]
         g_func, grad_lambda = get_val_grad(
             X_train, y_train, lambdak, X_val, y_val,
@@ -127,7 +127,7 @@ def grad_search(
                 # make sure we are not selecting a step size that is too small
                 try:
                     L_lambda = old_grads[-1] / np.sqrt(len(lambdak))
-                except:
+                except Exception:
                     L_lambda = old_grads[-1]
             else:
                 L_lambda = 1

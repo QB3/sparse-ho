@@ -104,7 +104,7 @@ for idx, dataset in enumerate(dataset_names):
             np.min(objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
         try:
             markevery = dict_markevery[dataset, method]
-        except:
+        except Exception:
             markevery = 5
         axarr2.flat[idx].semilogy(
             time, objs_test, color=dict_color[method],
@@ -130,7 +130,7 @@ for idx, dataset in enumerate(dataset_names):
         marker = dict_markers[method]
         try:
             markevery = dict_markevery[dataset, method]
-        except:
+        except Exception:
             markevery = 5
 
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
