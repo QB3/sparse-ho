@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 
-from my_data.synthetic import get_synt_data
+from sparse_ho.datasets.synthetic import get_synt_data
 
 from sparse_ho.forward import Forward
 from sparse_ho.criterion import CV

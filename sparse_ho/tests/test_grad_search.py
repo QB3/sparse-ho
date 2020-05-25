@@ -4,7 +4,7 @@ import pytest
 
 from sparse_ho.utils import Monitor
 
-from my_data.synthetic import get_synt_data
+from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, wLasso
 
 from sparse_ho.forward import Forward
