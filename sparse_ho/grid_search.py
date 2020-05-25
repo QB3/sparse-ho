@@ -1,7 +1,6 @@
 # This files contains the functions to perform zero order descent for HO
 # hyperparameter setting
 import numpy as np
-from smt.sampling_methods import LHS
 
 
 def grid_search(
@@ -17,13 +16,13 @@ def grid_search(
         log_alphas = rng.uniform(
             log_alpha_min, log_alpha_max, size=max_evals)
         log_alphas = -np.sort(-log_alphas)
-    
+
     elif samp == "lhs":
         xlimits = np.array([[log_alpha_min,  log_alpha_max]])
         sampling = LHS(xlimits=xlimits)
         num = max_evals
         log_alphas = sampling(num)
-    
+
     min_g_func = np.inf
     log_alpha_opt = log_alphas[0]
 
@@ -36,8 +35,8 @@ def grid_search(
         if g_func < min_g_func:
             min_g_func = g_func
             log_alpha_opt = log_alpha
-        
+
         monitor(g_func, algo.criterion.val_test, log_alpha, None,
                 algo.criterion.rmse)
-    
+
     return log_alpha_opt, min_g_func
