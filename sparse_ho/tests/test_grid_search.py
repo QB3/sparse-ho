@@ -6,8 +6,7 @@ from sparse_ho.models import Lasso
 from sparse_ho.forward import Forward
 from sparse_ho.criterion import CV, SURE
 from sparse_ho.grid_search import grid_search
-# from sparse_ho.grid_search import grid_searchCV
-# from sparse_ho.utils import Monitor, WarmStart
+
 
 n_samples = 100
 n_features = 100
@@ -57,13 +56,6 @@ def test_grid_search():
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
-    monitor_lhs = Monitor()
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    algo = Forward(criterion)
-    log_alpha_opt_lhs, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_lhs, max_evals=max_evals,
-        tol=1e-5, samp="lhs")
-
     monitor_random = Monitor()
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward(criterion)
@@ -72,7 +64,6 @@ def test_grid_search():
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[np.argmin(monitor_random.objs)] == log_alpha_opt_random)
-    assert(monitor_lhs.log_alphas[np.argmin(monitor_lhs.objs)] == log_alpha_opt_lhs)
     assert(monitor_grid.log_alphas[np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
     monitor_grid = Monitor()
@@ -84,14 +75,6 @@ def test_grid_search():
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
-    monitor_lhs = Monitor()
-    criterion = SURE(X_train, y_train, model, sigma=sigma_star,
-                     X_test=X_test, y_test=y_test)
-    algo = Forward(criterion)
-    log_alpha_opt_lhs, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_lhs, max_evals=max_evals,
-        tol=1e-5, samp="lhs")
-
     monitor_random = Monitor()
     criterion = SURE(X_train, y_train, model, sigma=sigma_star,
                      X_test=X_test, y_test=y_test)
@@ -101,7 +84,6 @@ def test_grid_search():
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[np.argmin(monitor_random.objs)] == log_alpha_opt_random)
-    assert(monitor_lhs.log_alphas[np.argmin(monitor_lhs.objs)] == log_alpha_opt_lhs)
     assert(monitor_grid.log_alphas[np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
 
