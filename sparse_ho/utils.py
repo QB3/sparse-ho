@@ -1,11 +1,40 @@
 import time
 import numpy as np
+from sklearn import linear_model
+from scipy.optimize import fmin_l_bfgs_b
+
+from numpy.linalg import norm
 from numba import njit
 
 
 @njit
 def ST(x, alpha):
     return np.sign(x) * np.maximum(np.abs(x) - alpha, 0.)
+
+
+@njit
+def proj_box_svm(x, C):
+    return min(max(0 , x), C)
+
+
+@njit
+def compute_grad_proj(theta, F, C):
+    if theta == 0:
+        return min(F, 0)
+    elif theta == C:
+        return max(F, 0)
+    else:
+        return F
+
+
+@njit
+def ind_box(x, C):
+    return np.logical_and((x > 0), (x < C))
+
+
+@njit
+def sigma(z):
+    return 1 / (1 + np.exp(-z))
 
 
 def mcp_pen(x, threshold, gamma=1.2):
@@ -21,6 +50,37 @@ def mcp_pen(x, threshold, gamma=1.2):
         if np.abs(x) < gamma * threshold:
             z = threshold * np.abs(x) - x ** 2 / (2 * gamma)
     return z
+
+
+def smooth_hinge(x):
+    if (x) <= 0:
+        return 0.5 - x
+    elif (0 < x) and (x <= 1):
+        return 0.5 * (1 - x) ** 2
+    else:
+        return 0.0
+
+
+def derivative_smooth_hinge(x):
+    if x <= 0:
+        return - 1.0
+    elif (0 < x and x <= 1):
+        return (- 1.0 + x)
+    else:
+        return 0.0
+
+
+def smooth_hinge_loss(X, y, beta):
+    n_samples, n_features = X.shape
+    val = 0
+    grad = np.zeros(n_features)
+    for i in range(n_samples):
+        val += smooth_hinge((X[i, :].T @ beta) * y[i])
+        grad += derivative_smooth_hinge(
+            (X[i, :].T @ beta) * y[i]) * X[i, :] * y[i]
+    val /= X.shape[0]
+    grad /= X.shape[0]
+    return val, grad
 
 
 @njit
@@ -77,6 +137,10 @@ def init_dbeta0_new_p(jac0, mask, mask_old):
 
 @njit
 def init_dbeta0_new(dbeta0, mask, mask_old):
+    # dbeta0_new = np.zeros(mask.shape[0])
+    # dbeta0_new[mask_old] = dbeta0
+    # # import ipdb; ipdb.set_trace()
+    # return dbeta0_new[mask]
     mask_both = np.logical_and(mask_old, mask)
     size_mat = mask.sum()
     dbeta0_new = np.zeros(size_mat)

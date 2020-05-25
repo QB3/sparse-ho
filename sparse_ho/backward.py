@@ -2,59 +2,53 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
-from numba import njit
-
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
-def get_beta_jac_backward(
-        X_train, y_train, log_alpha, X_val, y_val, mask0=None,
-        dense0=None, jac0=None,
-        tol=1e-3, maxit=100, model="lasso"):
-    n_samples, n_features = X_train.shape
+class Backward():
+    def __init__(self, criterion):
+        self.criterion = criterion
 
-    mask, dense, list_sign = get_beta_jac_iterdiff(
-        X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
-        jac0=jac0, tol=tol,
-        maxit=maxit, compute_jac=False, model="lasso", backward=True)
+    def get_beta_jac_v(
+            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
+            quantity_to_warm_start=None, maxit=1000, tol=1e-3,
+            compute_jac=False, backward=True, full_jac_v=False):
+        mask, dense, list_sign = get_beta_jac_iterdiff(
+            X, y, log_alpha, model, mask0=mask0, dense0=dense0,
+            jac0=None, maxit=maxit, tol=tol,
+            compute_jac=compute_jac, backward=backward)
+        v = np.zeros(X.shape[1])
+        v[mask] = get_v(mask, dense)
+        jac_v = get_only_jac_backward(
+            X, np.exp(log_alpha), list_sign, v, model,
+            jac_v0=quantity_to_warm_start)
 
-    v = np.zeros(n_features)
-    v[mask] = 2 * X_val[:, mask].T @ (
-        X_val[:, mask] @ dense - y_val) / X_val.shape[0]
+        if not full_jac_v:
+            jac_v = model.get_mask_jac_v(mask, jac_v)
+        return mask, dense, jac_v, jac_v
 
-    jac = get_only_jac_backward(
-        X_train, np.exp(log_alpha), list_sign, v)
-    return mask, dense, jac
+    def get_val_grad(
+            self, log_alpha, maxit=1000, tol=1e-3, compute_jac=False,
+            backward=True, beta_star=None):
+
+        return self.criterion.get_val_grad(
+            log_alpha, self.get_beta_jac_v, maxit=maxit, tol=tol,
+            compute_jac=compute_jac, backward=backward, beta_star=beta_star)
 
 
-def get_only_jac_backward(X_train, alpha, list_sign, v):
-    n_samples, n_features = X_train.shape
-    is_sparse = issparse(X_train)
+def get_only_jac_backward(X, alpha, list_beta, v, model, jac_v0=None):
+    n_samples, n_features = X.shape
+    is_sparse = issparse(X)
     if is_sparse:
-        L = slinalg.norm(X_train, axis=0) ** 2 / n_samples
+        L = slinalg.norm(X, axis=0) ** 2 / n_samples
     else:
-        L = norm(X_train, axis=0) ** 2 / n_samples
-    v_t_jac = v.copy()
-    list_sign = np.asarray(list_sign)
-    grad = 0.0
-    for k in (np.arange(list_sign.shape[0] - 1, -1, -1)):
-        sign_beta = list_sign[k, :]
-        grad = _update_bcd_jac_backward(
-            X_train, alpha, grad, sign_beta, v_t_jac, L)
-    return grad
+        L = norm(X, axis=0) ** 2 / n_samples
+    v_ = v.copy()
+    list_beta = np.asarray(list_beta)
+    jac_t_v = model._init_g_backward(None)
+    for k in (np.arange(list_beta.shape[0] - 1, -1, -1)):
+        beta = list_beta[k, :]
+        jac_t_v = model._update_bcd_jac_backward(
+            X, alpha, jac_t_v, beta, v_, L)
 
-
-@njit
-def _update_bcd_jac_backward(X_train, alpha, grad, sign_beta, v_t_jac, L):
-    n_samples, n_features = X_train.shape
-
-    for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
-        grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
-        v_t_jac[j] *= np.abs(sign_beta[j])
-        v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X_train[:, j] @ X_train
-    # for j in range(n_features):
-    #     grad -= alpha * sign_beta[j] * v_t_jac[j] / L[j]
-    #     v_t_jac[j] *= np.abs(sign_beta[j])
-    #     v_t_jac -= v_t_jac[j] * X_train[:, j].T @ X_train / (
-    #         L[j] * n_samples)
-    return grad
+    return jac_t_v
