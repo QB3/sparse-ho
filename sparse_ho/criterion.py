@@ -52,8 +52,8 @@ class CV():
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac, backward=backward,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
+            backward=backward, full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
@@ -131,7 +131,8 @@ class SURE():
     def get_val_grad(
             self, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
+            backward=False):
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.v,
             mask0=self.mask0, dense0=self.dense0,
@@ -139,8 +140,9 @@ class SURE():
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             backward=backward, full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
-            self.model.X, self.model.y + self.epsilon * self.delta, log_alpha,
-            self.model, self.v2, mask0=self.mask02, dense0=self.dense02,
+            self.model.X, self.model.y + self.epsilon * self.delta,
+            log_alpha, self.model, self.v2, mask0=self.mask02,
+            dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             backward=backward, full_jac_v=True)

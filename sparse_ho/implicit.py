@@ -27,7 +27,8 @@ class Implicit():
 
     def get_val_grad(
             self, log_alpha, mask0=None, dense0=None, beta_star=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
+            backward=False):
         return self.criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
@@ -52,7 +53,6 @@ def get_beta_jac_t_v_implicit(
         alphas = np.ones(n_features) * alpha
     else:
         alphas = alpha.copy()
-
 
     if sol_lin_sys is not None:
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
@@ -89,7 +89,6 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv + reg_amount * identity(size_mat),
             - n_samples * v, x0=sol0, atol=1e-3)
         jac = sol[0]
-
 
     jac_t_v = model._reduce_jac_t_v(jac, mask, dense, alphas)
 
