@@ -238,11 +238,11 @@ def _grad_search(
 
         g_func_old = g_func
 
-        monitor(g_func, 0, lambdak,
-                grad_lambda, 0)
+        monitor(g_func, 0, lambdak, grad_lambda, 0)
 
         # monitor(g_func, algo.criterion.val_test, lambdak,
         #         grad_lambda, algo.criterion.rmse)
+
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
