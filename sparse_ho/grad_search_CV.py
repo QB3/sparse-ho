@@ -14,7 +14,7 @@ def grad_search_CV(
 
     for i in range(cv):
         X_train, X_val, y_train, y_val = train_test_split(
-            X, y, test_size=0.33, random_state=random_state)
+            X, y, test_size=0.33, random_state=cv)
 
         model = Model(X_train, y_train, log_alpha0)
 
