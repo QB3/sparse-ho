@@ -12,7 +12,7 @@ class Implicit():
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            jac0=None, quantity_to_warm_start=None, maxit=1000, tol=1e-3,
+            jac0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
 
         mask, dense, jac_v, sol_lin_sys = get_beta_jac_t_v_implicit(
@@ -27,23 +27,23 @@ class Implicit():
 
     def get_val_grad(
             self, log_alpha, mask0=None, dense0=None, beta_star=None,
-            jac0=None, maxit=1000, tol=1e-3, compute_jac=True, backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
         return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, maxit=maxit, tol=tol,
+            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
 
 
 def get_beta_jac_t_v_implicit(
         X_train, y_train, log_alpha, X_val, y_val, get_v,
         mask0=None, dense0=None, tol=1e-3, model="lasso",
-        sk=False, maxit=1000, sol_lin_sys=None, criterion="cv", n=1,
+        sk=False, max_iter=1000, sol_lin_sys=None, criterion="cv", n=1,
         sigma=0, delta=0, epsilon=0):
     alpha = np.exp(log_alpha)
     n_samples, n_features = X_train.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
-        tol=tol, maxit=maxit, compute_jac=False, model=model)
+        tol=tol, max_iter=max_iter, compute_jac=False, model=model)
     v = get_v(mask, dense)
 
     # TODO: to clean

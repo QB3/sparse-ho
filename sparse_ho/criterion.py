@@ -46,13 +46,13 @@ class CV():
             self.rmse = None
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, maxit=10000, tol=1e-5,
+            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, backward=False, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            maxit=maxit, tol=tol, compute_jac=compute_jac, backward=backward,
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac, backward=backward,
             full_jac_v=True)
 
         self.mask0 = mask
@@ -131,18 +131,18 @@ class SURE():
     def get_val_grad(
             self, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
-            jac0=None, maxit=1000, tol=1e-3, compute_jac=True, backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            maxit=maxit, tol=tol, compute_jac=compute_jac,
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             backward=backward, full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
             self.model.X, self.model.y + self.epsilon * self.delta, log_alpha,
             self.model, self.v2, mask0=self.mask02, dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
-            maxit=maxit, tol=tol, compute_jac=compute_jac,
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             backward=backward, full_jac_v=True)
         val = self.value(mask, dense, mask2, dense2)
         self.value_test(mask, dense)

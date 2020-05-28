@@ -8,12 +8,12 @@ class Forward():
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, maxit=1000, tol=1e-3,
+            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=True, backward=False, full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            maxit=maxit, tol=tol, compute_jac=compute_jac, backward=backward)
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac, backward=backward)
         if jac is not None:
             jac_v = jac.T @ v(mask, dense)
             if full_jac_v:
@@ -23,16 +23,18 @@ class Forward():
         return mask, dense, jac_v, jac
 
     def get_val_grad(
-            self, log_alpha, mask0=None, dense0=None, beta_star=None,
-            jac0=None, maxit=1000, tol=1e-3, compute_jac=True, backward=False):
+            self, log_alpha,
+            # mask0=None, dense0=None,
+            beta_star=None,
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
 
         return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, maxit=maxit, tol=tol,
+            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
 
 
 def get_beta_jac_iterdiff(
-        X, y, log_alpha, model, mask0=None, dense0=None, jac0=None, maxit=1000,
+        X, y, log_alpha, model, mask0=None, dense0=None, jac0=None, max_iter=1000,
         tol=1e-3, compute_jac=True, backward=False):
     """
     Parameters
@@ -49,7 +51,7 @@ def get_beta_jac_iterdiff(
         beta for warm start
     dbeta0: np.array, shape (n_features,)
         initial value of the jacobian dbeta for warm start
-    maxit: int
+    max_iter: int
         number of iterations of the algorithm
     tol: float
         The tolerance for the optimization: if the updates are
@@ -94,8 +96,8 @@ def get_beta_jac_iterdiff(
     # store the iterates if needed
     if backward:
         list_beta = []
-    for i in range(maxit):
-        print("%i -st iteration over %i" % (i, maxit))
+    for i in range(max_iter):
+        print("%i -st iteration over %i" % (i, max_iter))
         if is_sparse:
             model._update_beta_jac_bcd_sparse(
                 X.data, X.indptr, X.indices, y, n_samples, n_features, beta,

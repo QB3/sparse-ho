@@ -11,11 +11,11 @@ class Backward():
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, maxit=1000, tol=1e-3,
+            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=True, full_jac_v=False):
         mask, dense, list_sign = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
-            jac0=None, maxit=maxit, tol=tol,
+            jac0=None, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
         v = np.zeros(X.shape[1])
         v[mask] = get_v(mask, dense)
@@ -28,11 +28,11 @@ class Backward():
         return mask, dense, jac_v, jac_v
 
     def get_val_grad(
-            self, log_alpha, maxit=1000, tol=1e-3, compute_jac=False,
+            self, log_alpha, max_iter=1000, tol=1e-3, compute_jac=False,
             backward=True, beta_star=None):
 
         return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, maxit=maxit, tol=tol,
+            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward, beta_star=beta_star)
 
 

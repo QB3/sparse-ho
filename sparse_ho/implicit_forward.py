@@ -6,14 +6,15 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class ImplicitForward():
-    def __init__(self, criterion, tol_jac, n_iter_jac):
+    def __init__(self, criterion, tol_jac, n_iter=100, n_iter_jac=100):
         self.criterion = criterion
+        self.n_iter = n_iter
         self.tol_jac = tol_jac
         self.n_iter_jac = n_iter_jac
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, maxit=1000, tol=1e-3,
+            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
         """TODO use get v function of the criterion
         """
@@ -21,7 +22,8 @@ class ImplicitForward():
             X, y, log_alpha, self.criterion.X_val, self.criterion.y_val,
             get_v, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start, tol_jac=self.tol_jac,
-            tol=tol, niter_jac=self.n_iter_jac, model=model)
+            tol=tol, niter_jac=self.n_iter_jac, model=model,
+            max_iter=self.criterion.model.max_iter)
         jac_v = jac.T @ get_v(mask, dense)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
@@ -29,21 +31,22 @@ class ImplicitForward():
 
     def get_val_grad(
             self, log_alpha, mask0=None, dense0=None, beta_star=None,
-            jac0=None, maxit=1000, tol=1e-3, compute_jac=True, backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
+            backward=False):
 
         return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, maxit=maxit, tol=tol,
+            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
 
 
 def get_beta_jac_fast_iterdiff(
         X, y, log_alpha, X_val, y_val, get_v, model, mask0=None, dense0=None,
         jac0=None,
-        tol=1e-3, maxit=100, niter_jac=1000, tol_jac=1e-6):
+        tol=1e-3, max_iter=100, niter_jac=1000, tol_jac=1e-6):
     n_samples, n_features = X.shape
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0, jac0=jac0, tol=tol,
-        maxit=maxit, compute_jac=False, model=model)
+        max_iter=max_iter, compute_jac=False, model=model)
 
     dbeta0_new = model._init_dbeta0(mask, mask0, jac0)
     reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
