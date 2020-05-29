@@ -9,7 +9,7 @@ def grid_search(
         beta_star=None, random_state=42, samp="grid", log_alphas=None):
 
     if log_alphas is None and samp == "grid":
-        log_alphas = np.linspace(log_alpha_min, log_alpha_max, max_evals)
+        log_alphas = np.linspace(log_alpha_max, log_alpha_min, max_evals)
 
     elif samp == "random":
         rng = np.random.RandomState(random_state)

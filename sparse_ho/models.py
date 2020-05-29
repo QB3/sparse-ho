@@ -130,6 +130,10 @@ class Lasso():
     def _init_dbeta(n_features):
         dbeta = np.zeros(n_features)
         return dbeta
+    
+    @staticmethod
+    def _init_dr(dbeta, X):
+        return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
@@ -311,6 +315,10 @@ class wLasso():
     def _init_dbeta(n_features):
         dbeta = np.zeros((n_features, n_features))
         return dbeta
+    
+    @staticmethod
+    def _init_dr(dbeta, X):
+        return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
@@ -541,9 +549,8 @@ class SparseLogreg():
         if jac0 is None or not compute_jac:
             dr = np.zeros(n_samples)
         else:
-            temp = X[:, mask0] @ dense0
             dbeta[mask0] = jac0.copy()
-            dr = - (sigma(temp) * (1 - sigma(temp))) @ X[:, mask0] @ jac0
+            dr = X[:, mask0] @ jac0.copy()
         return dbeta, dr
 
     def _init_beta_r(self, X, y, mask0, dense0):
@@ -654,6 +661,10 @@ class SparseLogreg():
     def _init_dbeta(n_features):
         dbeta = np.zeros(n_features)
         return dbeta
+    
+    @staticmethod
+    def _init_dr(dbeta, X):
+        return X @ dbeta
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
@@ -673,8 +684,8 @@ class SparseLogreg():
             # update residuals
             dr += Xs[:, j] * (dbeta[j] - dbeta_old)
 
-    # @njit
     @staticmethod
+    @njit
     def _update_only_jac_sparse(
             data, indptr, indices, n_samples, n_features,
             dbeta, r, dr, L, alpha, sign_beta):

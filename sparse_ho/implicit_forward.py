@@ -85,7 +85,7 @@ def get_only_jac(
     dbeta_old = dbeta.copy()
 
     tol_crit = tol_jac * norm(v)
-    dr = - Xs @ dbeta
+    dr = model._init_dr(dbeta, Xs)
     for i in range(niter_jac):
         print("%i -st iterations over %i" % (i, niter_jac))
         if is_sparse:
@@ -119,7 +119,6 @@ def get_only_jac(
         #             # n_features, dbeta, dr, L, alpha, sign_beta)
         #     else:
         #         _update_only_jac_p(Xs, dbeta, dr, L, alpha[mask], sign_beta)
-        print(norm(dbeta - dbeta_old))
         if norm(v @ (dbeta - dbeta_old)) < tol_crit:
             break
         dbeta_old = dbeta.copy()

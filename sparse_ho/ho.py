@@ -77,13 +77,13 @@ def grad_search(
         return algo.criterion.model.proj_param(lambdak)
 
     return _grad_search(
-        _get_val_grad, _proj_param, log_alpha0, monitor, n_outer=n_outer,
+        _get_val_grad, _proj_param, log_alpha0, monitor, algo, n_outer=n_outer,
         verbose=verbose, tolerance_decrease=tolerance_decrease, tol=tol,
         t_max=t_max)
 
 
 def _grad_search(
-        _get_val_grad, proj_param, log_alpha0, monitor, n_outer=100,
+        _get_val_grad, proj_param, log_alpha0, monitor, algo, n_outer=100,
         verbose=True, tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """
@@ -238,11 +238,11 @@ def _grad_search(
 
         g_func_old = g_func
 
-        monitor(g_func, 0, lambdak, grad_lambda, 0)
+        # monitor(g_func, 0, lambdak, grad_lambda, 0)
 
-        # monitor(g_func, algo.criterion.val_test, lambdak,
-        #         grad_lambda, algo.criterion.rmse)
-
+        monitor(g_func, algo.criterion.val_test, lambdak,
+                grad_lambda, algo.criterion.rmse)
+        print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
