@@ -10,7 +10,7 @@ from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import Logistic
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 
@@ -101,17 +101,17 @@ def test_beta_jac(model):
 
 @pytest.mark.parametrize('model', models)
 def test_val_grad(model):
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     algo = Forward(criterion)
     val_fwd, grad_fwd = algo.get_val_grad(
             log_alpha, tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
             log_alpha, tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     algo = Implicit(criterion)
     val_imp, grad_imp = algo.get_val_grad(
         log_alpha, tol=tol)
@@ -133,19 +133,19 @@ def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     n_outer = 2
 
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     monitor1 = Monitor()
     algo = Forward(criterion)
     grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
                 tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     monitor2 = Monitor()
     algo = Implicit(criterion)
     grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
                 tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
@@ -161,7 +161,7 @@ def test_grad_search(model, crit):
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     assert np.allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads), rtol=1e-4)
+        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-4)
     assert np.allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
     # assert np.allclose(
@@ -183,6 +183,6 @@ def test_grad_search(model, crit):
 
 if __name__ == '__main__':
     for model in models:
-        # test_beta_jac(model)
-        # test_grad_search(model, 'cv')
+        test_beta_jac(model)
+        test_grad_search(model, 'cv')
         test_val_grad(model)

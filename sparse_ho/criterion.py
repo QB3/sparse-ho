@@ -1,6 +1,6 @@
 from numpy.linalg import norm
 import numpy as np
-
+from sparse_ho.utils import sigma
 
 class CV():
     def __init__(self, X_val, y_val, model, convexify=False,
@@ -67,6 +67,70 @@ class CV():
         if self.convexify:
             val += self.gamma_convex + np.sum(np.exp(log_alpha) ** 2)
             grad += 2 * self.gamma_convex * np.exp(log_alpha)
+        return val, grad
+
+
+class Logistic():
+    def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+        """TODO
+        """
+        self.X_val = X_val
+        self.y_val = y_val
+        self.X_test = X_test
+        self.y_test = y_test
+        self.model = model
+
+        self.mask0 = None
+        self.dense0 = None
+        self.quantity_to_warm_start = None
+        self.val_test = None
+        
+    def get_v(self, mask, dense):
+        temp = sigma(self.X_val[:, mask] @ dense)
+        v = self.X_val[:, mask].T @ (temp - self.y_val)
+        v /= self.X_val.shape[0]
+        return v
+
+    def value(self, mask, dense):
+        temp = sigma(self.X_val[:, mask] @ dense)
+        val = np.sum(- self.y_val * np.log(temp) - (1 - self.y_val) * np.log(1 - temp))
+        val /= self.X_val.shape[0]
+        return val
+
+    def value_test(self, mask, dense):
+        if self.X_test is not None and self.y_test is not None:
+            temp = sigma(self.X_test[:, mask] @ dense)
+            self.val_test = np.sum(- self.y_test * np.log(temp) - (1 - self.y_test) * np.log(1 - temp))
+            self.val_test /= self.X_test.shape[0]
+        else:
+            self.val_test = None
+
+    def compute_rmse(self, mask, dense, beta_star):
+        if beta_star is not None:
+            diff_beta = beta_star.copy()
+            diff_beta[mask] -= dense
+            self.rmse = norm(diff_beta)
+        else:
+            self.rmse = None
+
+    def get_val_grad(
+            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            compute_jac=True, backward=False, beta_star=None):
+        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
+            self.model.X, self.model.y, log_alpha, self.model, self.get_v,
+            mask0=self.mask0, dense0=self.dense0,
+            quantity_to_warm_start=self.quantity_to_warm_start,
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
+            backward=backward, full_jac_v=True)
+
+        self.mask0 = mask
+        self.dense0 = dense
+        self.quantity_to_warm_start = quantity_to_warm_start
+
+        val = self.value(mask, dense)
+        self.value_test(mask, dense)
+        self.compute_rmse(mask, dense, beta_star)
+
         return val, grad
 
 
