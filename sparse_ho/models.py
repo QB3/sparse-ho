@@ -710,45 +710,6 @@ class SparseLogreg():
     @staticmethod
     def _reduce_jac_t_v(jac, mask, dense, alphas):
         return alphas[mask] * np.sign(dense) @ jac
-"""
-Method comparison on Lasso
-==========================
-
-The aim of this example is to demonstrate on a simple
-dateset how methods compare.
-
-"""
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from sparse_ho.ho import grad_search
-from sparse_ho.utils import Monitor
-from sparse_ho.models import SparseLogreg
-from sparse_ho.criterion import CV
-from sparse_ho.implicit_forward import ImplicitForward
-# from sparse_ho.grid_search import grid_searchCV
-# from sparse_ho.bayesian import hyperopt_lasso
-
-from sparse_ho.datasets.real import get_rcv1
-from expes.utils import configure_plt
-
-
-X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-y_train[y_train == -1.0] = 0.0
-y_val[y_val == -1.0] = 0.0
-y_test[y_test == -1.0] = 0.0
-
-n_samples, n_features = X_train.shape
-
-alpha_max = 1 / 4
-alpha_max = (np.abs(X_train.T @ y_train)).max() / (4 * X_train.shape[0])
-maxit = 1000
-
-log_alpha0 = np.log(alpha_max / 10)
-tol = 1e-4
 
     def proj_param(self, log_alpha):
         if self.log_alpha_max is None:
