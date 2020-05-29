@@ -18,6 +18,8 @@ class CV():
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
+        self.val_test = None
+        self.rmse = None
 
     def get_v(self, mask, dense):
         return 2 * (self.X_val[:, mask].T @ (

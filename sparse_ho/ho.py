@@ -242,6 +242,7 @@ def _grad_search(
 
         monitor(g_func, algo.criterion.val_test, lambdak,
                 grad_lambda, algo.criterion.rmse)
+
         print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:
             break

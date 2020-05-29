@@ -40,6 +40,12 @@ models["SparseLogReg"] = SparseLogreg(
                             X_train, y_train,
                             log_alpha, max_iter=10000,
                             tol=tol)
+
+models["SparseLogReg_sparse"] = SparseLogreg(
+                            X_train_s, y_train,
+                            log_alpha, max_iter=10000,
+                            tol=tol)
+
 dict_log_alpha = {}
 dict_log_alpha["SparseLogReg"] = log_alpha
 

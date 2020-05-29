@@ -40,6 +40,7 @@ def grad_search_CV(
         return dict_algo[0].criterion.model.proj_param(lambdak)
 
     return _grad_search(
-        _get_val_grad, _proj_param, log_alpha0, monitor, n_outer=n_outer,
+        _get_val_grad, _proj_param, log_alpha0, monitor,
+        dict_algo[0], n_outer=n_outer,
         verbose=verbose, tolerance_decrease=tolerance_decrease, tol=tol,
         t_max=t_max)

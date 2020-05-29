@@ -67,9 +67,12 @@ models = [
 # @pytest.mark.parametrize('model', models)
 # @pytest.mark.parametrize('crit', ['cv', 'sure'])
 def test_grad_search():
+    # monitor = Monitor()
+    # grad_search_CV(
+    #     X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=5)
     monitor = Monitor()
     grad_search_CV(
-        X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=5)
+        X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=15)
 
 
 if __name__ == '__main__':
