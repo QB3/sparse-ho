@@ -16,8 +16,6 @@ class ImplicitForward():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
-        """TODO use get v function of the criterion
-        """
         mask, dense, jac = get_beta_jac_fast_iterdiff(
             X, y, log_alpha, self.criterion.X_val, self.criterion.y_val,
             get_v, mask0=mask0, dense0=dense0,

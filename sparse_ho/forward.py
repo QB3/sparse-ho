@@ -34,7 +34,8 @@ class Forward():
 
 
 def get_beta_jac_iterdiff(
-        X, y, log_alpha, model, mask0=None, dense0=None, jac0=None, max_iter=1000,
+        X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
+        max_iter=1000,
         tol=1e-3, compute_jac=True, backward=False):
     """
     Parameters
@@ -96,6 +97,8 @@ def get_beta_jac_iterdiff(
     # store the iterates if needed
     if backward:
         list_beta = []
+
+    # import ipdb; ipdb.set_trace()
     for i in range(max_iter):
         print("%i -st iteration over %i" % (i, max_iter))
         if is_sparse:
