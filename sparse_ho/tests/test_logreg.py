@@ -33,7 +33,7 @@ X_val_s = csc_matrix(X_val)
 
 alpha = 0.1
 log_alpha = np.log(alpha)
-tol = 1e-12
+tol = 1e-16
 
 
 models = [
@@ -123,7 +123,7 @@ def test_val_grad(model):
 
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2
-    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-5)
+    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-4)
 
 
 
@@ -183,6 +183,6 @@ def test_grad_search(model, crit):
 
 if __name__ == '__main__':
     for model in models:
-        test_beta_jac(model)
-        test_grad_search(model, 'cv')
+        # test_beta_jac(model)
+        # test_grad_search(model, 'cv')
         test_val_grad(model)
