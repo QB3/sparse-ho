@@ -130,19 +130,19 @@ n_outer = 2
 def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
 
-    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    criterion = CV(X_val, y_val, model)
     monitor1 = Monitor()
     algo = Forward(criterion)
     grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    criterion = CV(X_val, y_val, model)
     monitor2 = Monitor()
     algo = Implicit(criterion)
     grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    criterion = CV(X_val, y_val, model)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
@@ -178,7 +178,8 @@ def test_grad_search(model, crit):
     #     np.array(monitor1.times), np.array(monitor4.times))
 
 
-
 if __name__ == '__main__':
-    test_beta_jac()
-    test_val_grad()
+    # test_beta_jac()
+    # test_val_grad()
+    for model in models.values():
+        test_grad_search(model, 'cv')
