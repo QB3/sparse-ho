@@ -1,5 +1,9 @@
 import numpy as np
+import pytest
 from sklearn import datasets
+from sklearn.linear_model import LogisticRegression
+from scipy.sparse import csc_matrix
+
 from sparse_ho.models import SparseLogreg
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
@@ -7,8 +11,8 @@ from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
 from sparse_ho.criterion import CV
-from sklearn.linear_model import LogisticRegression
-from scipy.sparse import csc_matrix
+from sparse_ho.utils import Monitor
+from sparse_ho.ho import grad_search
 
 n_samples = 100
 n_features = 1000
@@ -50,8 +54,9 @@ def test_beta_jac():
             X_train, y_train, dict_log_alpha["SparseLogReg"], tol=tol,
             model=models["SparseLogReg"], compute_jac=True, max_iter=1000)
 
-    clf = LogisticRegression(penalty="l1", tol=1e-12, C=(1 / (alpha * n_samples)),
-                             fit_intercept=False, max_iter=100000, solver="saga")
+    clf = LogisticRegression(penalty="l1", tol=1e-12, C=(
+        1 / (alpha * n_samples)), fit_intercept=False, max_iter=100000,
+        solver="saga")
     clf.fit(X_train, y_train)
     supp_sk = clf.coef_ != 0
     dense_sk = clf.coef_[supp_sk]
@@ -110,6 +115,62 @@ def test_val_grad():
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-5)
+
+
+n_outer = 2
+
+@pytest.mark.parametrize('model', models)
+@pytest.mark.parametrize('crit', ['cv'])
+def test_grad_search(model, crit):
+    """check that the paths are the same in the line search"""
+
+    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    monitor1 = Monitor()
+    algo = Forward(criterion)
+    grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
+                tol=1e-16)
+
+    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    monitor2 = Monitor()
+    algo = Implicit(criterion)
+    grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
+                tol=1e-16)
+
+    criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    monitor3 = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
+                tol=1e-16)
+
+
+    # criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
+    # monitor4 = Monitor()
+    # algo = Backward(criterion)
+    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
+    #             tol=1e-16)
+
+    assert np.allclose(
+        np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
+    assert np.allclose(
+        np.array(monitor1.grads), np.array(monitor3.grads))
+    assert np.allclose(
+        np.array(monitor1.objs), np.array(monitor3.objs))
+    assert np.allclose(
+        np.array(monitor1.objs_test), np.array(monitor3.objs_test))
+    assert not np.allclose(
+        np.array(monitor1.times), np.array(monitor3.times))
+    # assert np.allclose(
+    #     np.array(monitor1.objs), np.array(monitor4.objs))
+    # assert np.allclose(
+    #     np.array(monitor1.log_alphas), np.array(monitor4.log_alphas), atol=1e-6)
+    # assert np.allclose(
+    #     np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
+
+    # assert np.allclose(
+    #     np.array(monitor1.objs_test), np.array(monitor4.objs_test))
+    # assert not np.allclose(
+    #     np.array(monitor1.times), np.array(monitor4.times))
+
 
 
 if __name__ == '__main__':
