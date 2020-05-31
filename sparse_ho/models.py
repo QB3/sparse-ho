@@ -283,7 +283,7 @@ class wLasso():
     @staticmethod
     @njit
     def _update_bcd_jac_backward(
-         X, alpha, jac_t_v, beta, v_, L):
+            X, alpha, jac_t_v, beta, v_, L):
         n_samples, n_features = X.shape
         sign_beta = np.sign(beta)
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
