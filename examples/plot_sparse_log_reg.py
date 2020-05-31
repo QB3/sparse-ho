@@ -34,16 +34,16 @@ from expes.utils import configure_plt
 n_samples = 100
 n_features = 1000
 X_train, y_train = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=10, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=10, flip_y=0.1, n_redundant=0)
 X_train_s = csc_matrix(X_train)
 
 
 X_val, y_val = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=12, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 X_val_s = csc_matrix(X_val)
 
