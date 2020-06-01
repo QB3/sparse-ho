@@ -29,7 +29,8 @@ def grad_search_CV(
         grad = np.zeros_like(log_alpha0)
         for i in range(cv):
             val_i, grad_i = algo.get_val_grad(
-                lambdak, tol=tol, beta_star=beta_star)
+                lambdak, tol=algo.criterion.model.tol,
+                beta_star=beta_star)
             val += val_i
             grad += grad_i
         val /= cv

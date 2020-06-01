@@ -30,7 +30,8 @@ def grid_search(
         if samp == "lhs":
             log_alpha = log_alpha[0]
         g_func, grad_lambda = algo.get_val_grad(
-            log_alpha, tol=tol, beta_star=beta_star, compute_jac=False)
+            log_alpha, tol=algo.criterion.model.tol,
+            beta_star=beta_star, compute_jac=False)
 
         if g_func < min_g_func:
             min_g_func = g_func
