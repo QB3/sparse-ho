@@ -696,9 +696,9 @@ class SparseLogreg():
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
             dbeta_old = dbeta[j]
-            hess_fj = sigma(r) * (1 - sigma(r))
+            hess_fj = sigma(r[idx_nz]) * (1 - sigma(r[idx_nz]))
             # update of the Jacobian dbeta
-            dbeta[j] -= Xjs @ (hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
+            dbeta[j] -= Xjs @ (hess_fj * dr[idx_nz]) / (L[j] * n_samples)
             dbeta[j] -= alpha * sign_beta[j] / L[j]
             dr[idx_nz] += Xjs * (dbeta[j] - dbeta_old)
 
