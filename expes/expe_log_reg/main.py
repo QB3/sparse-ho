@@ -18,9 +18,9 @@ from sparse_ho.grid_search import grid_search
 dataset_names = ["rcv1"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["implicit_forward", "forward", "grid_search"]
+methods = ["implicit", "implicit_forward", "forward", "grid_search"]
 # "grid_search",
-tolerance_decreases = ["constant"]
+tolerance_decreases = ["exponential"]
 tols = 1e-5
 n_outers = [1]
 
@@ -43,9 +43,9 @@ def parallel_function(
 
     alpha_max = np.max(np.abs(X_train.T @ y_train))
     alpha_max /= X_train.shape[0]
-    log_alpha0 = np.log(0.1 * alpha_max)
+    log_alpha0 = np.log(0.2 * alpha_max)
     log_alpha_max = np.log(alpha_max)
-    n_outer = 10
+    n_outer = 5
 
     if dataset_name == "rcv1":
         size_loop = 1
@@ -86,9 +86,9 @@ def parallel_function(
 
         elif method == "grid_search":
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-4 * alpha_max)
+            log_alpha_min = np.log(1e-8 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, 0.8 * log_alpha_max, monitor, max_evals=10,
+                algo, log_alpha_min, 0.2 * log_alpha_max, monitor, max_evals=25,
                 tol=tol, samp="grid")
             print(log_alpha_opt)
 

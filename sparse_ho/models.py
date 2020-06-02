@@ -642,7 +642,6 @@ class SparseLogreg():
     @staticmethod
     def _get_pobj(r, beta, alphas, y):
         n_samples = r.shape[0]
-
         return (
             np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
 

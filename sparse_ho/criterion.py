@@ -94,14 +94,14 @@ class Logistic():
 
     def value(self, mask, dense):
         val = np.sum(
-            np.log(1 + np.exp(-self.y_val * self.X_val[:, mask] @ dense)))
+            np.log(1 + np.exp(-self.y_val * (self.X_val[:, mask] @ dense))))
         val /= self.X_val.shape[0]
         return val
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
             self.val_test = np.sum(
-                np.log(1 + np.exp(-self.y_test * self.X_test[:, mask] @ dense)))
+                np.log(1 + np.exp(-self.y_test * (self.X_test[:, mask] @ dense))))
             self.val_test /= self.X_test.shape[0]
         else:
             self.val_test = None

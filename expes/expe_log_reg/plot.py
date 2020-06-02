@@ -103,7 +103,7 @@ fig2, axarr2 = plt.subplots(
 for idx, dataset in enumerate(dataset_names):
     df_data = pandas.read_pickle("%s.pkl" % dataset)
     df_data = pandas.read_pickle("%s.pkl" % "rcv1")
-    df_data = df_data[df_data['tolerance_decrease'] == 'constant']
+    df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
 
     methods = df_data['method']
     times = df_data['times']
