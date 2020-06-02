@@ -30,11 +30,12 @@ X_val, y_val = datasets.make_classification(
 
 X_val_s = csc_matrix(X_val)
 
-
-alpha = 0.1
+alpha = 0.3
 log_alpha = np.log(alpha)
 tol = 1e-16
 
+y_train[y_train == 0.0] = -1.0
+y_val[y_val == 0.0] = -1.0
 
 models = [
     SparseLogreg(
@@ -42,6 +43,7 @@ models = [
     SparseLogreg(
         X_train_s, y_train, log_alpha, max_iter=10000, tol=tol)
 ]
+model = models[0]
 # models = {}
 
 # models["SparseLogReg_sparse"] = SparseLogreg(
@@ -73,7 +75,8 @@ def test_beta_jac(model):
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
             X_train, y_train, log_alpha, None, None,
-            get_v, tol=tol, model=model, tol_jac=1e-12)
+            get_v, tol=tol, model=model, tol_jac=1e-12,
+            max_iter=1000)
 
     supp3, dense3, jac3 = get_beta_jac_iterdiff(
             X_train, y_train, log_alpha, tol=tol,
@@ -120,11 +123,9 @@ def test_val_grad(model):
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
     assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
 
-
-        # for the implcit the conjugate grad does not converge
-        # hence the rtol=1e-2
+    # for the implcit the conjugate grad does not converge
+    # hence the rtol=1e-2
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-4)
-
 
 
 @pytest.mark.parametrize('model', models)
@@ -150,7 +151,6 @@ def test_grad_search(model, crit):
     algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
-
 
     # criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
     # monitor4 = Monitor()

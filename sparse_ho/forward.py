@@ -12,8 +12,8 @@ class Forward():
             compute_jac=True, backward=False, full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
-            jac0=quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac, backward=backward)
+            jac0=quantity_to_warm_start, max_iter=max_iter, tol=tol,
+            compute_jac=compute_jac, backward=backward)
         if jac is not None:
             jac_v = jac.T @ v(mask, dense)
             if full_jac_v:
@@ -25,8 +25,8 @@ class Forward():
     def get_val_grad(
             self, log_alpha,
             # mask0=None, dense0=None,
-            beta_star=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True, backward=False):
+            beta_star=None, jac0=None, max_iter=1000,
+            tol=1e-3, compute_jac=True, backward=False):
 
         return self.criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
@@ -89,7 +89,7 @@ def get_beta_jac_iterdiff(
     ############################################
     # warm start for dbeta
     dbeta, dr = model._init_dbeta_dr(
-        X, mask0=mask0, dense0=dense0, jac0=jac0, compute_jac=compute_jac)
+        X, y, mask0=mask0, dense0=dense0, jac0=jac0, compute_jac=compute_jac)
     # store the values of the objective function
     pobj0 = model._get_pobj(r, beta, alphas, y)
     pobj = []

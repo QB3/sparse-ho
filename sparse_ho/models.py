@@ -17,7 +17,7 @@ class Lasso():
         self.tol = tol
         self.log_alpha_max = log_alpha_max
 
-    def _init_dbeta_dr(self, X, mask0=None, jac0=None,
+    def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_features)
@@ -132,7 +132,7 @@ class Lasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X):
+    def _init_dr(dbeta, X, y):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -143,7 +143,7 @@ class Lasso():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             # dbeta_old = dbeta[j].copy()
@@ -155,7 +155,7 @@ class Lasso():
     @staticmethod
     @njit
     def _update_only_jac_sparse(
-            data, indptr, indices, n_samples, n_features,
+            data, indptr, indices, y, n_samples, n_features,
             dbeta, r, dr, L, alpha, sign_beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
@@ -213,7 +213,7 @@ class wLasso():
         self.max_iter = max_iter
         self.tol = tol
 
-    def _init_dbeta_dr(self, X, mask0=None, jac0=None,
+    def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros((n_features, n_features))
@@ -317,7 +317,7 @@ class wLasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X):
+    def _init_dr(dbeta, X, y):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -328,7 +328,7 @@ class wLasso():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             dbeta_old = dbeta[j, :].copy()
@@ -340,7 +340,7 @@ class wLasso():
     @staticmethod
     @njit
     def _update_only_jac_sparse(
-            data, indptr, indices, n_samples, n_features, dbeta, r, dr, L,
+            data, indptr, indices, y, n_samples, n_features, dbeta, r, dr, L,
             alpha, sign_beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
@@ -542,7 +542,7 @@ class SparseLogreg():
         self.tol = tol
         self.log_alpha_max = log_alpha_max
 
-    def _init_dbeta_dr(self, X, dense0=None,
+    def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_features)
@@ -550,7 +550,7 @@ class SparseLogreg():
             dr = np.zeros(n_samples)
         else:
             dbeta[mask0] = jac0.copy()
-            dr = X[:, mask0] @ jac0.copy()
+            dr = y * (X[:, mask0] @ jac0.copy())
         return dbeta, dr
 
     def _init_beta_r(self, X, y, mask0, dense0):
@@ -559,31 +559,34 @@ class SparseLogreg():
             r = np.zeros(X.shape[0])
         else:
             beta[mask0] = dense0
-            r = X[:, mask0] @ dense0
+            r = y * (X[:, mask0] @ dense0)
         return beta, r
 
     @staticmethod
-    @njit
+    # @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
-        non_zeros = np.where(L != 0)[0]
-        for j in non_zeros:
+        for j in range(n_features):
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j]
                 # compute derivatives
-            grad_fj = sigma(r) - y
-            zj = beta[j] - grad_fj @ X[:, j] / (L[j] * n_samples)
-            beta[j] = ST(zj, alpha[j] / L[j])
-            r += X[:, j] * (beta[j] - beta_old)
+            sigmar = sigma(r)
+            grad_j = X[:, j] @ (y * (sigmar - 1))
+            L_temp = np.sum(X[:, j] ** 2 * sigmar * (1 - sigmar))
+            L_temp /= n_samples
+            zj = beta[j] - grad_j / (L_temp * n_samples)
+            beta[j] = ST(zj, alpha[j] / L_temp)
+            r += y * X[:, j] * (beta[j] - beta_old)
             if compute_jac:
-                hess_fj = sigma(r) * (1 - sigma(r))
-                dzj = dbeta[j] - X[:, j] @ (hess_fj * dr) / (L[j] * n_samples)
+                dsigmar = sigmar * (1 - sigmar) * dr
+                hess_fj = X[:, j] @ (y * dsigmar)
+                dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
                 dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1] -= alpha[j] * np.sign(beta[j]) / L[j]
+                dbeta[j:j+1] -= alpha[j] * np.sign(beta[j]) / L_temp
                 # update residuals
-                dr += X[:, j] * (dbeta[j] - dbeta_old)
+                dr += y * X[:, j] * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
@@ -591,9 +594,7 @@ class SparseLogreg():
             data, indptr, indices, y, n_samples, n_features, beta,
             dbeta, r, dr, alphas, L, compute_jac=True):
 
-        non_zeros = np.where(L != 0)[0]
-
-        for j in non_zeros:
+        for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
             # get the non zero indices
@@ -601,20 +602,26 @@ class SparseLogreg():
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j]
-            grad_fj = sigma(r) - y
-            zj = beta[j] - grad_fj[idx_nz] @ Xjs / (L[j] * n_samples)
-            beta[j:j+1] = ST(zj, alphas[j] / L[j])
+            sigmar = sigma(r)
+            grad_j = Xjs @ (y[idx_nz] * (sigmar[idx_nz] - 1))
+            L_temp = np.sum(
+                Xjs ** 2 * sigmar[idx_nz] * (1 - sigmar[idx_nz]))
+            L_temp /= n_samples
+            zj = beta[j] - grad_j / (L_temp * n_samples)
+            beta[j:j+1] = ST(zj, alphas[j] / L_temp)
             if compute_jac:
-                hess_fj = sigma(r) * (1 - sigma(r))
-                dzj = dbeta[j] - Xjs @ (hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
+                dsigmar = sigmar * (1 - sigmar) * dr
+                hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
+                dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
                 dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L[j]
+                dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
                 # update residuals
-                dr[idx_nz] += Xjs * (dbeta[j] - dbeta_old)
-            r[idx_nz] += Xjs * (beta[j] - beta_old)
+                dr[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
+            r[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
 
     @staticmethod
     @njit
+    # TODO
     def _update_bcd_jac_backward(X, alpha, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         r = X @ beta
@@ -631,10 +638,9 @@ class SparseLogreg():
     @staticmethod
     def _get_pobj(r, beta, alphas, y):
         n_samples = r.shape[0]
-        temp = sigma(r)
 
         return (
-            np.sum(- y * np.log(temp) - (1 - y) * np.log(1 - temp)) / (n_samples) + np.abs(alphas * beta).sum())
+            np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
 
     @staticmethod
     def _get_jac(dbeta, mask):
@@ -663,8 +669,8 @@ class SparseLogreg():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X):
-        return X @ dbeta
+    def _init_dr(dbeta, X, y):
+        return y * (X @ dbeta)
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
@@ -674,33 +680,44 @@ class SparseLogreg():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
+            sigmar = sigma(r)
+            L_temp = np.sum(Xs[:, j] ** 2 * sigmar * (1 - sigmar))
+            L_temp /= n_samples
+
             dbeta_old = dbeta[j]
-            hess_fj = sigma(r) * (1 - sigma(r))
-            dbeta[j:j+1] += - Xs[:, j] @ (hess_fj * dr) / (L[j] * n_samples)
-            dbeta[j:j+1] -= alpha * sign_beta[j] / L[j]
+            dsigmar = sigmar * (1 - sigmar) * dr
+            hess_fj = Xs[:, j] @ (y * dsigmar)
+            dbeta[j:j+1] += - hess_fj / (L_temp * n_samples)
+            dbeta[j:j+1] -= alpha * sign_beta[j] / L_temp
             # update residuals
-            dr += Xs[:, j] * (dbeta[j] - dbeta_old)
+            dr += y * Xs[:, j] * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
-            data, indptr, indices, n_samples, n_features,
+            data, indptr, indices, y, n_samples, n_features,
             dbeta, r, dr, L, alpha, sign_beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
             # get the non zero idices
             idx_nz = indices[indptr[j]:indptr[j+1]]
+            sigmar = sigma(r)
+            L_temp = np.sum(Xjs ** 2 * sigmar * (1 - sigmar))
+            L_temp /= n_samples
+
             # store old beta j for fast update
             dbeta_old = dbeta[j]
-            hess_fj = sigma(r[idx_nz]) * (1 - sigma(r[idx_nz]))
+            dsigmar = sigmar * (1 - sigmar) * dr
+
+            hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
             # update of the Jacobian dbeta
-            dbeta[j] -= Xjs @ (hess_fj * dr[idx_nz]) / (L[j] * n_samples)
-            dbeta[j] -= alpha * sign_beta[j] / L[j]
-            dr[idx_nz] += Xjs * (dbeta[j] - dbeta_old)
+            dbeta[j] -= hess_fj / (L_temp * n_samples)
+            dbeta[j] -= alpha * sign_beta[j] / L_temp
+            dr[idx_nz] += y * Xjs * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
@@ -725,10 +742,7 @@ class SparseLogreg():
 
     @staticmethod
     def get_L(X, is_sparse=False):
-        if is_sparse:
-            return slinalg.norm(X, axis=0) ** 2 / (4 * X.shape[0])
-        else:
-            return norm(X, axis=0) ** 2 / (4 * X.shape[0])
+        return 0.0
 
     @staticmethod
     def hessian_f(x):

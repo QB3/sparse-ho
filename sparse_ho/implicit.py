@@ -60,7 +60,7 @@ def get_beta_jac_t_v_implicit(
         size_mat = mask.sum()
         sol0 = np.zeros(size_mat)
 
-    hessian = model.hessian_f(X_train[:, mask] @ dense)
+    hessian = model.hessian_f(y_train * (X_train[:, mask] @ dense))
     mat_to_inv = X_train[:, mask].T @ np.diag(hessian) @ X_train[:, mask]
     size_mat = mask.sum()
 

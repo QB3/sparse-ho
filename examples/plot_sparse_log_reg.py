@@ -54,11 +54,11 @@ alpha_max = 1 / 4
 alpha_max = np.abs((y_train - np.mean(y_train) * (1 - np.mean(y_train))).T @ X_train).max() / n_samples
 maxit = 1000
 
-log_alpha0 = np.log(0.3 * alpha_max)
-tol = 1e-4
+log_alpha0 = np.log(0.9 * alpha_max)
+tol = 1e-12
 
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000, tol=tol)
 criterion = Logistic(X_val, y_val, model)
 monitor = Monitor()
 algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
-grad_search(algo, log_alpha0, monitor, n_outer=25, tol=tol)
+grad_search(algo, log_alpha0, monitor, n_outer=50, tol=tol)

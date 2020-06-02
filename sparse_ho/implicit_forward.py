@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse
-import scipy.sparse.linalg as slinalg
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
@@ -42,7 +41,7 @@ class ImplicitForward():
 def get_beta_jac_fast_iterdiff(
         X, y, log_alpha, X_val, y_val, get_v, model, mask0=None, dense0=None,
         jac0=None,
-        tol=1e-3, max_iter=100, niter_jac=1000, tol_jac=1e-6):
+        tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6):
     n_samples, n_features = X.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
@@ -55,7 +54,7 @@ def get_beta_jac_fast_iterdiff(
     v = get_v(mask, dense)
     r = X[:, mask] @ dense
     jac = get_only_jac(
-        X[:, mask], r, reduce_alpha, np.sign(dense), v,
+        X[:, mask], y, r, reduce_alpha, np.sign(dense), v,
         dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model,
         mask=mask, dense=dense)
 
@@ -63,7 +62,7 @@ def get_beta_jac_fast_iterdiff(
 
 
 def get_only_jac(
-        Xs, r, alpha, sign_beta, v, dbeta=None, niter_jac=100, tol_jac=1e-4,
+        Xs, y, r, alpha, sign_beta, v, dbeta=None, niter_jac=100, tol_jac=1e-4,
         model="lasso", mask=None, dense=None):
     n_samples, n_features = Xs.shape
 
@@ -83,15 +82,15 @@ def get_only_jac(
     dbeta_old = dbeta.copy()
 
     tol_crit = tol_jac * norm(v)
-    dr = model._init_dr(dbeta, Xs)
+    dr = model._init_dr(dbeta, Xs, y)
     for i in range(niter_jac):
         print("%i -st iterations over %i" % (i, niter_jac))
         if is_sparse:
             model._update_only_jac_sparse(
-                Xs.data, Xs.indptr, Xs.indices, n_samples,
+                Xs.data, Xs.indptr, Xs.indices, y, n_samples,
                 n_features, dbeta, r, dr, L, alpha, sign_beta)
         else:
-            model._update_only_jac(Xs, r, dbeta, dr, L, alpha, sign_beta)
+            model._update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
         # if model == "lasso":
         #     if is_sparse:
@@ -104,7 +103,8 @@ def get_only_jac(
         #     if is_sparse:
         #         _update_only_jac_mcp_sparse(
         #             Xs.data, Xs.indptr, Xs.indices, n_samples, n_features,
-        #             dense, dbeta, dr, alpha[0], alpha[1], L, compute_jac=True)
+        #             dense, dbeta, dr, alpha[0], alpha[1], L,
+        #             compute_jac=True)
         #     else:
         #         _update_only_jac_mcp(
         #             Xs, dense, dbeta, dr, alpha[0], alpha[1],
