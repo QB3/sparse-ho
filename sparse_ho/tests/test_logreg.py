@@ -122,7 +122,7 @@ def test_val_grad(model):
 
     # for the implcit the conjugate grad does not converge
     # hence the rtol=1e-2
-    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-4)
+    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
 
 
 @pytest.mark.parametrize('model', models)

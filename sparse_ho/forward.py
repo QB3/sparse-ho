@@ -13,7 +13,7 @@ class Forward():
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=self.model.max_iter, tol=tol,
+            max_iter=self.criterion.model.max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
         if jac is not None:
             jac_v = jac.T @ v(mask, dense)
