@@ -22,3 +22,8 @@ coverage/*
 
 .DS_Store
 MANIFEST
+.vscode/settings.json
+.gitignore
+examples/ugar.utils import sugar_adaptive, fast_sugar_adaptive, sugar, my_Lasso
+.gitignore
+junit-results.xml
