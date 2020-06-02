@@ -10,7 +10,9 @@ except Exception:
 def grid_search(
         algo, log_alpha_min, log_alpha_max, monitor, max_evals=50,
         tol=1e-5,
-        beta_star=None, random_state=42, samp="grid", log_alphas=None):
+        beta_star=None, random_state=42, samp="grid", log_alphas=None,
+
+        t_max=1000):
 
     if log_alphas is None and samp == "grid":
         log_alphas = np.linspace(log_alpha_max, log_alpha_min, max_evals)
@@ -45,5 +47,6 @@ def grid_search(
 
         monitor(g_func, algo.criterion.val_test, log_alpha, None,
                 algo.criterion.rmse)
-
+        if monitor.times[-1] > t_max:
+            break
     return log_alpha_opt, min_g_func
