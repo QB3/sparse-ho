@@ -17,16 +17,16 @@ from sparse_ho.ho import grad_search
 n_samples = 100
 n_features = 1000
 X_train, y_train = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=10, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=10, flip_y=0.1, n_redundant=0)
 X_train_s = csc_matrix(X_train)
 
 
 X_val, y_val = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=12, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 X_val_s = csc_matrix(X_val)
 
@@ -61,8 +61,8 @@ def get_v(mask, dense):
 @pytest.mark.parametrize('model', models)
 def test_beta_jac(model):
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
-            X_train, y_train, log_alpha, tol=tol,
-            model=model, compute_jac=True, max_iter=1000)
+        X_train, y_train, log_alpha, tol=tol,
+        model=model, compute_jac=True, max_iter=1000)
 
     clf = LogisticRegression(penalty="l1", tol=1e-12, C=(
         1 / (alpha * n_samples)), fit_intercept=False, max_iter=100000,
@@ -72,16 +72,16 @@ def test_beta_jac(model):
     dense_sk = clf.coef_[supp_sk]
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-            X_train, y_train, log_alpha, None, None,
-            get_v, tol=tol, model=model, tol_jac=1e-12)
+        X_train, y_train, log_alpha, None, None,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
 
     supp3, dense3, jac3 = get_beta_jac_iterdiff(
-            X_train, y_train, log_alpha, tol=tol,
-            model=model, compute_jac=True, max_iter=1000)
+        X_train, y_train, log_alpha, tol=tol,
+        model=model, compute_jac=True, max_iter=1000)
 
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, log_alpha, None, None,
-            get_v, tol=tol, model=model, tol_jac=1e-12)
+        X_train_s, y_train, log_alpha, None, None,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)
     assert np.allclose(dense1, dense_sk, atol=1e-4)
@@ -103,13 +103,11 @@ def test_beta_jac(model):
 def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
     algo = Forward(criterion)
-    val_fwd, grad_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+    val_fwd, grad_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     algo = Implicit(criterion)
@@ -120,6 +118,8 @@ def test_val_grad(model):
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
     assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
 
+    # for the implcit the conjugate grad does not converge
+    # hence the rtol=1e-2
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-4)
 
 

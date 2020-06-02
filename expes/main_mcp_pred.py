@@ -84,8 +84,8 @@ def parallel_function(
             # n_alpha = 100
             # p_alphas = np.geomspace(1, 0.0001, n_alpha)
             grid_searchMCP(
-                    X_train, y_train, list_log_alphas, list_log_gammas,
-                    X_val, y_val, X_test, y_test, tol, monitor=monitor)
+                X_train, y_train, list_log_alphas, list_log_gammas,
+                X_val, y_val, X_test, y_test, tol, monitor=monitor)
         elif method in ("bayesian", "random"):
             monitor = hyperopt_lasso(
                 X_train, y_train, log_alpha0, X_val, y_val, X_test, y_test,

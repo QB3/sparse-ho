@@ -283,7 +283,7 @@ class wLasso():
     @staticmethod
     @njit
     def _update_bcd_jac_backward(
-         X, alpha, jac_t_v, beta, v_, L):
+            X, alpha, jac_t_v, beta, v_, L):
         n_samples, n_features = X.shape
         sign_beta = np.sign(beta)
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
@@ -701,10 +701,9 @@ class SparseLogreg():
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
             dbeta_old = dbeta[j]
-            hess_fj = sigma(r) * (1 - sigma(r))
+            hess_fj = sigma(r[idx_nz]) * (1 - sigma(r[idx_nz]))
             # update of the Jacobian dbeta
-            dbeta[j] -= Xjs @ (
-                hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
+            dbeta[j] -= Xjs @ (hess_fj * dr[idx_nz]) / (L[j] * n_samples)
             dbeta[j] -= alpha * sign_beta[j] / L[j]
             dr[idx_nz] += Xjs * (dbeta[j] - dbeta_old)
 

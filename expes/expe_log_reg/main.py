@@ -61,29 +61,29 @@ def parallel_function(
         if method == "implicit_forward":
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
             _, _, _ = grad_search(
-                    algo=algo, verbose=False,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo, verbose=False,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
             algo = Forward(criterion)
             _, _, _ = grad_search(
-                    algo=algo,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
             algo = Implicit(criterion)
             _, _, _ = grad_search(
-                    algo=algo,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
             algo = Forward(criterion)

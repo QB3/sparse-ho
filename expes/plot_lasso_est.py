@@ -52,7 +52,7 @@ dict_filling['random'] = 'full'
 df = pandas.read_pickle("%s.pkl" % "results_lasso_cor")
 
 labels = np.flip([
-    "implicit_forward",  "implicit", "forward", "GridSearch", "bayesian",
+    "implicit_forward", "implicit", "forward", "GridSearch", "bayesian",
     "random"])
 
 dict_markevery = [5, (1, 5), (2, 5), (3, 5), 1, (4, 5)]
@@ -102,7 +102,7 @@ fig.tight_layout()
 fig.show()
 
 labels = ([
-    "implicit_forward",  "implicit", "forward", "GridSearch", "bayesian",
+    "implicit_forward", "implicit", "forward", "GridSearch", "bayesian",
     "random"])
 
 fig, axarr = plt.subplots(

@@ -1,6 +1,5 @@
 """
 Method comparison on Lasso
-==========================
 
 The aim of this example is to demonstrate on a simple
 dateset how methods compare.
@@ -11,8 +10,8 @@ dateset how methods compare.
 import numpy as np
 # import matplotlib.pyplot as plt
 # import seaborn as sns
-# from sklearn import datasets
-# from scipy.sparse import csc_matrix
+from sklearn import datasets
+from scipy.sparse import csc_matrix
 
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
@@ -32,19 +31,19 @@ y_train[y_train == -1.0] = 0.0
 y_val[y_val == -1.0] = 0.0
 y_test[y_test == -1.0] = 0.0
 
-# n_samples = 100
-# n_features = 1000
-# X_train, y_train = datasets.make_classification(
-#         n_samples=n_samples,
-#         n_features=n_features, n_informative=50,
-#         random_state=10, flip_y=0.1, n_redundant=0)
-# X_train_s = csc_matrix(X_train)
+n_samples = 100
+n_features = 1000
+X_train, y_train = datasets.make_classification(
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=10, flip_y=0.1, n_redundant=0)
+X_train_s = csc_matrix(X_train)
 
 
-# X_val, y_val = datasets.make_classification(
-#         n_samples=n_samples,
-#         n_features=n_features, n_informative=50,
-#         random_state=12, flip_y=0.1, n_redundant=0)
+X_val, y_val = datasets.make_classification(
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 # X_val_s = csc_matrix(X_val)
 

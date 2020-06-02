@@ -72,8 +72,8 @@ def parallel_function(
             p_alphas = np.geomspace(1, 0.0001, n_alpha)
             log_alphas = np.log(alpha_max * p_alphas)
             grid_searchCV(
-                    X_train, y_train, log_alphas, X_val, y_val, X_test,
-                    y_test, tol, monitor)
+                X_train, y_train, log_alphas, X_val, y_val, X_test,
+                y_test, tol, monitor)
         elif method in ("bayesian", "random"):
             monitor = hyperopt_lasso(
                 X_train, y_train, log_alpha0, X_val, y_val, X_test,

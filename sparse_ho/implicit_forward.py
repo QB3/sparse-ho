@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse
-import scipy.sparse.linalg as slinalg
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
@@ -68,10 +67,7 @@ def get_only_jac(
     n_samples, n_features = Xs.shape
 
     is_sparse = issparse(Xs)
-    if is_sparse:
-        L = slinalg.norm(Xs, axis=0) ** 2 / n_samples
-    else:
-        L = norm(Xs, axis=0) ** 2 / n_samples
+    L = model.get_L(Xs, is_sparse)
 
     if dbeta is None:
         model._init_dbeta(n_features)

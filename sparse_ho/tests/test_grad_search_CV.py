@@ -6,7 +6,13 @@ from sparse_ho.criterion import CV
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 
+# from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
+# from sparse_ho.implicit import Implicit
+# from sparse_ho.backward import Backward
+# from sparse_ho.criterion import CV
+# from sparse_ho.criterion import SURE
+# from sparse_ho.ho import grad_search
 from sparse_ho.grad_search_CV import grad_search_CV
 
 n_samples = 100
@@ -57,9 +63,10 @@ models = [
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
-
 # @pytest.mark.parametrize('model', models)
 # @pytest.mark.parametrize('crit', ['cv', 'sure'])
+
+
 def test_grad_search():
     monitor = Monitor()
     grad_search_CV(

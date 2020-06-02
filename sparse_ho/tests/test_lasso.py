@@ -13,7 +13,6 @@ from sparse_ho.implicit import Implicit
 from sparse_ho.backward import Backward
 from sparse_ho.criterion import CV, SURE
 
-
 n_samples = 100
 n_features = 100
 n_active = 5
@@ -134,6 +133,9 @@ def test_val_grad():
         assert np.allclose(val_bwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_bwd)
         assert np.allclose(grad_bwd, grad_imp_fwd)
+
+        # for the implcit the conjugate grad does not converge
+        # hence the rtol=1e-2
         assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
 
     for key in models.keys():

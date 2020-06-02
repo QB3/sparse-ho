@@ -22,7 +22,9 @@ def grid_search(
         log_alphas = -np.sort(-log_alphas)
 
     elif samp == "lhs":
-        xlimits = np.array([[log_alpha_min,  log_alpha_max]])
+        # # XXX WIP
+        # pass
+        xlimits = np.array([[log_alpha_min, log_alpha_max]])
         sampling = LHS(xlimits=xlimits)
         num = max_evals
         log_alphas = sampling(num)
