@@ -81,7 +81,7 @@ def get_only_jac(
         dbeta = dbeta.copy()
     dbeta_old = dbeta.copy()
 
-    tol_crit = tol_jac * norm(v)
+    # tol_crit = tol_jac * norm(v)
     dr = model._init_dr(dbeta, Xs, y)
     for i in range(niter_jac):
         print("%i -st iterations over %i" % (i, niter_jac))
@@ -90,9 +90,11 @@ def get_only_jac(
                 Xs.data, Xs.indptr, Xs.indices, y, n_samples,
                 n_features, dbeta, r, dr, L, alpha, sign_beta)
         else:
-            model._update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta)
+            model._update_only_jac(
+                Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
-        if norm(v @ (dbeta - dbeta_old)) < tol_crit:
+        # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
+        if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
             break
         dbeta_old = dbeta.copy()
     return dbeta
