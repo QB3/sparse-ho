@@ -127,7 +127,8 @@ for idx, dataset in enumerate(dataset_names):
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
         marker = dict_markers[method]
-        objs_test = [np.min(objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
+        objs_test = [np.min(objs_test[:k]) for k in np.arange(
+            len(objs_test)) + 1]
         axarr2.flat[idx].semilogy(
             time, objs_test, color=dict_color[method],
             label="%s" % (dict_method[method]),
@@ -135,19 +136,21 @@ for idx, dataset in enumerate(dataset_names):
             marker=marker, markersize=markersize,
             markevery=dict_markevery[dataset])
         # plt.legend()
-  
+
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
         # import ipdb; ipdb.set_trace()
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            axarr.flat[idx].semilogy(time, (obj-min_objs),
-            # time, (obj-min_objs) / norm_val,
-            color=dict_color[method], label="%s" % (dict_method[method]),
-            # label="%s, %s" % (dict_method[method], tol),
-            marker=marker, markersize=markersize,
-            markevery=dict_markevery[dataset]))
+            axarr.flat[idx].semilogy(
+                time, (obj-min_objs),
+                # time, (obj-min_objs) / norm_val,
+                color=dict_color[method],
+                label="%s" % (dict_method[method]),
+                # label="%s, %s" % (dict_method[method], tol),
+                marker=marker, markersize=markersize,
+                markevery=dict_markevery[dataset]))
         # axarr.flat[i].legend()
 
     axarr.flat[idx].set_title("%s %s" % (

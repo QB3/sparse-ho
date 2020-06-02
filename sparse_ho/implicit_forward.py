@@ -92,31 +92,6 @@ def get_only_jac(
         else:
             model._update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
-        # if model == "lasso":
-        #     if is_sparse:
-        #         _update_only_jac_sparse(
-        #             Xs.data, Xs.indptr, Xs.indices, n_samples,
-        #             n_features, dbeta, dr, L, alpha, sign_beta)
-        #     else:
-        #         _update_only_jac(Xs, dbeta, dr, L, alpha, sign_beta)
-        # elif model == "mcp":
-        #     if is_sparse:
-        #         _update_only_jac_mcp_sparse(
-        #             Xs.data, Xs.indptr, Xs.indices, n_samples, n_features,
-        #             dense, dbeta, dr, alpha[0], alpha[1], L,
-        #             compute_jac=True)
-        #     else:
-        #         _update_only_jac_mcp(
-        #             Xs, dense, dbeta, dr, alpha[0], alpha[1],
-        #             L, compute_jac=True)
-        # elif model == "wlasso":
-        #     if is_sparse:
-        #         _update_only_jac_sparse_p(
-        #             Xs.data, Xs.indptr, Xs.indices, n_samples,
-        #             n_features, dbeta, dr, L, alpha[mask], sign_beta)
-        #             # n_features, dbeta, dr, L, alpha, sign_beta)
-        #     else:
-        #         _update_only_jac_p(Xs, dbeta, dr, L, alpha[mask], sign_beta)
         if norm(v @ (dbeta - dbeta_old)) < tol_crit:
             break
         dbeta_old = dbeta.copy()

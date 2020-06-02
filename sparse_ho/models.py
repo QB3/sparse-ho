@@ -283,7 +283,7 @@ class wLasso():
     @staticmethod
     @njit
     def _update_bcd_jac_backward(
-         X, alpha, jac_t_v, beta, v_, L):
+            X, alpha, jac_t_v, beta, v_, L):
         n_samples, n_features = X.shape
         sign_beta = np.sign(beta)
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
@@ -386,7 +386,8 @@ class wLasso():
         proj_log_alpha = log_alpha.copy()
         proj_log_alpha[proj_log_alpha < -12] = -12
         if np.max(proj_log_alpha > self.log_alpha_max):
-            proj_log_alpha[proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
+            proj_log_alpha[
+                proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
         return proj_log_alpha
 
     @staticmethod
@@ -473,7 +474,8 @@ class SVM():
     def _get_pobj(X, y, beta, C):
         n_samples = X.shape[0]
         return (
-            0.5 * norm(beta) ** 2 + C * np.sum(np.maximum(np.ones(n_samples) - y * (X @ beta), np.zeros(n_samples))))
+            0.5 * norm(beta) ** 2 + C * np.sum(np.maximum(
+                np.ones(n_samples) - y * (X @ beta), np.zeros(n_samples))))
 
     @staticmethod
     def _get_jac(dbeta, mask):
@@ -630,7 +632,8 @@ class SparseLogreg():
             hess_fj = sigma(r) * (1 - sigma(r))
             grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
             v_t_jac[j] *= np.abs(sign_beta[j])
-            v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * (X[:, j] * hess_fj) @ X
+            v_t_jac -= v_t_jac[j] / (
+                L[j] * n_samples) * (X[:, j] * hess_fj) @ X
             r += X[:, j] * (beta[j-1] - beta[j])
 
         return grad

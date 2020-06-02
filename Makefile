@@ -58,4 +58,4 @@ test-manifest:
 	check-manifest --ignore doc,expes;
 
 pep:
-	flake8 --count sparse_ho --exit-zero
+	flake8 --count sparse_ho

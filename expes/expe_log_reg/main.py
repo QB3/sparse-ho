@@ -40,11 +40,9 @@ def parallel_function(
     y_train[y_train == -1.0] = 0.0
     y_val[y_val == -1.0] = 0.0
     y_test[y_test == -1.0] = 0.0
-
-    alpha_max = np.abs(
-        (y_train - np.mean(y_train) * (1 - np.mean(y_train))).T @ X_train).max()
-    alpha_max /= n_samples
-    log_alpha0 = np.log(0.5 * alpha_max)
+    alpha_max = np.abs((y_train - np.mean(y_train) * (
+        1 - np.mean(y_train))).T @ X_train).max() / n_samples
+    log_alpha0 = np.log(0.1 * alpha_max)
     log_alpha_max = np.log(alpha_max)
     n_outer = 10
 
@@ -61,29 +59,29 @@ def parallel_function(
         if method == "implicit_forward":
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
             _, _, _ = grad_search(
-                    algo=algo, verbose=False,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo, verbose=False,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
             algo = Forward(criterion)
             _, _, _ = grad_search(
-                    algo=algo,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
             algo = Implicit(criterion)
             _, _, _ = grad_search(
-                    algo=algo,
-                    log_alpha0=log_alpha0, tol=tol,
-                    n_outer=n_outer, monitor=monitor,
-                    t_max=dict_t_max[dataset_name],
-                    tolerance_decrease=tolerance_decrease)
+                algo=algo,
+                log_alpha0=log_alpha0, tol=tol,
+                n_outer=n_outer, monitor=monitor,
+                t_max=dict_t_max[dataset_name],
+                tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
             algo = Forward(criterion)

@@ -80,8 +80,9 @@ for method in methods:
             X_train, y_train, log_alpha0, X_val, y_val, X_test, y_test, tol,
             monitor, method=method, maxit=1000, n_outer=n_outer,
             warm_start=warm_start, model="lasso", t_max=20)
-    pobj = np.array([np.min(monitor.objs[:k]) for k in np.arange(
-           len(monitor.objs)) + 1])
+    pobj = np.array(
+        [np.min(monitor.objs[:k]) for k in np.arange(
+            len(monitor.objs)) + 1])
     dict_pobj[method] = pobj
     dict_times[method] = np.array(monitor.times)
 

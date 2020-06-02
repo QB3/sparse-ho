@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.sparse import csc_matrix
-from sparse_ho.utils import Monitor
 
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import get_beta_jac_iterdiff
@@ -13,7 +12,6 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
 from sparse_ho.backward import Backward
 from sparse_ho.criterion import CV, SURE
-from sparse_ho.ho import grad_search
 
 n_samples = 100
 n_features = 100
@@ -135,7 +133,6 @@ def test_val_grad():
         assert np.allclose(val_bwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_bwd)
         assert np.allclose(grad_bwd, grad_imp_fwd)
-
 
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2

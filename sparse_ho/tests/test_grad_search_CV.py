@@ -1,18 +1,18 @@
 import numpy as np
 from scipy.sparse import csc_matrix
-import pytest
 
-from sparse_ho.utils import Monitor
-
-from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, wLasso
+from sparse_ho.criterion import CV
+from sparse_ho.utils import Monitor
+from sparse_ho.datasets.synthetic import get_synt_data
 
-from sparse_ho.forward import Forward
+# from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
-from sparse_ho.backward import Backward
-from sparse_ho.criterion import CV, SURE
-from sparse_ho.ho import grad_search
+# from sparse_ho.implicit import Implicit
+# from sparse_ho.backward import Backward
+# from sparse_ho.criterion import CV
+# from sparse_ho.criterion import SURE
+# from sparse_ho.ho import grad_search
 from sparse_ho.grad_search_CV import grad_search_CV
 
 n_samples = 100
@@ -63,27 +63,17 @@ models = [
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
-
 # @pytest.mark.parametrize('model', models)
 # @pytest.mark.parametrize('crit', ['cv', 'sure'])
+
+
 def test_grad_search():
-    # monitor = Monitor()
-    # grad_search_CV(
-    #     X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=5)
     monitor = Monitor()
     grad_search_CV(
         X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=15)
 
 
 if __name__ == '__main__':
-    # models = [
-    #     Lasso(X_train, y_train, dict_log_alpha["lasso"]),
-    #     wLasso(X_train, y_train, dict_log_alpha["wlasso"])]
-    # crits = ['cv', 'sure']
-    # # for model in models:
-    # #     for crit in crits:
-    # #         test_grad_search(model, crit)
-    # test_grad_search()
     monitor = Monitor()
     grad_search_CV(
         X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=15)

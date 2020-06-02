@@ -17,16 +17,16 @@ from sparse_ho.ho import grad_search
 n_samples = 100
 n_features = 1000
 X_train, y_train = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=10, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=10, flip_y=0.1, n_redundant=0)
 X_train_s = csc_matrix(X_train)
 
 
 X_val, y_val = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=12, flip_y=0.1, n_redundant=0)
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 X_val_s = csc_matrix(X_val)
 
@@ -63,8 +63,8 @@ def get_v(mask, dense):
 @pytest.mark.parametrize('model', models)
 def test_beta_jac(model):
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
-            X_train, y_train, log_alpha, tol=tol,
-            model=model, compute_jac=True, max_iter=1000)
+        X_train, y_train, log_alpha, tol=tol,
+        model=model, compute_jac=True, max_iter=1000)
 
     clf = LogisticRegression(penalty="l1", tol=1e-12, C=(
         1 / (alpha * n_samples)), fit_intercept=False, max_iter=100000,
@@ -74,17 +74,16 @@ def test_beta_jac(model):
     dense_sk = clf.coef_[supp_sk]
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-            X_train, y_train, log_alpha, None, None,
-            get_v, tol=tol, model=model, tol_jac=1e-12,
-            max_iter=1000)
+        X_train, y_train, log_alpha, None, None,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
 
     supp3, dense3, jac3 = get_beta_jac_iterdiff(
-            X_train, y_train, log_alpha, tol=tol,
-            model=model, compute_jac=True, max_iter=1000)
+        X_train, y_train, log_alpha, tol=tol,
+        model=model, compute_jac=True, max_iter=1000)
 
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, log_alpha, None, None,
-            get_v, tol=tol, model=model, tol_jac=1e-12)
+        X_train_s, y_train, log_alpha, None, None,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)
     assert np.allclose(dense1, dense_sk, atol=1e-4)
@@ -106,13 +105,11 @@ def test_beta_jac(model):
 def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
     algo = Forward(criterion)
-    val_fwd, grad_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+    val_fwd, grad_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     algo = Implicit(criterion)
@@ -152,33 +149,14 @@ def test_grad_search(model, crit):
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
 
-    # criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
-    # monitor4 = Monitor()
-    # algo = Backward(criterion)
-    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
-    #             tol=1e-16)
-
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     assert np.allclose(
         np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-4)
     assert np.allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
-    # assert np.allclose(
-    #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
-    # assert np.allclose(
-    #     np.array(monitor1.objs), np.array(monitor4.objs))
-    # assert np.allclose(
-    #     np.array(monitor1.log_alphas), np.array(monitor4.log_alphas), atol=1e-6)
-    # assert np.allclose(
-    #     np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
-
-    # assert np.allclose(
-    #     np.array(monitor1.objs_test), np.array(monitor4.objs_test))
-    # assert not np.allclose(
-    #     np.array(monitor1.times), np.array(monitor4.times))
 
 
 if __name__ == '__main__':

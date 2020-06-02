@@ -58,6 +58,7 @@ models = [
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
+
 @pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('crit', ['cv', 'sure'])
 def test_grad_search(model, crit):
@@ -115,7 +116,8 @@ def test_grad_search(model, crit):
     assert np.allclose(
         np.array(monitor1.objs), np.array(monitor4.objs))
     assert np.allclose(
-        np.array(monitor1.log_alphas), np.array(monitor4.log_alphas), atol=1e-6)
+        np.array(monitor1.log_alphas), np.array(monitor4.log_alphas),
+        atol=1e-6)
     assert np.allclose(
         np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
 

@@ -2,6 +2,7 @@ from numpy.linalg import norm
 import numpy as np
 from sparse_ho.utils import sigma
 
+
 class CV():
     def __init__(self, X_val, y_val, model, convexify=False,
                  gamma_convex=1e-2, X_test=None, y_test=None):
@@ -84,7 +85,7 @@ class Logistic():
         self.dense0 = None
         self.quantity_to_warm_start = None
         self.val_test = None
-        
+
     def get_v(self, mask, dense):
         temp = sigma(self.X_val[:, mask] @ dense)
         v = self.X_val[:, mask].T @ (temp - self.y_val)
@@ -93,14 +94,17 @@ class Logistic():
 
     def value(self, mask, dense):
         temp = sigma(self.X_val[:, mask] @ dense)
-        val = np.sum(- self.y_val * np.log(temp) - (1 - self.y_val) * np.log(1 - temp))
+        val = np.sum(
+            - self.y_val * np.log(temp) - (1 - self.y_val) * np.log(1 - temp))
         val /= self.X_val.shape[0]
         return val
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
             temp = sigma(self.X_test[:, mask] @ dense)
-            self.val_test = np.sum(- self.y_test * np.log(temp) - (1 - self.y_test) * np.log(1 - temp))
+            self.val_test = np.sum(
+                - self.y_test * np.log(temp) -
+                (1 - self.y_test) * np.log(1 - temp))
             self.val_test /= self.X_test.shape[0]
         else:
             self.val_test = None
