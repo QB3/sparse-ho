@@ -2,6 +2,7 @@ from numpy.linalg import norm
 import numpy as np
 from sparse_ho.utils import sigma
 
+
 class CV():
     def __init__(self, X_val, y_val, model, convexify=False,
                  gamma_convex=1e-2, X_test=None, y_test=None):
@@ -84,7 +85,7 @@ class Logistic():
         self.dense0 = None
         self.quantity_to_warm_start = None
         self.val_test = None
-        
+
     def get_v(self, mask, dense):
         temp = sigma(self.X_val[:, mask] @ dense)
         v = self.X_val[:, mask].T @ (temp - self.y_val)

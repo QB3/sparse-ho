@@ -58,6 +58,7 @@ models = [
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
+
 @pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('crit', ['cv', 'sure'])
 def test_grad_search(model, crit):
