@@ -105,7 +105,8 @@ labels = ([
     "implicit_forward",  "implicit", "forward", "GridSearch", "bayesian",
     "random"])
 
-fig, axarr = plt.subplots(1, 2, sharex=False, sharey=False, figsize=[10,4],)
+fig, axarr = plt.subplots(
+    1, 2, sharex=False, sharey=False, figsize=[10, 4])
 df_mean = df.groupby(['method', 'p'], as_index=False).mean()
 best = df_mean[df_mean['method'].eq("implicit_forward")]
 best = np.array(best['Error est'])

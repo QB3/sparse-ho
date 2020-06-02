@@ -63,8 +63,10 @@ def test_grid_search():
         algo, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
-    assert(monitor_random.log_alphas[np.argmin(monitor_random.objs)] == log_alpha_opt_random)
-    assert(monitor_grid.log_alphas[np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
+    assert(monitor_random.log_alphas[
+        np.argmin(monitor_random.objs)] == log_alpha_opt_random)
+    assert(monitor_grid.log_alphas[
+        np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
     monitor_grid = Monitor()
     model = Lasso(X_train, y_train, log_alpha)
@@ -83,8 +85,10 @@ def test_grid_search():
         algo, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
-    assert(monitor_random.log_alphas[np.argmin(monitor_random.objs)] == log_alpha_opt_random)
-    assert(monitor_grid.log_alphas[np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
+    assert(monitor_random.log_alphas[
+        np.argmin(monitor_random.objs)] == log_alpha_opt_random)
+    assert(monitor_grid.log_alphas[
+        np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
 
 if __name__ == '__main__':

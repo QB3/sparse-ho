@@ -203,6 +203,7 @@ def _grad_search(
         incr = norm(step_size * grad_lambda)
 
         C = 0.25
+        # C = 0.25 / algo.criterion.model.X.shape[0]
         factor_L_lambda = 1.0
         if g_func <= g_func_old + C * tol + \
                 old_tol * (C + factor_L_lambda) * incr - factor_L_lambda * \

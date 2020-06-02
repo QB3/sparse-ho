@@ -1,9 +1,5 @@
 import time
 import numpy as np
-from sklearn import linear_model
-from scipy.optimize import fmin_l_bfgs_b
-
-from numpy.linalg import norm
 from numba import njit
 
 
@@ -14,7 +10,7 @@ def ST(x, alpha):
 
 @njit
 def proj_box_svm(x, C):
-    return min(max(0 , x), C)
+    return min(max(0, x), C)
 
 
 @njit

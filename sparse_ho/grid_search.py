@@ -1,6 +1,10 @@
 # This files contains the functions to perform zero order descent for HO
 # hyperparameter setting
 import numpy as np
+try:
+    from smt.sampling_methods import LHS
+except Exception:
+    print("could import smt.sampling_methods")
 
 
 def grid_search(

@@ -120,11 +120,7 @@ def test_val_grad(model):
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
     assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
 
-
-        # for the implcit the conjugate grad does not converge
-        # hence the rtol=1e-2
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-4)
-
 
 
 @pytest.mark.parametrize('model', models)
@@ -151,34 +147,14 @@ def test_grad_search(model, crit):
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
 
-
-    # criterion = CV(X_val, y_val, model, X_val=X_val, y_val=y_val)
-    # monitor4 = Monitor()
-    # algo = Backward(criterion)
-    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
-    #             tol=1e-16)
-
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     assert np.allclose(
         np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-4)
     assert np.allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
-    # assert np.allclose(
-    #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
-    # assert np.allclose(
-    #     np.array(monitor1.objs), np.array(monitor4.objs))
-    # assert np.allclose(
-    #     np.array(monitor1.log_alphas), np.array(monitor4.log_alphas), atol=1e-6)
-    # assert np.allclose(
-    #     np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
-
-    # assert np.allclose(
-    #     np.array(monitor1.objs_test), np.array(monitor4.objs_test))
-    # assert not np.allclose(
-    #     np.array(monitor1.times), np.array(monitor4.times))
 
 
 if __name__ == '__main__':

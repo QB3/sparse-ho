@@ -386,7 +386,8 @@ class wLasso():
         proj_log_alpha = log_alpha.copy()
         proj_log_alpha[proj_log_alpha < -12] = -12
         if np.max(proj_log_alpha > self.log_alpha_max):
-            proj_log_alpha[proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
+            proj_log_alpha[
+                proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
         return proj_log_alpha
 
     @staticmethod
@@ -473,7 +474,8 @@ class SVM():
     def _get_pobj(X, y, beta, C):
         n_samples = X.shape[0]
         return (
-            0.5 * norm(beta) ** 2 + C * np.sum(np.maximum(np.ones(n_samples) - y * (X @ beta), np.zeros(n_samples))))
+            0.5 * norm(beta) ** 2 + C * np.sum(np.maximum(
+                np.ones(n_samples) - y * (X @ beta), np.zeros(n_samples))))
 
     @staticmethod
     def _get_jac(dbeta, mask):
@@ -606,7 +608,8 @@ class SparseLogreg():
             beta[j:j+1] = ST(zj, alphas[j] / L[j])
             if compute_jac:
                 hess_fj = sigma(r) * (1 - sigma(r))
-                dzj = dbeta[j] - Xjs @ (hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
+                dzj = dbeta[j] - Xjs @ (
+                    hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
                 dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L[j]
                 # update residuals
@@ -623,7 +626,8 @@ class SparseLogreg():
             hess_fj = sigma(r) * (1 - sigma(r))
             grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
             v_t_jac[j] *= np.abs(sign_beta[j])
-            v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * (X[:, j] * hess_fj) @ X
+            v_t_jac -= v_t_jac[j] / (
+                L[j] * n_samples) * (X[:, j] * hess_fj) @ X
             r += X[:, j] * (beta[j-1] - beta[j])
 
         return grad
@@ -634,7 +638,8 @@ class SparseLogreg():
         temp = sigma(r)
 
         return (
-            np.sum(- y * np.log(temp) - (1 - y) * np.log(1 - temp)) / (n_samples) + np.abs(alphas * beta).sum())
+            np.sum(- y * np.log(temp) - (1 - y) * np.log(1 - temp)) /
+            (n_samples) + np.abs(alphas * beta).sum())
 
     @staticmethod
     def _get_jac(dbeta, mask):
@@ -698,7 +703,8 @@ class SparseLogreg():
             dbeta_old = dbeta[j]
             hess_fj = sigma(r) * (1 - sigma(r))
             # update of the Jacobian dbeta
-            dbeta[j] -= Xjs @ (hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
+            dbeta[j] -= Xjs @ (
+                hess_fj[idx_nz] * dr[idx_nz]) / (L[j] * n_samples)
             dbeta[j] -= alpha * sign_beta[j] / L[j]
             dr[idx_nz] += Xjs * (dbeta[j] - dbeta_old)
 

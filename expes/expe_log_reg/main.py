@@ -42,7 +42,8 @@ def parallel_function(
     y_train[y_train == -1.0] = 0.0
     y_val[y_val == -1.0] = 0.0
     y_test[y_test == -1.0] = 0.0
-    alpha_max = np.abs((y_train - np.mean(y_train) * (1 - np.mean(y_train))).T @ X_train).max() / n_samples
+    alpha_max = np.abs((y_train - np.mean(y_train) * (
+        1 - np.mean(y_train))).T @ X_train).max() / n_samples
     log_alpha0 = np.log(0.1 * alpha_max)
     log_alpha_max = np.log(alpha_max)
     n_outer = 10
