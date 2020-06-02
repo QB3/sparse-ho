@@ -87,24 +87,21 @@ class Logistic():
         self.val_test = None
 
     def get_v(self, mask, dense):
-        temp = sigma(self.X_val[:, mask] @ dense)
-        v = self.X_val[:, mask].T @ (temp - self.y_val)
+        temp = sigma(self.y_val * (self.X_val[:, mask] @ dense))
+        v = self.X_val[:, mask].T @ (self.y_val * (temp - 1))
         v /= self.X_val.shape[0]
         return v
 
     def value(self, mask, dense):
-        temp = sigma(self.X_val[:, mask] @ dense)
         val = np.sum(
-            - self.y_val * np.log(temp) - (1 - self.y_val) * np.log(1 - temp))
+            np.log(1 + np.exp(-self.y_val * (self.X_val[:, mask] @ dense))))
         val /= self.X_val.shape[0]
         return val
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
-            temp = sigma(self.X_test[:, mask] @ dense)
             self.val_test = np.sum(
-                - self.y_test * np.log(temp) -
-                (1 - self.y_test) * np.log(1 - temp))
+                np.log(1 + np.exp(-self.y_test * (self.X_test[:, mask] @ dense))))
             self.val_test /= self.X_test.shape[0]
         else:
             self.val_test = None

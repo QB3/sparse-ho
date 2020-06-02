@@ -565,7 +565,7 @@ class SparseLogreg():
         return beta, r
 
     @staticmethod
-    # @njit
+    @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
@@ -609,17 +609,18 @@ class SparseLogreg():
             L_temp = np.sum(
                 Xjs ** 2 * sigmar[idx_nz] * (1 - sigmar[idx_nz]))
             L_temp /= n_samples
-            zj = beta[j] - grad_j / (L_temp * n_samples)
-            beta[j:j+1] = ST(zj, alphas[j] / L_temp)
-            if compute_jac:
-                dsigmar = sigmar * (1 - sigmar) * dr
-                hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
-                dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
-                dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
-                # update residuals
-                dr[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
-            r[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
+            if L_temp != 0:
+                zj = beta[j] - grad_j / (L_temp * n_samples)
+                beta[j:j+1] = ST(zj, alphas[j] / L_temp)
+                if compute_jac:
+                    dsigmar = sigmar * (1 - sigmar) * dr
+                    hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
+                    dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
+                    dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
+                    dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
+                    # update residuals
+                    dr[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
+                r[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
 
     @staticmethod
     @njit
@@ -641,7 +642,6 @@ class SparseLogreg():
     @staticmethod
     def _get_pobj(r, beta, alphas, y):
         n_samples = r.shape[0]
-
         return (
             np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
 
@@ -709,18 +709,18 @@ class SparseLogreg():
             # get the non zero idices
             idx_nz = indices[indptr[j]:indptr[j+1]]
             sigmar = sigma(r)
-            L_temp = np.sum(Xjs ** 2 * sigmar * (1 - sigmar))
+            L_temp = np.sum(Xjs ** 2 * sigmar[idx_nz] * (1 - sigmar[idx_nz]))
             L_temp /= n_samples
+            if L_temp != 0:
+                # store old beta j for fast update
+                dbeta_old = dbeta[j]
+                dsigmar = sigmar * (1 - sigmar) * dr
 
-            # store old beta j for fast update
-            dbeta_old = dbeta[j]
-            dsigmar = sigmar * (1 - sigmar) * dr
-
-            hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
-            # update of the Jacobian dbeta
-            dbeta[j] -= hess_fj / (L_temp * n_samples)
-            dbeta[j] -= alpha * sign_beta[j] / L_temp
-            dr[idx_nz] += y * Xjs * (dbeta[j] - dbeta_old)
+                hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
+                # update of the Jacobian dbeta
+                dbeta[j] -= hess_fj / (L_temp * n_samples)
+                dbeta[j] -= alpha * sign_beta[j] / L_temp
+                dr[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
@@ -736,8 +736,8 @@ class SparseLogreg():
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= (4 * self.X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < -12:
-            return - 12.0
+        if log_alpha < -18:
+            return - 18.0
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:

@@ -18,9 +18,9 @@ from sparse_ho.grid_search import grid_search
 dataset_names = ["rcv1"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["implicit_forward", "forward", "grid_search"]
+methods = ["implicit", "implicit_forward", "forward", "grid_search"]
 # "grid_search",
-tolerance_decreases = ["constant"]
+tolerance_decreases = ["exponential"]
 tols = 1e-5
 n_outers = [1]
 
@@ -34,22 +34,23 @@ def parallel_function(
 
     # load data
     X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset_name)
+    X_train = X_train[0:3000, :]
+    y_train = y_train[0:3000]
+    X_train = X_train[:, 0:7500]
     n_samples, n_features = X_train.shape
     print('n_samples', n_samples)
     print('n_features', n_features)
-    y_train[y_train == -1.0] = 0.0
-    y_val[y_val == -1.0] = 0.0
-    y_test[y_test == -1.0] = 0.0
-    alpha_max = np.abs((y_train - np.mean(y_train) * (
-        1 - np.mean(y_train))).T @ X_train).max() / n_samples
-    log_alpha0 = np.log(0.1 * alpha_max)
+
+    alpha_max = np.max(np.abs(X_train.T @ y_train))
+    alpha_max /= X_train.shape[0]
+    log_alpha0 = np.log(0.2 * alpha_max)
     log_alpha_max = np.log(alpha_max)
-    n_outer = 10
+    n_outer = 5
 
     if dataset_name == "rcv1":
         size_loop = 1
     else:
-        size_loop = 1
+        size_loop = 2
     model = SparseLogreg(
         X_train, y_train, log_alpha0, log_alpha_max, max_iter=1000, tol=tol)
     criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
@@ -85,9 +86,9 @@ def parallel_function(
 
         elif method == "grid_search":
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-4 * alpha_max)
+            log_alpha_min = np.log(1e-8 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, 0.8 * log_alpha_max, monitor, max_evals=10,
+                algo, log_alpha_min, 0.2 * log_alpha_max, monitor, max_evals=25,
                 tol=tol, samp="grid")
             print(log_alpha_opt)
 
