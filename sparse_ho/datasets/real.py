@@ -23,11 +23,15 @@ PATH = pjoin(str(Path.home()), 'imp_forward_data')
 
 NAMES = {'rcv1_train': 'binary/rcv1_train.binary',
          'news20': 'binary/news20.binary',
-         'finance': 'regression/log1p.E2006.train'}
+         'finance': 'regression/log1p.E2006.train',
+         'leu': 'binary/leu',
+         'real-sim': 'binary/real-sim'}
 
 N_FEATURES = {'rcv1_train': 47236,
               'finance': 4272227,
-              'news20': 1355191}
+              'news20': 1355191,
+              'leu': 7129,
+              'real-sim': 20958}
 
 
 def get_20newsgroup(sparse=True):
@@ -87,6 +91,30 @@ def get_rcv1():
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
+def get_leukemia():
+    X, y = load_libsvm("leu")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5, random_state=42)
+    X_train = X_train.tocsc()
+    X_val = X_val.tocsc()
+    X_test = X_test.tocsc()
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
+def get_real_sim():
+    X, y = load_libsvm("real-sim")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5, random_state=42)
+    X_train = X_train.tocsc()
+    X_val = X_val.tocsc()
+    X_test = X_test.tocsc()
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
 def get_data(dataset_name):
     if dataset_name == "finance":
         return get_finance()
@@ -94,6 +122,10 @@ def get_data(dataset_name):
         return get_20newsgroup()
     elif dataset_name == "rcv1":
         return get_rcv1()
+    elif dataset_name == "leukemia":
+        return get_leukemia()
+    elif dataset_name == "real-sim":
+        return get_real_sim()
     else:
         raise ValueError("dataset_name %s do not exist" % dataset_name)
 

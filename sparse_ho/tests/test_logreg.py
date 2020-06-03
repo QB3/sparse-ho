@@ -19,23 +19,25 @@ n_features = 1000
 X_train, y_train = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=10, flip_y=0.1, n_redundant=0)
+    random_state=110, flip_y=0.1, n_redundant=0)
 X_train_s = csc_matrix(X_train)
 
 
 X_val, y_val = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=12, flip_y=0.1, n_redundant=0)
+    random_state=122, flip_y=0.1, n_redundant=0)
 
 X_val_s = csc_matrix(X_val)
 
-alpha = 0.3
-log_alpha = np.log(alpha)
-tol = 1e-16
-
 y_train[y_train == 0.0] = -1.0
 y_val[y_val == 0.0] = -1.0
+
+alpha_max = np.max(np.abs(X_train.T @ (- y_train)))
+alpha_max /= (2 * n_samples)
+alpha = 0.3 * alpha_max
+log_alpha = np.log(alpha)
+tol = 1e-16
 
 models = [
     SparseLogreg(
@@ -43,7 +45,6 @@ models = [
     SparseLogreg(
         X_train_s, y_train, log_alpha, max_iter=10000, tol=tol)
 ]
-model = models[0]
 # models = {}
 
 # models["SparseLogReg_sparse"] = SparseLogreg(
