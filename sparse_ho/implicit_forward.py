@@ -81,9 +81,7 @@ def get_only_jac(
         #     dbeta = np.zeros((n_features, n_features))
     else:
         dbeta = dbeta.copy()
-    dbeta_old = dbeta.copy()
 
-    tol_crit = tol_jac * norm(v)
     dr = model._init_dr(dbeta, Xs, y)
     for i in range(niter_jac):
         print("%i -st iterations over %i" % (i, niter_jac))
