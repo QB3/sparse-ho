@@ -69,6 +69,8 @@ def get_only_jac(
     is_sparse = issparse(Xs)
     L = model.get_L(Xs, is_sparse)
 
+    objs = []
+
     if dbeta is None:
         model._init_dbeta(n_features)
         # if model == "lasso":
@@ -81,7 +83,7 @@ def get_only_jac(
         dbeta = dbeta.copy()
     dbeta_old = dbeta.copy()
 
-    # tol_crit = tol_jac * norm(v)
+    tol_crit = tol_jac * norm(v)
     dr = model._init_dr(dbeta, Xs, y)
     for i in range(niter_jac):
         print("%i -st iterations over %i" % (i, niter_jac))
@@ -93,8 +95,21 @@ def get_only_jac(
             model._update_only_jac(
                 Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
+        objs.append(
+            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+
+        # m1 = norm(- v.T @ Xs.T @ dr + sign_beta * n_samples * alpha)
+        # m2 = tol_jac * np.sqrt(n_features) * n_samples * alpha * norm(v)
+        # crit = m1 <= m2
+        # print("m1 %.2f", m1)
+        # print("m2 %.2f", m2)
+        # print("m1 = %f" % norm(v @ (dbeta - dbeta_old)))
+        # print("tol_crit %f" % tol_crit)
         # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
-        if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
+        # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
+        # crit =
+        if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
             break
-        dbeta_old = dbeta.copy()
+        # dbeta_old = dbeta.copy()
+        # dr_old = dr.copy()
     return dbeta

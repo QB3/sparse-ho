@@ -17,8 +17,8 @@ from sparse_ho.grid_search import grid_search
 
 dataset_names = ["rcv1"]
 
-# methods = ["implicit_forward", "implicit"]
-methods = ["implicit", "implicit_forward", "forward", "grid_search"]
+methods = ["implicit_forward", "implicit"]
+# methods = ["implicit", "implicit_forward", "forward", "grid_search"]
 # "grid_search",
 tolerance_decreases = ["exponential"]
 tols = 1e-5
@@ -43,6 +43,7 @@ def parallel_function(
 
     alpha_max = np.max(np.abs(X_train.T @ y_train))
     alpha_max /= X_train.shape[0]
+    alpha_max /= 2
     log_alpha0 = np.log(0.2 * alpha_max)
     log_alpha_max = np.log(alpha_max)
     n_outer = 5
@@ -58,7 +59,7 @@ def parallel_function(
         monitor = Monitor()
 
         if method == "implicit_forward":
-            algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
+            algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
                 log_alpha0=log_alpha0, tol=tol,
