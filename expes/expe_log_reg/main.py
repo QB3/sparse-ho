@@ -17,8 +17,8 @@ from sparse_ho.grid_search import grid_search
 
 dataset_names = ["rcv1"]
 
-methods = ["implicit_forward", "implicit"]
-# methods = ["implicit", "implicit_forward", "forward", "grid_search"]
+# methods = ["implicit_forward", "implicit"]
+methods = ["forward"]
 # "grid_search",
 tolerance_decreases = ["exponential"]
 tols = 1e-5
@@ -52,11 +52,11 @@ def parallel_function(
         size_loop = 1
     model = SparseLogreg(
         X_train, y_train, log_alpha0, log_alpha_max, max_iter=1000, tol=tol)
-    criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
     for i in range(size_loop):
         monitor = Monitor()
 
         if method == "implicit_forward":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
@@ -66,6 +66,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -75,6 +76,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Implicit(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -84,6 +86,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(1e-8 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
