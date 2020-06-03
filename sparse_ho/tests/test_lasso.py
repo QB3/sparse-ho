@@ -69,6 +69,9 @@ def test_beta_jac():
         supp1, dense1, jac1 = get_beta_jac_iterdiff(
             X_train, y_train, dict_log_alpha[key], tol=tol,
             model=models[key])
+        supp1sk, dense1sk, jac1sk = get_beta_jac_iterdiff(
+            X_train, y_train, dict_log_alpha[key], tol=tol,
+            model=models[key], sk=True)
         supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
             X_train, y_train, dict_log_alpha[key], X_test, y_test, get_v,
             tol=tol, model=models[key], tol_jac=tol)
@@ -79,7 +82,9 @@ def test_beta_jac():
             X_train_s, y_train, dict_log_alpha[key], X_test, y_test, get_v,
             tol=tol, model=models[key], tol_jac=tol)
 
+        assert np.all(supp1 == supp1sk)
         assert np.all(supp1 == supp2)
+        assert np.allclose(dense1, dense1sk)
         assert np.allclose(dense1, dense2)
         assert np.allclose(jac1, jac2)
 
@@ -174,4 +179,4 @@ def test_val_grad():
 
 if __name__ == '__main__':
     test_beta_jac()
-    test_val_grad()
+    # test_val_grad()

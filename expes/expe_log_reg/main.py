@@ -17,8 +17,8 @@ from sparse_ho.grid_search import grid_search
 
 dataset_names = ["rcv1"]
 
-# methods = ["implicit_forward", "implicit"]
-methods = ["implicit", "implicit_forward", "forward", "grid_search"]
+methods = ["implicit_forward", "implicit"]
+# methods = ["implicit", "implicit_forward", "forward", "grid_search"]
 # "grid_search",
 tolerance_decreases = ["exponential"]
 tols = 1e-5
@@ -39,8 +39,9 @@ def parallel_function(
     print('n_samples', n_samples)
     print('n_features', n_features)
 
-    alpha_max = np.max(np.abs(X_train.T @ (- y_train)))
-    alpha_max /= (2 * n_samples)
+    alpha_max = np.max(np.abs(X_train.T @ y_train))
+    alpha_max /= X_train.shape[0]
+    alpha_max /= 2
     log_alpha0 = np.log(0.2 * alpha_max)
     log_alpha_max = np.log(alpha_max)
     n_outer = 50

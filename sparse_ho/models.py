@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
 from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p
@@ -202,6 +203,14 @@ class Lasso():
     def hessian_f(x):
         return np.ones(np.size(x))
 
+    def sk(self, X, y, alpha, tol, max_iter):
+        clf = linear_model.Lasso(
+            alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
+        clf.fit(X, y)
+        mask = clf.coef_ != 0
+        dense = clf.coef_[mask]
+        return mask, dense, None
+
 
 class wLasso():
     def __init__(self, X, y, log_alpha, log_alpha_max=None,
@@ -400,6 +409,17 @@ class wLasso():
     @staticmethod
     def hessian_f(x):
         return np.ones(np.size(x))
+
+    def sk(self, X, y, alpha, tol, max_iter):
+        """TODO
+        """
+        X /= alpha
+        clf = linear_model.Lasso(
+            alpha=1, fit_intercept=False, tol=tol, max_iter=max_iter)
+        clf.fit(X, y)
+        mask = clf.coef_ != 0
+        dense = (clf.coef_ / alpha)[mask]
+        return mask, dense, None
 
 
 class SVM():

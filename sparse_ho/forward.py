@@ -38,7 +38,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000,
-        tol=1e-3, compute_jac=True, backward=False):
+        tol=1e-3, compute_jac=True, backward=False, sk=False):
     """
     Parameters
     --------------
@@ -70,6 +70,7 @@ def get_beta_jac_iterdiff(
         to store the iterates or not in order to compute the Jacobian in a
         backward way
     """
+
     n_samples, n_features = X.shape
     is_sparse = issparse(X)
     if not is_sparse and not np.isfortran(X):
@@ -78,6 +79,9 @@ def get_beta_jac_iterdiff(
 
     ############################################
     alpha = np.exp(log_alpha)
+    if sk:
+        return model.sk(X, y, alpha, tol, max_iter)
+
     try:
         alpha.shape[0]
         alphas = alpha.copy()
