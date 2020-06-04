@@ -10,13 +10,18 @@ import scipy.sparse.linalg as slinalg
 
 class Lasso():
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3):
+            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False):
         self.X = X
         self.y = y
         self.log_alpha = log_alpha
         self.max_iter = max_iter
         self.tol = tol
         self.log_alpha_max = log_alpha_max
+        if use_sk:
+            self.clf = linear_model.Lasso(
+                fit_intercept=False, max_iter=max_iter, warm_start=True)
+        else:
+            self.clf = None
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -204,11 +209,16 @@ class Lasso():
         return np.ones(np.size(x))
 
     def sk(self, X, y, alpha, tol, max_iter):
-        clf = linear_model.Lasso(
-            alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        clf.fit(X, y)
-        mask = clf.coef_ != 0
-        dense = clf.coef_[mask]
+        if self.clf is None:
+            self.clf = linear_model.Lasso(
+                fit_intercept=False, max_iter=max_iter, warm_start=True)
+        self.clf.alpha = alpha
+        self.clf.tol = tol
+        # clf = linear_model.Lasso(
+        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
+        self.clf.fit(X, y)
+        mask = self.clf.coef_ != 0
+        dense = self.clf.coef_[mask]
         return mask, dense, None
 
 
