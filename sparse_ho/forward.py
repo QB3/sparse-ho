@@ -3,8 +3,9 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    def __init__(self, criterion):
+    def __init__(self, criterion, use_sk=False):
         self.criterion = criterion
+        self.use_sk = use_sk
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
@@ -14,7 +15,9 @@ class Forward():
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             max_iter=self.criterion.model.max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward)
+            compute_jac=compute_jac, backward=backward,
+            use_sk=self.use_sk)
+
         if jac is not None:
             jac_v = jac.T @ v(mask, dense)
             if full_jac_v:
@@ -38,7 +41,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000,
-        tol=1e-3, compute_jac=True, backward=False, sk=False):
+        tol=1e-3, compute_jac=True, backward=False, use_sk=False):
     """
     Parameters
     --------------
@@ -79,7 +82,8 @@ def get_beta_jac_iterdiff(
 
     ############################################
     alpha = np.exp(log_alpha)
-    if sk:
+    # import ipdb; ipdb.set_trace()
+    if use_sk:
         return model.sk(X, y, alpha, tol, max_iter)
 
     try:
