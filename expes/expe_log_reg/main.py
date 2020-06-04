@@ -18,7 +18,7 @@ from sparse_ho.grid_search import grid_search
 dataset_names = ["rcv1"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["forward"]
+methods = ["grid_search"]
 # "grid_search",
 tolerance_decreases = ["exponential"]
 tols = 1e-5
@@ -44,7 +44,7 @@ def parallel_function(
     alpha_max /= 2
     log_alpha0 = np.log(0.2 * alpha_max)
     log_alpha_max = np.log(alpha_max)
-    n_outer = 50
+    n_outer = 10
 
     if dataset_name == "rcv1":
         size_loop = 1
@@ -90,8 +90,26 @@ def parallel_function(
             algo = Forward(criterion)
             log_alpha_min = np.log(1e-8 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, 0.2 * log_alpha_max, monitor, max_evals=5,
+                algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
                 tol=tol, samp="grid")
+            print(log_alpha_opt)
+        
+        elif method == "random":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            algo = Forward(criterion)
+            log_alpha_min = np.log(1e-8 * alpha_max)
+            log_alpha_opt, min_g_func = grid_search(
+                algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
+                tol=tol, samp="random")
+            print(log_alpha_opt)
+
+        elif method == "lhs":
+            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            algo = Forward(criterion)
+            log_alpha_min = np.log(1e-8 * alpha_max)
+            log_alpha_opt, min_g_func = grid_search(
+                algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
+                tol=tol, samp="lhs")
             print(log_alpha_opt)
 
     monitor.times = np.array(monitor.times)
