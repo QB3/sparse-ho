@@ -27,9 +27,6 @@ from sparse_ho.datasets.real import get_rcv1
 
 
 X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-y_train[y_train == -1.0] = 0.0
-y_val[y_val == -1.0] = 0.0
-y_test[y_test == -1.0] = 0.0
 
 n_samples = 100
 n_features = 1000
@@ -50,10 +47,8 @@ X_val, y_val = datasets.make_classification(
 
 n_samples, n_features = X_train.shape
 
-alpha_max = 1 / 4
-alpha_max = np.abs(
-    (y_train - np.mean(y_train) *
-        (1 - np.mean(y_train))).T @ X_train).max() / n_samples
+alpha_max = np.max(np.abs(X_train.T @ y_train))
+alpha_max /= 2 * n_samples
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(alpha_max / 100)
 maxit = 1000
