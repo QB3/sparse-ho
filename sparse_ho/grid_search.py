@@ -30,6 +30,8 @@ def grid_search(
         sampling = LHS(xlimits=xlimits)
         num = max_evals
         log_alphas = sampling(num)
+        log_alphas[log_alphas < log_alpha_min] = log_alpha_min
+        log_alphas[log_alphas > log_alpha_max] = log_alpha_max
 
     min_g_func = np.inf
     log_alpha_opt = log_alphas[0]
@@ -38,7 +40,8 @@ def grid_search(
         if samp == "lhs":
             log_alpha = log_alpha[0]
         g_func, grad_lambda = algo.get_val_grad(
-            log_alpha, tol=algo.criterion.model.tol,
+            log_alpha, tol=tol,
+            # log_alpha, tol=algo.criterion.model.tol,
             beta_star=beta_star, compute_jac=False)
 
         if g_func < min_g_func:

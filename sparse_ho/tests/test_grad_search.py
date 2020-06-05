@@ -55,6 +55,7 @@ dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
     Lasso(X_train, y_train, dict_log_alpha["lasso"]),
+    # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
@@ -130,6 +131,7 @@ def test_grad_search(model, crit):
 if __name__ == '__main__':
     models = [
         Lasso(X_train, y_train, dict_log_alpha["lasso"]),
+        # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
         wLasso(X_train, y_train, dict_log_alpha["wlasso"])]
     crits = ['cv', 'sure']
     for model in models:
