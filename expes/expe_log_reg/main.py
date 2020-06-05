@@ -18,7 +18,7 @@ from sparse_ho.grid_search import grid_search
 dataset_names = ["rcv1"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["grid_search"]
+methods = ["lhs"]
 # "grid_search",
 tolerance_decreases = ["exponential"]
 tols = 1e-5
@@ -27,6 +27,7 @@ n_outers = [1]
 dict_t_max = {}
 dict_t_max["rcv1"] = 500
 dict_t_max["real-sim"] = 500
+dict_t_max["leukemia"] = 10
 
 
 def parallel_function(
@@ -88,7 +89,7 @@ def parallel_function(
         elif method == "grid_search":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-8 * alpha_max)
+            log_alpha_min = np.log(1e-6 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
                 tol=tol, samp="grid")
@@ -97,7 +98,7 @@ def parallel_function(
         elif method == "random":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-8 * alpha_max)
+            log_alpha_min = np.log(1e-6 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
                 tol=tol, samp="random")
@@ -106,7 +107,7 @@ def parallel_function(
         elif method == "lhs":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-8 * alpha_max)
+            log_alpha_min = np.log(1e-6 * alpha_max)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
                 tol=tol, samp="lhs")
