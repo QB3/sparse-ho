@@ -2,7 +2,7 @@ import time
 import numpy as np
 from numpy.linalg import norm
 
-from sklearn.datasets import make_regression
+# from sklearn.datasets import make_regression
 from sklearn import linear_model
 from sklearn.linear_model import LassoCV
 from sparse_ho.models import Lasso
@@ -10,13 +10,15 @@ from sparse_ho.criterion import CV
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.grad_search_CV import grad_search_CV
+from sparse_ho.datasets.real import load_libsvm
 
-# X, y = load_libsvm('rcv1_train')
-X, y = make_regression(
-    n_samples=2000, n_features=10000)
+
+X, y = load_libsvm('rcv1train')
+# X, y = make_regression(
+#     n_samples=2000, n_features=10000)
 
 random_state = 0
-cv = 5
+cv = 2
 
 print("Starting path computation...")
 n_samples = len(y)
@@ -25,13 +27,13 @@ alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 n_alphas = 100
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 
-tol = 1e-5
+tol = 1e-8
 
 print('scikit started')
 
 t0 = time.time()
 reg = LassoCV(
-    cv=cv, random_state=random_state, verbose=True, tol=tol, fit_intercept=False).fit(X, y)
+    cv=cv, random_state=random_state, verbose=True, tol=tol, fit_intercept=False, alphas=alphas).fit(X, y)
 reg.score(X, y)
 t_sk = time.time() - t0
 

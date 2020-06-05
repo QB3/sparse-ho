@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
+from scipy.sparse import issparse
 
 from sparse_ho.ho import _grad_search
 
@@ -15,6 +16,11 @@ def grad_search_CV(
     for i in range(cv):
         X_train, X_val, y_train, y_val = train_test_split(
             X, y, test_size=test_size, random_state=cv)
+
+        if issparse(X_train):
+            X_train = X_train.tocsc().copy()
+        if issparse(X_val):
+            X_val = X_val.tocsc().copy()
 
         model = Model(X_train, y_train, log_alpha0)
 

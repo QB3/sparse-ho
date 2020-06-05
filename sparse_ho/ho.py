@@ -174,6 +174,9 @@ def _grad_search(
         #     lambdak, tol=tol, beta_star=beta_star)
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
 
+        monitor(g_func, algo.criterion.val_test, lambdak,
+                grad_lambda, algo.criterion.rmse)
+
         if convexify:
             g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
             grad_lambda += gamma_convex * np.exp(lambdak)
@@ -239,9 +242,6 @@ def _grad_search(
         g_func_old = g_func
 
         # monitor(g_func, 0, lambdak, grad_lambda, 0)
-
-        monitor(g_func, algo.criterion.val_test, lambdak,
-                grad_lambda, algo.criterion.rmse)
 
         print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:
