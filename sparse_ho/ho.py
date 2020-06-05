@@ -247,3 +247,53 @@ def _grad_search(
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
+
+
+def grad_search_wolfe(
+        algo, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=5):
+
+    def _get_val_grad(lambdak, tol=tol):
+        return algo.get_val_grad(lambdak, tol=tol)
+
+    def _get_val(lambdak, tol=tol):
+        return algo.criterion.get_val(lambdak, tol=tol)
+
+    log_alphak = log_alpha0
+    for i in range(n_outer):
+        val, grad = _get_val_grad(log_alphak)
+
+        monitor(val.copy(), algo.criterion.val_test, log_alphak,
+                grad, algo.criterion.rmse)
+
+        # step_size = 1 / norm(grad)
+        step_size = wolfe(
+            log_alphak, -grad, val, _get_val, _get_val_grad, maxit_ln=maxit_ln)
+        log_alphak -= step_size * grad
+
+
+def wolfe(x_k, p_k, val, fun, fun_grad, maxit_ln=5):
+
+    alpha_low = 0
+    alpha_high = 1000
+    alpha = 1 / (10 * norm(p_k))
+    # alpha = 1 / (10 * norm(p_k))
+    c1 = 0.1
+    c2 = 0.7
+
+    k = 0
+    while k < maxit_ln:
+        if (fun(x_k + alpha * p_k) > val - c1 * (alpha * norm(p_k) ** 2)):
+            alpha_high = alpha
+            alpha = (alpha_high+alpha_low) / 2
+        elif fun_grad(x_k + alpha * p_k)[1].T * p_k < - c2 * norm(p_k) ** 2:
+            alpha_low = alpha
+            if alpha_high > 100:
+                alpha = 2 * alpha_low
+            else:
+                alpha = (alpha_high + alpha_low) / 2
+        else:
+            break
+        k += 1
+
+    return alpha

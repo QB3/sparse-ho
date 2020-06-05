@@ -1,6 +1,7 @@
 from numpy.linalg import norm
 import numpy as np
 from sparse_ho.utils import sigma
+from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class CV():
@@ -47,6 +48,11 @@ class CV():
             self.rmse = norm(diff_beta)
         else:
             self.rmse = None
+
+    def get_val(self, log_alpha, tol=1e-3):
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol)
+        return self.value(mask, dense)
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,

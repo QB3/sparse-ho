@@ -94,7 +94,7 @@ def parallel_function(
                 algo, log_alpha_min, np.log(0.2 * alpha_max), monitor, max_evals=25,
                 tol=tol, samp="grid")
             print(log_alpha_opt)
-        
+
         elif method == "random":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
