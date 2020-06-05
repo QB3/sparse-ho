@@ -1,17 +1,16 @@
 import time
 import numpy as np
+# import scipy
 
 import matplotlib.pyplot as plt
 
-# from sklearn.datasets import make_regression
-# from sklearn.linear_model import lasso_path
 from sklearn.model_selection import train_test_split
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
-# from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
-# from sparse_ho.ho import grad_search_wolfe
+from sparse_ho.ho import grad_search_wolfe
 # from sklearn.datasets import make_regression
 # from sparse_ho.ho import grad_search, grad_search_wolfe
 from sparse_ho.utils import Monitor
@@ -19,8 +18,10 @@ from sparse_ho.datasets.real import load_libsvm
 from sparse_ho.grid_search import grid_search
 
 X, y = load_libsvm('leu')
+# X = X.todense()
 # X, y = make_regression(
 #     n_samples=3000, n_features=1000)
+# X = scipy.sparse.csc_matrix(X)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.33, random_state=42)
@@ -54,31 +55,31 @@ print('grid search finished')
 print('grid search started')
 
 t0 = time.time()
-model = Lasso(X_train, y_train, np.log(alpha_max/10), use_sk=True)
+model = Lasso(X_train, y_train, np.log(alpha_max/10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=False)
 monitor_grid_us = Monitor()
 grid_search(
-    algo, None, None, monitor_grid_us, log_alphas=np.log(alphas))
+    algo, None, None, monitor_grid_us, log_alphas=np.log(alphas),
+    tol=tol)
 t_gradsearch = time.time() - t0
 
 print('grid search finished')
 
-1 / 0
+# 1 / 0
 
-# print('grad search started')
+print('grad search started')
 
-# t0 = time.time()
-# model = Lasso(X_train, y_train, np.log(alpha_max/10), use_sk=True)
-# criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# # algo = Forward(criterion)
-# algo = ImplicitForward(criterion, use_sk=False, n_iter_jac=100)
-# monitor_wolfe = Monitor()
-# grad_search_wolfe(
-#     algo, np.log(alpha_max/10), monitor_wolfe, n_outer=10, tol=tol, maxit_ln=5)
-# t_gradsearch = time.time() - t0
+t0 = time.time()
+model = Lasso(X_train, y_train, np.log(alpha_max/10))
+criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+algo = ImplicitForward(criterion, n_iter_jac=100)
+monitor_wolfe = Monitor()
+grad_search_wolfe(
+    algo, np.log(alpha_max/10), monitor_wolfe, n_outer=10, tol=tol, maxit_ln=5)
+t_gradsearch = time.time() - t0
 
-# print('grad search finished')
+print('grad search finished')
 
 plt.figure()
 plt.semilogy(monitor_grid.times, monitor_grid.objs, label='grid-search')
