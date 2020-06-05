@@ -10,7 +10,7 @@ from sparse_ho.models import Lasso, wLasso
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
-from sparse_ho.backward import Backward
+# from sparse_ho.backward import Backward
 from sparse_ho.criterion import CV, SURE
 from sparse_ho.ho import grad_search
 
@@ -68,41 +68,45 @@ def test_grad_search(model, crit):
         n_outer = 2
         criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     else:
-        n_outer = 5
+        n_outer = 2
         criterion = SURE(X_train, y_train, model, sigma=sigma_star,
                          X_test=X_test, y_test=y_test)
 
-    criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-        y_test=y_test)
+    # criterion = SURE(
+    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+    #     y_test=y_test)
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
     algo = Forward(criterion)
     grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-        y_test=y_test)
+    # criterion = SURE(
+    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+    #     y_test=y_test)
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
     algo = Implicit(criterion)
     grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-        y_test=y_test)
+    # criterion = SURE(
+    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+    #     y_test=y_test)
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-        y_test=y_test)
-    monitor4 = Monitor()
-    algo = Backward(criterion)
-    grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
-                tol=1e-16)
+    # criterion = SURE(
+    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+    #     y_test=y_test)
+    # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    # monitor4 = Monitor()
+    # algo = Backward(criterion)
+    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
+    #             tol=1e-16)
 
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
@@ -114,18 +118,18 @@ def test_grad_search(model, crit):
         np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
-    assert np.allclose(
-        np.array(monitor1.objs), np.array(monitor4.objs))
-    assert np.allclose(
-        np.array(monitor1.log_alphas), np.array(monitor4.log_alphas),
-        atol=1e-6)
-    assert np.allclose(
-        np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
+    # assert np.allclose(
+    #     np.array(monitor1.objs), np.array(monitor4.objs))
+    # assert np.allclose(
+    #     np.array(monitor1.log_alphas), np.array(monitor4.log_alphas),
+    #     atol=1e-6)
+    # assert np.allclose(
+    #     np.array(monitor1.grads), np.array(monitor4.grads), atol=1e-7)
 
-    assert np.allclose(
-        np.array(monitor1.objs_test), np.array(monitor4.objs_test))
-    assert not np.allclose(
-        np.array(monitor1.times), np.array(monitor4.times))
+    # assert np.allclose(
+    #     np.array(monitor1.objs_test), np.array(monitor4.objs_test))
+    # assert not np.allclose(
+    #     np.array(monitor1.times), np.array(monitor4.times))
 
 
 if __name__ == '__main__':
@@ -133,7 +137,8 @@ if __name__ == '__main__':
         Lasso(X_train, y_train, dict_log_alpha["lasso"]),
         # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
         wLasso(X_train, y_train, dict_log_alpha["wlasso"])]
-    crits = ['cv', 'sure']
+    crits = ['cv']
+    # crits = ['cv', 'sure']
     for model in models:
         for crit in crits:
             test_grad_search(model, crit)
