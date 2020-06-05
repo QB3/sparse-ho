@@ -71,20 +71,24 @@ dict_title["finance"] = "finance"
 dict_title["kdda_train"] = "kdda"
 dict_title["climate"] = "climate"
 dict_title["leukemia"] = "leukemia"
+dict_title["real-sim"] = "real-sim"
 
 dict_markevery = {}
 dict_markevery["20newsgroups"] = 5
 dict_markevery["finance"] = 10
 dict_markevery["rcv1"] = 1
+dict_markevery["leukemia"] = 1
+dict_markevery["real-sim"] = 1
 
 dict_n_feature = {}
 dict_n_feature["rcv1"] = r"($p=19,959$)"
 dict_n_feature["20newsgroups"] = r"($p=130,107$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
-
+dict_n_feature["leukemia"] = r"($p=7,129$)"
+dict_n_feature["real-sim"] = r"($p=20,958$)"
 markersize = 8
 
-dataset_names = ["rcv1"]
+dataset_names = ["rcv1", "leukemia", "real-sim"]
 # dataset_names = ["20newsgroups"]
 # dataset_names = ["finance"]
 # dataset_names = ["leukemia"]
@@ -102,7 +106,6 @@ fig2, axarr2 = plt.subplots(
 
 for idx, dataset in enumerate(dataset_names):
     df_data = pandas.read_pickle("%s.pkl" % dataset)
-    df_data = pandas.read_pickle("%s.pkl" % "rcv1")
     df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
 
     methods = df_data['method']
