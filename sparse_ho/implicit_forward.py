@@ -59,10 +59,10 @@ def get_beta_jac_fast_iterdiff(
     dbeta0_new = model._init_dbeta0(mask, mask0, jac0)
     reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
-    v = get_v(mask, dense)
-    r = X[:, mask] @ dense
+    v = None
+    _, r = model._init_beta_r(X, y, mask, dense)
     jac = get_only_jac(
-        X[:, mask], y, r, reduce_alpha, np.sign(dense), v,
+        model.reduce_X(mask), model.reduce_y(mask), r, reduce_alpha, model.sign(dense), v,
         dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model,
         mask=mask, dense=dense)
 
