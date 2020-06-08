@@ -8,8 +8,9 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 
 
-n_samples = 1000
-n_features = 100
+n_samples = 100
+n_features = 300
+
 X_train, y_train = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
@@ -45,7 +46,18 @@ def get_v(mask, dense):
 def test_beta_jac(model):
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
         X_train, y_train, log_C, tol=tol,
-        model=model, compute_jac=True, max_iter=1000)
+        model=model, compute_jac=True, max_iter=10000)
+
+    beta = np.zeros(n_samples)
+    beta[supp1] = dense1
+    full_supp = np.logical_and(beta > 0, beta < C)
+    # full_supp = np.logical_or(beta <= 0, beta >= C)
+
+    Q = (y_train[:, np.newaxis] * X_train)  @  (y_train[:, np.newaxis] * X_train).T
+    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ np.ones((beta >= C).sum())
+
+    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v) * C
+    assert np.allclose(jac_dense, jac1[dense1 < C])
 
     primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
     clf = LinearSVC(
@@ -55,7 +67,7 @@ def test_beta_jac(model):
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X_train, y_train, log_C, None, None,
-        get_v, tol=tol, model=model, tol_jac=1e-16)
+        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
 
     assert np.allclose(primal, clf.coef_)
 
