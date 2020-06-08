@@ -114,8 +114,8 @@ def get_only_jac(
         # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
         # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
         # crit =
-        if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
-            break
+        # if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
+        #     break
         # dbeta_old = dbeta.copy()
         # dr_old = dr.copy()
     return dbeta

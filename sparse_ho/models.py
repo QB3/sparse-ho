@@ -564,16 +564,19 @@ class SVM():
         return np.sum(y * dbeta * X.T, axis=1)
 
     @staticmethod
-    @njit
+    # @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, C, sign_beta):
-        n_samples = Xs.shape[0]
-        for j in range(n_samples):
+        supp = np.where(sign_beta == 0.0)
+        dbeta[sign_beta == 1.0] = C
+        dr = np.sum(ys * dbeta * Xs.T, axis=1)
+        for j in supp[0]:
             dF = ys[j] * np.sum(dr * Xs[j, :])
+            print(dF)
             dbeta_old = dbeta[j]
             dzj = dbeta[j] - (dF / L[j])
-            dbeta[j] = (sign_beta[j] == 0.0) * dzj
-            dbeta[j] += C * (sign_beta[j] == 1.0)
+            dbeta[j] = dzj
             dr += (dbeta[j] - dbeta_old) * ys[j] * Xs[j, :]
+
 # TODO
     # @staticmethod
     # @njit
