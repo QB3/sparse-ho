@@ -40,8 +40,8 @@ class Forward():
 
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
-        max_iter=1000,
-        tol=1e-3, compute_jac=True, backward=False, use_sk=False):
+        max_iter=1000, tol=1e-3, compute_jac=True, backward=False,
+        use_sk=False, save_iterates=False):
     """
     Parameters
     --------------
@@ -107,6 +107,9 @@ def get_beta_jac_iterdiff(
     # store the iterates if needed
     if backward:
         list_beta = []
+    if save_iterates:
+        list_beta = []
+        list_jac = []
 
     # import ipdb; ipdb.set_trace()
     for i in range(max_iter):
@@ -129,6 +132,9 @@ def get_beta_jac_iterdiff(
             break
         if backward:
             list_beta.append(beta.copy())
+        if save_iterates:
+            list_beta.append(beta.copy())
+            list_jac.append(dbeta.copy())
     else:
         print('did not converge !')
         # raise RuntimeError('did not converge !')
@@ -138,6 +144,8 @@ def get_beta_jac_iterdiff(
 
     jac = model._get_jac(dbeta, mask)
 
+    if save_iterates:
+        return np.array(list_beta), np.array(list_jac)
     if backward:
         return mask, dense, list_beta
     else:

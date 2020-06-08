@@ -10,7 +10,6 @@ from sklearn import datasets
 from sparse_ho.utils import sigma
 
 
-
 def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
               max_iter=1000, tol=1e-3, compute_jac=True):
 
@@ -178,4 +177,4 @@ axarr.flat[0].axvline(x=supp_id[0], c='red', linestyle="--")
 axarr.flat[1].axvline(x=supp_id[0], c='red', linestyle="--")
 axarr.flat[0].set_title("Iterates convergence for the Logistic Regression")
 axarr.flat[1].set_title("Jacobian convergence for the Logistic Regression")
-plt.show()
+plt.show(block=False)
