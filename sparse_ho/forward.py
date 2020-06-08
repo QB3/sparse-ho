@@ -111,6 +111,7 @@ def get_beta_jac_iterdiff(
         list_beta = []
         list_jac = []
 
+    print(tol)
     # import ipdb; ipdb.set_trace()
     for i in range(max_iter):
         print("%i -st iteration over %i" % (i, max_iter))
