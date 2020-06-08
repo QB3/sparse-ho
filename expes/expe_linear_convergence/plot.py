@@ -5,6 +5,11 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
 
+
+save_fig = True
+fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
+
+
 configure_plt()
 
 fontsize = 16
@@ -48,4 +53,8 @@ axarr.flat[0].set_ylabel(r"$||\beta^{(k)} - \hat \beta||$")
 axarr.flat[4].set_ylabel(r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$")
 
 fig.tight_layout()
+
+if save_fig:
+    fig.savefig(
+        fig_dir + "linear_convergence_lasso.pdf", bbox_inches="tight")
 fig.show()
