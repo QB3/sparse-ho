@@ -3,10 +3,11 @@ from numpy.linalg import norm
 from joblib import Parallel, delayed
 import pandas
 # from sklearn.linear_model import Lasso as Lasso_sk
-from sklearn.linear_model import LogisticRegression
+# from sklearn.linear_model import LogisticRegression
 from scipy.sparse.linalg import cg
-from sparse_ho.models import Lasso, SparseLogreg
-import matplotlib.pyplot as plt
+from sparse_ho.models import Lasso
+# , SparseLogreg
+# import matplotlib.pyplot as plt
 
 from celer import Lasso as Lasso_sk
 # from sparse_ho.utils import sigma

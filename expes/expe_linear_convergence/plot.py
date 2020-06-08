@@ -1,6 +1,6 @@
-import numpy as np
+# import numpy as np
 import pandas
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
