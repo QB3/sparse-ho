@@ -17,7 +17,7 @@ n_samples = 100
 n_features = 100
 n_active = 5
 SNR = 3
-rho = 0.5
+rho = 0.1
 
 X_train, y_train, beta_star, noise, sigma_star = get_synt_data(
     dictionary_type="Toeplitz", n_samples=n_samples,
@@ -141,7 +141,7 @@ def test_val_grad():
 
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2
-        assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
+        assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
 
     for key in models.keys():
         # model = Lasso(log_alpha)
@@ -175,8 +175,9 @@ def test_val_grad():
         assert np.allclose(val_bwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_bwd)
         assert np.allclose(grad_bwd, grad_imp_fwd)
+        # import ipdb; ipdb.set_trace()
 
 
 if __name__ == '__main__':
-    test_beta_jac()
-    # test_val_grad()
+    # test_beta_jac()
+    test_val_grad()

@@ -180,9 +180,10 @@ class Lasso():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def _reduce_jac_t_v(jac, mask, dense, alphas):
-        return alphas[mask] * np.sign(dense) @ jac
+    # @staticmethod
+    def _get_jac_t_v(self, jac, mask, dense, alphas):
+        n_samples = self.X.shape[0]
+        return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
         if self.log_alpha_max is None:
@@ -403,11 +404,12 @@ class wLasso():
     def get_mask_jac_v(mask, jac_v):
         return jac_v[mask]
 
-    @staticmethod
-    def _reduce_jac_t_v(jac, mask, dense, alphas):
+    # @staticmethod
+    def _get_jac_t_v(self, jac, mask, dense, alphas):
+        n_samples = self.X.shape[0]
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
-        jac_t_v = alphas[mask] * np.sign(dense) * jac
+        jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
     def proj_param(self, log_alpha):
@@ -619,9 +621,10 @@ class SVM():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def _reduce_jac_t_v(jac, mask, dense, alphas):
-        return alphas[mask] * np.sign(dense) @ jac
+    # @staticmethod
+    def _get_jac_t_v(self, jac, mask, dense, alphas):
+        n_samples = self.X.shape[0]
+        return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     @staticmethod
     def get_L(X, is_sparse=False):
@@ -854,9 +857,10 @@ class SparseLogreg():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def _reduce_jac_t_v(jac, mask, dense, alphas):
-        return alphas[mask] * np.sign(dense) @ jac
+    # @staticmethod
+    def _get_jac_t_v(self, jac, mask, dense, alphas):
+        n_samples = self.X.shape[0]
+        return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
         if self.log_alpha_max is None:

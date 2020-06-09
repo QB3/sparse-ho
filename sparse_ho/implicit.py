@@ -68,16 +68,14 @@ def get_beta_jac_t_v_implicit(
 
     try:
         sol = cg(
-            # this is shady and may lead to errors to multiply by n_samples
-            # here
-            mat_to_inv, - n_samples * v,
+            mat_to_inv, - v,
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
-            jac = sol[0]
+            sol_lin_sys = sol[0]
         else:
             raise ValueError('cg did not converge.')
-            1 / 0
+            # 1 / 0
     except Exception:
         print("Matrix to invert was badly conditioned")
         size_mat = mask.sum()
@@ -89,9 +87,9 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - n_samples * v, x0=sol0, atol=1e-3)
-        jac = sol[0]
+            - v, x0=sol0, atol=1e-3)
+        sol_lin_sys = sol[0]
 
-    jac_t_v = model._reduce_jac_t_v(jac, mask, dense, alphas)
+    jac_t_v = model._get_jac_t_v(sol_lin_sys, mask, dense, alphas)
 
     return mask, dense, jac_t_v, sol[0]
