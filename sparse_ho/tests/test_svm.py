@@ -2,7 +2,9 @@ import numpy as np
 import pytest
 from sklearn import datasets
 from sklearn.svm import LinearSVC
-
+from sparse_ho.criterion import Logistic
+from sparse_ho.forward import Forward
+from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.models import SVM
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
@@ -76,6 +78,28 @@ def test_beta_jac(model):
     assert np.allclose(jac1, jac2, atol=1e-4)
 
 
+@pytest.mark.parametrize('model', models)
+def test_val_grad(model):
+    #######################################################################
+    # Not all methods computes the full Jacobian, but all
+    # compute the gradients
+    # check that the gradient returned by all methods are the same
+
+    criterion = Logistic(X_val, y_val, model)
+    algo = Forward(criterion)
+    val_fwd, grad_fwd = algo.get_val_grad(
+        log_C, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
+        log_C, tol=tol)
+
+    assert np.allclose(val_fwd, val_imp_fwd)
+    assert np.allclose(grad_fwd, grad_imp_fwd)
+
+
 if __name__ == '__main__':
     for model in models:
         test_beta_jac(model)
+        test_val_grad(model)

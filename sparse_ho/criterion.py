@@ -67,7 +67,7 @@ class CV():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-
+        mask, dense = self.model.get_primal(mask, dense)
         val = self.value(mask, dense)
         self.value_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)
@@ -133,7 +133,7 @@ class Logistic():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-
+        mask, dense = self.model.get_primal(mask, dense)
         val = self.value(mask, dense)
         self.value_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)

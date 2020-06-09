@@ -19,7 +19,7 @@ class Forward():
             use_sk=self.use_sk)
 
         if jac is not None:
-            jac_v = jac.T @ v(mask, dense)
+            jac_v = model.get_jac_v(mask, dense, jac, v)
             if full_jac_v:
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:

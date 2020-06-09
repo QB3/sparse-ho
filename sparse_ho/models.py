@@ -230,6 +230,12 @@ class Lasso():
     def sign(self, x):
         return np.sign(x)
 
+    def get_primal(self, mask, dense):
+        return mask, dense
+
+    def get_jac_v(self, mask, dense, jac, v):
+        return jac.T @ v(mask, dense)
+
 
 class wLasso():
     def __init__(self, X, y, log_alpha, log_alpha_max=None,
@@ -449,6 +455,12 @@ class wLasso():
     def sign(self, x):
         return np.sign(x)
 
+    def get_primal(self, mask, dense):
+        return mask, dense
+
+    def get_jac_v(self, mask, dense, jac, v):
+        return jac.T @ v(mask, dense)
+
 
 class SVM():
     def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
@@ -479,7 +491,7 @@ class SVM():
         return beta, r
 
     @staticmethod
-    # @njit
+    @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, C, L, compute_jac=True):
 
@@ -504,32 +516,34 @@ class SVM():
                 dbeta[j] = ind_box(zj, C) * dzj
                 dbeta[j] += C * (C <= zj)
                 dr += (dbeta[j] - dbeta_old) * y[j] * X[j, :]
-# TODO
-    # @staticmethod
-    # @njit
-    # def _update_beta_jac_bcd_sparse(
-    #         data, indptr, indices, n_samples, n_features, beta,
-    #         dbeta, r, dr, alphas, L, compute_jac=True):
 
-    #     non_zeros = np.where(L != 0)[0]
-
-    #     for j in non_zeros:
-    #         # get the j-st column of X in sparse format
-    #         Xjs = data[indptr[j]:indptr[j+1]]
-    #         # get the non zero indices
-    #         idx_nz = indices[indptr[j]:indptr[j+1]]
-    #         beta_old = beta[j]
-    #         if compute_jac:
-    #             dbeta_old = dbeta[j]
-    #         zj = beta[j] + r[idx_nz] @ Xjs / (L[j] * n_samples)
-    #         beta[j:j+1] = ST(zj, alphas[j] / L[j])
-    #         if compute_jac:
-    #             dzj = dbeta[j] + Xjs @ dr[idx_nz] / (L[j] * n_samples)
-    #             dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
-    #             dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L[j]
-    #             # update residuals
-    #             dr[idx_nz] -= Xjs * (dbeta[j] - dbeta_old)
-    #         r[idx_nz] -= Xjs * (beta[j] - beta_old)
+    @staticmethod
+    @njit
+    def _update_beta_jac_bcd_sparse(
+            data, indptr, indices, y, n_samples, n_features, beta,
+            dbeta, r, dr, C, L, compute_jac=True):
+        # data needs to be a row sparse matrix
+        non_zeros = np.where(L != 0)[0]
+        C = C[0]
+        for j in non_zeros:
+            # get the i-st row of X in sparse format
+            Xis = data[indptr[j]:indptr[j+1]]
+            # get the non zero indices
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            beta_old = beta[j]
+            if compute_jac:
+                dbeta_old = dbeta[j]
+            F = y[j] * np.sum(r[idx_nz] * Xis) - 1.0
+            zj = beta[j] - F / L[j]
+            beta[j:j+1] = proj_box_svm(zj, C)
+            r += (beta[j] - beta_old) * y[j] * Xis
+            if compute_jac:
+                dF = y[j] * np.sum(dr[idx_nz] * Xis)
+                dzj = dzj = dbeta[j] - dF / L[j]
+                dbeta[j:j+1] = ind_box(zj, C) * dzj
+                dbeta[j:j+1] += C * (C <= zj)
+                # update residuals
+                dr += (dbeta[j] - dbeta_old) * y[j] * Xis
 
     def _get_pobj(self, r, beta, C, y):
         C = C[0]
@@ -564,36 +578,41 @@ class SVM():
         return np.sum(y * dbeta * X.T, axis=1)
 
     @staticmethod
-    # @njit
+    @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, C, sign_beta):
         supp = np.where(sign_beta == 0.0)
         dbeta[sign_beta == 1.0] = C
         dr = np.sum(ys * dbeta * Xs.T, axis=1)
         for j in supp[0]:
             dF = ys[j] * np.sum(dr * Xs[j, :])
-            print(dF)
             dbeta_old = dbeta[j]
             dzj = dbeta[j] - (dF / L[j])
             dbeta[j] = dzj
             dr += (dbeta[j] - dbeta_old) * ys[j] * Xs[j, :]
 
-# TODO
-    # @staticmethod
-    # @njit
-    # def _update_only_jac_sparse(
-    #         data, indptr, indices, n_samples, n_features,
-    #         dbeta, dr, L, alpha, sign_beta):
-    #     for j in range(n_features):
-    #         # get the j-st column of X in sparse format
-    #         Xjs = data[indptr[j]:indptr[j+1]]
-    #         # get the non zero idices
-    #         idx_nz = indices[indptr[j]:indptr[j+1]]
-    #         # store old beta j for fast update
-    #         dbeta_old = dbeta[j]
-    #         # update of the Jacobian dbeta
-    #         dbeta[j] += Xjs @ dr[idx_nz] / (L[j] * n_samples)
-    #         dbeta[j] -= alpha * sign_beta[j] / L[j]
-    #         dr[idx_nz] -= Xjs * (dbeta[j] - dbeta_old)
+    @staticmethod
+    @njit
+    def _update_only_jac_sparse(
+            data, indptr, indices, y, n_samples, n_features,
+            dbeta, dr, L, C, sign_beta):
+        supp = np.where(sign_beta == 0.0)
+        for j in np.where(sign_beta == 1.0)[0]:
+            Xis = data[indptr[j]:indptr[j+1]]
+            dr += (C - dbeta[j]) * y[j] * Xis
+        dbeta[sign_beta == 1.0] = C
+
+        dr = np.sum(y * dbeta * data.T, axis=1)
+        for j in supp[0]:
+            # get the i-st row of X in sparse format
+            Xis = data[indptr[j]:indptr[j+1]]
+            # get the non zero idices
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            # store old beta j for fast update
+            dF = y[j] * np.sum(dr[idx_nz] * Xis)
+            dbeta_old = dbeta[j]
+            dzj = dbeta[j] - (dF / L[j])
+            dbeta[j] = dzj
+            dr += (dbeta[j] - dbeta_old) * y[j] * Xis
 
     @staticmethod
     @njit
@@ -622,6 +641,24 @@ class SVM():
         sign[x == 0.0] = -1.0
         sign[x == np.exp(self.logC)] = 1.0
         return sign
+
+    def get_jac_v(self, mask, dense, jac, v):
+        n_samples, n_features = self.X.shape
+        primal_jac = np.sum(self.y[mask] * jac * self.X[mask, :].T, axis=1)
+        primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+        mask_primal = primal != 0
+        dense_primal = primal[mask_primal]
+        return primal_jac.T @ v(mask_primal, dense_primal)
+
+    def get_primal(self, mask, dense):
+        primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+        mask_primal = primal != 0
+        dense_primal = primal[mask_primal]
+        return mask_primal, dense_primal
+
+    @staticmethod
+    def get_full_jac_v(mask, jac_v, n_features):
+        return jac_v
 
 
 class SparseLogreg():
@@ -849,3 +886,9 @@ class SparseLogreg():
 
     def sign(self, x):
         return np.sign(x)
+
+    def get_primal(self, mask, dense):
+        return mask, dense
+
+    def get_jac_v(self, mask, dense, jac, v):
+        return jac.T @ v(mask, dense)

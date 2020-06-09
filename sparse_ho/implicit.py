@@ -45,6 +45,12 @@ def get_beta_jac_t_v_implicit(
     mask, dense, _ = get_beta_jac_iterdiff(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
+
+    hessian = model.hessian_f(y_train * (X_train[:, mask] @ dense))
+    mat_to_inv = X_train[:, mask].T @ np.diag(hessian) @ X_train[:, mask]
+    size_mat = mask.sum()
+
+    mask, dense = model.get_primal(mask, dense)
     v = get_v(mask, dense)
 
     # TODO: to clean
@@ -59,10 +65,6 @@ def get_beta_jac_t_v_implicit(
     else:
         size_mat = mask.sum()
         sol0 = np.zeros(size_mat)
-
-    hessian = model.hessian_f(y_train * (X_train[:, mask] @ dense))
-    mat_to_inv = X_train[:, mask].T @ np.diag(hessian) @ X_train[:, mask]
-    size_mat = mask.sum()
 
     try:
         sol = cg(

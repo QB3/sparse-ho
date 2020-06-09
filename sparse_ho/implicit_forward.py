@@ -26,7 +26,7 @@ class ImplicitForward():
             tol_jac=tol, use_sk=self.use_sk,
             tol=tol, niter_jac=self.n_iter_jac, model=model,
             max_iter=self.criterion.model.max_iter)
-        jac_v = jac.T @ get_v(mask, dense)
+        jac_v = model.get_jac_v(mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         return mask, dense, jac_v, jac
