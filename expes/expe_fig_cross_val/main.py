@@ -1,11 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
-from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
-from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.real import get_real_sim
 # from sparse_ho.datasets.real import get_rcv1
@@ -45,26 +42,6 @@ monitor_grid_sk = Monitor()
 grid_search(
     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
     tol=tol)
-
-# # grad search
-# model = Lasso(X_train, y_train, np.log(alpha_max/10))
-# criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# algo = Forward(criterion, use_sk=False)
-# monitor_grad = Monitor()
-# grad_search(
-#     algo, log_alpha0, monitor_grad, tol=tol)
-# print('grad search finished')
-
-# # grad search
-# model = Lasso(X_train, y_train, np.log(alpha_max/10))
-# criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# algo = ImplicitForward(criterion, use_sk=True)
-# monitor_grad_sk = Monitor()
-# grad_search(
-#     algo, log_alpha0, monitor_grad_sk, tol=tol)
-# print('grad search finished')
-
-# alphas = np.array(np.exp(monitor_grid_sk.log_alphas) / alpha_max)
 
 np.save("p_alphas.npy", p_alphas)
 objs = np.array(monitor_grid_sk.objs)
