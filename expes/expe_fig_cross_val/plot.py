@@ -6,6 +6,7 @@ from sparse_ho.utils_plot import configure_plt
 
 configure_plt()
 
+# save_fig = False
 save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/ICML2020slides/prebuiltimages/"
 
@@ -22,12 +23,12 @@ fig = plt.figure()
 plt.semilogx(
     p_alphas, objs, color=current_palette[0], linewidth=7.0)
 plt.semilogx(
-    p_alphas, objs, 'bo', label='grid-search scikit-learn',
+    p_alphas, objs, 'bo', label='grid-search',
     color=current_palette[1])
 plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
 plt.ylabel("validation loss", fontsize=28)
 plt.tick_params(width=5)
-# plt.legend()
+plt.legend(fontsize=28)
 plt.tight_layout()
 
 if save_fig:

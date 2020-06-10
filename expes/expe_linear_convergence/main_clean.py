@@ -15,13 +15,15 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 
-dataset_names = ["finance"]
+dataset_names = ["real-sim"]
+# dataset_names = ["finance"]
 # dataset_names = ["leu", "rcv1_train", "news20"]
 p_alphas = {}
 p_alphas["leu"] = 0.01
 p_alphas["rcv1_train"] = 0.075
 p_alphas["news20"] = 0.3
 p_alphas["finance"] = 0.3
+p_alphas["real-sim"] = 0.1
 
 
 def linear_cv(
