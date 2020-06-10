@@ -46,12 +46,11 @@ def get_beta_jac_t_v_implicit(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
 
-    hessian = model.hessian_f(y_train * (X_train[:, mask] @ dense))
-    mat_to_inv = X_train[:, mask].T @ np.diag(hessian) @ X_train[:, mask]
-    size_mat = mask.sum()
+    mat_to_inv = model.get_hessian(mask, dense)
+    size_mat = mat_to_inv.shape[0]
 
-    mask, dense = model.get_primal(mask, dense)
-    v = get_v(mask, dense)
+    maskp, densep = model.get_primal(mask, dense)
+    v = get_v(maskp, densep)
 
     # TODO: to clean
     is_sparse = issparse(X_train)
@@ -63,12 +62,11 @@ def get_beta_jac_t_v_implicit(
     if sol_lin_sys is not None:
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
     else:
-        size_mat = mask.sum()
+        size_mat = mat_to_inv.shape[0]
         sol0 = np.zeros(size_mat)
-
     try:
         sol = cg(
-            mat_to_inv, - v,
+            mat_to_inv, - model.restrict_full_supp(mask, dense, v),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -78,18 +76,17 @@ def get_beta_jac_t_v_implicit(
             # 1 / 0
     except Exception:
         print("Matrix to invert was badly conditioned")
-        size_mat = mask.sum()
+        size_mat = mat_to_inv.shape[0]
         if is_sparse:
-            reg_amount = 1e-7 * norm(X_train[:, mask].todense(), ord=2) ** 2
+            reg_amount = 1e-7 * norm(model.reduce_X(mask).todense(), ord=2) ** 2
             mat_to_inv += reg_amount * identity(size_mat)
         else:
-            reg_amount = 1e-7 * norm(X_train[:, mask], ord=2) ** 2
+            reg_amount = 1e-7 * norm(model.reduce_X(mask), ord=2) ** 2
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - v, x0=sol0, atol=1e-3)
+            - model.restrict_full_supp(mask, dense, v), x0=sol0, atol=1e-3)
         sol_lin_sys = sol[0]
-
-    jac_t_v = model._get_jac_t_v(sol_lin_sys, mask, dense, alphas)
+    jac_t_v = model._get_jac_t_v(sol_lin_sys, mask, dense, alphas, v.copy())
 
     return mask, dense, jac_t_v, sol[0]

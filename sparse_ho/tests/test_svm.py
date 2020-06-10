@@ -4,6 +4,7 @@ from sklearn import datasets
 from sklearn.svm import LinearSVC
 from sparse_ho.criterion import Logistic
 from sparse_ho.forward import Forward
+from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.models import SVM
 from sparse_ho.forward import get_beta_jac_iterdiff
@@ -16,13 +17,13 @@ n_features = 300
 X_train, y_train = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=110, flip_y=0.1, n_redundant=0)
+    random_state=11, flip_y=0.1, n_redundant=0)
 
 
 X_val, y_val = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=122, flip_y=0.1, n_redundant=0)
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 
 y_train[y_train == 0.0] = -1.0
@@ -56,9 +57,9 @@ def test_beta_jac(model):
     # full_supp = np.logical_or(beta <= 0, beta >= C)
 
     Q = (y_train[:, np.newaxis] * X_train)  @  (y_train[:, np.newaxis] * X_train).T
-    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ np.ones((beta >= C).sum())
+    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
-    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v) * C
+    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
     assert np.allclose(jac_dense, jac1[dense1 < C])
 
     primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
@@ -95,8 +96,15 @@ def test_val_grad(model):
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
         log_C, tol=tol)
 
+    criterion = Logistic(X_val, y_val, model)
+    algo = Implicit(criterion)
+    val_imp, grad_imp = algo.get_val_grad(
+        log_C, tol=tol)
+
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
+    assert np.allclose(val_imp_fwd, val_imp)
+    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-5)
 
 
 if __name__ == '__main__':
