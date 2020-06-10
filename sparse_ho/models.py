@@ -6,6 +6,7 @@ from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p
 from sparse_ho.utils import proj_box_svm, ind_box
 from sparse_ho.utils import sigma
 import scipy.sparse.linalg as slinalg
+from scipy.sparse import issparse
 
 
 class Lasso():
@@ -181,7 +182,7 @@ class Lasso():
         return alpha
 
     # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas):
+    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
         n_samples = self.X.shape[0]
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
@@ -204,10 +205,6 @@ class Lasso():
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
-
-    @staticmethod
-    def hessian_f(x):
-        return np.ones(np.size(x))
 
     def sk(self, X, y, alpha, tol, max_iter):
         if self.clf is None:
@@ -236,6 +233,13 @@ class Lasso():
 
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
+
+    def get_hessian(self, mask, dense):
+        hessian = self.X[:, mask].T @ self.X[:, mask]
+        return hessian
+
+    def restrict_full_supp(self, mask, dense, v):
+        return v
 
 
 class wLasso():
@@ -405,7 +409,7 @@ class wLasso():
         return jac_v[mask]
 
     # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas):
+    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
         n_samples = self.X.shape[0]
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
@@ -433,9 +437,9 @@ class wLasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    @staticmethod
-    def hessian_f(x):
-        return np.ones(np.size(x))
+    def get_hessian(self, mask, dense):
+        hessian = self.X[:, mask].T @ self.X[:, mask]
+        return hessian
 
     def sk(self, X, y, alpha, tol, max_iter):
         """TODO
@@ -463,6 +467,9 @@ class wLasso():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
+    def restrict_full_supp(self, mask, dense, v):
+        return v
+
 
 class SVM():
     def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
@@ -480,6 +487,11 @@ class SVM():
             dr = np.zeros(n_features)
         else:
             dbeta[mask0] = jac0.copy()
+        if issparse(self.X):
+            dr = (self.X.T).multiply(y * dbeta)
+            dr = np.sum(dr, axis=1)
+            dr = np.squeeze(np.array(dr))
+        else:
             dr = np.sum(y * dbeta * X.T, axis=1)
         return dbeta, dr
 
@@ -489,7 +501,11 @@ class SVM():
             r = np.zeros(X.shape[1])
         else:
             beta[mask0] = dense0
-            r = np.sum(y * beta * X.T, axis=1)
+            if issparse(self.X):
+                r = np.sum(self.X.T.multiply(y * beta), axis=1)
+                r = np.squeeze(np.array(r))
+            else:
+                r = np.sum(y * beta * X.T, axis=1)
         return beta, r
 
     @staticmethod
@@ -541,11 +557,11 @@ class SVM():
             r += (beta[j] - beta_old) * y[j] * Xis
             if compute_jac:
                 dF = y[j] * np.sum(dr[idx_nz] * Xis)
-                dzj = dzj = dbeta[j] - dF / L[j]
+                dzj = dbeta[j] - dF / L[j]
                 dbeta[j:j+1] = ind_box(zj, C) * dzj
                 dbeta[j:j+1] += C * (C <= zj)
                 # update residuals
-                dr += (dbeta[j] - dbeta_old) * y[j] * Xis
+                dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
     def _get_pobj(self, r, beta, C, y):
         C = C[0]
@@ -577,7 +593,12 @@ class SVM():
 
     @staticmethod
     def _init_dr(dbeta, X, y):
-        return np.sum(y * dbeta * X.T, axis=1)
+        is_sparse = issparse(X)
+        if is_sparse:
+            res = np.array(np.sum(X.T.multiply(y * dbeta), axis=1))
+            return res.reshape((res.shape[0],))
+        else:
+            return np.sum(y * dbeta * X.T, axis=1)
 
     @staticmethod
     @njit
@@ -596,14 +617,13 @@ class SVM():
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, dr, L, C, sign_beta):
+            dbeta, r, dr, L, C, sign_beta):
         supp = np.where(sign_beta == 0.0)
         for j in np.where(sign_beta == 1.0)[0]:
             Xis = data[indptr[j]:indptr[j+1]]
-            dr += (C - dbeta[j]) * y[j] * Xis
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            dr[idx_nz] += ((C - dbeta[j]) * y[j] * Xis)
         dbeta[sign_beta == 1.0] = C
-
-        dr = np.sum(y * dbeta * data.T, axis=1)
         for j in supp[0]:
             # get the i-st row of X in sparse format
             Xis = data[indptr[j]:indptr[j+1]]
@@ -614,17 +634,12 @@ class SVM():
             dbeta_old = dbeta[j]
             dzj = dbeta[j] - (dF / L[j])
             dbeta[j] = dzj
-            dr += (dbeta[j] - dbeta_old) * y[j] * Xis
+            dr[idx_nz] += ((dbeta[j] - dbeta_old) * y[j] * Xis)
 
     @staticmethod
     @njit
     def _reduce_alpha(alpha, mask):
         return alpha
-
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas):
-        n_samples = self.X.shape[0]
-        return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     @staticmethod
     def get_L(X, is_sparse=False):
@@ -647,14 +662,24 @@ class SVM():
 
     def get_jac_v(self, mask, dense, jac, v):
         n_samples, n_features = self.X.shape
-        primal_jac = np.sum(self.y[mask] * jac * self.X[mask, :].T, axis=1)
-        primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+        if issparse(self.X):
+            primal_jac = np.sum(self.X[mask, :].T.multiply(self.y[mask] * jac), axis=1)
+            primal_jac = np.squeeze(np.array(primal_jac))
+            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+            primal = np.squeeze(np.array(primal))
+        else:
+            primal_jac = np.sum(self.y[mask] * jac * self.X[mask, :].T, axis=1)
+            primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
         mask_primal = primal != 0
         dense_primal = primal[mask_primal]
         return primal_jac.T @ v(mask_primal, dense_primal)
 
     def get_primal(self, mask, dense):
-        primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+        if issparse(self.X):
+            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+            primal = np.squeeze(np.array(primal))
+        else:
+            primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
         mask_primal = primal != 0
         dense_primal = primal[mask_primal]
         return mask_primal, dense_primal
@@ -662,6 +687,50 @@ class SVM():
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
+
+    def get_hessian(self, mask, dense):
+        beta = np.zeros(self.X.shape[0])
+        beta[mask] = dense
+        full_supp = np.logical_and(beta > 0, beta < np.exp(self.logC))
+        if issparse(self.X):
+            mat = self.X.multiply(self.y[:, np.newaxis])
+        else:
+            mat = self.y[:, np.newaxis] * self.X
+        Q = mat @ mat.T
+        Q = Q[np.ix_(full_supp, full_supp)]
+        return Q
+
+    def _get_jac_t_v(self, jac, mask, dense, C, v):
+        C = C[0]
+        n_samples = self.X.shape[0]
+        if issparse(self.X):
+            mat = self.X.multiply(self.y[:, np.newaxis])
+        else:
+            mat = self.y[:, np.newaxis] * self.X
+        beta = np.zeros(n_samples)
+        beta[mask] = dense
+        full_supp = np.logical_and(beta > 0, beta < C)
+        Q = mat @ mat.T
+        Q = Q[np.ix_(full_supp, beta >= C)]
+        u = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones((beta >= C).sum()) * C)
+        if issparse(self.X):
+            temp = self.X.multiply(self.y[:, np.newaxis])
+            w = (temp @ v)[beta >= C]
+        else:
+            w = ((self.y[:, np.newaxis] * self.X) @ v)[beta >= C]
+        return u @ jac + C * np.sum(w)
+
+    def restrict_full_supp(self, mask, dense, v):
+        n_samples = self.X.shape[0]
+        beta = np.zeros(n_samples)
+        beta[mask] = dense
+        full_supp = np.logical_and(beta > 0, beta < np.exp(self.logC))
+        if issparse(self.X):
+            temp = self.X.multiply(self.y[:, np.newaxis])
+            res = (temp @ v)[full_supp]
+        else:
+            res = ((self.y[:, np.newaxis] * self.X) @ v)[full_supp]
+        return - res
 
 
 class SparseLogreg():
@@ -858,7 +927,7 @@ class SparseLogreg():
         return alpha
 
     # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas):
+    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
         n_samples = self.X.shape[0]
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
@@ -878,10 +947,6 @@ class SparseLogreg():
     def get_L(X, is_sparse=False):
         return 0.0
 
-    @staticmethod
-    def hessian_f(x):
-        return sigma(x) * (1 - sigma(x))
-
     def reduce_X(self, mask):
         return self.X[:, mask]
 
@@ -896,3 +961,12 @@ class SparseLogreg():
 
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
+
+    def get_hessian(self, mask, dense):
+        a = self.y * (self.X[:, mask] @ dense)
+        temp = np.diag(sigma(a) * (1 - sigma(a)))
+        hessian = self.X[:, mask].T @ temp @ self.X[:, mask]
+        return hessian
+
+    def restrict_full_supp(self, mask, dense, v):
+        return v

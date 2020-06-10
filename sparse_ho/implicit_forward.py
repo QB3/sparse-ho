@@ -118,4 +118,5 @@ def get_only_jac(
         #     break
         # dbeta_old = dbeta.copy()
         # dr_old = dr.copy()
+
     return dbeta

@@ -179,5 +179,5 @@ def test_val_grad():
 
 
 if __name__ == '__main__':
-    # test_beta_jac()
+    test_beta_jac()
     test_val_grad()

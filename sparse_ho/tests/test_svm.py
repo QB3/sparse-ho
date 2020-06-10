@@ -4,10 +4,13 @@ from sklearn import datasets
 from sklearn.svm import LinearSVC
 from sparse_ho.criterion import Logistic
 from sparse_ho.forward import Forward
+from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.models import SVM
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
+from scipy.sparse import csr_matrix
+from scipy.sparse import issparse
 
 
 n_samples = 100
@@ -16,13 +19,15 @@ n_features = 300
 X_train, y_train = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=110, flip_y=0.1, n_redundant=0)
+    random_state=11, flip_y=0.1, n_redundant=0)
+X_train_s = csr_matrix(X_train)
 
 
 X_val, y_val = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=122, flip_y=0.1, n_redundant=0)
+    random_state=12, flip_y=0.1, n_redundant=0)
+X_val_s = csr_matrix(X_val)
 
 
 y_train[y_train == 0.0] = -1.0
@@ -35,7 +40,9 @@ tol = 1e-16
 
 models = [
     SVM(
-        X_train, y_train, log_C, max_iter=10000, tol=tol)
+        X_train, y_train, log_C, max_iter=10000, tol=tol),
+    SVM(
+        X_train_s, y_train, log_C, max_iter=10000, tol=tol)
 ]
 
 
@@ -56,21 +63,23 @@ def test_beta_jac(model):
     # full_supp = np.logical_or(beta <= 0, beta >= C)
 
     Q = (y_train[:, np.newaxis] * X_train)  @  (y_train[:, np.newaxis] * X_train).T
-    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ np.ones((beta >= C).sum())
+    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
-    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v) * C
+    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
     assert np.allclose(jac_dense, jac1[dense1 < C])
 
-    primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
+    if issparse(model.X):
+        primal = np.sum(X_train_s[supp1, :].T.multiply(y_train[supp1] * dense1), axis=1)
+        primal = primal.T
+    else:
+        primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
 
     clf.fit(X_train, y_train)
-
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X_train, y_train, log_C, None, None,
         get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
-
     assert np.allclose(primal, clf.coef_)
 
     assert np.all(supp1 == supp2)
@@ -95,8 +104,15 @@ def test_val_grad(model):
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
         log_C, tol=tol)
 
+    criterion = Logistic(X_val, y_val, model)
+    algo = Implicit(criterion)
+    val_imp, grad_imp = algo.get_val_grad(
+        log_C, tol=tol)
+
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
+    assert np.allclose(val_imp_fwd, val_imp)
+    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-5)
 
 
 if __name__ == '__main__':
