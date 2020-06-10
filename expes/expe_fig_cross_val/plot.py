@@ -9,6 +9,7 @@ configure_plt()
 # save_fig = False
 save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/ICML2020slides/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/ICML2020slides/images/"
 
 
 current_palette = sns.color_palette("colorblind")
@@ -27,7 +28,7 @@ plt.semilogx(
     p_alphas, objs, color=current_palette[0], linewidth=7.0)
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1])
+    color=current_palette[1], markersize=15)
 # plt.semilogx(
 #     p_alphas_grad, objs_grad, 'bX', label='1rst order method',
 #     color=current_palette[2])
@@ -40,6 +41,8 @@ plt.tight_layout()
 if save_fig:
     fig.savefig(
         fig_dir + "cross_val_real_sim.pdf", bbox_inches="tight")
+    fig.savefig(
+        fig_dir_svg + "cross_val_real_sim.svg", bbox_inches="tight")
 fig.show()
 
 plt.show(block=False)
@@ -52,10 +55,10 @@ plt.semilogx(
     p_alphas, objs, color=current_palette[0], linewidth=7.0)
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1])
+    color=current_palette[1], markersize=15)
 plt.semilogx(
     p_alphas_grad, objs_grad, 'bX', label='1-rst order method',
-    color=current_palette[2])
+    color=current_palette[2], markersize=25)
 plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
 plt.ylabel("validation loss", fontsize=28)
 plt.tick_params(width=5)
@@ -65,6 +68,8 @@ plt.tight_layout()
 if save_fig:
     fig.savefig(
         fig_dir + "cross_val_and_grad_search_real_sim.pdf", bbox_inches="tight")
+    fig.savefig(
+        fig_dir_svg + "cross_val_and_grad_search_real_sim.svg", bbox_inches="tight")
 fig.show()
 
 plt.show(block=False)
