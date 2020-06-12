@@ -731,7 +731,7 @@ class SVM():
         else:
             res = ((self.y[:, np.newaxis] * self.X) @ v)[full_supp]
         return - res
-    
+
     def proj_param(self, log_alpha):
         return log_alpha
 
