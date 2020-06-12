@@ -20,7 +20,7 @@ print("Starting path computation...")
 
 
 n_alphas = 10
-Cs = np.geomspace(1e-1, 1e4, n_alphas)
+Cs = np.geomspace(1e-1, 1e2, n_alphas)
 logCs = np.log(Cs)
 
 tol = 1e-3

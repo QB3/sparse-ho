@@ -126,7 +126,7 @@ def get_beta_jac_iterdiff(
         print(pobj[-1])
 
         if i > 1:
-            assert pobj[-1] - pobj[-2] <= 1e-5 * np.abs(pobj[0])
+            assert pobj[-1] - pobj[-2] <= 1e-2 * np.abs(pobj[0])
             print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
         if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
             break
