@@ -536,7 +536,7 @@ class SVM():
                 dr += (dbeta[j] - dbeta_old) * y[j] * X[j, :]
 
     @staticmethod
-    @njit
+    # @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
             dbeta, r, dr, C, L, compute_jac=True):
@@ -554,7 +554,7 @@ class SVM():
             F = y[j] * np.sum(r[idx_nz] * Xis) - 1.0
             zj = beta[j] - F / L[j]
             beta[j:j+1] = proj_box_svm(zj, C)
-            r += (beta[j] - beta_old) * y[j] * Xis
+            r[idx_nz] += (beta[j] - beta_old) * y[j] * Xis
             if compute_jac:
                 dF = y[j] * np.sum(dr[idx_nz] * Xis)
                 dzj = dbeta[j] - dF / L[j]
@@ -670,9 +670,9 @@ class SVM():
         else:
             primal_jac = np.sum(self.y[mask] * jac * self.X[mask, :].T, axis=1)
             primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
-        mask_primal = primal != 0
+        mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
-        return primal_jac.T @ v(mask_primal, dense_primal)
+        return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
     def get_primal(self, mask, dense):
         if issparse(self.X):
@@ -731,6 +731,9 @@ class SVM():
         else:
             res = ((self.y[:, np.newaxis] * self.X) @ v)[full_supp]
         return - res
+    
+    def proj_param(self, log_alpha):
+        return log_alpha
 
 
 class SparseLogreg():
