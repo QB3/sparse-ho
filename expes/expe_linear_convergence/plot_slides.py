@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from sparse_ho.utils_plot import configure_plt
 
 
-save_fig = False
-# save_fig = True
-fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
-fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
+# save_fig = False
+save_fig = True
+fig_dir = "../../../CD_SUGAR/tex/ICML2020slides/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/ICML2020slides/images/"
 
 
 configure_plt()
@@ -46,15 +46,17 @@ for idx, dataset in enumerate(dataset_names):
     axarr.flat[idx+4].semilogy(diff_jac)
     axarr.flat[idx+4].axvline(x=supp_id, c='red', linestyle="--")
 
-    axarr.flat[idx+4].set_xlabel(r"$\#$ epochs")
+    axarr.flat[idx+4].set_xlabel(r"$\#$ epochs", size=fontsize)
 
     axarr.flat[idx].set_title("%s" % (
         dict_title[dataset]), size=fontsize)
     # xarr.flat[idx].set_title("%s %s" % (
     #     dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
-axarr.flat[0].set_ylabel(r"$||\beta^{(k)} - \hat \beta||$")
-axarr.flat[4].set_ylabel(r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$")
+axarr.flat[0].set_ylabel(
+    r"$||\beta^{(k)} - \hat \beta||$", fontsize=fontsize)
+axarr.flat[4].set_ylabel(
+    r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$", fontsize=fontsize)
 
 fig.tight_layout()
 

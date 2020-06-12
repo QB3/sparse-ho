@@ -3,7 +3,9 @@ import numpy as np
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
 from sparse_ho.forward import Forward
+from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
+from sparse_ho.ho import grad_search
 from sparse_ho.datasets.real import get_real_sim
 # from sparse_ho.datasets.real import get_rcv1
 # from sparse_ho.datasets.real import get_leukemia
@@ -26,23 +28,30 @@ log_alphas = np.log(alphas)
 
 tol = 1e-7
 
+# grid search
 # model = Lasso(X_train, y_train, np.log(alpha_max/10))
 # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# algo = Forward(criterion, use_sk=False)
-# monitor_grid = Monitor()
+# algo = Forward(criterion, use_sk=True)
+# monitor_grid_sk = Monitor()
 # grid_search(
-#     algo, None, None, monitor_grid, log_alphas=log_alphas,
+#     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
 #     tol=tol)
 
-# grid search
+# np.save("p_alphas.npy", p_alphas)
+# objs = np.array(monitor_grid_sk.objs)
+# np.save("objs.npy", objs)
+
+# grad_search
 model = Lasso(X_train, y_train, np.log(alpha_max/10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = Forward(criterion, use_sk=True)
-monitor_grid_sk = Monitor()
-grid_search(
-    algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
-    tol=tol)
+algo = ImplicitForward(criterion, use_sk=True)
+monitor_grad = Monitor()
+grad_search(
+    algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)
 
-np.save("p_alphas.npy", p_alphas)
-objs = np.array(monitor_grid_sk.objs)
-np.save("objs.npy", objs)
+
+p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+
+np.save("p_alphas_grad.npy", p_alphas_grad)
+objs_grad = np.array(monitor_grad.objs)
+np.save("objs_grad.npy", objs_grad)

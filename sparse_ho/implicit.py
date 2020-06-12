@@ -73,7 +73,6 @@ def get_beta_jac_t_v_implicit(
             sol_lin_sys = sol[0]
         else:
             raise ValueError('cg did not converge.')
-            # 1 / 0
     except Exception:
         print("Matrix to invert was badly conditioned")
         size_mat = mat_to_inv.shape[0]
