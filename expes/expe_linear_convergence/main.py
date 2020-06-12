@@ -4,10 +4,11 @@ from numpy.linalg import norm
 from sklearn.linear_model import Lasso as Lasso_sk
 from sklearn.linear_model import LogisticRegression
 from scipy.sparse.linalg import cg
-from sparse_ho.models import Lasso, SparseLogreg
+from sparse_ho.models import Lasso, SparseLogreg, SVM
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sparse_ho.utils import sigma
+from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
@@ -177,4 +178,121 @@ axarr.flat[0].axvline(x=supp_id[0], c='red', linestyle="--")
 axarr.flat[1].axvline(x=supp_id[0], c='red', linestyle="--")
 axarr.flat[0].set_title("Iterates convergence for the Logistic Regression")
 axarr.flat[1].set_title("Jacobian convergence for the Logistic Regression")
+plt.show(block=False)
+
+
+# Same for SVM
+
+def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
+              max_iter=1000, tol=1e-3, compute_jac=True):
+
+    n_samples, n_features = X.shape
+    is_sparse = False
+    L = model.get_L(X, is_sparse=is_sparse)
+    ############################################
+    alpha = np.exp(log_alpha)
+    try:
+        alpha.shape[0]
+        alphas = alpha.copy()
+    except Exception:
+        alphas = np.ones(n_features) * alpha
+    ############################################
+    # warm start for beta
+    beta, r = model._init_beta_r(X, y, None, None)
+
+    ############################################
+    # warm start for dbeta
+    dbeta, dr = model._init_dbeta_dr(
+        X, y, mask0=None, dense0=None, jac0=None, compute_jac=compute_jac)
+    # store the values of the objective function
+    pobj0 = model._get_pobj(r, beta, alphas, y)
+    pobj = []
+    diff_beta = []
+    diff_jac = []
+    supp_id = []
+    mask0_star = beta_star == 0.0
+    maskC_star = beta_star >= np.exp(log_alpha)
+    for i in range(max_iter):
+        print("%i -st iteration over %i" % (i, max_iter))
+
+        model._update_beta_jac_bcd(
+            X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
+
+        pobj.append(model._get_pobj(r, beta, alphas, y))
+        print(pobj[-1])
+
+        diff_beta.append(norm(beta - beta_star))
+        diff_jac.append(norm(dbeta - jac_star))
+        mask0 = beta == 0.0
+        maskC = beta >= np.exp(log_alpha)
+        if (mask0 == mask0_star).all() and (maskC == maskC_star).all():
+            supp_id.append(i)
+        if i > 1:
+            assert pobj[-1] - pobj[-2] <= 1e-5 * np.abs(pobj[0])
+            print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
+        if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
+            break
+
+    else:
+        print('did not converge !')
+        # raise RuntimeError('did not converge !')
+
+    return diff_beta, diff_jac, i, supp_id
+
+
+n_samples = 2500
+n_features = 1000
+SNR = 3.0
+seed = 10
+tol = 1e-10
+max_iter = 10000
+
+X_train, y_train = datasets.make_classification(
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=110, flip_y=0.1, n_redundant=0)
+
+y_train[y_train == 0.0] = -1.0
+
+X_val, y_val = datasets.make_classification(
+    n_samples=n_samples,
+    n_features=n_features, n_informative=50,
+    random_state=122, flip_y=0.1, n_redundant=0)
+
+
+C = 0.0005
+model = SVM(X_train, y_train, np.log(C), max_iter=max_iter, tol=tol)
+mask, dense, _ = get_beta_jac_iterdiff(
+    X_train, y_train, np.log(C), model,
+    max_iter=100000, tol=1e-16, compute_jac=True)
+
+beta_star_svm = np.zeros(n_samples)
+beta_star_svm[mask] = dense
+full_supp = np.logical_and(beta_star_svm > 0, beta_star_svm < C)
+
+Q = (y_train[:, np.newaxis] * X_train)  @  (y_train[:, np.newaxis] * X_train).T
+v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta_star_svm >= C)] @ (np.ones((beta_star_svm >= C).sum()) * C)
+
+jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
+
+jac_star = np.zeros(n_samples)
+jac_star[full_supp] = jac_dense
+jac_star[beta_star_svm >= C] = C
+model = SVM(X_train, y_train, np.log(C), max_iter=max_iter, tol=tol)
+diff_beta_svm, diff_jac_svm, n_iter_svm, supp_id = linear_cv(X_train, y_train, np.log(C), model, beta_star_svm, jac_star,
+                                                             max_iter=max_iter, tol=tol, compute_jac=True)
+
+fig, axarr = plt.subplots(
+    1, 2, sharex=False, sharey=False, figsize=[10, 4])
+plt.figure()
+axarr.flat[0].semilogy(range(n_iter_svm+1), diff_beta_svm, linewidth=2.0)
+axarr.flat[1].semilogy(range(n_iter_svm+1), diff_jac_svm, linewidth=2.0)
+axarr.flat[0].set_xlabel("epoch")
+axarr.flat[0].set_ylabel("||beta - beta_star||")
+axarr.flat[1].set_xlabel("epoch")
+axarr.flat[1].set_ylabel("||jac - jac_Star||")
+axarr.flat[0].axvline(x=supp_id[0], c='red', linestyle="--")
+axarr.flat[1].axvline(x=supp_id[0], c='red', linestyle="--")
+axarr.flat[0].set_title("Iterates convergence for the SVM")
+axarr.flat[1].set_title("Jacobian convergence for the SVM")
 plt.show(block=False)
