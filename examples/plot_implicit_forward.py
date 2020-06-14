@@ -7,6 +7,11 @@ dateset how methods compare.
 
 """
 
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,12 +19,13 @@ import seaborn as sns
 
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor, WarmStart
-from sparse_ho.grid_search import grid_searchCV
+from sparse_ho.grid_search import grid_search
 # from sparse_ho.bayesian import hyperopt_lasso
 
 from sparse_ho.datasets.real import get_20newsgroup
 from expes.utils import configure_plt
 
+print(__doc__)
 
 # from sparse_ho.datasets.real import get_leukemia
 # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()

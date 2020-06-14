@@ -1,10 +1,17 @@
 """
+===========================
 Method comparison on Lasso
+===========================
 
 The aim of this example is to demonstrate on a simple
 dateset how methods compare.
 
 """
+
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
 
 
 import numpy as np
@@ -25,6 +32,7 @@ from sparse_ho.grid_search import grid_search
 from sparse_ho.datasets.real import get_rcv1
 # from expes.utils import configure_plt
 
+print(__doc__)
 
 X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 

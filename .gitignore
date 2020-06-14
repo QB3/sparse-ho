@@ -9,6 +9,11 @@ sparse_ho.egg-info/*
 # Python precompilation
 *pyc
 
+# doc
+doc/generated/*
+doc/auto_examples/*
+doc/_build/*
+
 # Data
 examples/data/*
 data/*
@@ -16,7 +21,6 @@ data/*
 # cache
 .pytest_cache/*
 
-doc/*
 coverage/*
 .coverage
 
