@@ -1,3 +1,17 @@
+"""
+======================
+Grad Search CV
+======================
+
+...
+
+"""
+
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
+
 import time
 import numpy as np
 from numpy.linalg import norm
@@ -12,6 +26,7 @@ from sparse_ho.utils import Monitor
 from sparse_ho.grad_search_CV import grad_search_CV
 from sparse_ho.datasets.real import load_libsvm
 
+print(__doc__)
 
 X, y = load_libsvm('rcv1train')
 # X, y = make_regression(

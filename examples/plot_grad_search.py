@@ -1,3 +1,17 @@
+"""
+======================
+Grad Search
+======================
+
+...
+
+"""
+
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
+
 import numpy as np
 import matplotlib.pyplot as plt
 
