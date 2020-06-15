@@ -74,3 +74,11 @@ jobs:
             root: doc/_build
             paths:
               - html
+
+
+workflows:
+  version: 2
+
+  default:
+    jobs:
+      - build_docs
