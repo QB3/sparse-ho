@@ -536,7 +536,7 @@ class SVM():
                 dr += (dbeta[j] - dbeta_old) * y[j] * X[j, :]
 
     @staticmethod
-    # @njit
+    @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
             dbeta, r, dr, C, L, compute_jac=True):
