@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.linalg import norm
 from scipy.sparse import issparse
 from sparse_ho.forward import get_beta_jac_iterdiff
 
@@ -102,7 +101,7 @@ def get_only_jac(
                 Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
         objs.append(
-            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+            model.get_jac_obj(Xs, y, sign_beta, dbeta, r, dr, alpha))
 
         # m1 = norm(- v.T @ Xs.T @ dr + sign_beta * n_samples * alpha)
         # m2 = tol_jac * np.sqrt(n_features) * n_samples * alpha * norm(v)
@@ -114,8 +113,8 @@ def get_only_jac(
         # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
         # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
         # crit =
-        # if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
-        #     break
+        if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
+            break
         # dbeta_old = dbeta.copy()
         # dr_old = dr.copy()
 

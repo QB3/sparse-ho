@@ -241,6 +241,11 @@ class Lasso():
     def restrict_full_supp(self, mask, dense, v):
         return v
 
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+        n_samples = self.X.shape[0]
+        return(
+            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+
 
 class wLasso():
     def __init__(self, X, y, log_alpha, log_alpha_max=None,
@@ -470,6 +475,11 @@ class wLasso():
     def restrict_full_supp(self, mask, dense, v):
         return v
 
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+        n_samples = self.X.shape[0]
+        return(
+            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+
 
 class SVM():
     def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
@@ -656,8 +666,8 @@ class SVM():
 
     def sign(self, x):
         sign = np.zeros(x.shape[0])
-        sign[x == 0.0] = -1.0
-        sign[x == np.exp(self.logC)] = 1.0
+        sign[np.isclose(x, 0.0)] = -1.0
+        sign[np.isclose(x, np.exp(self.logC))] = 1.0
         return sign
 
     def get_jac_v(self, mask, dense, jac, v):
@@ -734,6 +744,20 @@ class SVM():
 
     def proj_param(self, log_alpha):
         return log_alpha
+
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
+        full_supp = sign_beta == 0.0
+        maskC = sign_beta == 1.0
+        if issparse(self.X):
+            Q = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis]))  @  (Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T
+            v = np.array((np.eye(full_supp.sum(), maskC.sum()) - Q) @ (np.ones(maskC.sum()) * C))
+            v = np.squeeze(v)
+        else:
+            Q = (Xs[full_supp, :] * ys[full_supp, None])  @  (Xs[maskC, :] * ys[maskC, None]).T
+            v = (np.eye(full_supp.sum(), maskC.sum()) - Q) @ (np.ones(maskC.sum()) * C)
+
+        return(
+            norm(dr.T @ dr - v.T @ dbeta[full_supp]))
 
 
 class SparseLogreg():
@@ -973,3 +997,8 @@ class SparseLogreg():
 
     def restrict_full_supp(self, mask, dense, v):
         return v
+
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+        n_samples = self.X.shape[0]
+        return(
+            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))

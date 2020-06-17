@@ -6,7 +6,7 @@ from bcdsugar.utils import Monitor
 from sparse_ho.ho import grad_search
 from itertools import product
 from sparse_ho.criterion import Logistic
-from sparse_ho.models import SparseLogreg
+from sparse_ho.models import SVM
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
@@ -15,7 +15,7 @@ from sparse_ho.grid_search import grid_search
 
 # from my_data import get_data
 
-dataset_names = ["rcv1", "real-sim", "20news"]
+dataset_names = ["leukemia"]
 
 # methods = ["implicit_forward", "implicit"]
 methods = ["implicit_forward", "implicit", "forward",
@@ -37,26 +37,24 @@ def parallel_function(
         tolerance_decrease='exponential'):
 
     # load data
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset_name)
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset_name, csr=True)
     n_samples, n_features = X_train.shape
     print('n_samples', n_samples)
     print('n_features', n_features)
     y_train[y_train == 0.0] = -1.0
     y_val[y_val == 0.0] = -1.0
     y_test[y_test == 0.0] = -1.0
-    alpha_max = np.max(np.abs(X_train.T @ y_train))
-    alpha_max /= X_train.shape[0]
-    alpha_max /= 2
-    log_alpha0 = np.log(0.3 * alpha_max)
-    log_alpha_max = np.log(alpha_max)
-    n_outer = 25
+
+    C_max = 100
+    logC = np.log(1e-3)
+    n_outer = 10
 
     if dataset_name == "rcv1":
-        size_loop = 2
+        size_loop = 1
     else:
-        size_loop = 2
-    model = SparseLogreg(
-        X_train, y_train, log_alpha0, log_alpha_max, max_iter=1000, tol=tol)
+        size_loop = 1
+    model = SVM(
+        X_train, y_train, logC, max_iter=1000, tol=tol)
     for i in range(size_loop):
         monitor = Monitor()
 
@@ -65,7 +63,7 @@ def parallel_function(
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
-                log_alpha0=log_alpha0, tol=tol,
+                log_alpha0=logC, tol=tol,
                 n_outer=n_outer, monitor=monitor,
                 t_max=dict_t_max[dataset_name],
                 tolerance_decrease=tolerance_decrease)
@@ -75,7 +73,7 @@ def parallel_function(
             algo = Forward(criterion)
             _, _, _ = grad_search(
                 algo=algo,
-                log_alpha0=log_alpha0, tol=tol,
+                log_alpha0=logC, tol=tol,
                 n_outer=n_outer, monitor=monitor,
                 t_max=dict_t_max[dataset_name],
                 tolerance_decrease=tolerance_decrease)
@@ -85,7 +83,7 @@ def parallel_function(
             algo = Implicit(criterion)
             _, _, _ = grad_search(
                 algo=algo,
-                log_alpha0=log_alpha0, tol=tol,
+                log_alpha0=logC, tol=tol,
                 n_outer=n_outer, monitor=monitor,
                 t_max=dict_t_max[dataset_name],
                 tolerance_decrease=tolerance_decrease)
@@ -93,27 +91,27 @@ def parallel_function(
         elif method == "grid_search":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(1e-3)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
+                algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="grid")
             print(log_alpha_opt)
 
         elif method == "random":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(1e-3)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
+                algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="random")
             print(log_alpha_opt)
 
         elif method == "lhs":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(1e-3)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
+                algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="lhs")
             print(log_alpha_opt)
 
