@@ -6,7 +6,7 @@ from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p
 from sparse_ho.utils import proj_box_svm, ind_box
 from sparse_ho.utils import sigma
 import scipy.sparse.linalg as slinalg
-from scipy.sparse import issparse
+from scipy.sparse import issparse, csc_matrix
 
 
 class Lasso():
@@ -240,6 +240,13 @@ class Lasso():
 
     def restrict_full_supp(self, mask, dense, v):
         return v
+
+    def compute_alpha_max(self):
+        if self.log_alpha_max is None:
+            alpha_max = np.max(np.abs(self.X.T @ self.y))
+            alpha_max /= self.X.shape[0]
+            self.log_alpha_max = np.log(alpha_max)
+        return self.log_alpha_max
 
 
 class wLasso():
@@ -806,17 +813,20 @@ class SparseLogreg():
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j]
-            sigmar = sigma(r)
-            grad_j = Xjs @ (y[idx_nz] * (sigmar[idx_nz] - 1))
-            L_temp = np.sum(
-                Xjs ** 2 * sigmar[idx_nz] * (1 - sigmar[idx_nz]))
+            sigmar = sigma(r[idx_nz])
+            grad_j = Xjs @ (y[idx_nz] * (sigmar - 1))
+            L_temp = (Xjs ** 2 * sigmar * (1 - sigmar)).sum()
+            # Xjs2 = (Xjs ** 2 * sigmar * (1 - sigmar)).sum()
+            # temp1 =
+            # # temp2 = temp1 * Xjs2
+            # L_temp = temp2.sum()
             L_temp /= n_samples
             if L_temp != 0:
                 zj = beta[j] - grad_j / (L_temp * n_samples)
                 beta[j:j+1] = ST(zj, alphas[j] / L_temp)
                 if compute_jac:
-                    dsigmar = sigmar * (1 - sigmar) * dr
-                    hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
+                    dsigmar = sigmar * (1 - sigmar) * dr[idx_nz]
+                    hess_fj = Xjs @ (y[idx_nz] * dsigmar)
                     dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
                     dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
                     dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
@@ -967,9 +977,21 @@ class SparseLogreg():
 
     def get_hessian(self, mask, dense):
         a = self.y * (self.X[:, mask] @ dense)
-        temp = np.diag(sigma(a) * (1 - sigma(a)))
-        hessian = self.X[:, mask].T @ temp @ self.X[:, mask]
+        temp = sigma(a) * (1 - sigma(a))
+        is_sparse = issparse(self.X)
+        if is_sparse:
+            hessian = csc_matrix(
+                self.X[:, mask].T.multiply(temp)) @ self.X[:, mask]
+        else:
+            hessian = (self.X[:, mask].T * temp) @ self.X[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
         return v
+
+    def compute_alpha_max(self):
+        if self.log_alpha_max is None:
+            alpha_max = np.max(np.abs(self.X.T @ self.y))
+            alpha_max /= (4 * self.X.shape[0])
+            self.log_alpha_max = np.log(alpha_max)
+        return self.log_alpha_max
