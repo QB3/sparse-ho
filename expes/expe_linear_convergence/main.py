@@ -8,7 +8,8 @@ from sparse_ho.models import Lasso, SparseLogreg, SVM
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from sparse_ho.utils import sigma
-from sparse_ho.forward import get_beta_jac_iterdiff
+from cvxopt import matrix
+from cvxopt import solvers
 
 
 def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
@@ -157,7 +158,7 @@ v = - n_samples * alpha * np.sign(dense_sk)
 r = y_train * (X_train[:, supp_sk] @ dense_sk)
 mat_to_inv = X_train[:, supp_sk].T  @ np.diag(sigma(r) * (1 - sigma(r))) @ X_train[:, supp_sk]
 
-jac_temp = cg(mat_to_inv, v, atol=1e-7)
+jac_temp = cg(mat_to_inv, v, tol=1e-12)
 jac_star = np.zeros(n_features)
 jac_star[supp_sk] = jac_temp[0]
 
@@ -210,8 +211,8 @@ def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
     diff_beta = []
     diff_jac = []
     supp_id = []
-    mask0_star = beta_star == 0.0
-    maskC_star = beta_star >= np.exp(log_alpha)
+    mask0_star = np.isclose(beta_star, 0)
+    maskC_star = np.isclose(beta_star, np.exp(log_alpha))
     for i in range(max_iter):
         print("%i -st iteration over %i" % (i, max_iter))
 
@@ -223,8 +224,8 @@ def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
 
         diff_beta.append(norm(beta - beta_star))
         diff_jac.append(norm(dbeta - jac_star))
-        mask0 = beta == 0.0
-        maskC = beta >= np.exp(log_alpha)
+        mask0 = np.isclose(beta, 0)
+        maskC = np.isclose(beta, np.exp(log_alpha))
         if (mask0 == mask0_star).all() and (maskC == maskC_star).all():
             supp_id.append(i)
         if i > 1:
@@ -236,12 +237,11 @@ def linear_cv(X, y, log_alpha, model, beta_star, jac_star,
     else:
         print('did not converge !')
         # raise RuntimeError('did not converge !')
-
     return diff_beta, diff_jac, i, supp_id
 
 
-n_samples = 2500
-n_features = 1000
+n_samples = 1000
+n_features = 100
 SNR = 3.0
 seed = 10
 tol = 1e-10
@@ -250,34 +250,57 @@ max_iter = 10000
 X_train, y_train = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=110, flip_y=0.1, n_redundant=0)
+    random_state=10, flip_y=0.1, n_redundant=0)
 
 y_train[y_train == 0.0] = -1.0
 
 X_val, y_val = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
-    random_state=122, flip_y=0.1, n_redundant=0)
+    random_state=12, flip_y=0.1, n_redundant=0)
 
 
-C = 0.0005
+C = 0.001
 model = SVM(X_train, y_train, np.log(C), max_iter=max_iter, tol=tol)
-mask, dense, _ = get_beta_jac_iterdiff(
-    X_train, y_train, np.log(C), model,
-    max_iter=100000, tol=1e-16, compute_jac=True)
 
-beta_star_svm = np.zeros(n_samples)
-beta_star_svm[mask] = dense
-full_supp = np.logical_and(beta_star_svm > 0, beta_star_svm < C)
 
+# Computation of dual solution of SVM via cvxopt
 Q = (y_train[:, np.newaxis] * X_train)  @  (y_train[:, np.newaxis] * X_train).T
-v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta_star_svm >= C)] @ (np.ones((beta_star_svm >= C).sum()) * C)
 
-jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
+# Quadratic term
+Q_cvx = matrix(Q)
+
+# Linear term
+L = np.repeat(-1.0, Q.shape[0])
+L = matrix(L)
+
+# matrix inequality constraints
+G = np.zeros((2 * n_samples, n_samples))
+G[0:n_samples, :] = -np.eye(n_samples)
+G[n_samples:(2 * n_samples), :] = np.eye(n_samples)
+G = matrix(G)
+
+# vector inequality constraints
+h = np.zeros(2 * n_samples)
+h[n_samples:(2 * n_samples)] = C
+h = matrix(h)
+
+solvers.options['show_progress'] = False
+solvers.options['abstol'] = 1e-16
+solvers.options['feastol'] = 1e-16
+solvers.options['reltol'] = 1e-16
+sol = solvers.qp(Q_cvx, L, G, h, None, None)
+beta_star_svm = sol['x'][:n_samples]
+beta_star_svm = np.array(beta_star_svm).flatten()
+full_supp = np.logical_and(np.logical_not(np.isclose(beta_star_svm, 0)), np.logical_not(np.isclose(beta_star_svm, C)))
+
+v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star_svm, C))] @ (np.ones((np.isclose(beta_star_svm, C)).sum()) * C)
+
+jac_dense = cg(Q[np.ix_(full_supp, full_supp)], v, tol=1e-14)
 
 jac_star = np.zeros(n_samples)
-jac_star[full_supp] = jac_dense
-jac_star[beta_star_svm >= C] = C
+jac_star[full_supp] = jac_dense[0]
+jac_star[np.isclose(beta_star_svm, C)] = C
 model = SVM(X_train, y_train, np.log(C), max_iter=max_iter, tol=tol)
 diff_beta_svm, diff_jac_svm, n_iter_svm, supp_id = linear_cv(X_train, y_train, np.log(C), model, beta_star_svm, jac_star,
                                                              max_iter=max_iter, tol=tol, compute_jac=True)

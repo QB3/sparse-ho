@@ -96,15 +96,22 @@ def get_rcv1(csr=False):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_leukemia():
+def get_leukemia(csr=False):
     X, y = load_libsvm("leu")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
-    X_train = X_train.tocsc()
-    X_val = X_val.tocsc()
-    X_test = X_test.tocsc()
+
+    if csr:
+        X_train = X_train.tocsr()
+        X_val = X_val.tocsr()
+        X_test = X_test.tocsr()
+    else:
+        X_train = X_train.tocsc()
+        X_val = X_val.tocsc()
+        X_test = X_test.tocsc()
+
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
@@ -125,17 +132,36 @@ def get_real_sim(csr=False):
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_data(dataset_name):
+def get_news20(csr=False):
+    X, y = load_libsvm("news20")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5, random_state=42)
+    if csr:
+        X_train = X_train.tocsr()
+        X_val = X_val.tocsr()
+        X_test = X_test.tocsr()
+    else:
+        X_train = X_train.tocsc()
+        X_val = X_val.tocsc()
+        X_test = X_test.tocsc()
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
+def get_data(dataset_name, csr=False):
     if dataset_name == "finance":
-        return get_finance()
+        return get_finance(csr)
     elif dataset_name == "20newsgroups":
-        return get_20newsgroup()
+        return get_20newsgroup(csr)
     elif dataset_name == "rcv1":
-        return get_rcv1()
+        return get_rcv1(csr)
     elif dataset_name == "leukemia":
-        return get_leukemia()
+        return get_leukemia(csr)
     elif dataset_name == "real-sim":
-        return get_real_sim()
+        return get_real_sim(csr)
+    elif dataset_name == "20news":
+        return get_news20(csr)
     else:
         raise ValueError("dataset_name %s do not exist" % dataset_name)
 
