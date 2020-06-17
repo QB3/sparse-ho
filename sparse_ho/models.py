@@ -944,15 +944,15 @@ class SparseLogreg():
             Xjs = data[indptr[j]:indptr[j+1]]
             # get the non zero idices
             idx_nz = indices[indptr[j]:indptr[j+1]]
-            sigmar = sigma(r)
-            L_temp = np.sum(Xjs ** 2 * sigmar[idx_nz] * (1 - sigmar[idx_nz]))
+            sigmar = sigma(r[idx_nz])
+            L_temp = np.sum(Xjs ** 2 * sigmar * (1 - sigmar))
             L_temp /= n_samples
             if L_temp != 0:
                 # store old beta j for fast update
                 dbeta_old = dbeta[j]
-                dsigmar = sigmar * (1 - sigmar) * dr
+                dsigmar = sigmar * (1 - sigmar) * dr[idx_nz]
 
-                hess_fj = Xjs @ (y[idx_nz] * dsigmar[idx_nz])
+                hess_fj = Xjs @ (y[idx_nz] * dsigmar)
                 # update of the Jacobian dbeta
                 dbeta[j] -= hess_fj / (L_temp * n_samples)
                 dbeta[j] -= alpha * sign_beta[j] / L_temp
