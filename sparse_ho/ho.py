@@ -236,13 +236,12 @@ def _grad_search(
         else:
             old_lambdak = lambdak.copy()
             lambdak -= step_size * grad_lambda
-
         lambdak = proj_param(lambdak)
 
         g_func_old = g_func
 
         # monitor(g_func, 0, lambdak, grad_lambda, 0)
-
+        print('grad lambda', grad_lambda)
         print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:
             break

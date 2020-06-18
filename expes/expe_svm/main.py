@@ -18,8 +18,7 @@ from sparse_ho.grid_search import grid_search
 dataset_names = ["leukemia"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["implicit_forward", "implicit", "forward",
-           "grid_search", "random"]
+methods = ["forward", 'implicit_forward', 'grid_search', 'random']
 # "grid_search",
 tolerance_decreases = ["constant"]
 tols = 1e-5
@@ -46,21 +45,21 @@ def parallel_function(
     y_test[y_test == 0.0] = -1.0
 
     C_max = 100
-    logC = np.log(1e-3)
+    logC = np.log(0.005)
     n_outer = 10
 
     if dataset_name == "rcv1":
-        size_loop = 1
+        size_loop = 2
     else:
-        size_loop = 1
+        size_loop = 2
     model = SVM(
-        X_train, y_train, logC, max_iter=1000, tol=tol)
+        X_train, y_train, logC, max_iter=10000, tol=tol)
     for i in range(size_loop):
         monitor = Monitor()
 
         if method == "implicit_forward":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
-            algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
+            algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
                 log_alpha0=logC, tol=tol,
@@ -100,7 +99,7 @@ def parallel_function(
         elif method == "random":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-3)
+            log_alpha_min = np.log(0.005)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="random")
@@ -109,7 +108,7 @@ def parallel_function(
         elif method == "lhs":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-3)
+            log_alpha_min = np.log(0.005)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="lhs")
