@@ -2,57 +2,119 @@ import numpy as np
 from numpy.linalg import norm
 from joblib import Parallel, delayed
 import pandas
+from itertools import product
+import blitzl1
 # from sklearn.linear_model import Lasso as Lasso_sk
 # from sklearn.linear_model import LogisticRegression
+# from celer import LogisticRegression
 from scipy.sparse.linalg import cg
-from sparse_ho.models import Lasso
+from scipy.sparse import csc_matrix
+from sparse_ho.models import Lasso, SparseLogreg
 # , SparseLogreg
 # import matplotlib.pyplot as plt
 
-from celer import Lasso as Lasso_sk
+from celer import Lasso as Lasso_cel
 # from sparse_ho.utils import sigma
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
-
-dataset_names = ["real-sim"]
-# dataset_names = ["finance"]
-# dataset_names = ["leu", "rcv1_train", "news20"]
 p_alphas = {}
-p_alphas["leu"] = 0.01
-p_alphas["rcv1_train"] = 0.075
-p_alphas["news20"] = 0.3
-p_alphas["finance"] = 0.3
-p_alphas["real-sim"] = 0.1
+p_alphas["leu", "lasso"] = 0.01
+p_alphas["rcv1_train", "lasso"] = 0.075
+p_alphas["news20", "lasso"] = 0.3
+p_alphas["finance", "lasso"] = 0.3
+p_alphas["real-sim", "lasso"] = 0.1
+
+p_alphas["leu", "logreg"] = 0.3
+p_alphas["rcv1_train", "logreg"] = 0.25
+p_alphas["news20", "logreg"] = 0.8
+p_alphas["finance", "logreg"] = 0.3
+p_alphas["real-sim", "logreg"] = 0.15
+
+max_iters = {}
+max_iters["leu"] = 20
+max_iters["rcv1_train"] = 200
+max_iters["news20"] = 100
+max_iters["real-sim"] = 100
+
+# dataset_names = [""]
+# dataset_names = ["news20"]
+#
+# dataset_names = ["leu"]
+dataset_names = ["rcv1_train"]
+# dataset_names = ["leu"]
+# dataset_names = ["real-sim"]
+# dataset_names = ["finance"]
+# dataset_names = ["leu"]
+model_names = ["logreg"]
+# model_names = ["lasso"]
 
 
 def linear_cv(
-        dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
+        dataset_name, tol=1e-3, compute_jac=True, model_name="lasso"):
 
     X, y = load_libsvm(dataset_name)
+    X = csc_matrix(X)
     n_samples, n_features = X.shape
-    p_alpha = p_alphas[dataset_name]
+    p_alpha = p_alphas[dataset_name, model_name]
 
-    alpha_max = norm(X.T @ y, ord=np.inf) / n_samples
+    max_iter = max_iters[dataset_name]
+    if model_name == "lasso":
+        model = Lasso(X, y, 0, max_iter=max_iter, tol=tol)
+    elif model_name == "logreg":
+        model = SparseLogreg(X, y, 0, max_iter=max_iter, tol=tol)
+
+    alpha_max = np.exp(model.compute_alpha_max())
+
     alpha = p_alpha * alpha_max
-    clf = Lasso_sk(
-        alpha=alpha, fit_intercept=False, warm_start=True,
-        tol=tol * norm(y) ** 2 / 2, max_iter=10000)
-    clf.fit(X, y)
-    beta_star = clf.coef_
-    mask = beta_star != 0
-    # dense = beta_star[mask]
+    if model_name == "lasso":
+        clf = Lasso_cel(
+            alpha=alpha, fit_intercept=False, warm_start=True,
+            tol=tol * norm(y) ** 2 / 2, max_iter=10000)
+        clf.fit(X, y)
+        beta_star = clf.coef_
+        mask = beta_star != 0
+        dense = beta_star[mask]
+    elif model_name == "logreg":
+        # clf = LogisticRegression(
+        #     penalty='l1', C=(1 / (alpha * n_samples)),
+        #     fit_intercept=False,
+        #     warm_start=True, max_iter=10000,
+        #     tol=tol, verbose=True).fit(X, y)
+        # clf = LogisticRegression(
+        #     penalty='l1', C=(1 / (alpha * n_samples)),
+        #     fit_intercept=False,
+        #     warm_start=True, max_iter=10000,
+        #     tol=tol, verbose=True,
+        #     solver='liblinear').fit(X, y)
+        # beta_star = clf.coef_[0]
+        # import ipdb; ipdb.set_trace()
 
+        # import ipdb; ipdb.set_trace()
+        blitzl1.set_use_intercept(False)
+        blitzl1.set_tolerance(1e-100)
+        blitzl1.set_verbose(True)
+        # blitzl1.set_min_time(60)
+        prob = blitzl1.LogRegProblem(X, y)
+        # # lammax = prob.compute_lambda_max()
+        clf = prob.solve(alpha * n_samples)
+        beta_star = clf.x
+        mask = beta_star != 0
+        mask = np.array(mask)
+        dense = beta_star[mask]
+    # import ipdb; ipdb.set_trace()
+    # if model == "lasso":
     v = - n_samples * alpha * np.sign(beta_star[mask])
-    mat_to_inv = X[:, mask].T  @ X[:, mask]
+    mat_to_inv = model.get_hessian(mask, dense)
+    # mat_to_inv = X[:, mask].T  @ X[:, mask]
 
     jac_temp = cg(mat_to_inv, v, tol=1e-10)
     jac_star = np.zeros(n_features)
     jac_star[mask] = jac_temp[0]
+    # elif model == "logreg":
+    #     v = - n_samples * alpha * np.sign(beta_star[mask])
 
     log_alpha = np.log(alpha)
-
-    model = Lasso(X, y, np.log(alpha), max_iter=max_iter, tol=tol)
 
     list_beta, list_jac = get_beta_jac_iterdiff(
         X, y, log_alpha, model, save_iterates=True, tol=tol,
@@ -76,7 +138,7 @@ def linear_cv(
 
 # parameter of the algo
 tol = 1e-16
-max_iter = 100
+# max_iter = 100
 # max_iter = 10000
 
 # dataset_name = "news20"
@@ -95,9 +157,8 @@ backend = 'loky'
 n_jobs = 1
 results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
     delayed(linear_cv)(
-        dataset_name,
-        max_iter=max_iter, tol=tol, compute_jac=True)
-    for dataset_name in dataset_names)
+        dataset_name, tol=tol, compute_jac=True, model_name=model_name)
+    for dataset_name, model_name in product(dataset_names, model_names))
 print('OK finished parallel')
 
 df = pandas.DataFrame(results)
@@ -107,27 +168,9 @@ df.columns = [
     'supp_id']
 
 for dataset_name in dataset_names:
-    df[df['dataset_name'] == dataset_name].to_pickle(
-        "%s.pkl" % dataset_name)
-
-# 1 / 0
-
-# fig, axarr = plt.subplots(
-#     2, 1, sharex=True, sharey=False, figsize=[4, 12])
-# # plt.figure()
-# axarr.flat[0].semilogy(diff_beta, linewidth=2.0)
-# axarr.flat[1].semilogy(diff_jac, linewidth=2.0)
-# # axarr.flat[0].set_xlabel("epoch")
-# axarr.flat[0].set_ylabel("||beta - beta_star||")
-# axarr.flat[1].set_xlabel("epoch")
-# axarr.flat[1].set_ylabel("||jac - jac_Star||")
-# axarr.flat[0].axvline(x=supp_id, c='red', linestyle="--")
-# axarr.flat[1].axvline(x=supp_id, c='red', linestyle="--")
-# # axarr.flat[0].set_title("Iterates convergence for the Lasso")
-# # axarr.flat[1].set_title("Jacobian convergence for the Lasso")
-# fig.tight_layout()
-# plt.tight_layout()
-# plt.show()
+    for model_name in model_names:
+        df[df['dataset_name'] == dataset_name].to_pickle(
+            "%s_%s.pkl" % (dataset_name, model_name))
 
 
 # Same for the Logistic regression
