@@ -3,7 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.sparse.linalg import norm
+# from scipy.sparse.linalg import norm
 
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import Logistic

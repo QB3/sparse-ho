@@ -35,12 +35,12 @@ dict_title["real-sim"] = "real-sim"
 for model_name in model_names:
     # plt.close('all')
     fig, axarr = plt.subplots(
-        2, 4, sharex=False, sharey =False, figsize=[14, 8],)
+        2, 4, sharex=False, sharey=False, figsize=[14, 8],)
     for idx, dataset in enumerate(dataset_names):
         try:
             df_data = pandas.read_pickle(
                 "%s_%s.pkl" % (dataset, model_name))
-        except:
+        except Exception:
             break
         diff_beta = df_data["diff_beta"].to_numpy()[0]
         diff_jac = df_data["diff_jac"].to_numpy()[0]
