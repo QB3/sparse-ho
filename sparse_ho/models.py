@@ -737,7 +737,8 @@ class SVM():
             w = temp @ v
         else:
             w = ((self.y[maskC, np.newaxis] * self.X[maskC, :]) @ v)
-        return u @ jac + C * np.sum(w)
+
+        return np.array(u @ jac + C * np.sum(w))
 
     def restrict_full_supp(self, mask, dense, v):
         n_samples = self.X.shape[0]
