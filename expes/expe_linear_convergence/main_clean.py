@@ -25,14 +25,14 @@ p_alphas["news20", "lasso"] = 0.3
 p_alphas["finance", "lasso"] = 0.3
 p_alphas["real-sim", "lasso"] = 0.1
 
-p_alphas["leu", "logreg"] = 0.3
+p_alphas["leu", "logreg"] = 0.1
 p_alphas["rcv1_train", "logreg"] = 0.25
 p_alphas["news20", "logreg"] = 0.8
 p_alphas["finance", "logreg"] = 0.3
 p_alphas["real-sim", "logreg"] = 0.15
 
 max_iters = {}
-max_iters["leu"] = 20
+max_iters["leu"] = 2000
 max_iters["rcv1_train"] = 200
 max_iters["news20"] = 100
 max_iters["real-sim"] = 100
@@ -40,8 +40,8 @@ max_iters["real-sim"] = 100
 # dataset_names = [""]
 # dataset_names = ["news20"]
 #
-# dataset_names = ["leu"]
-dataset_names = ["rcv1_train"]
+dataset_names = ["leu"]
+# dataset_names = ["rcv1_train"]
 # dataset_names = ["leu"]
 # dataset_names = ["real-sim"]
 # dataset_names = ["finance"]
@@ -92,7 +92,7 @@ def linear_cv(
 
         # import ipdb; ipdb.set_trace()
         blitzl1.set_use_intercept(False)
-        blitzl1.set_tolerance(1e-100)
+        blitzl1.set_tolerance(1e-32)
         blitzl1.set_verbose(True)
         # blitzl1.set_min_time(60)
         prob = blitzl1.LogRegProblem(X, y)
