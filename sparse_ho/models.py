@@ -738,7 +738,10 @@ class SVM():
         else:
             w = ((self.y[maskC, np.newaxis] * self.X[maskC, :]) @ v)
 
-        return np.array(u @ jac + C * np.sum(w))
+        if issparse(self.X):
+            return np.array(u @ jac + C * np.sum(w))[0]
+        else:
+            return np.array(u @ jac + C * np.sum(w))
 
     def restrict_full_supp(self, mask, dense, v):
         n_samples = self.X.shape[0]
