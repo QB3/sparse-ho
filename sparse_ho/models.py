@@ -191,8 +191,8 @@ class Lasso():
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= self.X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < -12:
-            return - 12.0
+        if log_alpha < self.log_alpha_max - 7:
+            return self.log_alpha_max - 7
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:

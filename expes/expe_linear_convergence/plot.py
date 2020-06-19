@@ -20,7 +20,7 @@ fontsize = 25
 # dataset_names = ["leu", "rcv1_train", "news20", "finance"]
 dataset_names = ["leu", "rcv1_train", "news20", "real-sim"]
 # model_names = ["lasso"]
-model_names = ["lasso", "logreg"]
+model_names = ["lasso", "logreg", "svm"]
 
 
 dict_title = {}
@@ -66,8 +66,10 @@ for model_name in model_names:
 
     if save_fig:
         fig.savefig(
-            fig_dir + "linear_convergence_lasso.pdf", bbox_inches="tight")
+            fig_dir + "linear_convergence_%s.pdf" % model_name,
+            bbox_inches="tight")
         fig.savefig(
-            fig_dir_svg + "linear_convergence_lasso.svg", bbox_inches="tight")
+            fig_dir_svg + "linear_convergence_%s.svg" % model_name,
+            bbox_inches="tight")
     # plt.title(model_name)
     fig.show()
