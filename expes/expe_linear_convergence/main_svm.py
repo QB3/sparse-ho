@@ -2,68 +2,77 @@ import numpy as np
 from numpy.linalg import norm
 from joblib import Parallel, delayed
 import pandas
+from lightning.classification import SDCAClassifier
+
 from scipy.sparse.linalg import cg
+# from scipy.sparse import csc_matrix
 from sparse_ho.models import SVM
-from cvxopt import spmatrix, matrix
-from cvxopt import solvers
+# from cvxopt import spmatrix, matrix
+# from cvxopt import solvers
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 
-dataset_names = ["leu"]
+dataset_names = ["real-sim"]
+# dataset_names = ["leu"]
 # dataset_names = ["finance"]
 # dataset_names = ["leu", "rcv1_train", "news20"]
 Cs = {}
 Cs["leu"] = 0.01
-Cs["rcv1_train"] = 0.01
+Cs["rcv1_train"] = 0.0001
 Cs["news20"] = 0.01
 Cs["finance"] = 0.01
-Cs["real-sim"] = 0.01
+Cs["real-sim"] = 0.001
+
+max_iters = {}
+max_iters["leu"] = 2000
+max_iters["rcv1_train"] = 200
+max_iters["news20"] = 100
+max_iters["real-sim"] = 100
 
 
-def scipy_sparse_to_spmatrix(A):
-    coo = A.tocoo()
-    SP = spmatrix(coo.data, coo.row.tolist(), coo.col.tolist())
-    return SP
+# def scipy_sparse_to_spmatrix(A):
+#     coo = A.tocoo()
+#     SP = spmatrix(coo.data, coo.row.tolist(), coo.col.tolist())
+#     return SP
 
 
 def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
+    max_iter = max_iters[dataset_name]
     X, y = load_libsvm(dataset_name)
     X = X.tocsr()
     n_samples, n_features = X.shape
     C = Cs[dataset_name]
     # Computation of dual solution of SVM via cvxopt
-    Q = (X.multiply(y[:, np.newaxis]))  @  (X.multiply(y[:, np.newaxis])).T
-    # Quadratic term
-    Q_cvx = scipy_sparse_to_spmatrix(Q)
-    # Linear term
-    L = np.repeat(-1.0, Q.shape[0])
-    L = matrix(L)
 
-    # matrix inequality constraints
-    G = np.zeros((2 * n_samples, n_samples))
-    G[0:n_samples, :] = -np.eye(n_samples)
-    G[n_samples:(2 * n_samples), :] = np.eye(n_samples)
-    G = matrix(G)
+    clf = SDCAClassifier(alpha=1/(C * n_samples), loss='hinge', verbose=True)
+    clf.fit(X, y)
+    beta_star = clf.dual_coef_[0]
 
-    # vector inequality constraints
-    h = np.zeros(2 * n_samples)
-    h[n_samples:(2 * n_samples)] = C
-    h = matrix(h)
+    # import ipdb; ipdb.set_trace()
 
-    solvers.options['show_progress'] = False
-    solvers.options['abstol'] = 1e-16
-    solvers.options['feastol'] = 1e-16
-    solvers.options['reltol'] = 1e-16
-    sol = solvers.qp(Q_cvx, L, G, h, None, None)
-    beta_star = sol['x'][:n_samples]
-    beta_star = np.array(beta_star).flatten()
+    full_supp = np.logical_and(beta_star > 0, beta_star < C)
+    # full_supp = np.logical_and(np.logical_not(np.isclose(beta_star, 0)), np.logical_not(np.isclose(beta_star, C)))
 
-    full_supp = np.logical_and(np.logical_not(np.isclose(beta_star, 0)), np.logical_not(np.isclose(beta_star, C)))
+    # Q = (X.multiply(y[:, np.newaxis]))  @  (X.multiply(y[:, np.newaxis])).T
+    yX = X.multiply(y[:, np.newaxis])
+    yX = yX.tocsr()
 
-    v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
-    v = np.squeeze(v)
-    jac_dense = cg(Q[np.ix_(full_supp, full_supp)], v, tol=1e-14)
+    # TODO to optimize
+    temp3 = np.zeros(n_samples)
+    temp3[np.isclose(beta_star, C)] = np.ones(
+        (np.isclose(beta_star, C)).sum()) * C
+    # temp3 = temp3[full_supp]
+    # import ipdb; ipdb.set_trace()
+    v = temp3[full_supp] - yX[full_supp, :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
+    # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
+    # v = np.squeeze(v)
+    temp = yX[full_supp, :] @ yX[full_supp, :].T
+    # temp = csc_matrix(temp)
+    # temp = temp[:, full_supp]
+    # Q = csc_matrix(Q)
+    # import ipdb; ipdb.set_trace()
+    jac_dense = cg(temp, v, tol=1e-15)
     jac_star = np.zeros(n_samples)
     jac_star[full_supp] = jac_dense[0]
     jac_star[np.isclose(beta_star, C)] = C

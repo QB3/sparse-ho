@@ -65,7 +65,7 @@ criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=False)
 monitor_grad = Monitor()
 grad_search(
-    algo, log_alpha0, monitor_grad, tol=tol)
+    algo, log_alpha0, monitor_grad, tol=tol, n_outer=50)
 print('grad search finished')
 
 # grad search
@@ -74,7 +74,7 @@ criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion, use_sk=True)
 monitor_grad_sk = Monitor()
 grad_search(
-    algo, log_alpha0, monitor_grad_sk, tol=tol)
+    algo, log_alpha0, monitor_grad_sk, tol=tol, n_outer=50)
 print('grad search finished')
 
 plt.figure()
