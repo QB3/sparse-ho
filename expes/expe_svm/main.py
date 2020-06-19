@@ -5,7 +5,7 @@ import pandas
 from bcdsugar.utils import Monitor
 from sparse_ho.ho import grad_search
 from itertools import product
-from sparse_ho.criterion import Logistic
+from sparse_ho.criterion import SmoothedHinge
 from sparse_ho.models import SVM
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
@@ -15,17 +15,17 @@ from sparse_ho.grid_search import grid_search
 
 # from my_data import get_data
 
-dataset_names = ["leukemia"]
+dataset_names = ["real-sim"]
 
 # methods = ["implicit_forward", "implicit"]
-methods = ["forward", 'implicit_forward', 'grid_search', 'random']
+methods = ["forward", "implicit_forward"]
 # "grid_search",
 tolerance_decreases = ["constant"]
 tols = 1e-5
 n_outers = [1]
 
 dict_t_max = {}
-dict_t_max["rcv1"] = 100
+dict_t_max["rcv1"] = 50
 dict_t_max["real-sim"] = 100
 dict_t_max["leukemia"] = 10
 dict_t_max["20news"] = 500
@@ -45,20 +45,20 @@ def parallel_function(
     y_test[y_test == 0.0] = -1.0
 
     C_max = 100
-    logC = np.log(0.005)
-    n_outer = 10
+    logC = np.log(1e-2)
+    n_outer = 5
 
     if dataset_name == "rcv1":
-        size_loop = 2
+        size_loop = 1
     else:
-        size_loop = 2
+        size_loop = 1
     model = SVM(
         X_train, y_train, logC, max_iter=10000, tol=tol)
     for i in range(size_loop):
         monitor = Monitor()
 
         if method == "implicit_forward":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
@@ -68,7 +68,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -78,7 +78,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Implicit(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -88,27 +88,27 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-3)
+            log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="grid")
             print(log_alpha_opt)
 
         elif method == "random":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(0.005)
+            log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="random")
             print(log_alpha_opt)
 
         elif method == "lhs":
-            criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(0.005)
+            log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(
                 algo, log_alpha_min, np.log(C_max), monitor, max_evals=25,
                 tol=tol, samp="lhs")
