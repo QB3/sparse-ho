@@ -49,21 +49,20 @@ def mcp_pen(x, threshold, gamma=1.2):
 
 
 def smooth_hinge(x):
-    if (x) <= 0:
-        return 0.5 - x
-    elif (0 < x) and (x <= 1):
-        return 0.5 * (1 - x) ** 2
-    else:
-        return 0.0
+    val = np.zeros(len(x))
+    val[x <= 0.0] = 0.5 - x[x <= 0.0]
+    boole = np.logical_and(x > 0.0, x <= 1)
+    val[boole] = 0.5 * (1 - x[boole]) ** 2
+
+    return val
 
 
 def derivative_smooth_hinge(x):
-    if x <= 0:
-        return - 1.0
-    elif (0 < x and x <= 1):
-        return (- 1.0 + x)
-    else:
-        return 0.0
+    deriv = np.zeros(len(x))
+    deriv[x <= 0.0] = -1.0
+    boole = np.logical_and(x > 0.0, x <= 1)
+    deriv[boole] = -1.0 + x[boole]
+    return deriv
 
 
 def smooth_hinge_loss(X, y, beta):
