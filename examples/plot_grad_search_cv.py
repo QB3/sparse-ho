@@ -14,10 +14,10 @@ Grad Search CV
 
 import time
 import numpy as np
-from numpy.linalg import norm
+# from numpy.linalg import norm
 
 # from sklearn.datasets import make_regression
-from sklearn import linear_model
+# from sklearn import linear_model
 from sklearn.linear_model import LassoCV
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV

@@ -67,7 +67,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     v = temp3[full_supp] - yX[full_supp, :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
-    temp = yX[full_supp, : ] @ yX[full_supp, : ].T
+    temp = yX[full_supp, :] @ yX[full_supp, :].T
     # temp = csc_matrix(temp)
     # temp = temp[:, full_supp]
     # Q = csc_matrix(Q)
