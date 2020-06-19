@@ -17,6 +17,7 @@ sparse\_ho.models.wLasso
       ~wLasso.get_L
       ~wLasso.get_full_jac_v
       ~wLasso.get_hessian
+      ~wLasso.get_jac_obj
       ~wLasso.get_jac_v
       ~wLasso.get_mask_jac_v
       ~wLasso.get_primal

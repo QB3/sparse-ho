@@ -17,6 +17,7 @@ sparse\_ho.models.SVM
       ~SVM.get_L
       ~SVM.get_full_jac_v
       ~SVM.get_hessian
+      ~SVM.get_jac_obj
       ~SVM.get_jac_v
       ~SVM.get_primal
       ~SVM.proj_param

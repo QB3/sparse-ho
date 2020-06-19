@@ -113,13 +113,19 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.Lasso.__init__" title="sparse_ho.models.Lasso.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, X, y, log_alpha[, …])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_alpha_max</span></code>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(self, mask, dense)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(self, mask, dense)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(self, Xs, ys, sign_beta, dbeta, …)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(self, mask, dense, jac, v)</p></td>
