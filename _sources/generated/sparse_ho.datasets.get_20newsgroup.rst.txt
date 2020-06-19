@@ -1,0 +1,6 @@
+sparse\_ho.datasets.get\_20newsgroup
+====================================
+
+.. currentmodule:: sparse_ho.datasets
+
+.. autofunction:: get_20newsgroup

@@ -1,0 +1,23 @@
+sparse\_ho.utils.WarmStart
+==========================
+
+.. currentmodule:: sparse_ho.utils
+
+.. autoclass:: WarmStart
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WarmStart.__init__
+      ~WarmStart.set_sol_lin_sys
+   
+   
+
+   
+   
+   

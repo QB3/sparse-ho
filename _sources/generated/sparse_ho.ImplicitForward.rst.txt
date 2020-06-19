@@ -1,0 +1,25 @@
+sparse\_ho.ImplicitForward
+==========================
+
+.. currentmodule:: sparse_ho
+
+.. autoclass:: ImplicitForward
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ImplicitForward.__init__
+      ~ImplicitForward.get_beta_jac_v
+      ~ImplicitForward.get_val
+      ~ImplicitForward.get_val_grad
+   
+   
+
+   
+   
+   

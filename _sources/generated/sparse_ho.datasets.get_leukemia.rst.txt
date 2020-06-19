@@ -1,0 +1,6 @@
+sparse\_ho.datasets.get\_leukemia
+=================================
+
+.. currentmodule:: sparse_ho.datasets
+
+.. autofunction:: get_leukemia

@@ -1,0 +1,1140 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_sparse_log_reg.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_sparse_log_reg.py:
+
+
+===========================
+Method comparison on Lasso
+===========================
+
+The aim of this example is to demonstrate on a simple
+dateset how methods compare.
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Dataset: rcv1_train
+    Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
+
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                          | 24.6k/13.7M [00:00<02:50, 80.2kB/s]    file_sizes:   0%|                          | 49.2k/13.7M [00:00<03:19, 68.6kB/s]    file_sizes:   1%|2                          | 106k/13.7M [00:01<02:51, 79.4kB/s]    file_sizes:   1%|3                          | 156k/13.7M [00:01<02:51, 78.9kB/s]    file_sizes:   1%|3                          | 188k/13.7M [00:02<04:16, 52.7kB/s]    file_sizes:   2%|6                          | 311k/13.7M [00:03<03:19, 67.2kB/s]    file_sizes:   3%|7                          | 377k/13.7M [00:03<02:37, 85.0kB/s]    file_sizes:   3%|9                           | 459k/13.7M [00:04<02:06, 105kB/s]    file_sizes:   4%|#                           | 492k/13.7M [00:04<02:04, 106kB/s]    file_sizes:   4%|#1                          | 549k/13.7M [00:04<01:47, 122kB/s]    file_sizes:   4%|#2                          | 598k/13.7M [00:05<01:26, 151kB/s]    file_sizes:   5%|#2                          | 623k/13.7M [00:05<01:44, 125kB/s]    file_sizes:   5%|#3                          | 680k/13.7M [00:05<01:33, 140kB/s]    file_sizes:   5%|#4                          | 729k/13.7M [00:05<01:18, 166kB/s]    file_sizes:   5%|#5                          | 754k/13.7M [00:05<01:16, 170kB/s]    file_sizes:   6%|#6                          | 803k/13.7M [00:06<01:06, 194kB/s]    file_sizes:   6%|#7                          | 836k/13.7M [00:06<01:03, 202kB/s]    file_sizes:   6%|#7                          | 860k/13.7M [00:06<01:08, 188kB/s]    file_sizes:   6%|#8                          | 885k/13.7M [00:06<01:08, 188kB/s]    file_sizes:   7%|#8                          | 918k/13.7M [00:06<01:05, 195kB/s]    file_sizes:   7%|#9                          | 942k/13.7M [00:06<01:07, 190kB/s]    file_sizes:   7%|##                          | 991k/13.7M [00:06<01:00, 211kB/s]    file_sizes:   7%|#9                         | 1.02M/13.7M [00:07<01:06, 190kB/s]    file_sizes:   8%|##                         | 1.06M/13.7M [00:07<01:09, 182kB/s]    file_sizes:   8%|##1                        | 1.10M/13.7M [00:07<01:32, 137kB/s]    file_sizes:   9%|##3                        | 1.17M/13.7M [00:08<01:16, 163kB/s]    file_sizes:   9%|##3                        | 1.20M/13.7M [00:08<01:06, 188kB/s]    file_sizes:   9%|##4                        | 1.23M/13.7M [00:08<01:21, 153kB/s]    file_sizes:   9%|##4                        | 1.26M/13.7M [00:08<01:31, 136kB/s]    file_sizes:  10%|##6                        | 1.33M/13.7M [00:09<01:21, 152kB/s]    file_sizes:  10%|##6                        | 1.36M/13.7M [00:09<01:29, 138kB/s]    file_sizes:  10%|##7                        | 1.38M/13.7M [00:09<01:19, 155kB/s]    file_sizes:  10%|##7                        | 1.41M/13.7M [00:09<01:27, 140kB/s]    file_sizes:  11%|##8                        | 1.45M/13.7M [00:10<01:55, 106kB/s]    file_sizes:  11%|###                        | 1.54M/13.7M [00:10<01:35, 127kB/s]    file_sizes:  11%|###                        | 1.56M/13.7M [00:10<01:52, 108kB/s]    file_sizes:  12%|###1                       | 1.59M/13.7M [00:11<01:45, 115kB/s]    file_sizes:  12%|###1                       | 1.62M/13.7M [00:11<01:30, 134kB/s]    file_sizes:  12%|###2                       | 1.64M/13.7M [00:11<01:47, 112kB/s]    file_sizes:  12%|###2                       | 1.67M/13.7M [00:11<01:30, 133kB/s]    file_sizes:  12%|###3                       | 1.70M/13.7M [00:11<01:29, 134kB/s]    file_sizes:  13%|###3                       | 1.73M/13.7M [00:12<01:32, 129kB/s]    file_sizes:  13%|###4                       | 1.75M/13.7M [00:12<01:20, 148kB/s]    file_sizes:  13%|###4                       | 1.78M/13.7M [00:12<01:24, 142kB/s]    file_sizes:  13%|###5                       | 1.80M/13.7M [00:12<01:15, 159kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:12<01:20, 148kB/s]    file_sizes:  13%|###6                       | 1.84M/13.7M [00:12<01:18, 151kB/s]    file_sizes:  14%|###6                       | 1.86M/13.7M [00:12<01:37, 122kB/s]    file_sizes:  14%|###7                       | 1.89M/13.7M [00:13<01:24, 140kB/s]    file_sizes:  14%|###7                       | 1.91M/13.7M [00:13<01:35, 124kB/s]    file_sizes:  14%|###8                       | 1.94M/13.7M [00:13<01:39, 119kB/s]    file_sizes:  14%|###8                       | 1.98M/13.7M [00:13<01:22, 143kB/s]    file_sizes:  15%|###9                       | 2.01M/13.7M [00:13<01:26, 135kB/s]    file_sizes:  15%|###9                       | 2.03M/13.7M [00:13<01:15, 154kB/s]    file_sizes:  15%|####                       | 2.06M/13.7M [00:14<01:23, 140kB/s]    file_sizes:  15%|####                       | 2.07M/13.7M [00:14<01:20, 146kB/s]    file_sizes:  15%|####1                      | 2.09M/13.7M [00:14<01:28, 132kB/s]    file_sizes:  15%|####1                      | 2.12M/13.7M [00:14<01:17, 150kB/s]    file_sizes:  16%|####2                      | 2.15M/13.7M [00:14<01:19, 146kB/s]    file_sizes:  16%|####2                      | 2.17M/13.7M [00:14<01:12, 160kB/s]    file_sizes:  16%|####3                      | 2.20M/13.7M [00:15<01:18, 148kB/s]    file_sizes:  16%|####3                      | 2.21M/13.7M [00:15<01:16, 151kB/s]    file_sizes:  16%|####3                      | 2.24M/13.7M [00:15<01:17, 148kB/s]    file_sizes:  16%|####4                      | 2.26M/13.7M [00:15<01:11, 161kB/s]    file_sizes:  17%|####4                      | 2.29M/13.7M [00:15<01:14, 153kB/s]    file_sizes:  17%|####5                      | 2.32M/13.7M [00:15<01:05, 175kB/s]    file_sizes:  17%|####6                      | 2.34M/13.7M [00:15<01:09, 163kB/s]    file_sizes:  17%|####6                      | 2.37M/13.7M [00:16<01:05, 175kB/s]    file_sizes:  17%|####7                      | 2.39M/13.7M [00:16<01:09, 163kB/s]    file_sizes:  18%|####7                      | 2.43M/13.7M [00:16<00:59, 191kB/s]    file_sizes:  18%|####8                      | 2.46M/13.7M [00:16<01:05, 173kB/s]    file_sizes:  18%|####9                      | 2.50M/13.7M [00:16<00:55, 201kB/s]    file_sizes:  18%|####9                      | 2.52M/13.7M [00:16<00:58, 192kB/s]    file_sizes:  19%|#####                      | 2.57M/13.7M [00:17<00:51, 215kB/s]    file_sizes:  19%|#####1                     | 2.60M/13.7M [00:17<00:57, 194kB/s]    file_sizes:  19%|#####2                     | 2.65M/13.7M [00:17<00:49, 223kB/s]    file_sizes:  20%|#####2                     | 2.69M/13.7M [00:17<00:56, 195kB/s]    file_sizes:  20%|#####4                     | 2.77M/13.7M [00:17<00:49, 221kB/s]    file_sizes:  21%|#####5                     | 2.83M/13.7M [00:17<00:40, 270kB/s]    file_sizes:  21%|#####6                     | 2.88M/13.7M [00:18<00:42, 256kB/s]    file_sizes:  21%|#####7                     | 2.91M/13.7M [00:18<01:13, 147kB/s]    file_sizes:  23%|######2                    | 3.16M/13.7M [00:19<00:56, 187kB/s]    file_sizes:  24%|######3                    | 3.23M/13.7M [00:19<00:46, 224kB/s]    file_sizes:  24%|######4                    | 3.28M/13.7M [00:19<00:45, 231kB/s]    file_sizes:  24%|######5                    | 3.34M/13.7M [00:19<00:37, 280kB/s]    file_sizes:  25%|######6                    | 3.38M/13.7M [00:19<00:39, 260kB/s]    file_sizes:  25%|######7                    | 3.45M/13.7M [00:19<00:33, 311kB/s]    file_sizes:  25%|######8                    | 3.49M/13.7M [00:20<00:36, 279kB/s]    file_sizes:  26%|######9                    | 3.56M/13.7M [00:20<00:30, 331kB/s]    file_sizes:  26%|#######1                   | 3.61M/13.7M [00:20<00:35, 282kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:20<00:31, 320kB/s]    file_sizes:  27%|#######2                   | 3.70M/13.7M [00:20<00:35, 284kB/s]    file_sizes:  27%|#######3                   | 3.74M/13.7M [00:21<00:47, 208kB/s]    file_sizes:  29%|#######8                   | 3.97M/13.7M [00:21<00:38, 254kB/s]    file_sizes:  29%|#######9                   | 4.04M/13.7M [00:21<00:35, 271kB/s]    file_sizes:  30%|########                   | 4.09M/13.7M [00:21<00:39, 245kB/s]    file_sizes:  30%|########1                  | 4.15M/13.7M [00:22<00:32, 298kB/s]    file_sizes:  31%|########2                  | 4.19M/13.7M [00:22<00:36, 260kB/s]    file_sizes:  31%|########3                  | 4.26M/13.7M [00:22<00:36, 257kB/s]    file_sizes:  32%|########5                  | 4.34M/13.7M [00:22<00:29, 313kB/s]    file_sizes:  32%|########6                  | 4.38M/13.7M [00:22<00:34, 267kB/s]    file_sizes:  32%|########7                  | 4.46M/13.7M [00:23<00:33, 278kB/s]    file_sizes:  33%|########8                  | 4.51M/13.7M [00:23<00:28, 326kB/s]    file_sizes:  33%|########9                  | 4.55M/13.7M [00:23<00:46, 197kB/s]    file_sizes:  34%|#########1                 | 4.68M/13.7M [00:23<00:36, 247kB/s]    file_sizes:  35%|#########3                 | 4.74M/13.7M [00:24<00:37, 238kB/s]    file_sizes:  35%|#########4                 | 4.79M/13.7M [00:24<00:33, 269kB/s]    file_sizes:  35%|#########5                 | 4.83M/13.7M [00:24<00:36, 242kB/s]    file_sizes:  36%|#########6                 | 4.88M/13.7M [00:24<00:35, 249kB/s]    file_sizes:  36%|#########6                 | 4.92M/13.7M [00:24<00:33, 266kB/s]    file_sizes:  36%|#########7                 | 4.96M/13.7M [00:24<00:30, 292kB/s]    file_sizes:  36%|#########8                 | 4.99M/13.7M [00:24<00:35, 248kB/s]    file_sizes:  37%|#########9                 | 5.05M/13.7M [00:25<00:29, 299kB/s]    file_sizes:  37%|##########                 | 5.11M/13.7M [00:25<00:33, 260kB/s]    file_sizes:  38%|##########1                | 5.18M/13.7M [00:25<00:31, 276kB/s]    file_sizes:  38%|##########3                | 5.24M/13.7M [00:25<00:33, 253kB/s]    file_sizes:  38%|##########3                | 5.28M/13.7M [00:26<00:32, 264kB/s]    file_sizes:  39%|##########4                | 5.31M/13.7M [00:26<00:37, 226kB/s]    file_sizes:  39%|##########5                | 5.36M/13.7M [00:26<00:31, 264kB/s]    file_sizes:  39%|##########6                | 5.39M/13.7M [00:26<00:38, 215kB/s]    file_sizes:  40%|##########7                | 5.45M/13.7M [00:26<00:37, 220kB/s]    file_sizes:  40%|##########7                | 5.48M/13.7M [00:26<00:36, 224kB/s]    file_sizes:  40%|##########8                | 5.53M/13.7M [00:27<00:33, 245kB/s]    file_sizes:  41%|##########9                | 5.56M/13.7M [00:27<00:39, 206kB/s]    file_sizes:  41%|###########                | 5.62M/13.7M [00:27<00:32, 250kB/s]    file_sizes:  41%|###########1               | 5.65M/13.7M [00:27<00:37, 215kB/s]    file_sizes:  41%|###########1               | 5.69M/13.7M [00:27<00:33, 237kB/s]    file_sizes:  42%|###########2               | 5.73M/13.7M [00:27<00:33, 241kB/s]    file_sizes:  42%|###########3               | 5.77M/13.7M [00:28<00:30, 258kB/s]    file_sizes:  42%|###########4               | 5.80M/13.7M [00:28<00:34, 228kB/s]    file_sizes:  43%|###########4               | 5.84M/13.7M [00:28<00:30, 258kB/s]    file_sizes:  43%|###########5               | 5.87M/13.7M [00:28<00:34, 228kB/s]    file_sizes:  43%|###########6               | 5.93M/13.7M [00:28<00:28, 270kB/s]    file_sizes:  43%|###########7               | 5.96M/13.7M [00:28<00:33, 231kB/s]    file_sizes:  44%|###########7               | 6.00M/13.7M [00:28<00:31, 249kB/s]    file_sizes:  44%|###########8               | 6.04M/13.7M [00:29<00:38, 198kB/s]    file_sizes:  45%|############               | 6.14M/13.7M [00:29<00:37, 202kB/s]    file_sizes:  45%|############1              | 6.20M/13.7M [00:30<00:36, 205kB/s]    file_sizes:  45%|############2              | 6.23M/13.7M [00:30<00:34, 217kB/s]    file_sizes:  46%|############3              | 6.26M/13.7M [00:30<00:40, 183kB/s]    file_sizes:  46%|############3              | 6.28M/13.7M [00:30<00:48, 153kB/s]    file_sizes:  46%|############4              | 6.31M/13.7M [00:30<00:49, 150kB/s]    file_sizes:  46%|############4              | 6.33M/13.7M [00:30<00:51, 142kB/s]    file_sizes:  46%|############5              | 6.37M/13.7M [00:31<00:43, 169kB/s]    file_sizes:  47%|############5              | 6.39M/13.7M [00:31<00:47, 153kB/s]    file_sizes:  47%|############6              | 6.41M/13.7M [00:31<00:42, 171kB/s]    file_sizes:  47%|############1             | 6.44M/13.7M [00:31<01:13, 99.0kB/s]    file_sizes:  48%|############8              | 6.53M/13.7M [00:32<00:59, 121kB/s]    file_sizes:  48%|############8              | 6.55M/13.7M [00:32<01:08, 105kB/s]    file_sizes:  48%|############9              | 6.59M/13.7M [00:32<01:03, 113kB/s]    file_sizes:  48%|############5             | 6.64M/13.7M [00:33<01:15, 93.7kB/s]    file_sizes:  49%|#############2             | 6.73M/13.7M [00:33<01:00, 116kB/s]    file_sizes:  49%|############7             | 6.74M/13.7M [00:34<01:32, 75.5kB/s]    file_sizes:  49%|############8             | 6.78M/13.7M [00:34<01:20, 86.0kB/s]    file_sizes:  50%|#############3             | 6.81M/13.7M [00:34<01:06, 104kB/s]    file_sizes:  50%|############9             | 6.82M/13.7M [00:34<01:12, 95.7kB/s]    file_sizes:  50%|#############4             | 6.85M/13.7M [00:34<01:00, 114kB/s]    file_sizes:  50%|############9             | 6.86M/13.7M [00:35<01:11, 95.5kB/s]    file_sizes:  50%|#############             | 6.90M/13.7M [00:35<01:32, 74.2kB/s]    file_sizes:  51%|#############1            | 6.96M/13.7M [00:36<01:12, 93.4kB/s]    file_sizes:  51%|#############7             | 6.97M/13.7M [00:36<01:04, 105kB/s]    file_sizes:  51%|#############2            | 6.99M/13.7M [00:36<01:59, 56.4kB/s]    file_sizes:  51%|#############3            | 7.05M/13.7M [00:37<01:34, 70.5kB/s]    file_sizes:  51%|#############3            | 7.06M/13.7M [00:37<01:38, 67.8kB/s]    file_sizes:  52%|#############4            | 7.08M/13.7M [00:37<01:35, 69.8kB/s]    file_sizes:  52%|#############4            | 7.09M/13.7M [00:37<01:22, 80.9kB/s]    file_sizes:  52%|#############4            | 7.11M/13.7M [00:37<01:28, 74.6kB/s]    file_sizes:  52%|#############5            | 7.14M/13.7M [00:38<01:28, 74.1kB/s]    file_sizes:  52%|#############5            | 7.16M/13.7M [00:38<01:26, 76.1kB/s]    file_sizes:  52%|#############6            | 7.18M/13.7M [00:38<01:24, 77.6kB/s]    file_sizes:  53%|#############6            | 7.22M/13.7M [00:39<01:18, 83.3kB/s]    file_sizes:  53%|#############7            | 7.25M/13.7M [00:39<01:13, 88.1kB/s]    file_sizes:  53%|#############7            | 7.27M/13.7M [00:39<01:04, 99.5kB/s]    file_sizes:  53%|#############7            | 7.28M/13.7M [00:39<01:08, 93.8kB/s]    file_sizes:  53%|#############8            | 7.31M/13.7M [00:40<01:08, 93.3kB/s]    file_sizes:  53%|#############8            | 7.32M/13.7M [00:40<01:21, 78.3kB/s]    file_sizes:  54%|#############9            | 7.36M/13.7M [00:40<01:12, 87.8kB/s]    file_sizes:  54%|##############            | 7.40M/13.7M [00:41<01:07, 93.6kB/s]    file_sizes:  54%|##############            | 7.42M/13.7M [00:41<01:03, 98.8kB/s]    file_sizes:  54%|##############6            | 7.46M/13.7M [00:41<00:58, 107kB/s]    file_sizes:  55%|##############7            | 7.50M/13.7M [00:41<00:53, 115kB/s]    file_sizes:  55%|##############8            | 7.54M/13.7M [00:42<00:46, 133kB/s]    file_sizes:  55%|##############8            | 7.56M/13.7M [00:42<00:50, 123kB/s]    file_sizes:  55%|##############9            | 7.61M/13.7M [00:42<00:45, 134kB/s]    file_sizes:  56%|###############            | 7.67M/13.7M [00:42<00:41, 147kB/s]    file_sizes:  56%|###############2           | 7.73M/13.7M [00:43<00:36, 164kB/s]    file_sizes:  57%|###############3           | 7.81M/13.7M [00:43<00:31, 189kB/s]    file_sizes:  57%|###############4           | 7.86M/13.7M [00:43<00:25, 235kB/s]    file_sizes:  58%|###############5           | 7.90M/13.7M [00:43<00:28, 207kB/s]    file_sizes:  58%|###############6           | 7.95M/13.7M [00:43<00:22, 255kB/s]    file_sizes:  58%|###############7           | 8.00M/13.7M [00:43<00:23, 247kB/s]    file_sizes:  59%|###############8           | 8.06M/13.7M [00:44<00:19, 293kB/s]    file_sizes:  59%|###############9           | 8.10M/13.7M [00:44<00:28, 198kB/s]    file_sizes:  60%|################1          | 8.20M/13.7M [00:44<00:25, 220kB/s]    file_sizes:  60%|################3          | 8.30M/13.7M [00:44<00:19, 280kB/s]    file_sizes:  61%|################4          | 8.36M/13.7M [00:45<00:17, 310kB/s]    file_sizes:  61%|################5          | 8.41M/13.7M [00:45<00:19, 279kB/s]    file_sizes:  62%|################6          | 8.48M/13.7M [00:45<00:15, 332kB/s]    file_sizes:  62%|################7          | 8.53M/13.7M [00:45<00:17, 296kB/s]    file_sizes:  63%|################8          | 8.59M/13.7M [00:45<00:16, 315kB/s]    file_sizes:  63%|################9          | 8.63M/13.7M [00:45<00:15, 332kB/s]    file_sizes:  63%|#################1         | 8.70M/13.7M [00:46<00:14, 336kB/s]    file_sizes:  64%|#################1         | 8.74M/13.7M [00:46<00:14, 346kB/s]    file_sizes:  64%|#################3         | 8.81M/13.7M [00:46<00:12, 393kB/s]    file_sizes:  64%|#################4         | 8.86M/13.7M [00:46<00:14, 347kB/s]    file_sizes:  65%|#################5         | 8.94M/13.7M [00:46<00:17, 281kB/s]    file_sizes:  66%|#################8         | 9.06M/13.7M [00:47<00:14, 327kB/s]    file_sizes:  67%|##################         | 9.16M/13.7M [00:47<00:12, 369kB/s]    file_sizes:  67%|##################1        | 9.21M/13.7M [00:47<00:11, 388kB/s]    file_sizes:  67%|##################2        | 9.26M/13.7M [00:47<00:14, 305kB/s]    file_sizes:  68%|##################3        | 9.32M/13.7M [00:47<00:14, 297kB/s]    file_sizes:  68%|##################4        | 9.36M/13.7M [00:48<00:13, 314kB/s]    file_sizes:  69%|##################5        | 9.42M/13.7M [00:48<00:14, 300kB/s]    file_sizes:  69%|##################6        | 9.47M/13.7M [00:48<00:12, 333kB/s]    file_sizes:  69%|##################7        | 9.52M/13.7M [00:48<00:14, 295kB/s]    file_sizes:  70%|##################8        | 9.59M/13.7M [00:48<00:11, 359kB/s]    file_sizes:  70%|##################9        | 9.65M/13.7M [00:48<00:13, 304kB/s]    file_sizes:  71%|###################1       | 9.72M/13.7M [00:49<00:13, 293kB/s]    file_sizes:  71%|###################2       | 9.80M/13.7M [00:49<00:10, 361kB/s]    file_sizes:  72%|###################3       | 9.85M/13.7M [00:49<00:12, 301kB/s]    file_sizes:  72%|###################5       | 9.94M/13.7M [00:49<00:12, 313kB/s]    file_sizes:  73%|###################7       | 10.0M/13.7M [00:49<00:10, 362kB/s]    file_sizes:  73%|###################8       | 10.1M/13.7M [00:50<00:11, 307kB/s]    file_sizes:  74%|###################9       | 10.1M/13.7M [00:50<00:12, 298kB/s]    file_sizes:  74%|####################1      | 10.2M/13.7M [00:50<00:09, 357kB/s]    file_sizes:  75%|####################2      | 10.3M/13.7M [00:50<00:11, 309kB/s]    file_sizes:  75%|####################3      | 10.3M/13.7M [00:50<00:11, 304kB/s]    file_sizes:  76%|####################4      | 10.4M/13.7M [00:51<00:09, 354kB/s]    file_sizes:  76%|####################5      | 10.5M/13.7M [00:51<00:10, 302kB/s]    file_sizes:  77%|####################7      | 10.5M/13.7M [00:51<00:08, 358kB/s]    file_sizes:  77%|####################7      | 10.6M/13.7M [00:51<00:10, 291kB/s]    file_sizes:  77%|####################9      | 10.6M/13.7M [00:51<00:09, 342kB/s]    file_sizes:  78%|#####################      | 10.7M/13.7M [00:51<00:10, 298kB/s]    file_sizes:  78%|#####################1     | 10.8M/13.7M [00:52<00:10, 290kB/s]    file_sizes:  79%|#####################2     | 10.8M/13.7M [00:52<00:08, 334kB/s]    file_sizes:  79%|#####################3     | 10.9M/13.7M [00:52<00:08, 335kB/s]    file_sizes:  79%|#####################4     | 10.9M/13.7M [00:52<00:08, 335kB/s]    file_sizes:  80%|#####################5     | 11.0M/13.7M [00:52<00:07, 359kB/s]    file_sizes:  80%|#####################6     | 11.0M/13.7M [00:52<00:07, 350kB/s]    file_sizes:  81%|#####################8     | 11.1M/13.7M [00:53<00:07, 347kB/s]    file_sizes:  81%|#####################9     | 11.1M/13.7M [00:53<00:07, 370kB/s]    file_sizes:  82%|######################     | 11.2M/13.7M [00:53<00:06, 366kB/s]    file_sizes:  82%|######################1    | 11.3M/13.7M [00:53<00:06, 373kB/s]    file_sizes:  83%|######################2    | 11.3M/13.7M [00:53<00:05, 400kB/s]    file_sizes:  83%|######################3    | 11.4M/13.7M [00:53<00:05, 415kB/s]    file_sizes:  83%|######################4    | 11.4M/13.7M [00:53<00:05, 421kB/s]    file_sizes:  84%|######################5    | 11.5M/13.7M [00:54<00:05, 403kB/s]    file_sizes:  84%|######################6    | 11.5M/13.7M [00:54<00:05, 391kB/s]    file_sizes:  84%|######################8    | 11.6M/13.7M [00:54<00:04, 433kB/s]    file_sizes:  85%|######################9    | 11.6M/13.7M [00:54<00:04, 442kB/s]    file_sizes:  85%|#######################    | 11.7M/13.7M [00:54<00:04, 449kB/s]    file_sizes:  86%|#######################1   | 11.8M/13.7M [00:54<00:04, 443kB/s]    file_sizes:  86%|#######################2   | 11.8M/13.7M [00:54<00:04, 425kB/s]    file_sizes:  87%|#######################3   | 11.9M/13.7M [00:54<00:03, 466kB/s]    file_sizes:  87%|#######################4   | 11.9M/13.7M [00:55<00:03, 496kB/s]    file_sizes:  87%|#######################6   | 12.0M/13.7M [00:55<00:03, 513kB/s]    file_sizes:  88%|#######################7   | 12.1M/13.7M [00:55<00:03, 496kB/s]    file_sizes:  88%|#######################8   | 12.1M/13.7M [00:55<00:03, 495kB/s]    file_sizes:  89%|########################   | 12.2M/13.7M [00:55<00:02, 551kB/s]    file_sizes:  89%|########################1  | 12.3M/13.7M [00:55<00:02, 493kB/s]    file_sizes:  90%|########################3  | 12.4M/13.7M [00:55<00:02, 570kB/s]    file_sizes:  91%|########################5  | 12.5M/13.7M [00:56<00:02, 491kB/s]    file_sizes:  92%|########################7  | 12.6M/13.7M [00:56<00:01, 584kB/s]    file_sizes:  92%|########################9  | 12.7M/13.7M [00:56<00:01, 544kB/s]    file_sizes:  93%|#########################1 | 12.8M/13.7M [00:56<00:01, 634kB/s]    file_sizes:  94%|#########################3 | 12.9M/13.7M [00:56<00:01, 581kB/s]    file_sizes:  95%|#########################6 | 13.1M/13.7M [00:56<00:00, 688kB/s]    file_sizes:  96%|#########################8 | 13.2M/13.7M [00:56<00:00, 638kB/s]    file_sizes:  97%|##########################1| 13.3M/13.7M [00:57<00:00, 504kB/s]    file_sizes: 100%|###########################| 13.7M/13.7M [00:57<00:00, 634kB/s]    file_sizes: 100%|###########################| 13.7M/13.7M [00:57<00:00, 238kB/s]
+    Successfully downloaded file to /Users/alex/imp_forward_data/binary/rcv1_train.binary.bz2
+    Preprocessing...
+    /Users/alex/miniconda3/lib/python3.7/site-packages/sklearn/utils/validation.py:71: FutureWarning: Pass n_features=47236 as keyword args. From version 0.25 passing these as positional arguments will result in an error
+      FutureWarning)
+    0.01
+    0 -st iteration over 10000
+    0.6387291116694195
+    1 -st iteration over 10000
+    0.6311273599700443
+    2 -st iteration over 10000
+    0.6276421805430861
+    relative decrease =  0.005028051075880909
+    0 -st iterations over 100
+    1 -st iterations over 100
+    2 -st iterations over 100
+    3 -st iterations over 100
+    4 -st iterations over 100
+    5 -st iterations over 100
+    6 -st iterations over 100
+    7 -st iterations over 100
+    8 -st iterations over 100
+    9 -st iterations over 100
+    10 -st iterations over 100
+    11 -st iterations over 100
+    12 -st iterations over 100
+    13 -st iterations over 100
+    14 -st iterations over 100
+    15 -st iterations over 100
+    16 -st iterations over 100
+    17 -st iterations over 100
+    18 -st iterations over 100
+    19 -st iterations over 100
+    20 -st iterations over 100
+    21 -st iterations over 100
+    22 -st iterations over 100
+    23 -st iterations over 100
+    24 -st iterations over 100
+    25 -st iterations over 100
+    26 -st iterations over 100
+    27 -st iterations over 100
+    28 -st iterations over 100
+    29 -st iterations over 100
+    30 -st iterations over 100
+    31 -st iterations over 100
+    32 -st iterations over 100
+    33 -st iterations over 100
+    34 -st iterations over 100
+    35 -st iterations over 100
+    36 -st iterations over 100
+    37 -st iterations over 100
+    38 -st iterations over 100
+    39 -st iterations over 100
+    40 -st iterations over 100
+    41 -st iterations over 100
+    42 -st iterations over 100
+    43 -st iterations over 100
+    44 -st iterations over 100
+    45 -st iterations over 100
+    46 -st iterations over 100
+    47 -st iterations over 100
+    48 -st iterations over 100
+    49 -st iterations over 100
+    50 -st iterations over 100
+    51 -st iterations over 100
+    52 -st iterations over 100
+    53 -st iterations over 100
+    54 -st iterations over 100
+    55 -st iterations over 100
+    56 -st iterations over 100
+    57 -st iterations over 100
+    58 -st iterations over 100
+    59 -st iterations over 100
+    60 -st iterations over 100
+    61 -st iterations over 100
+    62 -st iterations over 100
+    63 -st iterations over 100
+    64 -st iterations over 100
+    65 -st iterations over 100
+    66 -st iterations over 100
+    67 -st iterations over 100
+    68 -st iterations over 100
+    69 -st iterations over 100
+    70 -st iterations over 100
+    71 -st iterations over 100
+    72 -st iterations over 100
+    73 -st iterations over 100
+    74 -st iterations over 100
+    75 -st iterations over 100
+    76 -st iterations over 100
+    77 -st iterations over 100
+    78 -st iterations over 100
+    79 -st iterations over 100
+    80 -st iterations over 100
+    81 -st iterations over 100
+    82 -st iterations over 100
+    83 -st iterations over 100
+    84 -st iterations over 100
+    85 -st iterations over 100
+    86 -st iterations over 100
+    87 -st iterations over 100
+    88 -st iterations over 100
+    89 -st iterations over 100
+    90 -st iterations over 100
+    91 -st iterations over 100
+    92 -st iterations over 100
+    93 -st iterations over 100
+    94 -st iterations over 100
+    95 -st iterations over 100
+    96 -st iterations over 100
+    97 -st iterations over 100
+    98 -st iterations over 100
+    99 -st iterations over 100
+    value of lambda_k -3.918203883094459
+    0.01
+    0 -st iteration over 10000
+    0.48582475063781727
+    1 -st iteration over 10000
+    0.46943326844496414
+    2 -st iteration over 10000
+    0.4626517899774521
+    relative decrease =  0.012236485526102578
+    3 -st iteration over 10000
+    0.45880950197874376
+    relative decrease =  0.0069330164076391015
+    0 -st iterations over 100
+    1 -st iterations over 100
+    2 -st iterations over 100
+    3 -st iterations over 100
+    4 -st iterations over 100
+    5 -st iterations over 100
+    6 -st iterations over 100
+    7 -st iterations over 100
+    8 -st iterations over 100
+    9 -st iterations over 100
+    10 -st iterations over 100
+    11 -st iterations over 100
+    12 -st iterations over 100
+    13 -st iterations over 100
+    14 -st iterations over 100
+    15 -st iterations over 100
+    16 -st iterations over 100
+    17 -st iterations over 100
+    18 -st iterations over 100
+    19 -st iterations over 100
+    20 -st iterations over 100
+    21 -st iterations over 100
+    22 -st iterations over 100
+    23 -st iterations over 100
+    24 -st iterations over 100
+    25 -st iterations over 100
+    26 -st iterations over 100
+    27 -st iterations over 100
+    28 -st iterations over 100
+    29 -st iterations over 100
+    30 -st iterations over 100
+    31 -st iterations over 100
+    32 -st iterations over 100
+    33 -st iterations over 100
+    34 -st iterations over 100
+    35 -st iterations over 100
+    36 -st iterations over 100
+    37 -st iterations over 100
+    38 -st iterations over 100
+    39 -st iterations over 100
+    40 -st iterations over 100
+    41 -st iterations over 100
+    42 -st iterations over 100
+    43 -st iterations over 100
+    44 -st iterations over 100
+    45 -st iterations over 100
+    46 -st iterations over 100
+    47 -st iterations over 100
+    48 -st iterations over 100
+    49 -st iterations over 100
+    50 -st iterations over 100
+    51 -st iterations over 100
+    52 -st iterations over 100
+    53 -st iterations over 100
+    54 -st iterations over 100
+    55 -st iterations over 100
+    56 -st iterations over 100
+    57 -st iterations over 100
+    58 -st iterations over 100
+    59 -st iterations over 100
+    60 -st iterations over 100
+    61 -st iterations over 100
+    62 -st iterations over 100
+    63 -st iterations over 100
+    64 -st iterations over 100
+    65 -st iterations over 100
+    66 -st iterations over 100
+    67 -st iterations over 100
+    68 -st iterations over 100
+    69 -st iterations over 100
+    70 -st iterations over 100
+    71 -st iterations over 100
+    72 -st iterations over 100
+    73 -st iterations over 100
+    74 -st iterations over 100
+    75 -st iterations over 100
+    76 -st iterations over 100
+    77 -st iterations over 100
+    78 -st iterations over 100
+    79 -st iterations over 100
+    80 -st iterations over 100
+    81 -st iterations over 100
+    82 -st iterations over 100
+    83 -st iterations over 100
+    84 -st iterations over 100
+    85 -st iterations over 100
+    86 -st iterations over 100
+    87 -st iterations over 100
+    88 -st iterations over 100
+    89 -st iterations over 100
+    90 -st iterations over 100
+    91 -st iterations over 100
+    92 -st iterations over 100
+    93 -st iterations over 100
+    94 -st iterations over 100
+    95 -st iterations over 100
+    96 -st iterations over 100
+    97 -st iterations over 100
+    98 -st iterations over 100
+    99 -st iterations over 100
+    value of lambda_k -12.524143403910479
+    0.01
+    0 -st iteration over 10000
+    0.34495902506030085
+    1 -st iteration over 10000
+    0.3424954840430964
+    2 -st iteration over 10000
+    0.34161156984565827
+    relative decrease =  0.0022859105513941018
+    0 -st iterations over 100
+    1 -st iterations over 100
+    2 -st iterations over 100
+    3 -st iterations over 100
+    4 -st iterations over 100
+    5 -st iterations over 100
+    6 -st iterations over 100
+    7 -st iterations over 100
+    8 -st iterations over 100
+    9 -st iterations over 100
+    10 -st iterations over 100
+    11 -st iterations over 100
+    12 -st iterations over 100
+    13 -st iterations over 100
+    14 -st iterations over 100
+    15 -st iterations over 100
+    16 -st iterations over 100
+    17 -st iterations over 100
+    18 -st iterations over 100
+    19 -st iterations over 100
+    20 -st iterations over 100
+    21 -st iterations over 100
+    22 -st iterations over 100
+    23 -st iterations over 100
+    24 -st iterations over 100
+    25 -st iterations over 100
+    26 -st iterations over 100
+    27 -st iterations over 100
+    28 -st iterations over 100
+    29 -st iterations over 100
+    30 -st iterations over 100
+    31 -st iterations over 100
+    32 -st iterations over 100
+    33 -st iterations over 100
+    34 -st iterations over 100
+    35 -st iterations over 100
+    36 -st iterations over 100
+    37 -st iterations over 100
+    38 -st iterations over 100
+    39 -st iterations over 100
+    40 -st iterations over 100
+    41 -st iterations over 100
+    42 -st iterations over 100
+    43 -st iterations over 100
+    44 -st iterations over 100
+    45 -st iterations over 100
+    46 -st iterations over 100
+    47 -st iterations over 100
+    48 -st iterations over 100
+    49 -st iterations over 100
+    50 -st iterations over 100
+    51 -st iterations over 100
+    52 -st iterations over 100
+    53 -st iterations over 100
+    54 -st iterations over 100
+    55 -st iterations over 100
+    56 -st iterations over 100
+    57 -st iterations over 100
+    58 -st iterations over 100
+    59 -st iterations over 100
+    60 -st iterations over 100
+    61 -st iterations over 100
+    62 -st iterations over 100
+    63 -st iterations over 100
+    64 -st iterations over 100
+    65 -st iterations over 100
+    66 -st iterations over 100
+    67 -st iterations over 100
+    68 -st iterations over 100
+    69 -st iterations over 100
+    70 -st iterations over 100
+    71 -st iterations over 100
+    72 -st iterations over 100
+    73 -st iterations over 100
+    74 -st iterations over 100
+    75 -st iterations over 100
+    76 -st iterations over 100
+    77 -st iterations over 100
+    78 -st iterations over 100
+    79 -st iterations over 100
+    80 -st iterations over 100
+    81 -st iterations over 100
+    82 -st iterations over 100
+    83 -st iterations over 100
+    84 -st iterations over 100
+    85 -st iterations over 100
+    86 -st iterations over 100
+    87 -st iterations over 100
+    88 -st iterations over 100
+    89 -st iterations over 100
+    90 -st iterations over 100
+    91 -st iterations over 100
+    92 -st iterations over 100
+    93 -st iterations over 100
+    94 -st iterations over 100
+    95 -st iterations over 100
+    96 -st iterations over 100
+    97 -st iterations over 100
+    98 -st iterations over 100
+    99 -st iterations over 100
+    value of lambda_k -10.264326553617448
+    1e-05
+    0 -st iteration over 10000
+    0.6931705725022221
+    1 -st iteration over 10000
+    0.6931494095379611
+    2 -st iteration over 10000
+    0.6931473930032306
+    relative decrease =  1.9561143409662558e-07
+    1e-05
+    0 -st iteration over 10000
+    0.6427166688530995
+    1 -st iteration over 10000
+    0.6351325641812025
+    2 -st iteration over 10000
+    0.6321001474977634
+    relative decrease =  0.0043755933543834355
+    3 -st iteration over 10000
+    0.6309385446257381
+    relative decrease =  0.001676122491683024
+    4 -st iteration over 10000
+    0.6304105893315425
+    relative decrease =  0.000761807468383228
+    5 -st iteration over 10000
+    0.6302001650950722
+    relative decrease =  0.00030362941073671995
+    6 -st iteration over 10000
+    0.6300913372898952
+    relative decrease =  0.00015703192232948714
+    7 -st iteration over 10000
+    0.6300484779569882
+    relative decrease =  6.184341791335808e-05
+    8 -st iteration over 10000
+    0.6300295075749425
+    relative decrease =  2.737311071480304e-05
+    9 -st iteration over 10000
+    0.6300194102406652
+    relative decrease =  1.4569840946283716e-05
+    10 -st iteration over 10000
+    0.6300137491711554
+    relative decrease =  8.168579951827014e-06
+    1e-05
+    0 -st iteration over 10000
+    0.5382897530186215
+    1 -st iteration over 10000
+    0.5304005310158566
+    2 -st iteration over 10000
+    0.5269072562178782
+    relative decrease =  0.00614712896665135
+    3 -st iteration over 10000
+    0.5246860513366345
+    relative decrease =  0.003908662689308571
+    4 -st iteration over 10000
+    0.5230594282116733
+    relative decrease =  0.002862374908226622
+    5 -st iteration over 10000
+    0.5219688637204917
+    relative decrease =  0.0019190704887068629
+    6 -st iteration over 10000
+    0.521134435156716
+    relative decrease =  0.001468347121719473
+    7 -st iteration over 10000
+    0.520448263151867
+    relative decrease =  0.0012074594903193488
+    8 -st iteration over 10000
+    0.5198721637434781
+    relative decrease =  0.0010137643231008715
+    9 -st iteration over 10000
+    0.5194237855845373
+    relative decrease =  0.0007890127540020667
+    10 -st iteration over 10000
+    0.5190648749480005
+    relative decrease =  0.0006315764140775532
+    11 -st iteration over 10000
+    0.5187727212132873
+    relative decrease =  0.0005141040396849995
+    12 -st iteration over 10000
+    0.5185250101430752
+    relative decrease =  0.000435898113696215
+    13 -st iteration over 10000
+    0.5183220500229856
+    relative decrease =  0.000357149696324974
+    14 -st iteration over 10000
+    0.5181534408992639
+    relative decrease =  0.0002967021171856892
+    15 -st iteration over 10000
+    0.518011231607056
+    relative decrease =  0.00025024623312311096
+    16 -st iteration over 10000
+    0.5178903848180257
+    relative decrease =  0.0002126545549192039
+    17 -st iteration over 10000
+    0.5177869754566536
+    relative decrease =  0.00018196984705617767
+    18 -st iteration over 10000
+    0.517697922299739
+    relative decrease =  0.00015670717939470606
+    19 -st iteration over 10000
+    0.5176207791055718
+    relative decrease =  0.00013574917258714665
+    20 -st iteration over 10000
+    0.5175535840465848
+    relative decrease =  0.00011824340122165022
+    21 -st iteration over 10000
+    0.517494750117542
+    relative decrease =  0.00010353028901429086
+    22 -st iteration over 10000
+    0.5174429838503678
+    relative decrease =  9.109329750581496e-05
+    23 -st iteration over 10000
+    0.5173981465415471
+    relative decrease =  7.89003831011647e-05
+    24 -st iteration over 10000
+    0.5173606018905171
+    relative decrease =  6.606746541180731e-05
+    25 -st iteration over 10000
+    0.5173282315143589
+    relative decrease =  5.696227421293714e-05
+    26 -st iteration over 10000
+    0.5172999626538952
+    relative decrease =  4.9744821424064954e-05
+    27 -st iteration over 10000
+    0.5172751192550304
+    relative decrease =  4.371702360206078e-05
+    28 -st iteration over 10000
+    0.5172531787654799
+    relative decrease =  3.860876302559894e-05
+    29 -st iteration over 10000
+    0.517233718262796
+    relative decrease =  3.4244720691168316e-05
+    30 -st iteration over 10000
+    0.5172163902255804
+    relative decrease =  3.0492213084565708e-05
+    31 -st iteration over 10000
+    0.5172009063549097
+    relative decrease =  2.7247026191891218e-05
+    32 -st iteration over 10000
+    0.5171870255748506
+    relative decrease =  2.4426061536874723e-05
+    33 -st iteration over 10000
+    0.5171745448800924
+    relative decrease =  2.1962326100615245e-05
+    34 -st iteration over 10000
+    0.5171632922475995
+    relative decrease =  1.9801300255069975e-05
+    35 -st iteration over 10000
+    0.5171531210764158
+    relative decrease =  1.7898248670417256e-05
+    36 -st iteration over 10000
+    0.5171439057775887
+    relative decrease =  1.6216196443732038e-05
+    37 -st iteration over 10000
+    0.5171355382428585
+    relative decrease =  1.4724382733738479e-05
+    38 -st iteration over 10000
+    0.5171279249936307
+    relative decrease =  1.339706366237387e-05
+    39 -st iteration over 10000
+    0.5171209848624085
+    relative decrease =  1.2212575344132472e-05
+    40 -st iteration over 10000
+    0.5171146470948498
+    relative decrease =  1.1152593711468893e-05
+    41 -st iteration over 10000
+    0.5171088497867473
+    relative decrease =  1.0201545147799392e-05
+    42 -st iteration over 10000
+    0.5171035385895824
+    relative decrease =  9.346133879650367e-06
+    1e-05
+    0 -st iteration over 10000
+    0.43582946057708566
+    1 -st iteration over 10000
+    0.43206453579937937
+    2 -st iteration over 10000
+    0.4304104590299315
+    relative decrease =  0.00366636205009308
+    3 -st iteration over 10000
+    0.4294235458246332
+    relative decrease =  0.002187553316433629
+    4 -st iteration over 10000
+    0.42871377650698755
+    relative decrease =  0.0015732469850266886
+    5 -st iteration over 10000
+    0.4282132251239052
+    relative decrease =  0.0011095026717939974
+    6 -st iteration over 10000
+    0.427850767386588
+    relative decrease =  0.0008034096829169302
+    7 -st iteration over 10000
+    0.42756681569387234
+    relative decrease =  0.000629396246572001
+    8 -st iteration over 10000
+    0.42732095655396424
+    relative decrease =  0.0005449617798141785
+    9 -st iteration over 10000
+    0.4271187745780503
+    relative decrease =  0.00044814868172721504
+    10 -st iteration over 10000
+    0.42696229767884336
+    relative decrease =  0.0003468405914195284
+    11 -st iteration over 10000
+    0.42682334966328594
+    relative decrease =  0.0003079867516339711
+    12 -st iteration over 10000
+    0.42670509444660354
+    relative decrease =  0.00026211990076774853
+    13 -st iteration over 10000
+    0.4265993675157672
+    relative decrease =  0.00023435019102560539
+    14 -st iteration over 10000
+    0.4265020049210629
+    relative decrease =  0.00021581012980534994
+    15 -st iteration over 10000
+    0.4264171079258192
+    relative decrease =  0.00018817936826004463
+    16 -st iteration over 10000
+    0.42634678709843343
+    relative decrease =  0.00015587040312793228
+    17 -st iteration over 10000
+    0.426283529100341
+    relative decrease =  0.00014021521120107942
+    18 -st iteration over 10000
+    0.42622776554500696
+    relative decrease =  0.00012360332170268564
+    19 -st iteration over 10000
+    0.4261768868217433
+    relative decrease =  0.00011277579346773336
+    20 -st iteration over 10000
+    0.42612994263708065
+    relative decrease =  0.00010405464867100415
+    21 -st iteration over 10000
+    0.42608628910677626
+    relative decrease =  9.67607125720197e-05
+    22 -st iteration over 10000
+    0.42604544826547563
+    relative decrease =  9.052621583487721e-05
+    23 -st iteration over 10000
+    0.42600704872537776
+    relative decrease =  8.511492281152268e-05
+    24 -st iteration over 10000
+    0.425970793650484
+    relative decrease =  8.036158488464451e-05
+    25 -st iteration over 10000
+    0.42593644086383675
+    relative decrease =  7.614504695602002e-05
+    26 -st iteration over 10000
+    0.42590376871786095
+    relative decrease =  7.24198043968392e-05
+    27 -st iteration over 10000
+    0.42587258835475644
+    relative decrease =  6.911317667115346e-05
+    28 -st iteration over 10000
+    0.42584274706657915
+    relative decrease =  6.614503541793333e-05
+    29 -st iteration over 10000
+    0.4258141159350765
+    relative decrease =  6.346264933492608e-05
+    30 -st iteration over 10000
+    0.42578658446309414
+    relative decrease =  6.102518693436904e-05
+    31 -st iteration over 10000
+    0.42576005705628556
+    relative decrease =  5.8799615233605086e-05
+    32 -st iteration over 10000
+    0.4257344504354296
+    relative decrease =  5.67586370061025e-05
+    33 -st iteration over 10000
+    0.4257096916227594
+    relative decrease =  5.487941845031145e-05
+    34 -st iteration over 10000
+    0.42568571633002095
+    relative decrease =  5.3142698730653876e-05
+    35 -st iteration over 10000
+    0.42566246764763416
+    relative decrease =  5.153212256650342e-05
+    36 -st iteration over 10000
+    0.42563989496776017
+    relative decrease =  5.0033721764026286e-05
+    37 -st iteration over 10000
+    0.42561795309270856
+    relative decrease =  4.863550439921177e-05
+    38 -st iteration over 10000
+    0.4255966014920205
+    relative decrease =  4.7327125268537455e-05
+    39 -st iteration over 10000
+    0.425575803679884
+    relative decrease =  4.60996191655795e-05
+    40 -st iteration over 10000
+    0.425555526690652
+    relative decrease =  4.494518343016449e-05
+    41 -st iteration over 10000
+    0.4255357406348513
+    relative decrease =  4.3856999535152286e-05
+    42 -st iteration over 10000
+    0.42551641832162024
+    relative decrease =  4.282908584342592e-05
+    43 -st iteration over 10000
+    0.42549806567238774
+    relative decrease =  4.0679766445889206e-05
+    44 -st iteration over 10000
+    0.4254813398567438
+    relative decrease =  3.7073790567926575e-05
+    45 -st iteration over 10000
+    0.42546516277432833
+    relative decrease =  3.5857489896979956e-05
+    46 -st iteration over 10000
+    0.42544946202731115
+    relative decrease =  3.4801663432531304e-05
+    47 -st iteration over 10000
+    0.4254341933663393
+    relative decrease =  3.384391835791211e-05
+    48 -st iteration over 10000
+    0.4254193224126284
+    relative decrease =  3.296237595579785e-05
+    49 -st iteration over 10000
+    0.425404820208675
+    relative decrease =  3.214501962647145e-05
+    50 -st iteration over 10000
+    0.42539066162780104
+    relative decrease =  3.138335811144927e-05
+    51 -st iteration over 10000
+    0.425376824527101
+    relative decrease =  3.067077769722039e-05
+    52 -st iteration over 10000
+    0.4253632891865165
+    relative decrease =  3.000190799530579e-05
+    53 -st iteration over 10000
+    0.42535003790248527
+    relative decrease =  2.9372279318898912e-05
+    54 -st iteration over 10000
+    0.4253370546800238
+    relative decrease =  2.8778104499045374e-05
+    55 -st iteration over 10000
+    0.4253243249919118
+    relative decrease =  2.821613014911089e-05
+    56 -st iteration over 10000
+    0.4253118355854744
+    relative decrease =  2.768353116132199e-05
+    57 -st iteration over 10000
+    0.4252995743242764
+    relative decrease =  2.717783332251845e-05
+    58 -st iteration over 10000
+    0.4252875300562282
+    relative decrease =  2.6696854770380358e-05
+    59 -st iteration over 10000
+    0.4252756925022314
+    relative decrease =  2.6238660466956576e-05
+    60 -st iteration over 10000
+    0.4252640521611781
+    relative decrease =  2.580152594871533e-05
+    61 -st iteration over 10000
+    0.42525260022822264
+    relative decrease =  2.5383907907743382e-05
+    62 -st iteration over 10000
+    0.42524132852399227
+    relative decrease =  2.498441994558575e-05
+    63 -st iteration over 10000
+    0.42523022943292565
+    relative decrease =  2.4601812339545458e-05
+    64 -st iteration over 10000
+    0.42521929584930424
+    relative decrease =  2.4234954992127735e-05
+    65 -st iteration over 10000
+    0.42520852112981755
+    relative decrease =  2.388282294754814e-05
+    66 -st iteration over 10000
+    0.4251978990517158
+    relative decrease =  2.3544484007491824e-05
+    67 -st iteration over 10000
+    0.42518742377576785
+    relative decrease =  2.3219088079330266e-05
+    68 -st iteration over 10000
+    0.4251771990852955
+    relative decrease =  2.26636500881896e-05
+    69 -st iteration over 10000
+    0.4251673969376932
+    relative decrease =  2.1727058043722278e-05
+    70 -st iteration over 10000
+    0.42515778385724196
+    relative decrease =  2.13079791711315e-05
+    71 -st iteration over 10000
+    0.42514834119212375
+    relative decrease =  2.0930243191007145e-05
+    72 -st iteration over 10000
+    0.4251390569802436
+    relative decrease =  2.057902192391505e-05
+    73 -st iteration over 10000
+    0.4251300854734539
+    relative decrease =  1.9885892017609117e-05
+    74 -st iteration over 10000
+    0.4251215195741008
+    relative decrease =  1.8986838394104244e-05
+    75 -st iteration over 10000
+    0.42511319940622727
+    relative decrease =  1.8442159581375906e-05
+    76 -st iteration over 10000
+    0.425105086161235
+    relative decrease =  1.7983502393746007e-05
+    77 -st iteration over 10000
+    0.4250971568869456
+    relative decrease =  1.7575720109466506e-05
+    78 -st iteration over 10000
+    0.42508939591690714
+    relative decrease =  1.7202663471553517e-05
+    79 -st iteration over 10000
+    0.42508179141172253
+    relative decrease =  1.6855849579400124e-05
+    80 -st iteration over 10000
+    0.4250743337825355
+    relative decrease =  1.6530289972030585e-05
+    81 -st iteration over 10000
+    0.4250670148990931
+    relative decrease =  1.6222751566276717e-05
+    82 -st iteration over 10000
+    0.4250598276564317
+    relative decrease =  1.5930961745749027e-05
+    83 -st iteration over 10000
+    0.4250527657183882
+    relative decrease =  1.5653216417194665e-05
+    84 -st iteration over 10000
+    0.42504587240583863
+    relative decrease =  1.5279447724506602e-05
+    85 -st iteration over 10000
+    0.42503990608080783
+    relative decrease =  1.3224723347491428e-05
+    86 -st iteration over 10000
+    0.4250343015554471
+    relative decrease =  1.2422772310796325e-05
+    87 -st iteration over 10000
+    0.4250289593918879
+    relative decrease =  1.1841231374844872e-05
+    88 -st iteration over 10000
+    0.4250238351913493
+    relative decrease =  1.1358103045055792e-05
+    89 -st iteration over 10000
+    0.4250189031019324
+    relative decrease =  1.09322770258938e-05
+    90 -st iteration over 10000
+    0.42501414511245983
+    relative decrease =  1.054637388011792e-05
+    91 -st iteration over 10000
+    0.4250095473000273
+    relative decrease =  1.0191331700771392e-05
+    92 -st iteration over 10000
+    0.42500509823260924
+    relative decrease =  9.861629303596825e-06
+    1e-05
+    0 -st iteration over 10000
+    0.3796499689975137
+    1 -st iteration over 10000
+    0.3788407684019642
+    2 -st iteration over 10000
+    0.3783578529023988
+    relative decrease =  0.001256735113555281
+    3 -st iteration over 10000
+    0.37803757107917424
+    relative decrease =  0.0008334986428103926
+    4 -st iteration over 10000
+    0.3778210538281547
+    relative decrease =  0.0005634626188052641
+    5 -st iteration over 10000
+    0.377653600361247
+    relative decrease =  0.000435779451972103
+    6 -st iteration over 10000
+    0.377519187985882
+    relative decrease =  0.0003497936015091436
+    7 -st iteration over 10000
+    0.3774030314146545
+    relative decrease =  0.00030228485493471156
+    8 -st iteration over 10000
+    0.37729904658574404
+    relative decrease =  0.00027060921814770395
+    9 -st iteration over 10000
+    0.3772035570023671
+    relative decrease =  0.00024850126474838965
+    10 -st iteration over 10000
+    0.37711573131180554
+    relative decrease =  0.00022855681646222835
+    11 -st iteration over 10000
+    0.3770344660761331
+    relative decrease =  0.00021148394547865676
+    12 -st iteration over 10000
+    0.37695921987883607
+    relative decrease =  0.00019582005214123505
+    13 -st iteration over 10000
+    0.37689371248194026
+    relative decrease =  0.00017047588232447966
+    14 -st iteration over 10000
+    0.3768357843700276
+    relative decrease =  0.00015075161672815508
+    15 -st iteration over 10000
+    0.3767813955551175
+    relative decrease =  0.00014154098086249255
+    16 -st iteration over 10000
+    0.3767297225058089
+    relative decrease =  0.00013447349598240665
+    17 -st iteration over 10000
+    0.3766828216595148
+    relative decrease =  0.00012205435618925567
+    18 -st iteration over 10000
+    0.37664093919054936
+    relative decrease =  0.0001089945744930526
+    19 -st iteration over 10000
+    0.3766012397088281
+    relative decrease =  0.00010331358739568373
+    20 -st iteration over 10000
+    0.3765634550784138
+    relative decrease =  9.833039493876133e-05
+    21 -st iteration over 10000
+    0.3765274838615451
+    relative decrease =  9.361118323373531e-05
+    22 -st iteration over 10000
+    0.3764946633296629
+    relative decrease =  8.541186791278588e-05
+    23 -st iteration over 10000
+    0.3764656028736009
+    relative decrease =  7.562667916417043e-05
+    24 -st iteration over 10000
+    0.37643879238932243
+    relative decrease =  6.977137208172251e-05
+    25 -st iteration over 10000
+    0.3764146949278291
+    relative decrease =  6.271102508303957e-05
+    26 -st iteration over 10000
+    0.37639289434663015
+    relative decrease =  5.6733643698075135e-05
+    27 -st iteration over 10000
+    0.3763730182866953
+    relative decrease =  5.172528622865793e-05
+    28 -st iteration over 10000
+    0.37635543853124764
+    relative decrease =  4.5749403319310944e-05
+    29 -st iteration over 10000
+    0.37633916041521753
+    relative decrease =  4.236202817258775e-05
+    30 -st iteration over 10000
+    0.37632386291090464
+    relative decrease =  3.9810092732746815e-05
+    31 -st iteration over 10000
+    0.3763093875188547
+    relative decrease =  3.767063489997548e-05
+    32 -st iteration over 10000
+    0.37629561364065334
+    relative decrease =  3.584502133610716e-05
+    33 -st iteration over 10000
+    0.3762824463533223
+    relative decrease =  3.4266434508870724e-05
+    34 -st iteration over 10000
+    0.3762699652511376
+    relative decrease =  3.248071222712603e-05
+    35 -st iteration over 10000
+    0.37625813905466543
+    relative decrease =  3.0776391272902246e-05
+    36 -st iteration over 10000
+    0.37624672812990595
+    relative decrease =  2.9695691764467313e-05
+    37 -st iteration over 10000
+    0.3762356858733411
+    relative decrease =  2.8736272847760377e-05
+    38 -st iteration over 10000
+    0.37622497423569673
+    relative decrease =  2.7875873032625244e-05
+    39 -st iteration over 10000
+    0.3762146572551769
+    relative decrease =  2.684882074984347e-05
+    40 -st iteration over 10000
+    0.37620481513149046
+    relative decrease =  2.561305743929486e-05
+    41 -st iteration over 10000
+    0.37619527210570647
+    relative decrease =  2.483468764844726e-05
+    42 -st iteration over 10000
+    0.3761859939162527
+    relative decrease =  2.4145479876474295e-05
+    43 -st iteration over 10000
+    0.37617703450385237
+    relative decrease =  2.331589723342414e-05
+    44 -st iteration over 10000
+    0.37616839840937993
+    relative decrease =  2.247449745816711e-05
+    45 -st iteration over 10000
+    0.37615998139168866
+    relative decrease =  2.190437394029105e-05
+    46 -st iteration over 10000
+    0.3761517658312905
+    relative decrease =  2.1380103225476173e-05
+    47 -st iteration over 10000
+    0.37614373668718976
+    relative decrease =  2.0894975067670913e-05
+    48 -st iteration over 10000
+    0.37613588093211436
+    relative decrease =  2.0443748969790932e-05
+    49 -st iteration over 10000
+    0.3761281871529162
+    relative decrease =  2.002222434980449e-05
+    50 -st iteration over 10000
+    0.3761206452563255
+    relative decrease =  1.9626966367519966e-05
+    51 -st iteration over 10000
+    0.376113262543572
+    relative decrease =  1.9212707728216795e-05
+    52 -st iteration over 10000
+    0.3761060472990453
+    relative decrease =  1.8776889865409503e-05
+    53 -st iteration over 10000
+    0.3760989597317061
+    relative decrease =  1.844462385835068e-05
+    54 -st iteration over 10000
+    0.3760919933109215
+    relative decrease =  1.812935311384995e-05
+    55 -st iteration over 10000
+    0.37608514218532
+    relative decrease =  1.782930992800272e-05
+    56 -st iteration over 10000
+    0.37607840102960416
+    relative decrease =  1.7543125250052755e-05
+    57 -st iteration over 10000
+    0.3760719115207296
+    relative decrease =  1.688824168973332e-05
+    58 -st iteration over 10000
+    0.37606623030006037
+    relative decrease =  1.4784759464784814e-05
+    59 -st iteration over 10000
+    0.37606071196751817
+    relative decrease =  1.436086081373854e-05
+    60 -st iteration over 10000
+    0.3760553195402549
+    relative decrease =  1.4033206006325523e-05
+    61 -st iteration over 10000
+    0.37605003978388696
+    relative decrease =  1.3739992244142063e-05
+    62 -st iteration over 10000
+    0.3760448633076753
+    relative decrease =  1.3471216859995165e-05
+    63 -st iteration over 10000
+    0.37603978293890106
+    relative decrease =  1.3221107697151006e-05
+    64 -st iteration over 10000
+    0.37603479287015046
+    relative decrease =  1.2986111697754011e-05
+    65 -st iteration over 10000
+    0.3760298881952609
+    relative decrease =  1.276388345338212e-05
+    66 -st iteration over 10000
+    0.3760250646448965
+    relative decrease =  1.2552765691740324e-05
+    67 -st iteration over 10000
+    0.37602031842750533
+    relative decrease =  1.2351515031939622e-05
+    68 -st iteration over 10000
+    0.3760156461278591
+    relative decrease =  1.215915213274588e-05
+    69 -st iteration over 10000
+    0.37601104463840135
+    relative decrease =  1.197487631150259e-05
+    70 -st iteration over 10000
+    0.37600680737512165
+    relative decrease =  1.1027017260291835e-05
+    71 -st iteration over 10000
+    0.37600332809091574
+    relative decrease =  9.054459083504596e-06
+
+    (-3.0168161717625686, 0.6624064741654194)
+
+
+
+
+
+|
+
+
+.. code-block:: default
+
+
+    # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+    #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #
+    # License: BSD (3-clause)
+
+
+    import numpy as np
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
+    from sklearn import datasets
+    from scipy.sparse import csc_matrix
+
+    from sparse_ho.ho import grad_search
+    from sparse_ho.utils import Monitor
+    from sparse_ho.models import SparseLogreg
+    from sparse_ho.criterion import Logistic
+    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho.forward import Forward
+    from sparse_ho.grid_search import grid_search
+    # from sparse_ho.bayesian import hyperopt_lasso
+
+    from sparse_ho.datasets.real import get_rcv1
+    # from expes.utils import configure_plt
+
+    print(__doc__)
+
+    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+
+    n_samples = 100
+    n_features = 1000
+    X_train, y_train = datasets.make_classification(
+        n_samples=n_samples,
+        n_features=n_features, n_informative=50,
+        random_state=10, flip_y=0.1, n_redundant=0)
+    X_train_s = csc_matrix(X_train)
+
+
+    X_val, y_val = datasets.make_classification(
+        n_samples=n_samples,
+        n_features=n_features, n_informative=50,
+        random_state=12, flip_y=0.1, n_redundant=0)
+
+    # X_val_s = csc_matrix(X_val)
+
+
+    n_samples, n_features = X_train.shape
+
+    alpha_max = np.max(np.abs(X_train.T @ y_train))
+    alpha_max /= 2 * n_samples
+    log_alpha_max = np.log(alpha_max)
+    log_alpha_min = np.log(alpha_max / 100)
+    maxit = 1000
+
+    log_alpha0 = np.log(0.3 * alpha_max)
+    tol = 1e-2
+
+    model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000, tol=tol)
+    criterion = Logistic(X_val, y_val, model)
+    monitor = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100)
+    grad_search(algo, log_alpha0, monitor, n_outer=3, tol=tol)
+
+
+    monitor_grid = Monitor()
+    algo_grid = Forward(criterion)
+    grid_search(
+        algo_grid, log_alpha_min, log_alpha_max, monitor_grid, max_evals=5)
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 1 minutes  9.008 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_sparse_log_reg.py <plot_sparse_log_reg.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_sparse_log_reg.ipynb <plot_sparse_log_reg.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

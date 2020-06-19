@@ -1,0 +1,6 @@
+sparse\_ho.grad\_search
+=======================
+
+.. currentmodule:: sparse_ho
+
+.. autofunction:: grad_search

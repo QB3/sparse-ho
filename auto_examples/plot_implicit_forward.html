@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Method comparison on Lasso &#8212; sparse-ho 0.1.dev documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          sparse-ho</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="https://github.com/QB3/sparse-ho">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/QB3/sparse-ho/">Fork sparse-ho on Github</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-implicit-forward-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="method-comparison-on-lasso">
+<span id="sphx-glr-auto-examples-plot-implicit-forward-py"></span><h1>Method comparison on Lasso<a class="headerlink" href="#method-comparison-on-lasso" title="Permalink to this headline">¶</a></h1>
+<p>The aim of this example is to demonstrate on a simple
+dateset how methods compare.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Quentin Bertrand &lt;quentin.bertrand@inria.fr&gt;</span>
+<span class="c1">#          Quentin Klopfenstein &lt;quentin.klopfenstein@u-bourgogne.fr&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># License: BSD (3-clause)</span>
+
+
+<span class="c1"># import numpy as np</span>
+<span class="c1"># import matplotlib.pyplot as plt</span>
+<span class="c1"># import seaborn as sns</span>
+
+<span class="c1"># from sparse_ho.ho import grad_search</span>
+<span class="c1"># from sparse_ho.utils import Monitor, WarmStart</span>
+<span class="c1"># from sparse_ho.grid_search import grid_search</span>
+<span class="c1"># # from sparse_ho.bayesian import hyperopt_lasso</span>
+
+<span class="c1"># from sparse_ho.datasets.real import get_20newsgroup</span>
+<span class="c1"># from expes.utils import configure_plt</span>
+
+<span class="c1"># print(__doc__)</span>
+
+<span class="c1"># # from sparse_ho.datasets.real import get_leukemia</span>
+<span class="c1"># # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()</span>
+
+<span class="c1"># # from sparse_ho.datasets.real import get_finance</span>
+<span class="c1"># # X_train, X_val, X_test, y_train, y_val, y_test = get_finance()</span>
+
+<span class="c1"># X_train, X_val, X_test, y_train, y_val, y_test = get_20newsgroup()</span>
+
+<span class="c1"># n_samples, n_features = X_train.shape</span>
+
+<span class="c1"># alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples</span>
+<span class="c1"># maxit = 1000</span>
+<span class="c1"># n_alpha = 100</span>
+<span class="c1"># p_alphas = np.geomspace(1, 0.0001, n_alpha)</span>
+<span class="c1"># log_alphas = np.log(alpha_max * p_alphas)</span>
+
+
+<span class="c1"># alpha0 = 0.6 * alpha_max</span>
+<span class="c1"># # alpha0 = 0.1 * alpha_max</span>
+<span class="c1"># log_alpha0_mcp = np.array([np.log(alpha0), np.log(100)])</span>
+<span class="c1"># log_alpha0 = np.log(alpha0)</span>
+<span class="c1"># log_alpha_min = np.log(alpha_max / 100)</span>
+<span class="c1"># log_alpha_max = np.log(alpha_max)</span>
+
+<span class="c1"># tol = 1e-5</span>
+
+<span class="c1"># dict_times = {}</span>
+<span class="c1"># dict_pobj = {}</span>
+
+
+<span class="c1"># methods = [&quot;forward&quot;, &quot;implicit_forward&quot;, &quot;implicit&quot;, &quot;grid_search&quot;]</span>
+<span class="c1"># maxits = np.floor(np.geomspace(5, 100, 5)).astype(int)</span>
+
+
+<span class="c1"># model = &quot;lasso&quot;</span>
+
+<span class="c1"># dict_n_outers = {}</span>
+<span class="c1"># dict_n_outers[&quot;20newsgroups&quot;, &quot;implicit_forward&quot;] = 50</span>
+<span class="c1"># dict_n_outers[&quot;20newsgroups&quot;, &quot;forward&quot;] = 30</span>
+<span class="c1"># dict_n_outers[&quot;20newsgroups&quot;, &quot;implicit&quot;] = 30</span>
+<span class="c1"># dict_n_outers[&quot;20newsgroups&quot;, &quot;bayesian&quot;] = 75</span>
+<span class="c1"># dict_n_outers[&quot;20newsgroups&quot;, &quot;random&quot;] = 35</span>
+
+<span class="c1"># dataset_name = &quot;20newsgroups&quot;</span>
+
+<span class="c1"># for method in methods:</span>
+<span class="c1">#     monitor = Monitor()</span>
+<span class="c1">#     warm_start = WarmStart()</span>
+<span class="c1">#     if method == &quot;grid_search&quot;:</span>
+<span class="c1">#         grid_search(</span>
+<span class="c1">#             X_train, y_train, log_alphas, X_val, y_val, X_test, y_test,</span>
+<span class="c1">#             tol, monitor)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         n_outer = dict_n_outers[dataset_name, method]</span>
+<span class="c1">#         grad_search(</span>
+<span class="c1">#             X_train, y_train, log_alpha0, X_val, y_val, X_test, y_test, tol,</span>
+<span class="c1">#             monitor, method=method, maxit=1000, n_outer=n_outer,</span>
+<span class="c1">#             warm_start=warm_start, model=&quot;lasso&quot;, t_max=20)</span>
+<span class="c1">#     pobj = np.array(</span>
+<span class="c1">#         [np.min(monitor.objs[:k]) for k in np.arange(</span>
+<span class="c1">#             len(monitor.objs)) + 1])</span>
+<span class="c1">#     dict_pobj[method] = pobj</span>
+<span class="c1">#     dict_times[method] = np.array(monitor.times)</span>
+
+
+<span class="c1"># pobj_star = np.infty</span>
+<span class="c1"># for method in methods:</span>
+<span class="c1">#     pobj_star = np.minimum(pobj_star, np.min(dict_pobj[method]))</span>
+
+<span class="c1"># dict_legend = {}</span>
+<span class="c1"># dict_legend[&quot;implicit_forward&quot;] = &quot;implicit forward&quot;</span>
+<span class="c1"># dict_legend[&quot;forward&quot;] = &quot;forward&quot;</span>
+<span class="c1"># dict_legend[&quot;implicit&quot;] = &quot;implicit&quot;</span>
+<span class="c1"># dict_legend[&quot;grid_search&quot;] = &quot;grid search&quot;</span>
+
+
+<span class="c1"># configure_plt()</span>
+<span class="c1"># current_palette = sns.color_palette(&quot;colorblind&quot;)</span>
+<span class="c1"># plt.figure()</span>
+<span class="c1"># for method in methods:</span>
+<span class="c1">#     plt.semilogy(</span>
+<span class="c1">#         dict_times[method], dict_pobj[method] - pobj_star,</span>
+<span class="c1">#         label=dict_legend[method], marker=&quot;X&quot;)</span>
+<span class="c1"># plt.ylabel(&quot;Objective minus optimum&quot;)</span>
+<span class="c1"># plt.xlabel(&quot;Time&quot;)</span>
+<span class="c1"># plt.legend()</span>
+<span class="c1"># plt.show(block=False)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.001 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-implicit-forward-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6e4fb9afdc201a50e9c1a2a08f85a499/plot_implicit_forward.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_implicit_forward.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/8cd10e231253b28f7fa213534c81013a/plot_implicit_forward.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_implicit_forward.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

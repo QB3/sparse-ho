@@ -1,0 +1,6 @@
+sparse\_ho.datasets.get\_rcv1
+=============================
+
+.. currentmodule:: sparse_ho.datasets
+
+.. autofunction:: get_rcv1

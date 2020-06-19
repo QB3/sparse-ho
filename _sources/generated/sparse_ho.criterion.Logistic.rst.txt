@@ -1,0 +1,27 @@
+sparse\_ho.criterion.Logistic
+=============================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: Logistic
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Logistic.__init__
+      ~Logistic.compute_rmse
+      ~Logistic.get_v
+      ~Logistic.get_val_grad
+      ~Logistic.value
+      ~Logistic.value_test
+   
+   
+
+   
+   
+   

@@ -1,0 +1,32 @@
+sparse\_ho.models.SVM
+=====================
+
+.. currentmodule:: sparse_ho.models
+
+.. autoclass:: SVM
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SVM.__init__
+      ~SVM.get_L
+      ~SVM.get_full_jac_v
+      ~SVM.get_hessian
+      ~SVM.get_jac_v
+      ~SVM.get_primal
+      ~SVM.proj_param
+      ~SVM.reduce_X
+      ~SVM.reduce_y
+      ~SVM.restrict_full_supp
+      ~SVM.sign
+   
+   
+
+   
+   
+   
