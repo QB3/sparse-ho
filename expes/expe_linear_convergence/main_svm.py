@@ -87,7 +87,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     M_jac = X.T @ (list_jac * y).T
     diff_beta = norm(M - primal_star, axis=0)
     diff_jac = norm(M_jac - primal_jac_star, axis=0)
-    full_supp_star = full_supp
+    full_supp_star = np.logical_and(np.logical_not(np.isclose(list_beta[-1], 0)), np.logical_not(np.isclose(list_beta[-1], C)))
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
         full_supp = np.logical_and(np.logical_not(np.isclose(list_beta[i, :], 0)), np.logical_not(np.isclose(list_beta[i, :], C)))
