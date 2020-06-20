@@ -772,16 +772,18 @@ class SVM():
     def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
-        if issparse(self.X):
-            Q = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis]))  @  (Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T
-            v = np.array((np.eye(full_supp.sum(), maskC.sum()) - Q) @ (np.ones(maskC.sum()) * C))
-            v = np.squeeze(v)
+        if issparse(Xs):
+            yXdbeta = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
         else:
-            Q = (Xs[full_supp, :] * ys[full_supp, None])  @  (Xs[maskC, :] * ys[maskC, None]).T
-            v = (np.eye(full_supp.sum(), maskC.sum()) - Q) @ (np.ones(maskC.sum()) * C)
-
+            yXdbeta = (ys[full_supp, np.newaxis] * Xs[full_supp, :]).T @ dbeta[full_supp]
+        q = yXdbeta.T @ yXdbeta
+        if issparse(Xs):
+            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
+        else:
+            linear_term = yXdbeta.T @ ((ys[maskC, np.newaxis] * Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
+        res = q + linear_term - C * np.sum(dbeta[full_supp])
         return(
-            norm(dr.T @ dr - v.T @ dbeta[full_supp]))
+            norm(res))
 
 
 class SparseLogreg():
