@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from sparse_ho.utils_plot import configure_plt
 
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -20,7 +20,8 @@ fontsize = 25
 # dataset_names = ["leu", "rcv1_train", "news20", "finance"]
 dataset_names = ["leu", "rcv1_train", "news20", "real-sim"]
 # model_names = ["lasso"]
-model_names = ["lasso", "logreg", "svm"]
+model_names = ["svm"]
+# model_names = ["lasso", "logreg", "svm"]
 
 
 dict_title = {}
