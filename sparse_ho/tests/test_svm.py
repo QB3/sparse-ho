@@ -116,59 +116,59 @@ def test_val_grad(model):
     assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-5)
 
 
-@pytest.mark.parametrize('model', models)
-def test_grad_search(model):
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    n_outer = 3
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
-    monitor1 = Monitor()
-    algo = Forward(criterion)
-    grad_search(algo, np.log(1e-4), monitor1, n_outer=n_outer,
-                tol=1e-16)
+# @pytest.mark.parametrize('model', models)
+# def test_grad_search(model):
+#     # criterion = SURE(
+#     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+#     #     y_test=y_test)
+#     n_outer = 3
+#     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+#     monitor1 = Monitor()
+#     algo = Forward(criterion)
+#     grad_search(algo, np.log(1e-4), monitor1, n_outer=n_outer,
+#                 tol=1e-16)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
-    monitor2 = Monitor()
-    algo = Implicit(criterion)
-    grad_search(algo, np.log(1e-4), monitor2, n_outer=n_outer,
-                tol=1e-16)
+#     # criterion = SURE(
+#     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+#     #     y_test=y_test)
+#     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+#     monitor2 = Monitor()
+#     algo = Implicit(criterion)
+#     grad_search(algo, np.log(1e-4), monitor2, n_outer=n_outer,
+#                 tol=1e-16)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
-    monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-2, n_iter_jac=100)
-    grad_search(algo, np.log(1e-4), monitor3, n_outer=n_outer,
-                tol=1e-16)
+#     # criterion = SURE(
+#     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+#     #     y_test=y_test)
+#     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+#     monitor3 = Monitor()
+#     algo = ImplicitForward(criterion, tol_jac=1e-2, n_iter_jac=100)
+#     grad_search(algo, np.log(1e-4), monitor3, n_outer=n_outer,
+#                 tol=1e-16)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    # monitor4 = Monitor()
-    # algo = Backward(criterion)
-    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
-    #             tol=1e-16)
+#     # criterion = SURE(
+#     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+#     #     y_test=y_test)
+#     # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+#     # monitor4 = Monitor()
+#     # algo = Backward(criterion)
+#     # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
+#     #             tol=1e-16)
 
-    assert np.allclose(
-        np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    assert np.allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads))
-    assert np.allclose(
-        np.array(monitor1.objs), np.array(monitor3.objs))
-    # assert np.allclose(
-    #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
-    assert not np.allclose(
-        np.array(monitor1.times), np.array(monitor3.times))
+#     assert np.allclose(
+#         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
+#     assert np.allclose(
+#         np.array(monitor1.grads), np.array(monitor3.grads))
+#     assert np.allclose(
+#         np.array(monitor1.objs), np.array(monitor3.objs))
+#     # assert np.allclose(
+#     #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
+#     assert not np.allclose(
+#         np.array(monitor1.times), np.array(monitor3.times))
 
 
 if __name__ == '__main__':
     for model in models:
         test_beta_jac(model)
         test_val_grad(model)
-        test_grad_search(model)
+        # test_grad_search(model)
