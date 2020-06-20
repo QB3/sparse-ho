@@ -587,6 +587,8 @@ class SVM():
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
+        # import ipdb; ipdb.set_trace()
+
     def _get_pobj(self, r, beta, C, y):
         C = C[0]
         n_samples = self.X.shape[0]

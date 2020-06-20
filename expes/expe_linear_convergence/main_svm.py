@@ -5,7 +5,7 @@ import pandas
 from lightning.classification import SDCAClassifier
 
 from scipy.sparse.linalg import cg
-# from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix
 from sparse_ho.models import SVM
 # from cvxopt import spmatrix, matrix
 # from cvxopt import solvers
@@ -13,6 +13,8 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 
+# dataset_names = ["news20"]
+# dataset_names = ["rcv1_train"]
 dataset_names = ["real-sim"]
 # dataset_names = ["leu"]
 # dataset_names = ["finance"]
@@ -69,7 +71,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
     temp = yX[full_supp, :] @ yX[full_supp, :].T
-    # temp = csc_matrix(temp)
+    temp = csc_matrix(temp)
     # temp = temp[:, full_supp]
     # Q = csc_matrix(Q)
 
@@ -100,7 +102,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
 
 
 # parameter of the algo
-tol = 1e-16
+tol = 1e-32
 max_iter = 10000
 
 print("enter sequential")
