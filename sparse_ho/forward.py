@@ -93,7 +93,6 @@ def get_beta_jac_iterdiff(
         alphas = np.ones(n_features) * alpha
     ############################################
     # warm start for beta
-
     beta, r = model._init_beta_r(X, y, mask0, dense0)
 
     ############################################
@@ -110,7 +109,6 @@ def get_beta_jac_iterdiff(
     if save_iterates:
         list_beta = []
         list_jac = []
-
     print(tol)
     for i in range(max_iter):
         print("%i -st iteration over %i" % (i, max_iter))

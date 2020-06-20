@@ -20,18 +20,17 @@ dataset_names = ["real-sim"]
 # dataset_names = ["finance"]
 # dataset_names = ["leu", "rcv1_train", "news20"]
 Cs = {}
-Cs["leu"] = 0.01
-Cs["rcv1_train"] = 0.08
-Cs["news20"] = 0.0005
+Cs["leu"] = 1e-5
+Cs["rcv1_train"] = 10
+Cs["news20"] = 0.01
 Cs["finance"] = 0.01
-Cs["real-sim"] = 0.05
-# Cs["real-sim"] = 0.03
+Cs["real-sim"] = 0.3
 
 max_iters = {}
-max_iters["leu"] = 10000
-max_iters["rcv1_train"] = 1000
-max_iters["news20"] = 1000
-max_iters["real-sim"] = 1000
+max_iters["leu"] = 2000
+max_iters["rcv1_train"] = 200
+max_iters["news20"] = 100
+max_iters["real-sim"] = 50
 
 
 # def scipy_sparse_to_spmatrix(A):
@@ -44,16 +43,16 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     max_iter = max_iters[dataset_name]
     X, y = load_libsvm(dataset_name)
     X = X.tocsr()
+    num_nonzeros = np.diff(X.indptr)
+    X = X[num_nonzeros != 0]
+    y = y[num_nonzeros != 0]
     n_samples, n_features = X.shape
     C = Cs[dataset_name]
     # Computation of dual solution of SVM via cvxopt
 
-    clf = SDCAClassifier(
-        alpha=1/(C * n_samples), loss='hinge', verbose=True, tol=1-16)
+    clf = SDCAClassifier(alpha=1/(C * n_samples), loss='hinge', verbose=True, tol=1e-16)
     clf.fit(X, y)
-    beta_star = y * clf.dual_coef_[0]
-
-    # import ipdb; ipdb.set_trace()
+    beta_star = np.abs(clf.dual_coef_[0])
 
     full_supp = np.logical_and(beta_star > 0, beta_star < C)
     # full_supp = np.logical_and(np.logical_not(np.isclose(beta_star, 0)), np.logical_not(np.isclose(beta_star, C)))
@@ -75,20 +74,17 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     temp = csc_matrix(temp)
     # temp = temp[:, full_supp]
     # Q = csc_matrix(Q)
-    # import ipdb; ipdb.set_trace()
-    print("size mat = %i" % v.shape[0])
-    jac_dense = cg(temp, v, tol=1e-3)
+
+    jac_dense = cg(temp, v, tol=1e-5)
     jac_star = np.zeros(n_samples)
     jac_star[full_supp] = jac_dense[0]
     jac_star[np.isclose(beta_star, C)] = C
-
     model = SVM(X, y, np.log(C), max_iter=max_iter, tol=tol)
     list_beta, list_jac = get_beta_jac_iterdiff(
-        X, y, np.log(C), model, save_iterates=True, tol=1e-32,
-        max_iter=max_iter, compute_jac=compute_jac)
+        X, y, np.log(C), model, save_iterates=True, tol=tol,
+        max_iter=max_iter, compute_jac=True)
     diff_beta = norm(list_beta - beta_star, axis=1)
     diff_jac = norm(list_jac - jac_star, axis=1)
-
     full_supp_star = full_supp
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
@@ -98,8 +94,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
             supp_id = i + 1
             break
         supp_id = 0
-
-    import ipdb; ipdb.set_trace()
     return dataset_name, C, diff_beta, diff_jac, n_iter, supp_id
 
 
