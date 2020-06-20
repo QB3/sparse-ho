@@ -5,7 +5,7 @@ import pandas
 from lightning.classification import SDCAClassifier
 
 from scipy.sparse.linalg import cg
-# from scipy.sparse import csc_matrix
+from scipy.sparse import csc_matrix
 from sparse_ho.models import SVM
 # from cvxopt import spmatrix, matrix
 # from cvxopt import solvers
@@ -13,22 +13,25 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 
+# dataset_names = ["news20"]
+# dataset_names = ["rcv1_train"]
 dataset_names = ["real-sim"]
 # dataset_names = ["leu"]
 # dataset_names = ["finance"]
 # dataset_names = ["leu", "rcv1_train", "news20"]
 Cs = {}
 Cs["leu"] = 0.01
-Cs["rcv1_train"] = 0.0001
-Cs["news20"] = 0.01
+Cs["rcv1_train"] = 0.08
+Cs["news20"] = 0.0005
 Cs["finance"] = 0.01
-Cs["real-sim"] = 0.001
+Cs["real-sim"] = 0.05
+# Cs["real-sim"] = 0.03
 
 max_iters = {}
-max_iters["leu"] = 2000
-max_iters["rcv1_train"] = 200
-max_iters["news20"] = 100
-max_iters["real-sim"] = 100
+max_iters["leu"] = 10000
+max_iters["rcv1_train"] = 1000
+max_iters["news20"] = 1000
+max_iters["real-sim"] = 1000
 
 
 # def scipy_sparse_to_spmatrix(A):
@@ -45,9 +48,10 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     C = Cs[dataset_name]
     # Computation of dual solution of SVM via cvxopt
 
-    clf = SDCAClassifier(alpha=1/(C * n_samples), loss='hinge', verbose=True)
+    clf = SDCAClassifier(
+        alpha=1/(C * n_samples), loss='hinge', verbose=True, tol=1-16)
     clf.fit(X, y)
-    beta_star = clf.dual_coef_[0]
+    beta_star = y * clf.dual_coef_[0]
 
     # import ipdb; ipdb.set_trace()
 
@@ -68,18 +72,19 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
     temp = yX[full_supp, :] @ yX[full_supp, :].T
-    # temp = csc_matrix(temp)
+    temp = csc_matrix(temp)
     # temp = temp[:, full_supp]
     # Q = csc_matrix(Q)
     # import ipdb; ipdb.set_trace()
-    jac_dense = cg(temp, v, tol=1e-15)
+    print("size mat = %i" % v.shape[0])
+    jac_dense = cg(temp, v, tol=1e-3)
     jac_star = np.zeros(n_samples)
     jac_star[full_supp] = jac_dense[0]
     jac_star[np.isclose(beta_star, C)] = C
 
     model = SVM(X, y, np.log(C), max_iter=max_iter, tol=tol)
     list_beta, list_jac = get_beta_jac_iterdiff(
-        X, y, np.log(C), model, save_iterates=True, tol=tol,
+        X, y, np.log(C), model, save_iterates=True, tol=1e-32,
         max_iter=max_iter, compute_jac=compute_jac)
     diff_beta = norm(list_beta - beta_star, axis=1)
     diff_jac = norm(list_jac - jac_star, axis=1)
@@ -94,11 +99,12 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
             break
         supp_id = 0
 
+    import ipdb; ipdb.set_trace()
     return dataset_name, C, diff_beta, diff_jac, n_iter, supp_id
 
 
 # parameter of the algo
-tol = 1e-16
+tol = 1e-32
 max_iter = 10000
 
 print("enter sequential")

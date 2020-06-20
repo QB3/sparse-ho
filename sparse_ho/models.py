@@ -570,6 +570,8 @@ class SVM():
                 dbeta_old = dbeta[j]
             F = y[j] * np.sum(r[idx_nz] * Xis) - 1.0
             zj = beta[j] - F / L[j]
+            # if j > 0:
+
             beta[j:j+1] = proj_box_svm(zj, C)
             r[idx_nz] += (beta[j] - beta_old) * y[j] * Xis
             if compute_jac:
@@ -580,13 +582,16 @@ class SVM():
                 # update residuals
                 dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
+        # import ipdb; ipdb.set_trace()
+
     def _get_pobj(self, r, beta, C, y):
         C = C[0]
         # n_samples = self.X.shape[0]
         # obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
         #     np.ones(n_samples) - self.y * (self.X @ r), np.zeros(n_samples)))
-
-        alph = self.X.T @ (beta * self.y)
+        # import ipdb; ipdb.set_trace()
+        alph = self.X.T.multiply(self.y)  @ beta
+        # alph = self.X.T @ (beta * self.y)
         obj_dual = 0.5 * alph.T @ alph - np.sum(beta) + 1.0
         return obj_dual
 

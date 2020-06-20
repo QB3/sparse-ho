@@ -41,7 +41,7 @@ for model_name in model_names:
             df_data = pandas.read_pickle(
                 "%s_%s.pkl" % (dataset, model_name))
         except Exception:
-            break
+            print("no dataset")
         diff_beta = df_data["diff_beta"].to_numpy()[0]
         diff_jac = df_data["diff_jac"].to_numpy()[0]
         supp_id = df_data["supp_id"].to_numpy()[0]
