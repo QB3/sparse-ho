@@ -3,7 +3,7 @@ from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
 from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p
-from sparse_ho.utils import proj_box_svm, ind_box
+from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
 from sparse_ho.utils import sigma
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse, csc_matrix
@@ -565,30 +565,35 @@ class SVM():
             Xis = data[indptr[j]:indptr[j+1]]
             # get the non zero indices
             idx_nz = indices[indptr[j]:indptr[j+1]]
-            beta_old = beta[j]
-            if compute_jac:
-                dbeta_old = dbeta[j]
-            F = y[j] * np.sum(r[idx_nz] * Xis) - 1.0
-            zj = beta[j] - F / L[j]
-            beta[j:j+1] = proj_box_svm(zj, C)
-            r[idx_nz] += (beta[j] - beta_old) * y[j] * Xis
-            if compute_jac:
-                dF = y[j] * np.sum(dr[idx_nz] * Xis)
-                dzj = dbeta[j] - dF / L[j]
-                dbeta[j:j+1] = ind_box(zj, C) * dzj
-                dbeta[j:j+1] += C * (C <= zj)
-                # update residuals
-                dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
+
+            # compute gradient_i
+            G = y[j] * np.sum(r[idx_nz] * Xis) - 1.0
+
+            # compute projected gradient
+            PG = compute_grad_proj(beta[j], G, C)
+
+            if np.abs(PG) > 1e-12:
+                beta_old = beta[j]
+                # update one coefficient SVM
+                zj = beta[j] - G / L[j]
+                beta[j] = min(max(zj, 0), C)
+                r[idx_nz] += (beta[j] - beta_old) * y[j] * Xis
+                if compute_jac:
+                    dbeta_old = dbeta[j]
+                    dG = y[j] * np.sum(dr[idx_nz] * Xis)
+                    dzj = dbeta[j] - dG / L[j]
+                    dbeta[j:j+1] = ind_box(zj, C) * dzj
+                    dbeta[j:j+1] += C * (C <= zj)
+                    # update residuals
+                    dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
     def _get_pobj(self, r, beta, C, y):
         C = C[0]
-        # n_samples = self.X.shape[0]
-        # obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
-        #     np.ones(n_samples) - self.y * (self.X @ r), np.zeros(n_samples)))
-
-        alph = self.X.T @ (beta * self.y)
-        obj_dual = 0.5 * alph.T @ alph - np.sum(beta) + 1.0
-        return obj_dual
+        n_samples = self.X.shape[0]
+        obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
+            np.ones(n_samples) - (self.X @ r) * self.y, np.zeros(n_samples)))
+        obj_dual = 0.5 * r.T @ r - np.sum(beta)
+        return (obj_dual + obj_prim)
 
     @staticmethod
     def _get_jac(dbeta, mask):
