@@ -76,7 +76,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     # temp = temp[:, full_supp]
     # Q = csc_matrix(Q)
     print("size system to solve %i" % v.shape[0])
-    import ipdb; ipdb.set_trace()
     jac_dense = cg(temp, v, tol=1e-12)
     jac_star = np.zeros(n_samples)
     jac_star[full_supp] = jac_dense[0]
@@ -101,7 +100,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
             supp_id = i + 1
             break
         supp_id = 0
-    import ipdb; ipdb.set_trace()
     return dataset_name, C, diff_beta, diff_jac, n_iter, supp_id
 
 

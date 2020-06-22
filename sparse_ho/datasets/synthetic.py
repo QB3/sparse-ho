@@ -1,3 +1,7 @@
+"""File to generate synthetic data
+"""
+
+
 import numpy as np
 
 from numpy.linalg import norm
@@ -12,7 +16,7 @@ def get_synt_data(
     """Simulate artificial data.
 
     Parameters:
-    ----------
+    -----------
     dictionary_type: string
         "Gaussian", "Toeplitz", real_me
     n_samples: int

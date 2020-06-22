@@ -15,6 +15,7 @@ def grad_search(
 
     Parameters
     --------------
+
     X_train: np.array, shape (n_samples, n_features)
         observation used for training
     y_train: np.array, shape (n_samples, n_features)
@@ -68,9 +69,10 @@ def grad_search(
     beta_star: np.array, shape (n_features,)
         True coefficients of the underlying model (if known)
         used to compute metrics
+
     """
-    def _get_val_grad(
-            lambdak, tol=tol):
+
+    def _get_val_grad(lambdak, tol=tol):
         return algo.get_val_grad(lambdak, tol=tol, beta_star=beta_star)
 
     def _proj_param(lambdak):
@@ -94,54 +96,77 @@ def _grad_search(
     --------------
     X_train: np.array, shape (n_samples, n_features)
         observation used for training
+
     y_train: np.array, shape (n_samples, n_features)
         targets used for training
+
     log_alpha: float
         log of the regularization coefficient alpha
+
     X_val: np.array, shape (n_samples, n_features)
         observation used for cross-validation
+
     y_val: np.array, shape (n_samples, n_features)
         targets used for cross-validation
+
     X_test: np.array, shape (n_samples, n_features)
         observation used for testing
+
     y_test: np.array, shape (n_samples, n_features)
         targets used for testing
+
     tol : float
         tolerance for the inner optimization solver
     monitor: Monitor object
         used to store the value of the cross-validation function
+
     warm_start: WarmStart object
         used for warm start for all methods
+
     method: string
         method used to compute the hypergradient, you may want to use
+
         "implicit" "forward" "backward" "fast_forward_iterdiff"
     maxit: int
         maximum number of iterations in the inner optimization solver
+
     n_outer: int
         number of maximum iteration in the outer loop (for the line search)
+
     tolerance_decrease: string
         tolerance decrease strategy for approximate gradient
+
     niter_jac: int
         maximum number of iteration for the fast_forward_iterdiff
         method in the Jacobian computation
+
     model: string
         model used, "lasso", "wlasso", "mcp"
+
     tol_jac: float
         tolerance for the Jacobian loop
+
     convexify: bool
         True if you want to regularize the problem
+
     gamma: non negative float
         convexification coefficient
+
     criterion: string
         criterion to optimize during hyperparameter optimization
         you may choose between "cv" and "sure"
+
     C: float
         constant for sure problem
+
     gamma_sure:
         constant for sure problem
+
      sigma,
         constant for sure problem
+
     random_state: int
+
     beta_star: np.array, shape (n_features,)
         True coefficients of the underlying model (if known)
         used to compute metrics
