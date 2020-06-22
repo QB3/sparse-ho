@@ -1,8 +1,8 @@
 """
-=============================
-Grad Search on held out loss
-=============================
-
+=====================================
+0 order method vs 1st order method
+with the Lasso and the held-out loss
+=====================================
 ...
 
 """
@@ -80,6 +80,6 @@ plt.ylabel(
     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
     fontsize=28)
 plt.tick_params(width=5)
-plt.legend(fontsize=28, loc=1)
+plt.legend(fontsize=14, loc=1)
 plt.tight_layout()
 plt.show(block=False)

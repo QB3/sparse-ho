@@ -1,10 +1,9 @@
 """
 ===========================
-Method comparison on Lasso
+Sparse logistic regression
 ===========================
 
-The aim of this example is to demonstrate on a simple
-dateset how methods compare.
+An example to show how to use this package for sparse logistic regression
 
 """
 
@@ -15,10 +14,8 @@ dateset how methods compare.
 
 
 import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-from sklearn import datasets
-from scipy.sparse import csc_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
@@ -27,51 +24,72 @@ from sparse_ho.criterion import Logistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
-# from sparse_ho.bayesian import hyperopt_lasso
-
-from sparse_ho.datasets.real import get_rcv1
-# from expes.utils import configure_plt
+from sparse_ho.datasets.real import get_real_sim
 
 print(__doc__)
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-
-n_samples = 100
-n_features = 1000
-X_train, y_train = datasets.make_classification(
-    n_samples=n_samples,
-    n_features=n_features, n_informative=50,
-    random_state=10, flip_y=0.1, n_redundant=0)
-X_train_s = csc_matrix(X_train)
-
-
-X_val, y_val = datasets.make_classification(
-    n_samples=n_samples,
-    n_features=n_features, n_informative=50,
-    random_state=12, flip_y=0.1, n_redundant=0)
-
-# X_val_s = csc_matrix(X_val)
-
-
+X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
 n_samples, n_features = X_train.shape
 
+
 alpha_max = np.max(np.abs(X_train.T @ y_train))
-alpha_max /= 2 * n_samples
+alpha_max /= 4 * n_samples
 log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 100)
+log_alpha_min = np.log(alpha_max / 1000)
 maxit = 1000
 
 log_alpha0 = np.log(0.3 * alpha_max)
-tol = 1e-2
+tol = 1e-7
 
+
+n_alphas = 10
+p_alphas = np.geomspace(1, 0.0001, n_alphas)
+alphas = alpha_max * p_alphas
+log_alphas = np.log(alphas)
+
+# grid search
+model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000)
+criterion = Logistic(X_val, y_val, model)
+algo_grid = Forward(criterion)
+monitor_grid = Monitor()
+grid_search(
+    algo_grid, log_alpha_min, log_alpha_max, monitor_grid,
+    log_alphas=log_alphas, tol=tol)
+objs = np.array(monitor_grid.objs)
+
+
+# grad search
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000, tol=tol)
 criterion = Logistic(X_val, y_val, model)
-monitor = Monitor()
+monitor_grad = Monitor()
 algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100)
-grad_search(algo, log_alpha0, monitor, n_outer=3, tol=tol)
+grad_search(algo, log_alpha0, monitor_grad, n_outer=10, tol=tol)
+objs_grad = np.array(monitor_grad.objs)
 
 
-monitor_grid = Monitor()
-algo_grid = Forward(criterion)
-grid_search(
-    algo_grid, log_alpha_min, log_alpha_max, monitor_grid, max_evals=5)
+p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+
+objs_grad = np.array(monitor_grad.objs)
+
+current_palette = sns.color_palette("colorblind")
+
+fig = plt.figure()
+plt.semilogx(
+    p_alphas, objs, color=current_palette[0], linewidth=7.0)
+plt.semilogx(
+    p_alphas, objs, 'bo', label='0-order method (grid-search)',
+    color=current_palette[1], markersize=15)
+plt.semilogx(
+    p_alphas_grad, objs_grad, 'bX', label='1-st order method',
+    color=current_palette[2], markersize=25)
+plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
+plt.ylabel(
+    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} \hat \beta^{(\lambda)} } \right ) $",
+    fontsize=28)
+# plt.ylabel(
+#     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
+#     fontsize=28)
+plt.tick_params(width=5)
+plt.legend(fontsize=14, loc=1)
+plt.tight_layout()
+plt.show(block=False)
