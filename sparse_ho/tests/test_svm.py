@@ -35,7 +35,7 @@ y_train[y_train == 0.0] = -1.0
 y_val[y_val == 0.0] = -1.0
 
 
-C = 1e-1
+C = 0.001
 log_C = np.log(C)
 tol = 1e-16
 
@@ -76,7 +76,6 @@ def test_beta_jac(model):
         primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
-
     clf.fit(X_train, y_train)
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X_train, y_train, log_C, None, None,
@@ -101,7 +100,7 @@ def test_val_grad(model):
         log_C, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=100)
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
         log_C, tol=tol)
 
