@@ -23,10 +23,12 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-from sparse_ho.datasets.real import get_real_sim
+# from sparse_ho.datasets.real import get_real_sim
+from sparse_ho.datasets.real import get_rcv1
 
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+# X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
 n_samples, n_features = X_train.shape
 
 print("Starting path computation...")
@@ -35,7 +37,7 @@ alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
 log_alpha0 = np.log(alpha_max / 10)
 
 n_alphas = 10
-p_alphas = np.geomspace(1, 0.001, n_alphas)
+p_alphas = np.geomspace(1, 0.0001, n_alphas)
 alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 

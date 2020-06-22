@@ -40,9 +40,10 @@ log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(alpha_max / 1000)
 maxit = 1000
 
-log_alpha0 = np.log(0.3 * alpha_max)
+log_alpha0 = np.log(0.1 * alpha_max)
 tol = 1e-7
-
+use_sk = True
+# use_sk = False
 
 n_alphas = 10
 p_alphas = np.geomspace(1, 0.0001, n_alphas)
@@ -50,9 +51,9 @@ alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
 # grid search
-model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000)
+model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100)
 criterion = Logistic(X_val, y_val, model)
-algo_grid = Forward(criterion)
+algo_grid = Forward(criterion, use_sk=use_sk)
 monitor_grid = Monitor()
 grid_search(
     algo_grid, log_alpha_min, log_alpha_max, monitor_grid,
@@ -61,10 +62,10 @@ objs = np.array(monitor_grid.objs)
 
 
 # grad search
-model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=10000, tol=tol)
+model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100, tol=tol)
 criterion = Logistic(X_val, y_val, model)
 monitor_grad = Monitor()
-algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100)
+algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100, use_sk=use_sk)
 grad_search(algo, log_alpha0, monitor_grad, n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 
@@ -91,6 +92,8 @@ plt.ylabel(
 # plt.ylabel(
 #     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
 #     fontsize=28)
+axes = plt.gca()
+axes.set_ylim([0, 1])
 plt.tick_params(width=5)
 plt.legend(fontsize=14, loc=1)
 plt.tight_layout()

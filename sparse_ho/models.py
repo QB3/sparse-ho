@@ -20,7 +20,8 @@ class Lasso():
         self.log_alpha_max = log_alpha_max
         if use_sk:
             self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=max_iter, warm_start=True)
+                fit_intercept=False, max_iter=max_iter, warm_start=True,
+                solver='liblinear')
         else:
             self.clf = None
 
@@ -788,13 +789,21 @@ class SVM():
 
 class SparseLogreg():
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3):
+            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3,
+            use_sk=False):
         self.X = X
         self.y = y
         self.log_alpha = log_alpha
         self.max_iter = max_iter
         self.tol = tol
         self.log_alpha_max = log_alpha_max
+
+        if use_sk:
+            self.clf = linear_model.LogisticRegression(
+                fit_intercept=False, max_iter=max_iter, warm_start=True,
+                penalty='l1', verbose=True)
+        else:
+            self.clf = None
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -1043,3 +1052,21 @@ class SparseLogreg():
         n_samples = self.X.shape[0]
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+
+    def sk(self, X, y, alpha, tol, max_iter):
+        n_samples = X.shape[0]
+        if self.clf is None:
+            self.clf = linear_model.LogisticRegression(
+                fit_intercept=False, max_iter=max_iter, warm_start=True,
+                penalty='l1', solver='liblinear', verbose=True)
+
+        self.clf.C = 1 / (alpha * n_samples)
+        self.clf.tol = tol
+        self.clf.max_iter = max_iter
+        # clf = linear_model.Lasso(
+        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
+        self.clf.fit(X, y)
+        mask = self.clf.coef_ != 0
+        dense = self.clf.coef_[mask]
+        # import ipdb; ipdb.set_trace()
+        return mask[0], dense, None
