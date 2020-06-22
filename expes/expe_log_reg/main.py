@@ -13,7 +13,6 @@ from sparse_ho.implicit import Implicit
 from sparse_ho.datasets.real import get_data
 from sparse_ho.grid_search import grid_search
 
-# from my_data import get_data
 
 dataset_names = ["rcv1", "real-sim", "20news"]
 

@@ -24,11 +24,13 @@ from sparse_ho.criterion import Logistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.datasets.real import get_real_sim
+from sparse_ho.datasets.real import get_rcv1
+# from sparse_ho.datasets.real import get_real_sim
 
 print(__doc__)
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+# X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
 n_samples, n_features = X_train.shape
 
 

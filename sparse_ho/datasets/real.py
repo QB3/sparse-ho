@@ -18,7 +18,12 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
-PATH = pjoin(str(Path.home()), 'imp_forward_data')
+myhost = os.uname()[1]
+
+if myhost.startswith("drago"):
+    PATH = pjoin('/storage/store/work/qbertran', 'imp_forward_data')
+else:
+    PATH = pjoin(str(Path.home()), 'imp_forward_data')
 
 
 NAMES = {'rcv1_train': 'binary/rcv1_train.binary',
