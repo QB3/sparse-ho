@@ -14,18 +14,20 @@ from sparse_ho.datasets.real import get_data
 from sparse_ho.grid_search import grid_search
 
 
-dataset_names = ["rcv1", "real-sim", "20news"]
+dataset_names = ["rcv1"]
+# dataset_names = ["real-sim"]
+# dataset_names = ["20news"]
 
-# methods = ["implicit_forward", "implicit"]
+# methods = ["grid_search"]
 methods = ["implicit_forward", "implicit", "forward",
            "grid_search", "random"]
 # "grid_search",
 tolerance_decreases = ["constant"]
-tols = 1e-5
-n_outers = [1]
+tols = 1e-7
+n_outers = [25]
 
 dict_t_max = {}
-dict_t_max["rcv1"] = 100
+dict_t_max["rcv1"] = 50
 dict_t_max["real-sim"] = 100
 dict_t_max["leukemia"] = 10
 dict_t_max["20news"] = 500
@@ -43,10 +45,17 @@ def parallel_function(
     y_train[y_train == 0.0] = -1.0
     y_val[y_val == 0.0] = -1.0
     y_test[y_test == 0.0] = -1.0
+
     alpha_max = np.max(np.abs(X_train.T @ y_train))
     alpha_max /= X_train.shape[0]
-    alpha_max /= 2
-    log_alpha0 = np.log(0.3 * alpha_max)
+    alpha_max /= 4
+    log_alpha_max = np.log(alpha_max)
+
+    alpha_min = alpha_max * 1e-4
+    alphas = np.geomspace(alpha_max, alpha_min, 10)
+    log_alphas = np.log(alphas)
+
+    log_alpha0 = np.log(0.1 * alpha_max)
     log_alpha_max = np.log(alpha_max)
     n_outer = 25
 
@@ -61,7 +70,7 @@ def parallel_function(
 
         if method == "implicit_forward":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
-            algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
+            algo = ImplicitForward(criterion, tol_jac=1e-5, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
                 log_alpha0=log_alpha0, tol=tol,
@@ -92,42 +101,43 @@ def parallel_function(
         elif method == "grid_search":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(alpha_min)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
-                tol=tol, samp="grid")
+                algo, None, None, monitor, max_evals=100, tol=tol, samp="grid",
+                t_max=dict_t_max[dataset_name], log_alphas=log_alphas)
             print(log_alpha_opt)
 
         elif method == "random":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(alpha_min)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
-                tol=tol, samp="random")
+                algo, log_alpha_min, np.log(alpha_max), monitor, max_evals=100, tol=tol, samp="random",
+                t_max=dict_t_max[dataset_name])
             print(log_alpha_opt)
 
         elif method == "lhs":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(1e-5 * alpha_max)
+            log_alpha_min = np.log(alpha_min)
             log_alpha_opt, min_g_func = grid_search(
-                algo, log_alpha_min, np.log(0.3 * alpha_max), monitor, max_evals=100,
-                tol=tol, samp="lhs")
+                algo, log_alpha_min, np.log(alpha_max), monitor, max_evals=100, tol=tol, samp="lhs",
+                t_max=dict_t_max[dataset_name])
             print(log_alpha_opt)
 
-    monitor.times = np.array(monitor.times)
-    monitor.objs = np.array(monitor.objs)
-    monitor.objs_test = np.array(monitor.objs_test)
-    monitor.log_alphas = np.array(monitor.log_alphas)
+    monitor.times = np.array(monitor.times).copy()
+    monitor.objs = np.array(monitor.objs).copy()
+    monitor.objs_test = np.array(monitor.objs_test).copy()
+    monitor.log_alphas = np.array(monitor.log_alphas).copy()
     return (dataset_name, method, tol, n_outer, tolerance_decrease,
             monitor.times, monitor.objs, monitor.objs_test,
-            monitor.log_alphas, norm(y_val), norm(y_test))
+            monitor.log_alphas, norm(y_val), norm(y_test), log_alpha_max)
 
 
 print("enter parallel")
 backend = 'loky'
-n_jobs = 1
+# n_jobs = 1
+n_jobs = len(methods)
 results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
     delayed(parallel_function)(
         dataset_name, method, n_outer=n_outer,
@@ -141,7 +151,7 @@ df = pandas.DataFrame(results)
 df.columns = [
     'dataset', 'method', 'tol', 'n_outer', 'tolerance_decrease',
     'times', 'objs', 'objs_test', 'log_alphas', 'norm y_val',
-    'norm y_test']
+    'norm y_test', "log_alpha_max"]
 
 for dataset_name in dataset_names:
     df[df['dataset'] == dataset_name].to_pickle(

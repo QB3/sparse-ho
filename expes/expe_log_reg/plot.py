@@ -4,7 +4,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from expes.utils import configure_plt
 
+save_fig = True
+fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
+
 configure_plt()
+
 # init()
 
 fontsize = 16
@@ -76,9 +81,9 @@ dict_title["real-sim"] = "real-sim"
 dict_markevery = {}
 dict_markevery["20news"] = 5
 dict_markevery["finance"] = 10
-dict_markevery["rcv1"] = 1
+dict_markevery["rcv1"] = 5
 dict_markevery["leukemia"] = 1
-dict_markevery["real-sim"] = 1
+dict_markevery["real-sim"] = 5
 
 dict_n_feature = {}
 dict_n_feature["rcv1"] = r"($p=19,959$)"
@@ -86,8 +91,20 @@ dict_n_feature["20news"] = r"($p=130,107$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
 dict_n_feature["leukemia"] = r"($p=7,129$)"
 dict_n_feature["real-sim"] = r"($p=20,958$)"
+
 markersize = 8
 
+dict_marker_size = {}
+dict_marker_size["forward"] = 4
+dict_marker_size["implicit_forward"] = 9
+dict_marker_size["fast_iterdiff"] = 4
+dict_marker_size['implicit'] = 4
+dict_marker_size['grid_search'] = 5
+dict_marker_size['bayesian'] = 4
+dict_marker_size['random'] = 5
+dict_marker_size['lhs'] = 4
+
+# dataset_names = ["rcv1", "real-sim"]
 dataset_names = ["rcv1", "real-sim", '20news']
 # dataset_names = ["20newsgroups"]
 # dataset_names = ["finance"]
@@ -101,6 +118,10 @@ fig, axarr = plt.subplots(
     1, 3, sharex=False, sharey=False, figsize=[14, 4],)
 
 fig2, axarr2 = plt.subplots(
+    1, 3, sharex=False, sharey=False, figsize=[14, 4],)
+
+
+fig3, axarr3 = plt.subplots(
     1, 3, sharex=False, sharey=False, figsize=[14, 4],)
 
 
@@ -127,6 +148,21 @@ for idx, dataset in enumerate(dataset_names):
     lines = []
 
     plt.figure()
+    for i, (time, obj, log_alpha, method, tol) in enumerate(
+            zip(times, objs, log_alphas, methods, tols)):
+        marker = dict_markers[method]
+        # objs_test = [np.min(objs_test[:k]) for k in np.arange(
+        #     len(objs_test)) + 1]
+        # if method == 'grid_search' or method == "implicit_forward":
+        if method.startswith(('grid_search', "implicit_forward", "random")):
+            # import ipdb; ipdb.set_trace()
+            axarr3.flat[idx].plot(
+                np.array(log_alpha), obj,
+                "bX", color=dict_color[method],
+                label="%s" % (dict_method[method]),
+                marker=marker, markersize=dict_marker_size[method],
+                markevery=1)
+
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
         marker = dict_markers[method]
@@ -135,14 +171,11 @@ for idx, dataset in enumerate(dataset_names):
         axarr2.flat[idx].semilogy(
             time, objs_test, color=dict_color[method],
             label="%s" % (dict_method[method]),
-            # label="%s, %s" % (dict_method[method], tol),
             marker=marker, markersize=markersize,
             markevery=dict_markevery[dataset])
-        # plt.legend()
 
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
-        # import ipdb; ipdb.set_trace()
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
@@ -156,15 +189,60 @@ for idx, dataset in enumerate(dataset_names):
                 markevery=dict_markevery[dataset]))
         # axarr.flat[i].legend()
 
-    axarr.flat[idx].set_title("%s %s" % (
+    axarr3.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
     # axarr.flat[idx].title.set_text(dict_title[dataset], size=18)
+    axarr.flat[0].set_xlim(0, 15)
+    axarr.flat[1].set_xlim(0, 40)
+    axarr.flat[2].set_xlim(0, 210)
+
+    axarr2.flat[0].set_xlim(0, 15)
+    axarr2.flat[1].set_xlim(0, 40)
+    axarr2.flat[2].set_xlim(0, 210)
 
 axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
+# axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
 
-fig.tight_layout()
-fig.show()
 
 axarr2.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
+axarr2.flat[0].set_xlabel("Time (s)", fontsize=fontsize)
+axarr2.flat[1].set_xlabel("Time (s)", fontsize=fontsize)
+axarr2.flat[2].set_xlabel("Time (s)", fontsize=fontsize)
+
+axarr3.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
+axarr3.flat[0].set_xlabel(
+    r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
+axarr3.flat[1].set_xlabel(
+    r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
+axarr3.flat[2].set_xlabel(
+    r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
+
+fig.tight_layout()
+if save_fig:
+    fig.savefig(
+        fig_dir + "pred_log_reg_validation_set.pdf",
+        bbox_inches="tight")
+    fig.savefig(
+        fig_dir_svg + "pred_log_reg_validation_set.pdf",
+        bbox_inches="tight")
+fig.show()
+
 fig2.tight_layout()
+if save_fig:
+    fig2.savefig(
+        fig_dir + "pred_log_reg_test_set.pdf",
+        bbox_inches="tight")
+    fig2.savefig(
+        fig_dir_svg + "pred_log_reg_test_set.pdf",
+        bbox_inches="tight")
 fig2.show()
+
+fig3.tight_layout()
+if save_fig:
+    fig3.savefig(
+        fig_dir + "pred_vs_alpha_log_reg_validation_set.pdf",
+        bbox_inches="tight")
+    fig3.savefig(
+        fig_dir_svg + "pred_vs_alpha_log_reg_validation_set.pdf",
+        bbox_inches="tight")
+fig3.show()
