@@ -73,7 +73,6 @@ def get_beta_jac_iterdiff(
         to store the iterates or not in order to compute the Jacobian in a
         backward way
     """
-
     n_samples, n_features = X.shape
     is_sparse = issparse(X)
     if not is_sparse and not np.isfortran(X):
@@ -82,7 +81,6 @@ def get_beta_jac_iterdiff(
 
     ############################################
     alpha = np.exp(log_alpha)
-    # import ipdb; ipdb.set_trace()
     if use_sk:
         return model.sk(X, y, alpha, tol, max_iter)
 
@@ -99,9 +97,12 @@ def get_beta_jac_iterdiff(
     # warm start for dbeta
     dbeta, dr = model._init_dbeta_dr(
         X, y, mask0=mask0, dense0=dense0, jac0=jac0, compute_jac=compute_jac)
-    # store the values of the objective function
-    pobj0 = model._get_pobj(r, beta, alphas, y)
+    # store the values of the objective
+
+    pobj0 = model._get_pobj0(r, np.zeros(X.shape[1]), alphas, y)
+    # pobj0 = model._get_pobj(r, np.zeros(X.shape[1]), alphas, y)
     pobj = []
+    # pobj.append(pobj0)
     ############################################
     # store the iterates if needed
     if backward:

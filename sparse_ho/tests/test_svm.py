@@ -40,8 +40,8 @@ log_C = np.log(C)
 tol = 1e-16
 
 models = [
-    SVM(
-        X_train, y_train, log_C, max_iter=10000, tol=tol),
+    # SVM(
+    #     X_train, y_train, log_C, max_iter=10000, tol=tol),
     SVM(
         X_train_s, y_train, log_C, max_iter=10000, tol=tol)
 ]
@@ -145,15 +145,6 @@ def test_grad_search(model):
     grad_search(algo, np.log(1e-3), monitor3, n_outer=n_outer,
                 tol=1e-13)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    # monitor4 = Monitor()
-    # algo = Backward(criterion)
-    # grad_search(algo, model.log_alpha, monitor4, n_outer=n_outer,
-    #             tol=1e-16)
-
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     assert np.allclose(
@@ -164,10 +155,11 @@ def test_grad_search(model):
     #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
+    # import ipdb; ipdb.set_trace()
 
 
 if __name__ == '__main__':
     for model in models:
-        test_beta_jac(model)
-        test_val_grad(model)
+        # test_beta_jac(model)
+        # test_val_grad(model)
         test_grad_search(model)

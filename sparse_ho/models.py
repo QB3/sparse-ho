@@ -108,6 +108,11 @@ class Lasso():
         return grad
 
     @staticmethod
+    def _get_pobj0(r, beta, alphas, y=None):
+        n_samples = r.shape[0]
+        return norm(y) ** 2 / (2 * n_samples)
+
+    @staticmethod
     def _get_pobj(r, beta, alphas, y=None):
         n_samples = r.shape[0]
         return (
@@ -351,6 +356,11 @@ class wLasso():
             norm(r) ** 2 / (2 * n_samples) + norm(alphas * beta, 1))
 
     @staticmethod
+    def _get_pobj0(r, beta, alphas, y=None):
+        n_samples = r.shape[0]
+        return norm(y) ** 2 / (2 * n_samples)
+
+    @staticmethod
     def _get_jac(dbeta, mask):
         return dbeta[np.ix_(mask, mask)]
 
@@ -590,7 +600,15 @@ class SVM():
 
         # import ipdb; ipdb.set_trace()
 
+    def _get_pobj0(self, r, beta, C, y):
+        C = C[0]
+        n_samples = self.X.shape[0]
+        obj_prim = C * np.sum(np.maximum(
+            np.ones(n_samples), np.zeros(n_samples)))
+        return obj_prim
+
     def _get_pobj(self, r, beta, C, y):
+        # r = y.copy()
         C = C[0]
         n_samples = self.X.shape[0]
         obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
@@ -936,6 +954,13 @@ class SparseLogreg():
         n_samples = r.shape[0]
         return (
             np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
+
+    @staticmethod
+    def _get_pobj0(r, beta, alphas, y):
+        n_samples = r.shape[0]
+        return np.log(2) / n_samples
+        # return (np.sum(np.log(1)) / (n_samples))
+        # return (np.sum(np.log(1)) / (n_samples))
 
     @staticmethod
     def _get_jac(dbeta, mask):
