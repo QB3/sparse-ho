@@ -36,7 +36,7 @@ X, y = load_libsvm('rcv1_train')
 # X, y = make_regression(
 #     n_samples=2000, n_features=1000)
 
-kf = KFold(n_splits=5, shuffle=False, random_state=42)
+kf = KFold(n_splits=5, shuffle=False)
 
 for train, test in kf.split(X):
     print("%s %s" % (train, test))

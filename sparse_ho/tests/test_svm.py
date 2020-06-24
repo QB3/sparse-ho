@@ -40,8 +40,8 @@ log_C = np.log(C)
 tol = 1e-16
 
 models = [
-    # SVM(
-    #     X_train, y_train, log_C, max_iter=10000, tol=tol),
+    SVM(
+        X_train, y_train, log_C, max_iter=10000, tol=tol),
     SVM(
         X_train_s, y_train, log_C, max_iter=10000, tol=tol)
 ]
