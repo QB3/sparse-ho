@@ -86,6 +86,7 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv + reg_amount * identity(size_mat),
             - model.restrict_full_supp(mask, dense, v), x0=sol0, atol=1e-3)
         sol_lin_sys = sol[0]
+
     jac_t_v = model._get_jac_t_v(sol_lin_sys, mask, dense, alphas, v.copy())
 
     return mask, dense, jac_t_v, sol[0]

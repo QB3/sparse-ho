@@ -11,9 +11,9 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from scipy.sparse import csr_matrix
 from scipy.sparse import issparse
-# from sparse_ho.ho import grad_search
-# from sparse_ho.criterion import SmoothedHinge
-# from sparse_ho.utils import Monitor
+from sparse_ho.ho import grad_search
+from sparse_ho.criterion import SmoothedHinge
+from sparse_ho.utils import Monitor
 n_samples = 100
 n_features = 300
 
@@ -40,8 +40,8 @@ log_C = np.log(C)
 tol = 1e-16
 
 models = [
-    SVM(
-        X_train, y_train, log_C, max_iter=10000, tol=tol),
+    # SVM(
+    #     X_train, y_train, log_C, max_iter=10000, tol=tol),
     SVM(
         X_train_s, y_train, log_C, max_iter=10000, tol=tol)
 ]
@@ -141,7 +141,7 @@ def test_val_grad(model):
 #     #     y_test=y_test)
 #     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
 #     monitor3 = Monitor()
-#     algo = ImplicitForward(criterion, tol_jac=1e-2, n_iter_jac=100)
+#     algo = ImplicitForward(criterion, tol_jac=1e-6, n_iter_jac=100)
 #     grad_search(algo, np.log(1e-4), monitor3, n_outer=n_outer,
 #                 tol=1e-16)
 

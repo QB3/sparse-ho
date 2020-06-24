@@ -732,6 +732,42 @@ class SVM():
         beta[mask] = dense
         maskC = np.isclose(beta, C)
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
+
+        full_jac = np.zeros(n_samples)
+        full_jac[full_supp] = jac
+        full_jac[maskC] = C
+
+        # primal dual relation
+        jac_primal = (self.y[mask] * full_jac[mask]) @ self.X[mask, :]
+
+        return jac_primal @ v
+
+        # if issparse(self.X):
+        #     mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
+        #     Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
+        # else:
+        #     mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
+        #     Q = mat @ (self.y[maskC, np.newaxis] * self.X[maskC, :]).T
+
+        # u = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones(maskC.sum()) * C)
+        # if issparse(self.X):
+        #     temp = self.X[maskC, :].multiply(self.y[maskC, np.newaxis])
+        #     w = temp @ v
+        # else:
+        #     w = ((self.y[maskC, np.newaxis] * self.X[maskC, :]) @ v)
+
+        # if issparse(self.X):
+        #     return np.array(u @ jac + C * np.sum(w))[0]
+        # else:
+        #     return np.array(u @ jac + C * np.sum(w))
+
+    def restrict_full_supp(self, mask, dense, v):
+        C = np.exp(self.logC)
+        n_samples = self.X.shape[0]
+        beta = np.zeros(n_samples)
+        beta[mask] = dense
+        maskC = np.isclose(beta, C)
+        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
         if issparse(self.X):
             mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
             Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
@@ -739,29 +775,21 @@ class SVM():
             mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
             Q = mat @ (self.y[maskC, np.newaxis] * self.X[maskC, :]).T
 
-        u = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones(maskC.sum()) * C)
+        w = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones(maskC.sum()) * C)
         if issparse(self.X):
-            temp = self.X[maskC, :].multiply(self.y[maskC, np.newaxis])
-            w = temp @ v
+            return - np.array(w)[0]
         else:
-            w = ((self.y[maskC, np.newaxis] * self.X[maskC, :]) @ v)
-
-        if issparse(self.X):
-            return np.array(u @ jac + C * np.sum(w))[0]
-        else:
-            return np.array(u @ jac + C * np.sum(w))
-
-    def restrict_full_supp(self, mask, dense, v):
-        n_samples = self.X.shape[0]
-        beta = np.zeros(n_samples)
-        beta[mask] = dense
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
-        if issparse(self.X):
-            temp = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
-            res = (temp @ v)
-        else:
-            res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
-        return - res
+            return - w
+        # n_samples = self.X.shape[0]
+        # beta = np.zeros(n_samples)
+        # beta[mask] = dense
+        # full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
+        # if issparse(self.X):
+        #     temp = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
+        #     res = (temp @ v)
+        # else:
+        #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
+        # return - res
 
     def proj_param(self, log_alpha):
         if log_alpha < -16.0:
