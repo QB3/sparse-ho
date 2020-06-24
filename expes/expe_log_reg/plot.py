@@ -223,7 +223,7 @@ if save_fig:
         fig_dir + "pred_log_reg_validation_set.pdf",
         bbox_inches="tight")
     fig.savefig(
-        fig_dir_svg + "pred_log_reg_validation_set.pdf",
+        fig_dir_svg + "pred_log_reg_validation_set.svg",
         bbox_inches="tight")
 fig.show()
 
@@ -233,7 +233,7 @@ if save_fig:
         fig_dir + "pred_log_reg_test_set.pdf",
         bbox_inches="tight")
     fig2.savefig(
-        fig_dir_svg + "pred_log_reg_test_set.pdf",
+        fig_dir_svg + "pred_log_reg_test_set.svg",
         bbox_inches="tight")
 fig2.show()
 
@@ -243,6 +243,6 @@ if save_fig:
         fig_dir + "pred_vs_alpha_log_reg_validation_set.pdf",
         bbox_inches="tight")
     fig3.savefig(
-        fig_dir_svg + "pred_vs_alpha_log_reg_validation_set.pdf",
+        fig_dir_svg + "pred_vs_alpha_log_reg_validation_set.svg",
         bbox_inches="tight")
 fig3.show()
