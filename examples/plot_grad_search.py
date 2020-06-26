@@ -1,11 +1,11 @@
-# """
-# ======================
-# Grad Search
-# ======================
+"""
+======================
+Grad Search
+======================
 
-# ...
+...
 
-# """
+"""
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
