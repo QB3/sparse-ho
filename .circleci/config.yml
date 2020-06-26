@@ -33,7 +33,7 @@ jobs:
             keys:
               - data-cache-0
               - pip-cache
-              # - sparse_ho_data
+              - sparse_ho_data
 
         - run:
             name: Spin up Xvfb
@@ -48,10 +48,10 @@ jobs:
               python -m pip install --user --upgrade --progress-bar off -r doc/doc-requirements.txt
               python -m pip install --user -e .
 
-        # - save_cache:
-        #     key: sparse_ho_data
-        #     paths:
-        #       - ~/imp_forward_data
+        - save_cache:
+            key: sparse_ho_data
+            paths:
+              - $HOME/imp_forward_data
 
         - save_cache:
             key: pip-cache

@@ -12,7 +12,7 @@ from scipy import sparse
 import numpy as np
 
 from os.path import join as pjoin
-# from pathlib import Path
+from pathlib import Path
 
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -23,8 +23,7 @@ myhost = os.uname()[1]
 if myhost.startswith("drago"):
     PATH = pjoin('/storage/store/work/qbertran', 'imp_forward_data')
 else:
-    PATH = pjoin("~/imp_forward_data")
-    # PATH = pjoin(str(Path.home()), 'imp_forward_data')
+    PATH = pjoin(str(Path.home()), 'imp_forward_data')
 
 
 NAMES = {'rcv1_train': 'binary/rcv1_train.binary',
