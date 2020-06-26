@@ -16,7 +16,6 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-# from numpy.linalg import norm
 
 # from sklearn.datasets import make_regression
 # from sklearn import linear_model
