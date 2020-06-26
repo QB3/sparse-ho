@@ -1,7 +1,7 @@
 """
-======================
-Grad Search CV
-======================
+=============================
+Example with cross validation
+=============================
 
 ...
 
@@ -101,7 +101,7 @@ plt.semilogx(
     color=current_palette[2], markersize=25)
 plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
 plt.ylabel(
-    r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
+    "Cross-validation loss",
     fontsize=28)
 axes = plt.gca()
 # axes.set_ylim([0, 1])

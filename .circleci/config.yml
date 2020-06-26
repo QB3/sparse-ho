@@ -51,7 +51,7 @@ jobs:
         - save_cache:
             key: sparse_ho_data
             paths:
-              - ~/imp_forward_data
+              - $HOME/imp_forward_data
 
         - save_cache:
             key: pip-cache
