@@ -1,6 +1,6 @@
 """
 =======================================================================
-Example Lasso and the held-out loss
+Lasso on the held-out loss
 =======================================================================
 ...
 
@@ -42,7 +42,9 @@ log_alphas = np.log(alphas)
 
 tol = 1e-7
 
-# grid search
+##############################################################################
+# Grid-search
+# -----------
 model = Lasso(X_train, y_train, np.log(alpha_max/10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=True)
@@ -52,7 +54,9 @@ grid_search(
     tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 
-# grad_search
+##############################################################################
+# Grad-search
+# -----------
 model = Lasso(X_train, y_train, np.log(alpha_max/10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion, use_sk=True)
@@ -61,6 +65,9 @@ grad_search(
     algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)
 
 
+##############################################################################
+# Plot results
+# ------------
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
