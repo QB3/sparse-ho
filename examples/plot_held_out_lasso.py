@@ -97,6 +97,6 @@ plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$")
 plt.tick_params(width=5)
-plt.legend(loc=1)
+plt.legend()
 plt.tight_layout()
 plt.show(block=False)
