@@ -45,7 +45,7 @@ tol = 1e-7
 ##############################################################################
 # Grid-search
 # -----------
-model = Lasso(X_train, y_train, np.log(alpha_max/10))
+model = Lasso(X_train, y_train, np.log(alpha_max / 10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=True)
 monitor_grid_sk = Monitor()
@@ -57,12 +57,12 @@ objs = np.array(monitor_grid_sk.objs)
 ##############################################################################
 # Grad-search
 # -----------
-model = Lasso(X_train, y_train, np.log(alpha_max/10))
+model = Lasso(X_train, y_train, np.log(alpha_max / 10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion, use_sk=True)
 monitor_grad = Monitor()
 grad_search(
-    algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)
+    algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 
 
 ##############################################################################
@@ -74,20 +74,19 @@ objs_grad = np.array(monitor_grad.objs)
 
 current_palette = sns.color_palette("colorblind")
 
-fig = plt.figure()
+fig = plt.figure(figsize=(7, 4))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0], linewidth=7.0)
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1], markersize=15)
+    color=current_palette[1])
 plt.semilogx(
     p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-    color=current_palette[2], markersize=25)
-plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
+    color=current_palette[2])
+plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
-    r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
-    fontsize=28)
+    r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$")
 plt.tick_params(width=5)
-plt.legend(fontsize=14, loc=1)
+plt.legend(loc=1)
 plt.tight_layout()
 plt.show(block=False)
