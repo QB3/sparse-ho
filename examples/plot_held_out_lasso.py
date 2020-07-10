@@ -1,8 +1,10 @@
 """
-=======================================================================
-Lasso on the held-out loss
-=======================================================================
-...
+============================
+Lasso with held-out test set
+============================
+
+This example shows how to perform hyperparameter optimisation
+for a Lasso using a held-out test set.
 
 """
 
@@ -22,12 +24,20 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-# from sparse_ho.datasets.real import get_real_sim
+from sparse_ho.datasets.real import get_real_sim
 from sparse_ho.datasets.real import get_rcv1
 
+print(__doc__)
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+dataset = 'rcv1'
+# dataset = 'simu'
+
+if dataset == 'rcv1':
+    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+else:
+    X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+
+
 n_samples, n_features = X_train.shape
 
 print("Starting path computation...")

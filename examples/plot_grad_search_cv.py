@@ -3,7 +3,8 @@
 Lasso with Cross-validation
 =============================
 
-...
+This example shows how to perform hyperparameter optimisation
+for a Lasso using a full cross-validation score.
 
 """
 
