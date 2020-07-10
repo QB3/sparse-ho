@@ -76,7 +76,7 @@ current_palette = sns.color_palette("colorblind")
 
 fig = plt.figure(figsize=(7, 4))
 plt.semilogx(
-    p_alphas, objs, color=current_palette[0], linewidth=7.0)
+    p_alphas, objs, color=current_palette[0])
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
     color=current_palette[1])
