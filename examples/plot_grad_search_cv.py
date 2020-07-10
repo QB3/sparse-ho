@@ -30,8 +30,8 @@ from sklearn.model_selection import KFold
 
 print(__doc__)
 
-dataset = 'rcv1'
-# dataset = 'simu'
+# dataset = 'rcv1'
+dataset = 'simu'
 
 if dataset == 'rcv1':
     X, y = load_libsvm('rcv1_train')

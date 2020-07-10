@@ -30,8 +30,8 @@ from sparse_ho.datasets.real import get_real_sim
 
 print(__doc__)
 
-dataset = 'rcv1'
-# dataset = 'simu'
+# dataset = 'rcv1'
+dataset = 'simu'
 
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
