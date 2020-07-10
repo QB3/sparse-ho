@@ -101,7 +101,7 @@ objs_grad = np.array(monitor.objs)
 
 current_palette = sns.color_palette("colorblind")
 
-fig = plt.figure(figsize=(7, 4))
+fig = plt.figure(figsize=(5, 3))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0])
 plt.semilogx(
@@ -114,6 +114,6 @@ plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel("Cross-validation loss")
 axes = plt.gca()
 plt.tick_params(width=5)
-plt.legend(loc=1)
+plt.legend()
 plt.tight_layout()
 plt.show(block=False)
