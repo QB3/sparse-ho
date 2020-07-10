@@ -14,14 +14,14 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The aim of this example is to demonstrate on a simple dateset how methods compare.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Example Lasso and the held-out loss">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_sparse_log_reg_thumb.png
-     :alt: Method comparison on Lasso
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_held_out_lasso_thumb.png
+     :alt: Example Lasso and the held-out loss
 
-     :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py`
+     :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py`
 
 .. raw:: html
 
@@ -31,7 +31,7 @@ can be done with the sparse_ho library.
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_sparse_log_reg
+   /auto_examples/plot_held_out_lasso
 
 .. raw:: html
 
@@ -40,7 +40,7 @@ can be done with the sparse_ho library.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_grad_search_cv_thumb.png
-     :alt: Grad Search CV
+     :alt: Example with cross validation
 
      :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py`
 
@@ -56,14 +56,14 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="...">
+    <div class="sphx-glr-thumbcontainer" tooltip="An example to show how to use this package for sparse logistic regression">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_grad_search_thumb.png
-     :alt: Grad Search
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_sparse_log_reg_thumb.png
+     :alt: Sparse logistic regression
 
-     :ref:`sphx_glr_auto_examples_plot_grad_search.py`
+     :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py`
 
 .. raw:: html
 
@@ -73,28 +73,7 @@ can be done with the sparse_ho library.
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_grad_search
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="The aim of this example is to demonstrate on a simple dateset how methods compare.">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_implicit_forward_thumb.png
-     :alt: Method comparison on Lasso
-
-     :ref:`sphx_glr_auto_examples_plot_implicit_forward.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_implicit_forward
+   /auto_examples/plot_sparse_log_reg
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

@@ -1,0 +1,2239 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_held_out_lasso.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_held_out_lasso.py:
+
+
+=======================================================================
+Example Lasso and the held-out loss
+=======================================================================
+...
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_held_out_lasso_001.png
+    :alt: plot held out lasso
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Starting path computation...
+    True
+    True
+    True
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 1.0502169714629872, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 5.041485477608035, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 6.551398868998774, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 9.647652123062699, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 13.819381628883102, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 10.007887681171507, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 8.915957159763808, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.002858701289369492, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 154.37677055639097
+    1 -st iterations over 100
+    jac obj 47.09078152016514
+    2 -st iterations over 100
+    jac obj 21.25959675992351
+    3 -st iterations over 100
+    jac obj 10.366795088600838
+    4 -st iterations over 100
+    jac obj 4.8396229912640365
+    5 -st iterations over 100
+    jac obj 1.8710614032306694
+    6 -st iterations over 100
+    jac obj 0.3883400461808151
+    7 -st iterations over 100
+    jac obj 0.2110031415386402
+    8 -st iterations over 100
+    jac obj 0.3300067244969114
+    9 -st iterations over 100
+    jac obj 0.23054098575755688
+    10 -st iterations over 100
+    jac obj 0.06962425454912591
+    11 -st iterations over 100
+    jac obj 0.06850220223611814
+    12 -st iterations over 100
+    jac obj 0.14836876073388794
+    13 -st iterations over 100
+    jac obj 0.16588114735964155
+    14 -st iterations over 100
+    jac obj 0.13479791087308968
+    15 -st iterations over 100
+    jac obj 0.07609264607754085
+    16 -st iterations over 100
+    jac obj 0.010358619879866637
+    17 -st iterations over 100
+    jac obj 0.04663491881728987
+    18 -st iterations over 100
+    jac obj 0.08562685623394373
+    19 -st iterations over 100
+    jac obj 0.10355389373728485
+    20 -st iterations over 100
+    jac obj 0.10210224031277448
+    21 -st iterations over 100
+    jac obj 0.08585780284886368
+    22 -st iterations over 100
+    jac obj 0.06057312838902362
+    23 -st iterations over 100
+    jac obj 0.031838415223319316
+    24 -st iterations over 100
+    jac obj 0.004250099099635918
+    25 -st iterations over 100
+    jac obj 0.018963677463716522
+    26 -st iterations over 100
+    jac obj 0.03597285753266988
+    27 -st iterations over 100
+    jac obj 0.04616150291928989
+    28 -st iterations over 100
+    jac obj 0.04984466928237907
+    29 -st iterations over 100
+    jac obj 0.04796775884483395
+    30 -st iterations over 100
+    jac obj 0.041835437063127756
+    31 -st iterations over 100
+    jac obj 0.03289001130667657
+    32 -st iterations over 100
+    jac obj 0.02254231259973949
+    33 -st iterations over 100
+    jac obj 0.012050352974483758
+    34 -st iterations over 100
+    jac obj 0.002439166337921961
+    35 -st iterations over 100
+    jac obj 0.005543982589074403
+    36 -st iterations over 100
+    jac obj 0.011443716032317752
+    37 -st iterations over 100
+    jac obj 0.015084294152188704
+    38 -st iterations over 100
+    jac obj 0.01653575865361745
+    39 -st iterations over 100
+    jac obj 0.016064107137253814
+    40 -st iterations over 100
+    jac obj 0.01407190417558013
+    41 -st iterations over 100
+    jac obj 0.011035988209414427
+    42 -st iterations over 100
+    jac obj 0.0074484974916231295
+    43 -st iterations over 100
+    jac obj 0.003766354750496248
+    44 -st iterations over 100
+    jac obj 0.00037280596404798416
+    45 -st iterations over 100
+    jac obj 0.0024471447334235563
+    46 -st iterations over 100
+    jac obj 0.004517274491036005
+    47 -st iterations over 100
+    jac obj 0.005767993839867813
+    48 -st iterations over 100
+    jac obj 0.006223936952324038
+    49 -st iterations over 100
+    jac obj 0.005984359213357493
+    50 -st iterations over 100
+    jac obj 0.00519961446502748
+    51 -st iterations over 100
+    jac obj 0.0040468025348445735
+    52 -st iterations over 100
+    jac obj 0.0027072011585005384
+    53 -st iterations over 100
+    jac obj 0.0013474323252467002
+    54 -st iterations over 100
+    jac obj 0.00010556917584381154
+    55 -st iterations over 100
+    jac obj 0.0009173387527425803
+    56 -st iterations over 100
+    jac obj 0.0016604824932073825
+    57 -st iterations over 100
+    jac obj 0.0021019125103975966
+    58 -st iterations over 100
+    jac obj 0.002253555079960279
+    59 -st iterations over 100
+    jac obj 0.0021537927916597255
+    60 -st iterations over 100
+    jac obj 0.0018587976019261987
+    61 -st iterations over 100
+    jac obj 0.0014337048739889724
+    62 -st iterations over 100
+    jac obj 0.0009445289257428158
+    63 -st iterations over 100
+    jac obj 0.000451480055517095
+    64 -st iterations over 100
+    jac obj 4.083162252754846e-06
+    65 -st iterations over 100
+    jac obj 0.00036175247464598215
+    66 -st iterations over 100
+    jac obj 0.000624781650458317
+    67 -st iterations over 100
+    jac obj 0.0007778314153483734
+    68 -st iterations over 100
+    jac obj 0.0008259276520448111
+    69 -st iterations over 100
+    jac obj 0.0007835594830112314
+    70 -st iterations over 100
+    jac obj 0.0006715095024674156
+    71 -st iterations over 100
+    jac obj 0.0005136426582339482
+    72 -st iterations over 100
+    jac obj 0.00033397901381704287
+    73 -st iterations over 100
+    jac obj 0.00015428810593220987
+    74 -st iterations over 100
+    jac obj 7.652537419744476e-06
+    75 -st iterations over 100
+    jac obj 0.0001390840989188291
+    76 -st iterations over 100
+    jac obj 0.00023260789782852953
+    77 -st iterations over 100
+    jac obj 0.00028593356660167046
+    78 -st iterations over 100
+    jac obj 0.0003011678791153827
+    79 -st iterations over 100
+    jac obj 0.0002837990235775578
+    80 -st iterations over 100
+    jac obj 0.0002415328149254492
+    81 -st iterations over 100
+    jac obj 0.00018312320287350303
+    82 -st iterations over 100
+    jac obj 0.0001173138402918994
+    83 -st iterations over 100
+    jac obj 5.197501047859987e-05
+    84 -st iterations over 100
+    jac obj 6.514593223982956e-06
+    85 -st iterations over 100
+    jac obj 5.362504248296318e-05
+    86 -st iterations over 100
+    jac obj 8.678390406657854e-05
+    87 -st iterations over 100
+    jac obj 0.0001052713690796736
+    88 -st iterations over 100
+    jac obj 0.00010995136290148366
+    89 -st iterations over 100
+    jac obj 0.00010289533361174108
+    90 -st iterations over 100
+    jac obj 8.695563565197517e-05
+    91 -st iterations over 100
+    jac obj 6.533996156576904e-05
+    92 -st iterations over 100
+    jac obj 4.1228741224585974e-05
+    93 -st iterations over 100
+    jac obj 1.746547081893368e-05
+    94 -st iterations over 100
+    jac obj 3.662770041046315e-06
+    95 -st iterations over 100
+    jac obj 2.0549456394292065e-05
+    96 -st iterations over 100
+    jac obj 3.230262757369928e-05
+    97 -st iterations over 100
+    jac obj 3.870195484978467e-05
+    98 -st iterations over 100
+    jac obj 4.009723897979711e-05
+    99 -st iterations over 100
+    jac obj 3.7269135646056384e-05
+    grad lambda 0.13895449219169778
+    value of lambda_k -10.356231674047136
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 21.956371064430357, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 77.88921603926266
+    1 -st iterations over 100
+    jac obj 21.375362158061478
+    2 -st iterations over 100
+    jac obj 8.749873161876963
+    3 -st iterations over 100
+    jac obj 3.832411462604483
+    4 -st iterations over 100
+    jac obj 1.4380610423320093
+    5 -st iterations over 100
+    jac obj 0.16651088817010873
+    6 -st iterations over 100
+    jac obj 0.5182300994588331
+    7 -st iterations over 100
+    jac obj 0.8651350937949758
+    8 -st iterations over 100
+    jac obj 1.0087054246129696
+    9 -st iterations over 100
+    jac obj 1.0294843949442054
+    10 -st iterations over 100
+    jac obj 0.9784899981900423
+    11 -st iterations over 100
+    jac obj 0.8886676921737262
+    12 -st iterations over 100
+    jac obj 0.781161505694854
+    13 -st iterations over 100
+    jac obj 0.6692170978158174
+    14 -st iterations over 100
+    jac obj 0.5608018793597012
+    15 -st iterations over 100
+    jac obj 0.46041086298029654
+    16 -st iterations over 100
+    jac obj 0.3703059972977769
+    17 -st iterations over 100
+    jac obj 0.29135106361320595
+    18 -st iterations over 100
+    jac obj 0.2235611360065093
+    19 -st iterations over 100
+    jac obj 0.16645579571630265
+    20 -st iterations over 100
+    jac obj 0.11928135852971877
+    21 -st iterations over 100
+    jac obj 0.08114811991609372
+    22 -st iterations over 100
+    jac obj 0.051113842509494134
+    23 -st iterations over 100
+    jac obj 0.028233950595023316
+    24 -st iterations over 100
+    jac obj 0.011591429058853464
+    25 -st iterations over 100
+    jac obj 0.0003144531951306817
+    26 -st iterations over 100
+    jac obj 0.006413414086125613
+    27 -st iterations over 100
+    jac obj 0.009347599825929365
+    28 -st iterations over 100
+    jac obj 0.009179803877316317
+    29 -st iterations over 100
+    jac obj 0.006537209149769296
+    30 -st iterations over 100
+    jac obj 0.0019830321438973897
+    31 -st iterations over 100
+    jac obj 0.00398195749204433
+    32 -st iterations over 100
+    jac obj 0.010917201291789524
+    33 -st iterations over 100
+    jac obj 0.018439586446902467
+    34 -st iterations over 100
+    jac obj 0.026220296140792243
+    35 -st iterations over 100
+    jac obj 0.03398139357113905
+    36 -st iterations over 100
+    jac obj 0.04149223582334116
+    37 -st iterations over 100
+    jac obj 0.04856579558708063
+    38 -st iterations over 100
+    jac obj 0.05505495309557773
+    39 -st iterations over 100
+    jac obj 0.06084880740161225
+    40 -st iterations over 100
+    jac obj 0.06586904515651781
+    41 -st iterations over 100
+    jac obj 0.07006639634465728
+    42 -st iterations over 100
+    jac obj 0.07341719977523553
+    43 -st iterations over 100
+    jac obj 0.07592009624494267
+    44 -st iterations over 100
+    jac obj 0.07759286383824815
+    45 -st iterations over 100
+    jac obj 0.07846940746253495
+    46 -st iterations over 100
+    jac obj 0.07859691307919547
+    47 -st iterations over 100
+    jac obj 0.07803317589957715
+    48 -st iterations over 100
+    jac obj 0.07684411080407472
+    49 -st iterations over 100
+    jac obj 0.07510145223670861
+    50 -st iterations over 100
+    jac obj 0.07288064967463015
+    51 -st iterations over 100
+    jac obj 0.07025896341392013
+    52 -st iterations over 100
+    jac obj 0.06731376380375309
+    53 -st iterations over 100
+    jac obj 0.06412103521637391
+    54 -st iterations over 100
+    jac obj 0.06075408400465676
+    55 -st iterations over 100
+    jac obj 0.05728244753584022
+    56 -st iterations over 100
+    jac obj 0.053770999176919076
+    57 -st iterations over 100
+    jac obj 0.050279241925778706
+    58 -st iterations over 100
+    jac obj 0.046860781331815815
+    59 -st iterations over 100
+    jac obj 0.043562966474695486
+    60 -st iterations over 100
+    jac obj 0.04042668616907008
+    61 -st iterations over 100
+    jac obj 0.03748630625480587
+    62 -st iterations over 100
+    jac obj 0.034769732867715675
+    63 -st iterations over 100
+    jac obj 0.032298585965463644
+    64 -st iterations over 100
+    jac obj 0.030088467121231588
+    65 -st iterations over 100
+    jac obj 0.02814930566057683
+    66 -st iterations over 100
+    jac obj 0.026485767595772813
+    67 -st iterations over 100
+    jac obj 0.02509771245746606
+    68 -st iterations over 100
+    jac obj 0.023980683999837993
+    69 -st iterations over 100
+    jac obj 0.02312642181686897
+    70 -st iterations over 100
+    jac obj 0.02252338210556104
+    71 -st iterations over 100
+    jac obj 0.02215725710073002
+    72 -st iterations over 100
+    jac obj 0.022011484046942087
+    73 -st iterations over 100
+    jac obj 0.02206773592209288
+    74 -st iterations over 100
+    jac obj 0.02230638745760416
+    75 -st iterations over 100
+    jac obj 0.022706951276802556
+    76 -st iterations over 100
+    jac obj 0.02324848018196235
+    77 -st iterations over 100
+    jac obj 0.023909932735989514
+    78 -st iterations over 100
+    jac obj 0.024670500306939402
+    79 -st iterations over 100
+    jac obj 0.025509894653168885
+    80 -st iterations over 100
+    jac obj 0.02640859593100231
+    81 -st iterations over 100
+    jac obj 0.02734806169982562
+    82 -st iterations over 100
+    jac obj 0.028310898089188186
+    83 -st iterations over 100
+    jac obj 0.02928099477799151
+    84 -st iterations over 100
+    jac obj 0.03024362582999629
+    85 -st iterations over 100
+    jac obj 0.031185518734474726
+    86 -st iterations over 100
+    jac obj 0.032094894229317106
+    87 -st iterations over 100
+    jac obj 0.03296147963453677
+    88 -st iterations over 100
+    jac obj 0.03377649852214404
+    89 -st iterations over 100
+    jac obj 0.034532639575871826
+    90 -st iterations over 100
+    jac obj 0.035224007488466214
+    91 -st iterations over 100
+    jac obj 0.03584605868169888
+    92 -st iterations over 100
+    jac obj 0.03639552454970385
+    93 -st iterations over 100
+    jac obj 0.03687032479999175
+    94 -st iterations over 100
+    jac obj 0.03726947332262398
+    95 -st iterations over 100
+    jac obj 0.03759297885451929
+    96 -st iterations over 100
+    jac obj 0.03784174252194816
+    97 -st iterations over 100
+    jac obj 0.03801745415623259
+    98 -st iterations over 100
+    jac obj 0.038122489077210275
+    99 -st iterations over 100
+    jac obj 0.03815980683961584
+    grad lambda -0.014388753175618333
+    value of lambda_k -10.13823143907179
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 1.6001416205998567, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 10.484527326426019
+    1 -st iterations over 100
+    jac obj 2.8530784250804118
+    2 -st iterations over 100
+    jac obj 1.2766393536533656
+    3 -st iterations over 100
+    jac obj 0.7862037848515229
+    4 -st iterations over 100
+    jac obj 0.5477078286452297
+    5 -st iterations over 100
+    jac obj 0.3913412533893279
+    6 -st iterations over 100
+    jac obj 0.2736778756990361
+    7 -st iterations over 100
+    jac obj 0.18159032434027722
+    8 -st iterations over 100
+    jac obj 0.10935424165768381
+    9 -st iterations over 100
+    jac obj 0.05313070621878069
+    10 -st iterations over 100
+    jac obj 0.009875772554551077
+    11 -st iterations over 100
+    jac obj 0.022840572552524918
+    12 -st iterations over 100
+    jac obj 0.046942744080467946
+    13 -st iterations over 100
+    jac obj 0.06396721233079461
+    14 -st iterations over 100
+    jac obj 0.07516248590360419
+    15 -st iterations over 100
+    jac obj 0.08155988880582754
+    16 -st iterations over 100
+    jac obj 0.08402028836104591
+    17 -st iterations over 100
+    jac obj 0.0832659563674838
+    18 -st iterations over 100
+    jac obj 0.07990457791976269
+    19 -st iterations over 100
+    jac obj 0.07444921532311355
+    20 -st iterations over 100
+    jac obj 0.06733571783075831
+    21 -st iterations over 100
+    jac obj 0.0589378636579454
+    22 -st iterations over 100
+    jac obj 0.049580101866638415
+    23 -st iterations over 100
+    jac obj 0.03954776208763633
+    24 -st iterations over 100
+    jac obj 0.02909476229797292
+    25 -st iterations over 100
+    jac obj 0.018449025270456332
+    26 -st iterations over 100
+    jac obj 0.00781594905492966
+    27 -st iterations over 100
+    jac obj 0.002619651474674356
+    28 -st iterations over 100
+    jac obj 0.012692700898526255
+    29 -st iterations over 100
+    jac obj 0.02225771549694855
+    30 -st iterations over 100
+    jac obj 0.03118900643721645
+    31 -st iterations over 100
+    jac obj 0.03938095947182774
+    32 -st iterations over 100
+    jac obj 0.046748190390985656
+    33 -st iterations over 100
+    jac obj 0.053225444788836285
+    34 -st iterations over 100
+    jac obj 0.058767171055478684
+    35 -st iterations over 100
+    jac obj 0.06334674464767431
+    36 -st iterations over 100
+    jac obj 0.06695535902031224
+    37 -st iterations over 100
+    jac obj 0.06960062475116047
+    38 -st iterations over 100
+    jac obj 0.07130493466559074
+    39 -st iterations over 100
+    jac obj 0.07210366084041198
+    40 -st iterations over 100
+    jac obj 0.07204325101895392
+    41 -st iterations over 100
+    jac obj 0.07117928885907077
+    42 -st iterations over 100
+    jac obj 0.0695745760739328
+    43 -st iterations over 100
+    jac obj 0.0672972861495964
+    44 -st iterations over 100
+    jac obj 0.06441922995361438
+    45 -st iterations over 100
+    jac obj 0.06101426393354359
+    46 -st iterations over 100
+    jac obj 0.057156862324745816
+    47 -st iterations over 100
+    jac obj 0.05292086622637271
+    48 -st iterations over 100
+    jac obj 0.04837841480463112
+    49 -st iterations over 100
+    jac obj 0.04359905740227532
+    50 -st iterations over 100
+    jac obj 0.038649040001700996
+    51 -st iterations over 100
+    jac obj 0.03359075532392808
+    52 -st iterations over 100
+    jac obj 0.02848234277314532
+    53 -st iterations over 100
+    jac obj 0.023377422380406188
+    54 -st iterations over 100
+    jac obj 0.018324945742165255
+    55 -st iterations over 100
+    jac obj 0.01336914658003252
+    56 -st iterations over 100
+    jac obj 0.008549573820744172
+    57 -st iterations over 100
+    jac obj 0.003901190899910034
+    58 -st iterations over 100
+    jac obj 0.0005454738047774299
+    59 -st iterations over 100
+    jac obj 0.004764139025780878
+    60 -st iterations over 100
+    jac obj 0.008732557089956572
+    61 -st iterations over 100
+    jac obj 0.012432285035856694
+    62 -st iterations over 100
+    jac obj 0.015848448806309534
+    63 -st iterations over 100
+    jac obj 0.01896950725529223
+    64 -st iterations over 100
+    jac obj 0.021787021112004368
+    65 -st iterations over 100
+    jac obj 0.02429543059002981
+    66 -st iterations over 100
+    jac obj 0.026491844041174772
+    67 -st iterations over 100
+    jac obj 0.028375838943190956
+    68 -st iterations over 100
+    jac obj 0.029949275593594393
+    69 -st iterations over 100
+    jac obj 0.03121612313600508
+    70 -st iterations over 100
+    jac obj 0.03218229698882169
+    71 -st iterations over 100
+    jac obj 0.032855506339160456
+    72 -st iterations over 100
+    jac obj 0.03324511011709319
+    73 -st iterations over 100
+    jac obj 0.03336197973413846
+    74 -st iterations over 100
+    jac obj 0.033218366866776705
+    75 -st iterations over 100
+    jac obj 0.0328277746360186
+    76 -st iterations over 100
+    jac obj 0.03220483069532065
+    77 -st iterations over 100
+    jac obj 0.03136516094934905
+    78 -st iterations over 100
+    jac obj 0.03032526287336168
+    79 -st iterations over 100
+    jac obj 0.029102377686342606
+    80 -st iterations over 100
+    jac obj 0.027714360915695124
+    81 -st iterations over 100
+    jac obj 0.02617955118375903
+    82 -st iterations over 100
+    jac obj 0.024516637322790302
+    83 -st iterations over 100
+    jac obj 0.022744524187487514
+    84 -st iterations over 100
+    jac obj 0.02088219776760525
+    85 -st iterations over 100
+    jac obj 0.01894859040442043
+    86 -st iterations over 100
+    jac obj 0.016962447087109922
+    87 -st iterations over 100
+    jac obj 0.01494219392566265
+    88 -st iterations over 100
+    jac obj 0.012905809995856998
+    89 -st iterations over 100
+    jac obj 0.010870703793443681
+    90 -st iterations over 100
+    jac obj 0.008853595552636762
+    91 -st iterations over 100
+    jac obj 0.006870406651614758
+    92 -st iterations over 100
+    jac obj 0.004936157275324149
+    93 -st iterations over 100
+    jac obj 0.0030648734100964248
+    94 -st iterations over 100
+    jac obj 0.001269504132039856
+    95 -st iterations over 100
+    jac obj 0.000438149987644465
+    96 -st iterations over 100
+    jac obj 0.0020474966946721906
+    97 -st iterations over 100
+    jac obj 0.003549199578799289
+    98 -st iterations over 100
+    jac obj 0.004935212993700588
+    99 -st iterations over 100
+    jac obj 0.006198804221753562
+    grad lambda -0.0032275501608380634
+    value of lambda_k -10.086757998972265
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.4586546887013583, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 4.00245408421938
+    1 -st iterations over 100
+    jac obj 0.43912394957158085
+    2 -st iterations over 100
+    jac obj 0.10952180121370247
+    3 -st iterations over 100
+    jac obj 0.28735625249305485
+    4 -st iterations over 100
+    jac obj 0.3519043946232614
+    5 -st iterations over 100
+    jac obj 0.3558224719261034
+    6 -st iterations over 100
+    jac obj 0.3303959304346904
+    7 -st iterations over 100
+    jac obj 0.29327455688354576
+    8 -st iterations over 100
+    jac obj 0.25336379710552137
+    9 -st iterations over 100
+    jac obj 0.21489038427250762
+    10 -st iterations over 100
+    jac obj 0.17971357035980873
+    11 -st iterations over 100
+    jac obj 0.14847533771609278
+    12 -st iterations over 100
+    jac obj 0.1211923408977782
+    13 -st iterations over 100
+    jac obj 0.09758011567436142
+    14 -st iterations over 100
+    jac obj 0.07723575151942441
+    15 -st iterations over 100
+    jac obj 0.05973827368472939
+    16 -st iterations over 100
+    jac obj 0.04469924013039872
+    17 -st iterations over 100
+    jac obj 0.03178360180174877
+    18 -st iterations over 100
+    jac obj 0.020713669054430284
+    19 -st iterations over 100
+    jac obj 0.011264297507523224
+    20 -st iterations over 100
+    jac obj 0.0032542332143634667
+    21 -st iterations over 100
+    jac obj 0.0034635204464166236
+    22 -st iterations over 100
+    jac obj 0.009010765136565624
+    23 -st iterations over 100
+    jac obj 0.01349185326762381
+    24 -st iterations over 100
+    jac obj 0.01699984693289025
+    25 -st iterations over 100
+    jac obj 0.01962109155243752
+    26 -st iterations over 100
+    jac obj 0.02143835198171473
+    27 -st iterations over 100
+    jac obj 0.0225327286447623
+    28 -st iterations over 100
+    jac obj 0.022984594700574235
+    29 -st iterations over 100
+    jac obj 0.022873790898984225
+    30 -st iterations over 100
+    jac obj 0.02227929440624621
+    31 -st iterations over 100
+    jac obj 0.02127854910293081
+    32 -st iterations over 100
+    jac obj 0.01994661267463016
+    33 -st iterations over 100
+    jac obj 0.018355243571875235
+    34 -st iterations over 100
+    jac obj 0.016572020697708467
+    35 -st iterations over 100
+    jac obj 0.014659561743883387
+    36 -st iterations over 100
+    jac obj 0.012674883056206454
+    37 -st iterations over 100
+    jac obj 0.010668924924175371
+    38 -st iterations over 100
+    jac obj 0.008686251121503119
+    39 -st iterations over 100
+    jac obj 0.006764920027933385
+    40 -st iterations over 100
+    jac obj 0.004936516290797499
+    41 -st iterations over 100
+    jac obj 0.0032263262587548525
+    42 -st iterations over 100
+    jac obj 0.0016536368603397023
+    43 -st iterations over 100
+    jac obj 0.00023213575917679918
+    44 -st iterations over 100
+    jac obj 0.0010296098876096949
+    45 -st iterations over 100
+    jac obj 0.0021276182342262473
+    46 -st iterations over 100
+    jac obj 0.003061922056303956
+    47 -st iterations over 100
+    jac obj 0.003835981749716666
+    48 -st iterations over 100
+    jac obj 0.004456099119238388
+    49 -st iterations over 100
+    jac obj 0.004930846759350516
+    50 -st iterations over 100
+    jac obj 0.005270525440778329
+    51 -st iterations over 100
+    jac obj 0.005486659505493208
+    52 -st iterations over 100
+    jac obj 0.0055915379233510976
+    53 -st iterations over 100
+    jac obj 0.005597806414698425
+    54 -st iterations over 100
+    jac obj 0.005518113947459824
+    55 -st iterations over 100
+    jac obj 0.005364815002735668
+    56 -st iterations over 100
+    jac obj 0.005149727305649776
+    57 -st iterations over 100
+    jac obj 0.004883943241566158
+    58 -st iterations over 100
+    jac obj 0.004577691950998997
+    59 -st iterations over 100
+    jac obj 0.004240248110022549
+    60 -st iterations over 100
+    jac obj 0.003879882663056833
+    61 -st iterations over 100
+    jac obj 0.0035038502660427184
+    62 -st iterations over 100
+    jac obj 0.003118407913518695
+    63 -st iterations over 100
+    jac obj 0.002728859131707395
+    64 -st iterations over 100
+    jac obj 0.0023396182134547416
+    65 -st iterations over 100
+    jac obj 0.0019542892030131043
+    66 -st iterations over 100
+    jac obj 0.0015757547107000391
+    67 -st iterations over 100
+    jac obj 0.0012062700836850127
+    68 -st iterations over 100
+    jac obj 0.0008475589921772553
+    69 -st iterations over 100
+    jac obj 0.0005009070542314475
+    70 -st iterations over 100
+    jac obj 0.00016725070503298411
+    71 -st iterations over 100
+    jac obj 0.0001527408932702201
+    72 -st iterations over 100
+    jac obj 0.0004585925475453223
+    73 -st iterations over 100
+    jac obj 0.0007499594473756588
+    74 -st iterations over 100
+    jac obj 0.0010265739227293125
+    75 -st iterations over 100
+    jac obj 0.0012882027436944554
+    76 -st iterations over 100
+    jac obj 0.0015346147763466433
+    77 -st iterations over 100
+    jac obj 0.0017655585060651902
+    78 -st iterations over 100
+    jac obj 0.0019807486744412017
+    79 -st iterations over 100
+    jac obj 0.002179861093054569
+    80 -st iterations over 100
+    jac obj 0.0023625345496043337
+    81 -st iterations over 100
+    jac obj 0.0025283786438308198
+    82 -st iterations over 100
+    jac obj 0.002676986349058552
+    83 -st iterations over 100
+    jac obj 0.0028079500973490212
+    84 -st iterations over 100
+    jac obj 0.002920880230021794
+    85 -st iterations over 100
+    jac obj 0.0030154247156701786
+    86 -st iterations over 100
+    jac obj 0.0030912891375010076
+    87 -st iterations over 100
+    jac obj 0.003148256058068455
+    88 -st iterations over 100
+    jac obj 0.0031862029888998222
+    89 -st iterations over 100
+    jac obj 0.003205118328367007
+    90 -st iterations over 100
+    jac obj 0.003205114755814975
+    91 -st iterations over 100
+    jac obj 0.0031864397080880735
+    92 -st iterations over 100
+    jac obj 0.003149482686808369
+    93 -st iterations over 100
+    jac obj 0.0030947792635060978
+    94 -st iterations over 100
+    jac obj 0.0030230117636733667
+    95 -st iterations over 100
+    jac obj 0.00293500670471758
+    96 -st iterations over 100
+    jac obj 0.002831729147601436
+    97 -st iterations over 100
+    jac obj 0.002714274199661304
+    98 -st iterations over 100
+    jac obj 0.0025838559580506626
+    99 -st iterations over 100
+    jac obj 0.002441794231970107
+    grad lambda -0.0026199706213165547
+    value of lambda_k -10.042775185181311
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.21859723942452547, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 1.2899208007705738
+    1 -st iterations over 100
+    jac obj 0.016699929054368567
+    2 -st iterations over 100
+    jac obj 0.16029683809853168
+    3 -st iterations over 100
+    jac obj 0.11534116731934319
+    4 -st iterations over 100
+    jac obj 0.05440041859174016
+    5 -st iterations over 100
+    jac obj 0.0021008015758638976
+    6 -st iterations over 100
+    jac obj 0.03887164870803872
+    7 -st iterations over 100
+    jac obj 0.06899678189631686
+    8 -st iterations over 100
+    jac obj 0.08950190962650595
+    9 -st iterations over 100
+    jac obj 0.10188515090601413
+    10 -st iterations over 100
+    jac obj 0.10767492047068572
+    11 -st iterations over 100
+    jac obj 0.10828455316624286
+    12 -st iterations over 100
+    jac obj 0.10494875543804483
+    13 -st iterations over 100
+    jac obj 0.09871289996385713
+    14 -st iterations over 100
+    jac obj 0.09044649757532852
+    15 -st iterations over 100
+    jac obj 0.0808635413175125
+    16 -st iterations over 100
+    jac obj 0.07054245177710072
+    17 -st iterations over 100
+    jac obj 0.059943784070924266
+    18 -st iterations over 100
+    jac obj 0.04942589939281561
+    19 -st iterations over 100
+    jac obj 0.03925918782266535
+    20 -st iterations over 100
+    jac obj 0.029639241999007027
+    21 -st iterations over 100
+    jac obj 0.020699117844969805
+    22 -st iterations over 100
+    jac obj 0.012520641683465783
+    23 -st iterations over 100
+    jac obj 0.005144651635077935
+    24 -st iterations over 100
+    jac obj 0.001419933480462987
+    25 -st iterations over 100
+    jac obj 0.007188277547868438
+    26 -st iterations over 100
+    jac obj 0.012193021820507965
+    27 -st iterations over 100
+    jac obj 0.016478852841373737
+    28 -st iterations over 100
+    jac obj 0.020098141739310904
+    29 -st iterations over 100
+    jac obj 0.023107525387672467
+    30 -st iterations over 100
+    jac obj 0.025565287825372707
+    31 -st iterations over 100
+    jac obj 0.027529401104061435
+    32 -st iterations over 100
+    jac obj 0.029056094835311796
+    33 -st iterations over 100
+    jac obj 0.03019883967675696
+    34 -st iterations over 100
+    jac obj 0.03100764875296136
+    35 -st iterations over 100
+    jac obj 0.03152862015519986
+    36 -st iterations over 100
+    jac obj 0.031803661504454794
+    37 -st iterations over 100
+    jac obj 0.03187035301380092
+    38 -st iterations over 100
+    jac obj 0.03176191805295048
+    39 -st iterations over 100
+    jac obj 0.03150727977947554
+    40 -st iterations over 100
+    jac obj 0.03113118917082147
+    41 -st iterations over 100
+    jac obj 0.030654414144009934
+    42 -st iterations over 100
+    jac obj 0.03009398186065937
+    43 -st iterations over 100
+    jac obj 0.02946346730334426
+    44 -st iterations over 100
+    jac obj 0.02877332121602194
+    45 -st iterations over 100
+    jac obj 0.02803122997920582
+    46 -st iterations over 100
+    jac obj 0.027242499244948704
+    47 -st iterations over 100
+    jac obj 0.026410452461561817
+    48 -st iterations over 100
+    jac obj 0.02553683493954395
+    49 -st iterations over 100
+    jac obj 0.024622213951317917
+    50 -st iterations over 100
+    jac obj 0.023666365578208115
+    51 -st iterations over 100
+    jac obj 0.022668639579023875
+    52 -st iterations over 100
+    jac obj 0.021628294472407106
+    53 -st iterations over 100
+    jac obj 0.020544796182718983
+    54 -st iterations over 100
+    jac obj 0.019418074974566935
+    55 -st iterations over 100
+    jac obj 0.018248736882583216
+    56 -st iterations over 100
+    jac obj 0.01703822738056715
+    57 -st iterations over 100
+    jac obj 0.01578894654016949
+    58 -st iterations over 100
+    jac obj 0.014504316368856962
+    59 -st iterations over 100
+    jac obj 0.013188802312185999
+    60 -st iterations over 100
+    jac obj 0.011847892055016018
+    61 -st iterations over 100
+    jac obj 0.010488035703190235
+    62 -st iterations over 100
+    jac obj 0.00911655217794305
+    63 -st iterations over 100
+    jac obj 0.007741507199341413
+    64 -st iterations over 100
+    jac obj 0.006371568567885788
+    65 -st iterations over 100
+    jac obj 0.005015844600222863
+    66 -st iterations over 100
+    jac obj 0.0036837115328580694
+    67 -st iterations over 100
+    jac obj 0.002384635513806188
+    68 -st iterations over 100
+    jac obj 0.001127994464582116
+    69 -st iterations over 100
+    jac obj 7.709535333333406e-05
+    70 -st iterations over 100
+    jac obj 0.0012219437712133185
+    71 -st iterations over 100
+    jac obj 0.0022984384494861843
+    72 -st iterations over 100
+    jac obj 0.0032991808695328473
+    73 -st iterations over 100
+    jac obj 0.004217604185953405
+    74 -st iterations over 100
+    jac obj 0.0050480712087619395
+    75 -st iterations over 100
+    jac obj 0.0057859514205347296
+    76 -st iterations over 100
+    jac obj 0.006427676536475246
+    77 -st iterations over 100
+    jac obj 0.006970774671117397
+    78 -st iterations over 100
+    jac obj 0.007413883673109467
+    79 -st iterations over 100
+    jac obj 0.0077567446204511725
+    80 -st iterations over 100
+    jac obj 0.008000176836617356
+    81 -st iterations over 100
+    jac obj 0.008146036079722307
+    82 -st iterations over 100
+    jac obj 0.008197157782944942
+    83 -st iterations over 100
+    jac obj 0.008157287376889144
+    84 -st iterations over 100
+    jac obj 0.00803099982636013
+    85 -st iterations over 100
+    jac obj 0.007823610537684544
+    86 -st iterations over 100
+    jac obj 0.007541079783322857
+    87 -st iterations over 100
+    jac obj 0.007189912722765257
+    88 -st iterations over 100
+    jac obj 0.006777056997236741
+    89 -st iterations over 100
+    jac obj 0.006309799743291933
+    90 -st iterations over 100
+    jac obj 0.005795665711445963
+    91 -st iterations over 100
+    jac obj 0.005242318001364765
+    92 -st iterations over 100
+    jac obj 0.004657462737895912
+    93 -st iterations over 100
+    jac obj 0.0040487588219093595
+    94 -st iterations over 100
+    jac obj 0.0034237336939781926
+    95 -st iterations over 100
+    jac obj 0.002789705864813641
+    96 -st iterations over 100
+    jac obj 0.0021537147806611756
+    97 -st iterations over 100
+    jac obj 0.0015224584247448547
+    98 -st iterations over 100
+    jac obj 0.0009022388975381546
+    99 -st iterations over 100
+    jac obj 0.0002989160702213667
+    grad lambda 0.0008262963926885239
+    value of lambda_k -10.057376731144045
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0890004375761464, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 1.0591170318133436
+    1 -st iterations over 100
+    jac obj 0.3375415208586219
+    2 -st iterations over 100
+    jac obj 0.19527563004299964
+    3 -st iterations over 100
+    jac obj 0.10925332490791106
+    4 -st iterations over 100
+    jac obj 0.05868993187050364
+    5 -st iterations over 100
+    jac obj 0.027175645167744733
+    6 -st iterations over 100
+    jac obj 0.005882108949890608
+    7 -st iterations over 100
+    jac obj 0.009525833004033757
+    8 -st iterations over 100
+    jac obj 0.021304577107684963
+    9 -st iterations over 100
+    jac obj 0.03068673643576858
+    10 -st iterations over 100
+    jac obj 0.038353609630462415
+    11 -st iterations over 100
+    jac obj 0.04466664565620704
+    12 -st iterations over 100
+    jac obj 0.04980171988552229
+    13 -st iterations over 100
+    jac obj 0.05383600528057286
+    14 -st iterations over 100
+    jac obj 0.05680484756697979
+    15 -st iterations over 100
+    jac obj 0.058736829154611314
+    16 -st iterations over 100
+    jac obj 0.05967284380744786
+    17 -st iterations over 100
+    jac obj 0.05967404242176144
+    18 -st iterations over 100
+    jac obj 0.058822605383227256
+    19 -st iterations over 100
+    jac obj 0.05721834759390276
+    20 -st iterations over 100
+    jac obj 0.054973294665217054
+    21 -st iterations over 100
+    jac obj 0.05220566239404434
+    22 -st iterations over 100
+    jac obj 0.04903413761275033
+    23 -st iterations over 100
+    jac obj 0.045572972916033905
+    24 -st iterations over 100
+    jac obj 0.041928138272510296
+    25 -st iterations over 100
+    jac obj 0.038194590285741015
+    26 -st iterations over 100
+    jac obj 0.034454602291589254
+    27 -st iterations over 100
+    jac obj 0.03077702851385311
+    28 -st iterations over 100
+    jac obj 0.02721734009156762
+    29 -st iterations over 100
+    jac obj 0.023818259814106568
+    30 -st iterations over 100
+    jac obj 0.020610827883388083
+    31 -st iterations over 100
+    jac obj 0.017615746847013725
+    32 -st iterations over 100
+    jac obj 0.014844875321728068
+    33 -st iterations over 100
+    jac obj 0.012302763888328627
+    34 -st iterations over 100
+    jac obj 0.009988150241952098
+    35 -st iterations over 100
+    jac obj 0.007895352791990717
+    36 -st iterations over 100
+    jac obj 0.006015521565814197
+    37 -st iterations over 100
+    jac obj 0.004337722013133316
+    38 -st iterations over 100
+    jac obj 0.0028498410617885384
+    39 -st iterations over 100
+    jac obj 0.00153931562147136
+    40 -st iterations over 100
+    jac obj 0.00039369190460547543
+    41 -st iterations over 100
+    jac obj 0.000598970252667641
+    42 -st iterations over 100
+    jac obj 0.0014498301074468145
+    43 -st iterations over 100
+    jac obj 0.002169115716583292
+    44 -st iterations over 100
+    jac obj 0.002766069868073373
+    45 -st iterations over 100
+    jac obj 0.003248971820028146
+    46 -st iterations over 100
+    jac obj 0.0036252155891816074
+    47 -st iterations over 100
+    jac obj 0.003901427241771671
+    48 -st iterations over 100
+    jac obj 0.004083605723792516
+    49 -st iterations over 100
+    jac obj 0.004177274049879998
+    50 -st iterations over 100
+    jac obj 0.004187630001638354
+    51 -st iterations over 100
+    jac obj 0.004119687781724224
+    52 -st iterations over 100
+    jac obj 0.003978404232157118
+    53 -st iterations over 100
+    jac obj 0.00376878520040691
+    54 -st iterations over 100
+    jac obj 0.0034959693923042323
+    55 -st iterations over 100
+    jac obj 0.003165288555692314
+    56 -st iterations over 100
+    jac obj 0.0027823040975363256
+    57 -st iterations over 100
+    jac obj 0.0023528212449264174
+    58 -st iterations over 100
+    jac obj 0.0018828826274557287
+    59 -st iterations over 100
+    jac obj 0.0013787437230803334
+    60 -st iterations over 100
+    jac obj 0.0008468329612583148
+    61 -st iterations over 100
+    jac obj 0.00029369947282020803
+    62 -st iterations over 100
+    jac obj 0.00027404847497791707
+    63 -st iterations over 100
+    jac obj 0.0008498113922996708
+    64 -st iterations over 100
+    jac obj 0.0014270700226575173
+    65 -st iterations over 100
+    jac obj 0.001999457764441104
+    66 -st iterations over 100
+    jac obj 0.002560831765947569
+    67 -st iterations over 100
+    jac obj 0.0031053407054173476
+    68 -st iterations over 100
+    jac obj 0.003627487599089818
+    69 -st iterations over 100
+    jac obj 0.004122186299639452
+    70 -st iterations over 100
+    jac obj 0.004584810671303785
+    71 -st iterations over 100
+    jac obj 0.005011235721326557
+    72 -st iterations over 100
+    jac obj 0.00539787024973748
+    73 -st iterations over 100
+    jac obj 0.005741680824257855
+    74 -st iterations over 100
+    jac obj 0.006040207108355844
+    75 -st iterations over 100
+    jac obj 0.006291568760047994
+    76 -st iterations over 100
+    jac obj 0.006494464272464029
+    77 -st iterations over 100
+    jac obj 0.006648162261171819
+    78 -st iterations over 100
+    jac obj 0.0067524857964258445
+    79 -st iterations over 100
+    jac obj 0.006807790455070517
+    80 -st iterations over 100
+    jac obj 0.006814936820148887
+    81 -st iterations over 100
+    jac obj 0.006775258174513965
+    82 -st iterations over 100
+    jac obj 0.006690524159012057
+    83 -st iterations over 100
+    jac obj 0.006562901151426104
+    84 -st iterations over 100
+    jac obj 0.006394910106223506
+    85 -st iterations over 100
+    jac obj 0.006189382570710222
+    86 -st iterations over 100
+    jac obj 0.005949415551128823
+    87 -st iterations over 100
+    jac obj 0.00567832586187933
+    88 -st iterations over 100
+    jac obj 0.005379604542326888
+    89 -st iterations over 100
+    jac obj 0.005056871875581237
+    90 -st iterations over 100
+    jac obj 0.004713833489290664
+    91 -st iterations over 100
+    jac obj 0.004354237966083474
+    92 -st iterations over 100
+    jac obj 0.0039818363375161425
+    93 -st iterations over 100
+    jac obj 0.003600343784967208
+    94 -st iterations over 100
+    jac obj 0.003213403817198923
+    95 -st iterations over 100
+    jac obj 0.0028245551485497344
+    96 -st iterations over 100
+    jac obj 0.002437201455563809
+    97 -st iterations over 100
+    jac obj 0.002054584141660598
+    98 -st iterations over 100
+    jac obj 0.0016797582071603756
+    99 -st iterations over 100
+    jac obj 0.0013155712749721715
+    grad lambda -0.0006562562511526432
+    value of lambda_k -10.045169621902927
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.08033475117531452, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 0.2603921000069249
+    1 -st iterations over 100
+    jac obj 0.08815457955415695
+    2 -st iterations over 100
+    jac obj 0.14001839862299903
+    3 -st iterations over 100
+    jac obj 0.11876662774693614
+    4 -st iterations over 100
+    jac obj 0.09648629436344436
+    5 -st iterations over 100
+    jac obj 0.07788623647735449
+    6 -st iterations over 100
+    jac obj 0.0628335754336149
+    7 -st iterations over 100
+    jac obj 0.05029692079284587
+    8 -st iterations over 100
+    jac obj 0.039601905379527125
+    9 -st iterations over 100
+    jac obj 0.030426993126411617
+    10 -st iterations over 100
+    jac obj 0.022655460943383332
+    11 -st iterations over 100
+    jac obj 0.016253869888259942
+    12 -st iterations over 100
+    jac obj 0.011201114441860227
+    13 -st iterations over 100
+    jac obj 0.007455408456223722
+    14 -st iterations over 100
+    jac obj 0.004943398527473164
+    15 -st iterations over 100
+    jac obj 0.0035605788113457493
+    16 -st iterations over 100
+    jac obj 0.0031769039566142965
+    17 -st iterations over 100
+    jac obj 0.0036444501204755397
+    18 -st iterations over 100
+    jac obj 0.004805524120058635
+    19 -st iterations over 100
+    jac obj 0.00650036375026275
+    20 -st iterations over 100
+    jac obj 0.008573932025853992
+    21 -st iterations over 100
+    jac obj 0.01088151287058281
+    22 -st iterations over 100
+    jac obj 0.013292963290837179
+    23 -st iterations over 100
+    jac obj 0.015695597728154098
+    24 -st iterations over 100
+    jac obj 0.017995777775809074
+    25 -st iterations over 100
+    jac obj 0.020119352257324863
+    26 -st iterations over 100
+    jac obj 0.022011137815468373
+    27 -st iterations over 100
+    jac obj 0.023633650795773065
+    28 -st iterations over 100
+    jac obj 0.02496530166786215
+    29 -st iterations over 100
+    jac obj 0.025998248844416594
+    30 -st iterations over 100
+    jac obj 0.0267360847154805
+    31 -st iterations over 100
+    jac obj 0.027191497559783784
+    32 -st iterations over 100
+    jac obj 0.02738402224974834
+    33 -st iterations over 100
+    jac obj 0.027337962914884884
+    34 -st iterations over 100
+    jac obj 0.02708054364649115
+    35 -st iterations over 100
+    jac obj 0.026640319865350648
+    36 -st iterations over 100
+    jac obj 0.02604586356727623
+    37 -st iterations over 100
+    jac obj 0.025324720293326664
+    38 -st iterations over 100
+    jac obj 0.024502624116507832
+    39 -st iterations over 100
+    jac obj 0.02360294878917557
+    40 -st iterations over 100
+    jac obj 0.022646367963432112
+    41 -st iterations over 100
+    jac obj 0.021650694584707253
+    42 -st iterations over 100
+    jac obj 0.02063086868429309
+    43 -st iterations over 100
+    jac obj 0.01959906340022144
+    44 -st iterations over 100
+    jac obj 0.018564880753899615
+    45 -st iterations over 100
+    jac obj 0.017535611155039987
+    46 -st iterations over 100
+    jac obj 0.01651653353223992
+    47 -st iterations over 100
+    jac obj 0.015511236145925977
+    48 -st iterations over 100
+    jac obj 0.01452194137425522
+    49 -st iterations over 100
+    jac obj 0.013549820930109036
+    50 -st iterations over 100
+    jac obj 0.012595290955118799
+    51 -st iterations over 100
+    jac obj 0.011658279205619237
+    52 -st iterations over 100
+    jac obj 0.010738459019080437
+    53 -st iterations over 100
+    jac obj 0.009835446927809244
+    54 -st iterations over 100
+    jac obj 0.008948962648730685
+    55 -st iterations over 100
+    jac obj 0.008078951727611638
+    56 -st iterations over 100
+    jac obj 0.007225672375454906
+    57 -st iterations over 100
+    jac obj 0.006389749005279555
+    58 -st iterations over 100
+    jac obj 0.005572195701347482
+    59 -st iterations over 100
+    jac obj 0.004774413343170636
+    60 -st iterations over 100
+    jac obj 0.003998164395341064
+    61 -st iterations over 100
+    jac obj 0.0032455294880833208
+    62 -st iterations over 100
+    jac obj 0.0025188498859733954
+    63 -st iterations over 100
+    jac obj 0.0018206597881658126
+    64 -st iterations over 100
+    jac obj 0.0011536121569406532
+    65 -st iterations over 100
+    jac obj 0.0005204014591981831
+    66 -st iterations over 100
+    jac obj 7.63136687851329e-05
+    67 -st iterations over 100
+    jac obj 0.0006339852203041119
+    68 -st iterations over 100
+    jac obj 0.0011502458822292283
+    69 -st iterations over 100
+    jac obj 0.0016229725877678902
+    70 -st iterations over 100
+    jac obj 0.0020503421833382163
+    71 -st iterations over 100
+    jac obj 0.0024308782288926523
+    72 -st iterations over 100
+    jac obj 0.0027634883057885418
+    73 -st iterations over 100
+    jac obj 0.0030474915408831293
+    74 -st iterations over 100
+    jac obj 0.0032826363425328964
+    75 -st iterations over 100
+    jac obj 0.0034691085998019844
+    76 -st iterations over 100
+    jac obj 0.00360753081065468
+    77 -st iterations over 100
+    jac obj 0.003698952776801434
+    78 -st iterations over 100
+    jac obj 0.0037448346409973965
+    79 -st iterations over 100
+    jac obj 0.003747023145535877
+    80 -st iterations over 100
+    jac obj 0.003707722048204687
+    81 -st iterations over 100
+    jac obj 0.003629457684951376
+    82 -st iterations over 100
+    jac obj 0.0035150406565662706
+    83 -st iterations over 100
+    jac obj 0.003367524624991347
+    84 -st iterations over 100
+    jac obj 0.003190163152964942
+    85 -st iterations over 100
+    jac obj 0.0029863654804103135
+    86 -st iterations over 100
+    jac obj 0.002759652065492446
+    87 -st iterations over 100
+    jac obj 0.0025136106430636573
+    88 -st iterations over 100
+    jac obj 0.0022518534763094067
+    89 -st iterations over 100
+    jac obj 0.001977976390605818
+    90 -st iterations over 100
+    jac obj 0.0016955200951542793
+    91 -st iterations over 100
+    jac obj 0.0014079342111017468
+    92 -st iterations over 100
+    jac obj 0.0011185443397607742
+    93 -st iterations over 100
+    jac obj 0.0008305224301921044
+    94 -st iterations over 100
+    jac obj 0.0005468606219665162
+    95 -st iterations over 100
+    jac obj 0.00027034867486008807
+    96 -st iterations over 100
+    jac obj 3.555032890290022e-06
+    97 -st iterations over 100
+    jac obj 0.00025118849004002186
+    98 -st iterations over 100
+    jac obj 0.0004917984638268535
+    99 -st iterations over 100
+    jac obj 0.0007164481406789491
+    grad lambda -0.0001304019299455091
+    value of lambda_k -10.042743998373547
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.013281299909181143, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 0.1475942975443445
+    1 -st iterations over 100
+    jac obj 0.09543394965129437
+    2 -st iterations over 100
+    jac obj 0.04593219509001756
+    3 -st iterations over 100
+    jac obj 0.023676952806908957
+    4 -st iterations over 100
+    jac obj 0.016564962569532327
+    5 -st iterations over 100
+    jac obj 0.01363709580965633
+    6 -st iterations over 100
+    jac obj 0.011216609132475241
+    7 -st iterations over 100
+    jac obj 0.008426036763069078
+    8 -st iterations over 100
+    jac obj 0.005249621409006977
+    9 -st iterations over 100
+    jac obj 0.0019010473848766196
+    10 -st iterations over 100
+    jac obj 0.0013929098182074995
+    11 -st iterations over 100
+    jac obj 0.004457973363173551
+    12 -st iterations over 100
+    jac obj 0.007183130459793574
+    13 -st iterations over 100
+    jac obj 0.009512569318474107
+    14 -st iterations over 100
+    jac obj 0.011432134419237627
+    15 -st iterations over 100
+    jac obj 0.012955610656774752
+    16 -st iterations over 100
+    jac obj 0.014113064651496643
+    17 -st iterations over 100
+    jac obj 0.014942010375023074
+    18 -st iterations over 100
+    jac obj 0.015481381563915875
+    19 -st iterations over 100
+    jac obj 0.015767898552780935
+    20 -st iterations over 100
+    jac obj 0.015834271350627205
+    21 -st iterations over 100
+    jac obj 0.015708682771901294
+    22 -st iterations over 100
+    jac obj 0.015415072005680486
+    23 -st iterations over 100
+    jac obj 0.014973842962717754
+    24 -st iterations over 100
+    jac obj 0.014402726304751923
+    25 -st iterations over 100
+    jac obj 0.013717616064354843
+    26 -st iterations over 100
+    jac obj 0.01293327617486284
+    27 -st iterations over 100
+    jac obj 0.012063868389873278
+    28 -st iterations over 100
+    jac obj 0.011123292580009547
+    29 -st iterations over 100
+    jac obj 0.010125355819752713
+    30 -st iterations over 100
+    jac obj 0.009083800894075011
+    31 -st iterations over 100
+    jac obj 0.0080122306912358
+    32 -st iterations over 100
+    jac obj 0.006923964921611514
+    33 -st iterations over 100
+    jac obj 0.005831861847013897
+    34 -st iterations over 100
+    jac obj 0.004748131925225607
+    35 -st iterations over 100
+    jac obj 0.0036841637181055376
+    36 -st iterations over 100
+    jac obj 0.002650375987741427
+    37 -st iterations over 100
+    jac obj 0.0016561041455247505
+    38 -st iterations over 100
+    jac obj 0.0007095244375818766
+    39 -st iterations over 100
+    jac obj 0.00018238445045426488
+    40 -st iterations over 100
+    jac obj 0.0010138453378090162
+    41 -st iterations over 100
+    jac obj 0.0017802567011244719
+    42 -st iterations over 100
+    jac obj 0.0024781426010349605
+    43 -st iterations over 100
+    jac obj 0.003105084217395415
+    44 -st iterations over 100
+    jac obj 0.0036596386310634443
+    45 -st iterations over 100
+    jac obj 0.004141249970302852
+    46 -st iterations over 100
+    jac obj 0.004550157331948412
+    47 -st iterations over 100
+    jac obj 0.004887303077225624
+    48 -st iterations over 100
+    jac obj 0.005154244278287479
+    49 -st iterations over 100
+    jac obj 0.0053530693084553604
+    50 -st iterations over 100
+    jac obj 0.005486320859631633
+    51 -st iterations over 100
+    jac obj 0.005556926058488898
+    52 -st iterations over 100
+    jac obj 0.005568133850999857
+    53 -st iterations over 100
+    jac obj 0.005523459436972189
+    54 -st iterations over 100
+    jac obj 0.005426635240098676
+    55 -st iterations over 100
+    jac obj 0.00528156771514432
+    56 -st iterations over 100
+    jac obj 0.005092299179239035
+    57 -st iterations over 100
+    jac obj 0.004862973817466809
+    58 -st iterations over 100
+    jac obj 0.004597807029426804
+    59 -st iterations over 100
+    jac obj 0.004301057345060144
+    60 -st iterations over 100
+    jac obj 0.003977000227905592
+    61 -st iterations over 100
+    jac obj 0.003629903202067908
+    62 -st iterations over 100
+    jac obj 0.0032640018541201243
+    63 -st iterations over 100
+    jac obj 0.0028834763971872235
+    64 -st iterations over 100
+    jac obj 0.00249242859831611
+    65 -st iterations over 100
+    jac obj 0.002094858989266868
+    66 -st iterations over 100
+    jac obj 0.0016946443824963353
+    67 -st iterations over 100
+    jac obj 0.0012955157962437625
+    68 -st iterations over 100
+    jac obj 0.0009010369635120696
+    69 -st iterations over 100
+    jac obj 0.0005145836554447669
+    70 -st iterations over 100
+    jac obj 0.00013932407620131926
+    71 -st iterations over 100
+    jac obj 0.00022179938690669587
+    72 -st iterations over 100
+    jac obj 0.000566086777325836
+    73 -st iterations over 100
+    jac obj 0.0008910952743690359
+    74 -st iterations over 100
+    jac obj 0.0011946517388423672
+    75 -st iterations over 100
+    jac obj 0.001474862881423178
+    76 -st iterations over 100
+    jac obj 0.0017301228726864792
+    77 -st iterations over 100
+    jac obj 0.001959118260970172
+    78 -st iterations over 100
+    jac obj 0.0021608301112792105
+    79 -st iterations over 100
+    jac obj 0.002334533325324628
+    80 -st iterations over 100
+    jac obj 0.0024797931566808984
+    81 -st iterations over 100
+    jac obj 0.002596458978814553
+    82 -st iterations over 100
+    jac obj 0.002684655410405412
+    83 -st iterations over 100
+    jac obj 0.002744770944616448
+    84 -st iterations over 100
+    jac obj 0.002777444262392237
+    85 -st iterations over 100
+    jac obj 0.0027835484445972725
+    86 -st iterations over 100
+    jac obj 0.0027641733212249164
+    87 -st iterations over 100
+    jac obj 0.0027206062174514045
+    88 -st iterations over 100
+    jac obj 0.0026543113704065036
+    89 -st iterations over 100
+    jac obj 0.0025669082980357416
+    90 -st iterations over 100
+    jac obj 0.0024601494073976937
+    91 -st iterations over 100
+    jac obj 0.0023358971262155137
+    92 -st iterations over 100
+    jac obj 0.002196100835874404
+    93 -st iterations over 100
+    jac obj 0.0020427738752459845
+    94 -st iterations over 100
+    jac obj 0.0018779708688043684
+    95 -st iterations over 100
+    jac obj 0.0017037656185721062
+    96 -st iterations over 100
+    jac obj 0.0015222297774357685
+    97 -st iterations over 100
+    jac obj 0.00133541250363578
+    98 -st iterations over 100
+    jac obj 0.0011453212712808636
+    99 -st iterations over 100
+    jac obj 0.0009539039891706125
+    grad lambda 0.0008027115222008436
+    value of lambda_k -10.058461201625684
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.07593517462441923, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 1.0555932521269256
+    1 -st iterations over 100
+    jac obj 0.2778541392200964
+    2 -st iterations over 100
+    jac obj 0.14999598589088237
+    3 -st iterations over 100
+    jac obj 0.07997144083162766
+    4 -st iterations over 100
+    jac obj 0.04165982802851431
+    5 -st iterations over 100
+    jac obj 0.019186326620513228
+    6 -st iterations over 100
+    jac obj 0.0044310295219816
+    7 -st iterations over 100
+    jac obj 0.006292882340801498
+    8 -st iterations over 100
+    jac obj 0.014728702898594292
+    9 -st iterations over 100
+    jac obj 0.02175496562608714
+    10 -st iterations over 100
+    jac obj 0.027825530721145242
+    11 -st iterations over 100
+    jac obj 0.03315647162980895
+    12 -st iterations over 100
+    jac obj 0.037823730828222324
+    13 -st iterations over 100
+    jac obj 0.04182602303438898
+    14 -st iterations over 100
+    jac obj 0.045128723864650055
+    15 -st iterations over 100
+    jac obj 0.04769348826766873
+    16 -st iterations over 100
+    jac obj 0.049496241453823586
+    17 -st iterations over 100
+    jac obj 0.05053611728459373
+    18 -st iterations over 100
+    jac obj 0.05083788676705581
+    19 -st iterations over 100
+    jac obj 0.05045011555648671
+    20 -st iterations over 100
+    jac obj 0.0494408383376026
+    21 -st iterations over 100
+    jac obj 0.04789207754930658
+    22 -st iterations over 100
+    jac obj 0.045894134095192385
+    23 -st iterations over 100
+    jac obj 0.04354025741048417
+    24 -st iterations over 100
+    jac obj 0.04092205691165418
+    25 -st iterations over 100
+    jac obj 0.038125834779634715
+    26 -st iterations over 100
+    jac obj 0.035229889379365886
+    27 -st iterations over 100
+    jac obj 0.032302749129485164
+    28 -st iterations over 100
+    jac obj 0.029402239675903274
+    29 -st iterations over 100
+    jac obj 0.026575255410705267
+    30 -st iterations over 100
+    jac obj 0.0238580934261563
+    31 -st iterations over 100
+    jac obj 0.021277208561059524
+    32 -st iterations over 100
+    jac obj 0.01885025789511019
+    33 -st iterations over 100
+    jac obj 0.016587318341180435
+    34 -st iterations over 100
+    jac obj 0.014492179185992882
+    35 -st iterations over 100
+    jac obj 0.012563630509191626
+    36 -st iterations over 100
+    jac obj 0.010796686994012816
+    37 -st iterations over 100
+    jac obj 0.009183703769622298
+    38 -st iterations over 100
+    jac obj 0.007715356079529556
+    39 -st iterations over 100
+    jac obj 0.00638146744097412
+    40 -st iterations over 100
+    jac obj 0.005171681519925642
+    41 -st iterations over 100
+    jac obj 0.0040759812276291996
+    42 -st iterations over 100
+    jac obj 0.003085064755282474
+    43 -st iterations over 100
+    jac obj 0.0021905925898408896
+    44 -st iterations over 100
+    jac obj 0.0013853222781108343
+    45 -st iterations over 100
+    jac obj 0.0006631490761606074
+    46 -st iterations over 100
+    jac obj 1.907089659880512e-05
+    47 -st iterations over 100
+    jac obj 0.0005509046113161276
+    48 -st iterations over 100
+    jac obj 0.0010498942237973097
+    49 -st iterations over 100
+    jac obj 0.0014802995684135567
+    50 -st iterations over 100
+    jac obj 0.0018439807600998392
+    51 -st iterations over 100
+    jac obj 0.0021424322433745147
+    52 -st iterations over 100
+    jac obj 0.0023769519180518728
+    53 -st iterations over 100
+    jac obj 0.0025487966283890273
+    54 -st iterations over 100
+    jac obj 0.0026593189782033733
+    55 -st iterations over 100
+    jac obj 0.0027100821299654854
+    56 -st iterations over 100
+    jac obj 0.002702950743355359
+    57 -st iterations over 100
+    jac obj 0.0026401574793908367
+    58 -st iterations over 100
+    jac obj 0.002524345553013063
+    59 -st iterations over 100
+    jac obj 0.002358588647155102
+    60 -st iterations over 100
+    jac obj 0.0021463901366018945
+    61 -st iterations over 100
+    jac obj 0.0018916640162842668
+    62 -st iterations over 100
+    jac obj 0.0015987002091151226
+    63 -st iterations over 100
+    jac obj 0.0012721170698455353
+    64 -st iterations over 100
+    jac obj 0.0009168039198925726
+    65 -st iterations over 100
+    jac obj 0.0005378563730005226
+    66 -st iterations over 100
+    jac obj 0.00014050705522095086
+    67 -st iterations over 100
+    jac obj 0.00026994588466777714
+    68 -st iterations over 100
+    jac obj 0.0006882103261318662
+    69 -st iterations over 100
+    jac obj 0.0011090699193232467
+    70 -st iterations over 100
+    jac obj 0.0015274504280000656
+    71 -st iterations over 100
+    jac obj 0.0019384813704164117
+    72 -st iterations over 100
+    jac obj 0.0023375519303954206
+    73 -st iterations over 100
+    jac obj 0.0027203603733596537
+    74 -st iterations over 100
+    jac obj 0.0030829564454961655
+    75 -st iterations over 100
+    jac obj 0.0034217764516029092
+    76 -st iterations over 100
+    jac obj 0.003733670902192898
+    77 -st iterations over 100
+    jac obj 0.00401592479164492
+    78 -st iterations over 100
+    jac obj 0.004266270707489639
+    79 -st iterations over 100
+    jac obj 0.004482895094156447
+    80 -st iterations over 100
+    jac obj 0.004664438082954803
+    81 -st iterations over 100
+    jac obj 0.0048099873828846285
+    82 -st iterations over 100
+    jac obj 0.00491906676529652
+    83 -st iterations over 100
+    jac obj 0.004991619724819429
+    84 -st iterations over 100
+    jac obj 0.00502798890812528
+    85 -st iterations over 100
+    jac obj 0.005028891914491851
+    86 -st iterations over 100
+    jac obj 0.0049953940634281935
+    87 -st iterations over 100
+    jac obj 0.004928878710018125
+    88 -st iterations over 100
+    jac obj 0.004831015669140015
+    89 -st iterations over 100
+    jac obj 0.00470372827828669
+    90 -st iterations over 100
+    jac obj 0.004549159597331709
+    91 -st iterations over 100
+    jac obj 0.004369638207890603
+    92 -st iterations over 100
+    jac obj 0.00416764403706793
+    93 -st iterations over 100
+    jac obj 0.003945774589453777
+    94 -st iterations over 100
+    jac obj 0.003706711934512441
+    95 -st iterations over 100
+    jac obj 0.0034531907547261653
+    96 -st iterations over 100
+    jac obj 0.0031879677227379943
+    97 -st iterations over 100
+    jac obj 0.0029137924395286063
+    98 -st iterations over 100
+    jac obj 0.0026333801263263013
+    99 -st iterations over 100
+    jac obj 0.0023493862342434113
+    grad lambda -0.0007847503480426536
+    value of lambda_k -10.043095680661745
+    True
+    /home/qbe/scikit-learn/sklearn/linear_model/_coordinate_descent.py:515: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0980883092466911, tolerance: 0.0006781
+      max_iter, tol, rng, random, positive)
+    True
+    0 -st iterations over 100
+    jac obj 0.08425641785288462
+    1 -st iterations over 100
+    jac obj 0.1652191278253099
+    2 -st iterations over 100
+    jac obj 0.17752780197349693
+    3 -st iterations over 100
+    jac obj 0.14189183894609414
+    4 -st iterations over 100
+    jac obj 0.11630320267943262
+    5 -st iterations over 100
+    jac obj 0.09869246706921331
+    6 -st iterations over 100
+    jac obj 0.08530708567440115
+    7 -st iterations over 100
+    jac obj 0.07375546185051007
+    8 -st iterations over 100
+    jac obj 0.063074349501278
+    9 -st iterations over 100
+    jac obj 0.05305309780948164
+    10 -st iterations over 100
+    jac obj 0.04379207760501913
+    11 -st iterations over 100
+    jac obj 0.0354732159819946
+    12 -st iterations over 100
+    jac obj 0.028257526080437856
+    13 -st iterations over 100
+    jac obj 0.022247474007940582
+    14 -st iterations over 100
+    jac obj 0.017479425154817818
+    15 -st iterations over 100
+    jac obj 0.013929080237630842
+    16 -st iterations over 100
+    jac obj 0.011522022322992598
+    17 -st iterations over 100
+    jac obj 0.010145826610937547
+    18 -st iterations over 100
+    jac obj 0.009662093375879977
+    19 -st iterations over 100
+    jac obj 0.009917580924764025
+    20 -st iterations over 100
+    jac obj 0.010753983815391166
+    21 -st iterations over 100
+    jac obj 0.012016104017106954
+    22 -st iterations over 100
+    jac obj 0.013558306449112933
+    23 -st iterations over 100
+    jac obj 0.015249266800196892
+    24 -st iterations over 100
+    jac obj 0.016975112936847836
+    25 -st iterations over 100
+    jac obj 0.018641129711113535
+    26 -st iterations over 100
+    jac obj 0.020172240068120573
+    27 -st iterations over 100
+    jac obj 0.021512495261788445
+    28 -st iterations over 100
+    jac obj 0.02262380781542106
+    29 -st iterations over 100
+    jac obj 0.02348414750002803
+    30 -st iterations over 100
+    jac obj 0.024085397798842223
+    31 -st iterations over 100
+    jac obj 0.024431042175706352
+    32 -st iterations over 100
+    jac obj 0.02453381923004372
+    33 -st iterations over 100
+    jac obj 0.024413455874821466
+    34 -st iterations over 100
+    jac obj 0.02409455965749885
+    35 -st iterations over 100
+    jac obj 0.023604726243092955
+    36 -st iterations over 100
+    jac obj 0.02297289641558109
+    37 -st iterations over 100
+    jac obj 0.022227978891123712
+    38 -st iterations over 100
+    jac obj 0.021397740700138
+    39 -st iterations over 100
+    jac obj 0.02050795564002783
+    40 -st iterations over 100
+    jac obj 0.019581793009308512
+    41 -st iterations over 100
+    jac obj 0.01863942311234723
+    42 -st iterations over 100
+    jac obj 0.017697812505559796
+    43 -st iterations over 100
+    jac obj 0.01677068023616357
+    44 -st iterations over 100
+    jac obj 0.015868586072542712
+    45 -st iterations over 100
+    jac obj 0.01499912259720304
+    46 -st iterations over 100
+    jac obj 0.014167184749965145
+    47 -st iterations over 100
+    jac obj 0.01337529272655047
+    48 -st iterations over 100
+    jac obj 0.012623946834651179
+    49 -st iterations over 100
+    jac obj 0.011911995808418396
+    50 -st iterations over 100
+    jac obj 0.011237003057260608
+    51 -st iterations over 100
+    jac obj 0.010595598233805958
+    52 -st iterations over 100
+    jac obj 0.009983804288879128
+    53 -st iterations over 100
+    jac obj 0.00939733275566823
+    54 -st iterations over 100
+    jac obj 0.008831842340782714
+    55 -st iterations over 100
+    jac obj 0.008283157954906528
+    56 -st iterations over 100
+    jac obj 0.007747449098815196
+    57 -st iterations over 100
+    jac obj 0.007221368009481921
+    58 -st iterations over 100
+    jac obj 0.006702149184206974
+    59 -st iterations over 100
+    jac obj 0.00618767285834565
+    60 -st iterations over 100
+    jac obj 0.005676495718262231
+    61 -st iterations over 100
+    jac obj 0.005167852627494085
+    62 -st iterations over 100
+    jac obj 0.004661633436739976
+    63 -st iterations over 100
+    jac obj 0.004158339078571771
+    64 -st iterations over 100
+    jac obj 0.0036590211361726688
+    65 -st iterations over 100
+    jac obj 0.0031652089402882666
+    66 -st iterations over 100
+    jac obj 0.002678828022851576
+    67 -st iterations over 100
+    jac obj 0.0022021134590772817
+    68 -st iterations over 100
+    jac obj 0.001737521278641907
+    69 -st iterations over 100
+    jac obj 0.0012876407399744494
+    70 -st iterations over 100
+    jac obj 0.0008551098619591357
+    71 -st iterations over 100
+    jac obj 0.00044253619427081503
+    72 -st iterations over 100
+    jac obj 5.242441289965427e-05
+    73 -st iterations over 100
+    jac obj 0.0003128880669009959
+    74 -st iterations over 100
+    jac obj 0.000651286620893643
+    75 -st iterations over 100
+    jac obj 0.0009609255888562984
+    76 -st iterations over 100
+    jac obj 0.001240264886348541
+    77 -st iterations over 100
+    jac obj 0.0014880971148159006
+    78 -st iterations over 100
+    jac obj 0.0017035654539085954
+    79 -st iterations over 100
+    jac obj 0.0018861728107140152
+    80 -st iterations over 100
+    jac obj 0.0020357828482246987
+    81 -st iterations over 100
+    jac obj 0.0021526136347347347
+    82 -st iterations over 100
+    jac obj 0.0022372247353246166
+    83 -st iterations over 100
+    jac obj 0.0022904986217895384
+    84 -st iterations over 100
+    jac obj 0.0023136172999329574
+    85 -st iterations over 100
+    jac obj 0.002308035058263158
+    86 -st iterations over 100
+    jac obj 0.002275448216209952
+    87 -st iterations over 100
+    jac obj 0.002217762720022165
+    88 -st iterations over 100
+    jac obj 0.002137060379141076
+    89 -st iterations over 100
+    jac obj 0.0020355644762730662
+    90 -st iterations over 100
+    jac obj 0.0019156054124778166
+    91 -st iterations over 100
+    jac obj 0.001779586979864689
+    92 -st iterations over 100
+    jac obj 0.0016299537688269083
+    93 -st iterations over 100
+    jac obj 0.0014691601464846826
+    94 -st iterations over 100
+    jac obj 0.0012996411628591886
+    95 -st iterations over 100
+    jac obj 0.001123785667687116
+    96 -st iterations over 100
+    jac obj 0.0009439118518912437
+    97 -st iterations over 100
+    jac obj 0.0007622453634326121
+    98 -st iterations over 100
+    jac obj 0.0005809000862200264
+    99 -st iterations over 100
+    jac obj 0.00040186162038935436
+    grad lambda -4.510524400398036e-05
+    value of lambda_k -10.042212513710554
+    /home/qbe/sparse-ho/examples/plot_held_out_lasso.py:86: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show(block=False)
+
+
+
+
+
+
+|
+
+
+.. code-block:: default
+
+
+    # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+    #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #
+    # License: BSD (3-clause)
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    from sparse_ho.models import Lasso
+    from sparse_ho.criterion import CV
+    from sparse_ho.forward import Forward
+    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho.utils import Monitor
+    from sparse_ho.ho import grad_search
+    from sparse_ho.grid_search import grid_search
+    # from sparse_ho.datasets.real import get_real_sim
+    from sparse_ho.datasets.real import get_rcv1
+
+
+    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+    # X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+    n_samples, n_features = X_train.shape
+
+    print("Starting path computation...")
+    n_samples = len(y_train)
+    alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
+    log_alpha0 = np.log(alpha_max / 10)
+
+    n_alphas = 10
+    p_alphas = np.geomspace(1, 0.0001, n_alphas)
+    alphas = alpha_max * p_alphas
+    log_alphas = np.log(alphas)
+
+    tol = 1e-7
+
+    # grid search
+    model = Lasso(X_train, y_train, np.log(alpha_max/10))
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    algo = Forward(criterion, use_sk=True)
+    monitor_grid_sk = Monitor()
+    grid_search(
+        algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
+        tol=tol)
+    objs = np.array(monitor_grid_sk.objs)
+
+    # grad_search
+    model = Lasso(X_train, y_train, np.log(alpha_max/10))
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    algo = ImplicitForward(criterion, use_sk=True)
+    monitor_grad = Monitor()
+    grad_search(
+        algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)
+
+
+    p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+
+    objs_grad = np.array(monitor_grad.objs)
+
+    current_palette = sns.color_palette("colorblind")
+
+    fig = plt.figure()
+    plt.semilogx(
+        p_alphas, objs, color=current_palette[0], linewidth=7.0)
+    plt.semilogx(
+        p_alphas, objs, 'bo', label='0-order method (grid-search)',
+        color=current_palette[1], markersize=15)
+    plt.semilogx(
+        p_alphas_grad, objs_grad, 'bX', label='1-st order method',
+        color=current_palette[2], markersize=25)
+    plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
+    plt.ylabel(
+        r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
+        fontsize=28)
+    plt.tick_params(width=5)
+    plt.legend(fontsize=14, loc=1)
+    plt.tight_layout()
+    plt.show(block=False)
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  5.986 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_held_out_lasso.py <plot_held_out_lasso.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_held_out_lasso.ipynb <plot_held_out_lasso.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

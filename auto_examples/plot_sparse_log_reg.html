@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Method comparison on Lasso &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>Sparse logistic regression &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -94,736 +94,1319 @@
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-sparse-log-reg-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="method-comparison-on-lasso">
-<span id="sphx-glr-auto-examples-plot-sparse-log-reg-py"></span><h1>Method comparison on Lasso<a class="headerlink" href="#method-comparison-on-lasso" title="Permalink to this headline">¶</a></h1>
-<p>The aim of this example is to demonstrate on a simple
-dateset how methods compare.</p>
+<div class="sphx-glr-example-title section" id="sparse-logistic-regression">
+<span id="sphx-glr-auto-examples-plot-sparse-log-reg-py"></span><h1>Sparse logistic regression<a class="headerlink" href="#sparse-logistic-regression" title="Permalink to this headline">¶</a></h1>
+<p>An example to show how to use this package for sparse logistic regression</p>
+<img alt="plot sparse log reg" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_sparse_log_reg_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>0.01
-0 -st iteration over 10000
-0.6387291116694195
-1 -st iteration over 10000
-0.6311273599700443
-2 -st iteration over 10000
-0.6276421805430861
-relative decrease =  0.005028051075880909
-0 -st iterations over 100
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear]0 -st iterations over 100
+jac obj 17244.26070895325
 1 -st iterations over 100
+jac obj 14799.16104267324
 2 -st iterations over 100
+jac obj 13776.975450288895
 3 -st iterations over 100
+jac obj 13308.947360859725
 4 -st iterations over 100
+jac obj 13122.091913256625
 5 -st iterations over 100
+jac obj 13064.829938004488
 6 -st iterations over 100
+jac obj 13060.35646509166
 7 -st iterations over 100
+jac obj 13073.94325550266
 8 -st iterations over 100
+jac obj 13090.932137217507
 9 -st iterations over 100
-grad lambda 0.031092942663294095
-value of lambda_k -3.918203883094459
-0.01
-0 -st iteration over 10000
-0.48582475063781727
-1 -st iteration over 10000
-0.46943326844496414
-2 -st iteration over 10000
-0.4626517899774521
-relative decrease =  0.012236485526102578
-3 -st iteration over 10000
-0.45880950197874376
-relative decrease =  0.0069330164076391015
-0 -st iterations over 100
+jac obj 13105.67816403595
+10 -st iterations over 100
+jac obj 13116.534080748072
+11 -st iterations over 100
+jac obj 13123.579338743113
+12 -st iterations over 100
+jac obj 13127.516481746849
+13 -st iterations over 100
+jac obj 13129.12112169466
+14 -st iterations over 100
+jac obj 13129.009771220499
+15 -st iterations over 100
+jac obj 13127.59834936112
+16 -st iterations over 100
+jac obj 13125.156315582572
+17 -st iterations over 100
+jac obj 13121.886604439753
+18 -st iterations over 100
+jac obj 13117.989736733425
+19 -st iterations over 100
+jac obj 13113.695823340506
+20 -st iterations over 100
+jac obj 13109.265749264905
+21 -st iterations over 100
+jac obj 13104.971691274968
+22 -st iterations over 100
+jac obj 13101.06908061822
+23 -st iterations over 100
+jac obj 13097.769946496112
+24 -st iterations over 100
+jac obj 13095.22378602028
+25 -st iterations over 100
+jac obj 13093.508408060989
+26 -st iterations over 100
+jac obj 13092.63043397411
+27 -st iterations over 100
+jac obj 13092.533505913521
+28 -st iterations over 100
+jac obj 13093.11159090496
+29 -st iterations over 100
+jac obj 13094.224781753715
+30 -st iterations over 100
+jac obj 13095.715395627494
+31 -st iterations over 100
+jac obj 13097.422734427762
+32 -st iterations over 100
+jac obj 13099.195450217328
+33 -st iterations over 100
+jac obj 13100.900970256182
+34 -st iterations over 100
+jac obj 13102.431841947327
+35 -st iterations over 100
+jac obj 13103.709150534409
+36 -st iterations over 100
+jac obj 13104.683351686997
+37 -st iterations over 100
+jac obj 13105.332965883903
+38 -st iterations over 100
+jac obj 13105.661623070953
+39 -st iterations over 100
+jac obj 13105.693944246637
+40 -st iterations over 100
+jac obj 13105.470717425977
+41 -st iterations over 100
+jac obj 13105.043780201533
+42 -st iterations over 100
+jac obj 13104.470966864865
+43 -st iterations over 100
+jac obj 13103.811418479014
+44 -st iterations over 100
+jac obj 13103.121491179912
+45 -st iterations over 100
+jac obj 13102.451432462864
+46 -st iterations over 100
+jac obj 13101.842928703634
+47 -st iterations over 100
+jac obj 13101.327561840319
+48 -st iterations over 100
+jac obj 13100.926151902502
+49 -st iterations over 100
+jac obj 13100.648908183133
+50 -st iterations over 100
+jac obj 13100.496268391587
+51 -st iterations over 100
+jac obj 13100.460274465186
+52 -st iterations over 100
+jac obj 13100.526317085334
+53 -st iterations over 100
+jac obj 13100.675078267304
+54 -st iterations over 100
+jac obj 13100.884511336884
+55 -st iterations over 100
+jac obj 13101.131717831659
+56 -st iterations over 100
+jac obj 13101.394608392178
+57 -st iterations over 100
+jac obj 13101.653266332576
+58 -st iterations over 100
+jac obj 13101.890965240258
+59 -st iterations over 100
+jac obj 13102.094823016781
+60 -st iterations over 100
+jac obj 13102.25610220448
+61 -st iterations over 100
+jac obj 13102.370188878622
+62 -st iterations over 100
+jac obj 13102.43629909331
+63 -st iterations over 100
+jac obj 13102.456972676204
+64 -st iterations over 100
+jac obj 13102.437419336731
+65 -st iterations over 100
+jac obj 13102.38478216913
+66 -st iterations over 100
+jac obj 13102.307379492435
+67 -st iterations over 100
+jac obj 13102.213978491385
+68 -st iterations over 100
+jac obj 13102.113144273586
+69 -st iterations over 100
+jac obj 13102.012696698923
+70 -st iterations over 100
+jac obj 13101.919295575144
+71 -st iterations over 100
+jac obj 13101.838163364793
+72 -st iterations over 100
+jac obj 13101.772944106087
+73 -st iterations over 100
+jac obj 13101.725688356846
+74 -st iterations over 100
+jac obj 13101.696947002798
+75 -st iterations over 100
+jac obj 13101.685951932863
+76 -st iterations over 100
+jac obj 13101.690858908365
+77 -st iterations over 100
+jac obj 13101.70902732316
+78 -st iterations over 100
+jac obj 13101.737312723539
+79 -st iterations over 100
+jac obj 13101.772350594838
+80 -st iterations over 100
+jac obj 13101.810813633781
+81 -st iterations over 100
+jac obj 13101.849629101378
+82 -st iterations over 100
+jac obj 13101.88614749328
+83 -st iterations over 100
+jac obj 13101.918258317206
+84 -st iterations over 100
+jac obj 13101.944452932981
+85 -st iterations over 100
+jac obj 13101.963837966514
+86 -st iterations over 100
+jac obj 13101.97610560515
+87 -st iterations over 100
+jac obj 13101.981469044393
+88 -st iterations over 100
+jac obj 13101.980572477492
+grad lambda 0.0830936573931528
+value of lambda_k -11.742526035167026
+[LibLinear]0 -st iterations over 100
+jac obj 18663.51130106987
 1 -st iterations over 100
+jac obj 17593.0243499924
 2 -st iterations over 100
+jac obj 17185.237325834263
 3 -st iterations over 100
+jac obj 16954.30545185337
 4 -st iterations over 100
+jac obj 16803.46029252406
 5 -st iterations over 100
+jac obj 16695.93853976014
 6 -st iterations over 100
+jac obj 16614.569144825
 7 -st iterations over 100
+jac obj 16550.885380880896
 8 -st iterations over 100
+jac obj 16499.901006492244
 9 -st iterations over 100
-grad lambda 0.017989210750400744
-value of lambda_k -5.136230206383936
-0.01
-0 -st iteration over 10000
-0.395685722640273
-1 -st iteration over 10000
-0.39342905662334676
-2 -st iteration over 10000
-0.3922600012008751
-relative decrease =  0.0028652823666013307
-0 -st iterations over 100
+jac obj 16458.392103100556
+10 -st iterations over 100
+jac obj 16424.165184925678
+11 -st iterations over 100
+jac obj 16395.678189077396
+12 -st iterations over 100
+jac obj 16371.814993996026
+13 -st iterations over 100
+jac obj 16351.741535731007
+14 -st iterations over 100
+jac obj 16334.812779621223
+15 -st iterations over 100
+jac obj 16320.513264984747
+16 -st iterations over 100
+jac obj 16308.419680084444
+17 -st iterations over 100
+jac obj 16298.177456324154
+18 -st iterations over 100
+jac obj 16289.48596472686
+19 -st iterations over 100
+jac obj 16282.088813431163
+20 -st iterations over 100
+jac obj 16275.76709047678
+21 -st iterations over 100
+jac obj 16270.3342876011
+22 -st iterations over 100
+jac obj 16265.632199050458
+23 -st iterations over 100
+jac obj 16261.527420499842
+24 -st iterations over 100
+jac obj 16257.908258798701
+25 -st iterations over 100
+jac obj 16254.681960921625
+26 -st iterations over 100
+jac obj 16251.772217906051
+27 -st iterations over 100
+jac obj 16249.116920010083
+28 -st iterations over 100
+jac obj 16246.66614644938
+29 -st iterations over 100
+jac obj 16244.38037438921
+30 -st iterations over 100
+jac obj 16242.228891231334
+31 -st iterations over 100
+jac obj 16240.188393427166
+32 -st iterations over 100
+jac obj 16238.241754738
+33 -st iterations over 100
+jac obj 16236.376947178094
+34 -st iterations over 100
+jac obj 16234.586098711197
+35 -st iterations over 100
+jac obj 16232.864672950092
+36 -st iterations over 100
+jac obj 16231.210757463143
+37 -st iterations over 100
+jac obj 16229.62444868578
+38 -st iterations over 100
+jac obj 16228.10732277806
+39 -st iterations over 100
+jac obj 16226.661983003954
+40 -st iterations over 100
+jac obj 16225.291675308563
+41 -st iterations over 100
+jac obj 16223.999964728035
+42 -st iterations over 100
+jac obj 16222.790466090079
+43 -st iterations over 100
+jac obj 16221.66662316351
+44 -st iterations over 100
+jac obj 16220.6315310092
+45 -st iterations over 100
+jac obj 16219.68779678979
+46 -st iterations over 100
+jac obj 16218.83743472609
+47 -st iterations over 100
+jac obj 16218.081791259556
+48 -st iterations over 100
+jac obj 16217.421496803625
+49 -st iterations over 100
+jac obj 16216.856440752366
+50 -st iterations over 100
+jac obj 16216.385766670483
+51 -st iterations over 100
+jac obj 16216.007884820776
+52 -st iterations over 100
+jac obj 16215.7204993987
+53 -st iterations over 100
+jac obj 16215.52064804242
+54 -st iterations over 100
+jac obj 16215.404751373584
+55 -st iterations over 100
+jac obj 16215.368670501832
+56 -st iterations over 100
+jac obj 16215.407770595904
+57 -st iterations over 100
+jac obj 16215.516988787645
+58 -st iterations over 100
+jac obj 16215.690904833225
+59 -st iterations over 100
+jac obj 16215.923813109044
+60 -st iterations over 100
+jac obj 16216.209794668184
+61 -st iterations over 100
+jac obj 16216.542788227573
+62 -st iterations over 100
+jac obj 16216.916659095341
+63 -st iterations over 100
+jac obj 16217.325265182857
+64 -st iterations over 100
+jac obj 16217.762519375792
+65 -st iterations over 100
+jac obj 16218.222447662783
+66 -st iterations over 100
+jac obj 16218.699242538893
+67 -st iterations over 100
+jac obj 16219.187311313166
+68 -st iterations over 100
+jac obj 16219.681319054816
+69 -st iterations over 100
+jac obj 16220.176226010812
+70 -st iterations over 100
+jac obj 16220.667319417878
+71 -st iterations over 100
+jac obj 16221.150239714603
+72 -st iterations over 100
+jac obj 16221.62100123359
+73 -st iterations over 100
+jac obj 16222.076007519778
+74 -st iterations over 100
+jac obj 16222.512061478725
+75 -st iterations over 100
+jac obj 16222.926370608266
+76 -st iterations over 100
+jac obj 16223.316547608356
+77 -st iterations over 100
+jac obj 16223.680606697479
+78 -st iterations over 100
+jac obj 16224.016955990179
+79 -st iterations over 100
+jac obj 16224.324386309272
+80 -st iterations over 100
+jac obj 16224.602056818563
+81 -st iterations over 100
+jac obj 16224.849477868234
+82 -st iterations over 100
+jac obj 16225.06649144574
+83 -st iterations over 100
+jac obj 16225.253249620591
+84 -st iterations over 100
+jac obj 16225.410191362753
+85 -st iterations over 100
+jac obj 16225.538018101724
+86 -st iterations over 100
+jac obj 16225.637668377383
+87 -st iterations over 100
+jac obj 16225.71029191528
+88 -st iterations over 100
+jac obj 16225.75722343797
+89 -st iterations over 100
+jac obj 16225.779956501776
+90 -st iterations over 100
+jac obj 16225.780117624396
+grad lambda -0.0014621835133897584
+value of lambda_k -11.70548011400537
+[LibLinear]0 -st iterations over 100
+jac obj 16210.60566637552
 1 -st iterations over 100
+jac obj 16196.663648386322
 2 -st iterations over 100
+jac obj 16193.372532610087
 3 -st iterations over 100
+jac obj 16191.54874719428
 4 -st iterations over 100
+jac obj 16190.707206145817
 5 -st iterations over 100
-grad lambda -0.028717547694547183
-value of lambda_k -3.1918019867356517
-1e-05
-0 -st iteration over 10000
-0.701739594820278
-1 -st iteration over 10000
-0.6933971947836545
-2 -st iteration over 10000
-0.6931509568400631
-relative decrease =  7.267825307475878e-05
-3 -st iteration over 10000
-0.69314754047025
-relative decrease =  1.0083571453543073e-06
-1e-05
-0 -st iteration over 10000
-0.6427098175337641
-1 -st iteration over 10000
-0.6351271068355719
-2 -st iteration over 10000
-0.6320990940720892
-relative decrease =  0.004369461398048136
-3 -st iteration over 10000
-0.6309381415415444
-relative decrease =  0.001675269446799612
-4 -st iteration over 10000
-0.630410514601008
-relative decrease =  0.0007613724674634519
-5 -st iteration over 10000
-0.6302001811025697
-relative decrease =  0.0003035139459206704
-6 -st iteration over 10000
-0.630091358312025
-relative decrease =  0.0001570326876581629
-7 -st iteration over 10000
-0.6300485093137268
-relative decrease =  6.183165614985647e-05
-8 -st iteration over 10000
-0.6300295328283783
-relative decrease =  2.738331264684486e-05
-9 -st iteration over 10000
-0.6300194295308068
-relative decrease =  1.457918845780328e-05
-10 -st iteration over 10000
-0.6300137635985354
-relative decrease =  8.1760132064914e-06
-1e-05
-0 -st iteration over 10000
-0.5382898785526702
-1 -st iteration over 10000
-0.5304006249395677
-2 -st iteration over 10000
-0.5269073414782219
-relative decrease =  0.006147143276595355
-3 -st iteration over 10000
-0.5246861238497071
-relative decrease =  0.003908684526196294
-4 -st iteration over 10000
-0.5230594912600789
-relative decrease =  0.002862391127850807
-5 -st iteration over 10000
-0.5219689399282694
-relative decrease =  0.0019190470402112706
-6 -st iteration over 10000
-0.5211345047730754
-relative decrease =  0.0014683584973174248
-7 -st iteration over 10000
-0.5204483298659032
-relative decrease =  0.0012074644138862463
-8 -st iteration over 10000
-0.5198722248907998
-relative decrease =  0.0010137739646686752
-9 -st iteration over 10000
-0.5194238320459514
-relative decrease =  0.0007890384768320326
-10 -st iteration over 10000
-0.5190649138667495
-relative decrease =  0.0006315895908656817
-11 -st iteration over 10000
-0.5187727568576685
-relative decrease =  0.0005141097234033446
-12 -st iteration over 10000
-0.5185250402326148
-relative decrease =  0.00043590782226797634
-13 -st iteration over 10000
-0.5183220839635323
-relative decrease =  0.00035714286536964445
-14 -st iteration over 10000
-0.5181534733435954
-relative decrease =  0.00029670470495066534
-15 -st iteration over 10000
-0.5180112624058589
-relative decrease =  0.0002502490907017058
-16 -st iteration over 10000
-0.5178904138882443
-relative decrease =  0.0002126575643692706
-17 -st iteration over 10000
-0.5177870027979704
-relative decrease =  0.00018197286173211996
-18 -st iteration over 10000
-0.517697947962788
-relative decrease =  0.00015671010881232613
-19 -st iteration over 10000
-0.5176208031683401
-relative decrease =  0.0001357519679584941
-20 -st iteration over 10000
-0.5175536066000388
-relative decrease =  0.00011824603918192731
-21 -st iteration over 10000
-0.5174947712570861
-relative decrease =  0.00010353276132894844
-22 -st iteration over 10000
-0.5174430036708408
-relative decrease =  9.109560482403327e-05
-23 -st iteration over 10000
-0.517398163536812
-relative decrease =  7.890534262879147e-05
-24 -st iteration over 10000
-0.5173606168233714
-relative decrease =  6.6071084593753e-05
-25 -st iteration over 10000
-0.5173282449742092
-relative decrease =  5.696485759908893e-05
-26 -st iteration over 10000
-0.5172999748724024
-relative decrease =  4.974699825330974e-05
-27 -st iteration over 10000
-0.5172751303899484
-relative decrease =  4.371892374823073e-05
-28 -st iteration over 10000
-0.5172531889432576
-relative decrease =  3.861044143627361e-05
-29 -st iteration over 10000
-0.5172337275890518
-relative decrease =  3.424621390817098e-05
-30 -st iteration over 10000
-0.5172163987900967
-relative decrease =  3.049354888232365e-05
-31 -st iteration over 10000
-0.5172009142349333
-relative decrease =  2.7248226551660577e-05
-32 -st iteration over 10000
-0.517187032837478
-relative decrease =  2.4427144255887073e-05
-33 -st iteration over 10000
-0.5171745515840516
-relative decrease =  2.196330585046709e-05
-34 -st iteration over 10000
-0.5171632984446168
-relative decrease =  1.9802189310495575e-05
-35 -st iteration over 10000
-0.5171531268122891
-relative decrease =  1.7899057424739703e-05
-36 -st iteration over 10000
-0.5171439110930478
-relative decrease =  1.6216933781614046e-05
-37 -st iteration over 10000
-0.5171355431742648
-relative decrease =  1.4725056313127618e-05
-38 -st iteration over 10000
-0.5171279295735549
-relative decrease =  1.339768012883782e-05
-39 -st iteration over 10000
-0.5171209891201138
-relative decrease =  1.2213140496299803e-05
-40 -st iteration over 10000
-0.5171146510566971
-relative decrease =  1.1153112637472876e-05
-41 -st iteration over 10000
-0.5171088534765418
-relative decrease =  1.020202232840379e-05
-42 -st iteration over 10000
-0.5171035420288681
-relative decrease =  9.34657327913904e-06
-1e-05
-0 -st iteration over 10000
-0.4358294742584683
-1 -st iteration over 10000
-0.4320645442280489
-2 -st iteration over 10000
-0.4304104672917077
-relative decrease =  0.0036663622148573583
-3 -st iteration over 10000
-0.4294235530877764
-relative decrease =  0.002187555407551588
-4 -st iteration over 10000
-0.42871378262592763
-relative decrease =  0.0015732494331856042
-5 -st iteration over 10000
-0.42821322937770684
-relative decrease =  0.0011095067439004722
-6 -st iteration over 10000
-0.4278507701378674
-relative decrease =  0.0008034129683911991
-7 -st iteration over 10000
-0.4275668178857381
-relative decrease =  0.0006293974513261226
-8 -st iteration over 10000
-0.42732095903003026
-relative decrease =  0.0005449611193715849
-9 -st iteration over 10000
-0.4271187771957222
-relative decrease =  0.0004481483427712873
-10 -st iteration over 10000
-0.4269623002453842
-relative decrease =  0.00034684068534595296
-11 -st iteration over 10000
-0.42682335218779965
-relative decrease =  0.0003079868275550485
-12 -st iteration over 10000
-0.42670509811657414
-relative decrease =  0.00026211734712490865
-13 -st iteration over 10000
-0.4265993714158817
-relative decrease =  0.000234349667783687
-14 -st iteration over 10000
-0.42650200876108135
-relative decrease =  0.00021581025093541173
-15 -st iteration over 10000
-0.4264171112575371
-relative decrease =  0.00018818048440891088
-16 -st iteration over 10000
-0.4263467903645401
-relative decrease =  0.00015587053983692206
-17 -st iteration over 10000
-0.42628353278714887
-relative decrease =  0.00014021427084500031
-18 -st iteration over 10000
-0.4262277693836415
-relative decrease =  0.00012360297825295802
-19 -st iteration over 10000
-0.4261768907859013
-relative decrease =  0.00011277550892650449
-20 -st iteration over 10000
-0.4261299467104297
-relative decrease =  0.00010405440081963697
-21 -st iteration over 10000
-0.4260862932770095
-relative decrease =  9.676049240775578e-05
-22 -st iteration over 10000
-0.42604545252249326
-relative decrease =  9.052601840620834e-05
-23 -st iteration over 10000
-0.42600705306051806
-relative decrease =  8.511474488493257e-05
-24 -st iteration over 10000
-0.4259707980561234
-relative decrease =  8.036142412214882e-05
-25 -st iteration over 10000
-0.4259364453331577
-relative decrease =  7.614490154098341e-05
-26 -st iteration over 10000
-0.42590377323684797
-relative decrease =  7.241969025649577e-05
-27 -st iteration over 10000
-0.4258725929145069
-relative decrease =  6.911308244900158e-05
-28 -st iteration over 10000
-0.42584275165995644
-relative decrease =  6.614495718063783e-05
-29 -st iteration over 10000
-0.425814120555988
-relative decrease =  6.346258475241088e-05
-30 -st iteration over 10000
-0.42578658910622835
-relative decrease =  6.102513426145551e-05
-31 -st iteration over 10000
-0.4257600617169819
-relative decrease =  5.8799573015746984e-05
-32 -st iteration over 10000
-0.4257344551095932
-relative decrease =  5.6758603979030385e-05
-33 -st iteration over 10000
-0.4257096963067907
-relative decrease =  5.487939350693016e-05
-34 -st iteration over 10000
-0.4256857210207563
-relative decrease =  5.3142680896849076e-05
-35 -st iteration over 10000
-0.4256624723422929
-relative decrease =  5.153211098645984e-05
-36 -st iteration over 10000
-0.4256398996638977
-relative decrease =  5.0033715686313185e-05
-37 -st iteration over 10000
-0.42561795778817557
-relative decrease =  4.863550316387584e-05
-38 -st iteration over 10000
-0.42559660618492606
-relative decrease =  4.732712829778237e-05
-39 -st iteration over 10000
-0.4255758083685643
-relative decrease =  4.6099625951507316e-05
-40 -st iteration over 10000
-0.4255555313736425
-relative decrease =  4.494519352683584e-05
-41 -st iteration over 10000
-0.42553574531086225
-relative decrease =  4.385701255151777e-05
-42 -st iteration over 10000
-0.42551642298951603
-relative decrease =  4.282910143454317e-05
-43 -st iteration over 10000
-0.42549806997369033
-relative decrease =  4.068057674564316e-05
-44 -st iteration over 10000
-0.4254813440935127
-relative decrease =  3.707393153622345e-05
-45 -st iteration over 10000
-0.42546516696163816
-relative decrease =  3.585759751942971e-05
-46 -st iteration over 10000
-0.4254494661715044
-relative decrease =  3.4801757055566166e-05
-47 -st iteration over 10000
-0.42543419747138644
-relative decrease =  3.384400323383013e-05
-48 -st iteration over 10000
-0.4254193264815334
-relative decrease =  3.296245422252818e-05
-49 -st iteration over 10000
-0.4254048242438849
-relative decrease =  3.214509251479818e-05
-50 -st iteration over 10000
-0.42539066563138
-relative decrease =  3.138342646725832e-05
-51 -st iteration over 10000
-0.42537682850082914
-relative decrease =  3.0670842147134515e-05
-52 -st iteration over 10000
-0.42536329313195276
-relative decrease =  3.0001969027085668e-05
-53 -st iteration over 10000
-0.42535004182101144
-relative decrease =  2.937233732310462e-05
-54 -st iteration over 10000
-0.42533705857287607
-relative decrease =  2.877815979643697e-05
-55 -st iteration over 10000
-0.42532432886020405
-relative decrease =  2.821618300895206e-05
-56 -st iteration over 10000
-0.4253118394302162
-relative decrease =  2.768358181316832e-05
-57 -st iteration over 10000
-0.42529957814638764
-relative decrease =  2.7177881963703436e-05
-58 -st iteration over 10000
-0.4252875338565499
-relative decrease =  2.6696901574366046e-05
-59 -st iteration over 10000
-0.4252756962815357
-relative decrease =  2.6238705584919314e-05
-60 -st iteration over 10000
-0.4252640559201759
-relative decrease =  2.5801569515440083e-05
-61 -st iteration over 10000
-0.42525260396757064
-relative decrease =  2.538395004235187e-05
-62 -st iteration over 10000
-0.42524133224429805
-relative decrease =  2.4984460755711156e-05
-63 -st iteration over 10000
-0.4252302331347531
-relative decrease =  2.4601851921201725e-05
-64 -st iteration over 10000
-0.425219299533178
-relative decrease =  2.42349934314255e-05
-65 -st iteration over 10000
-0.42520852479622623
-relative decrease =  2.3882860323518846e-05
-66 -st iteration over 10000
-0.4251979027011157
-relative decrease =  2.3544520390975148e-05
-67 -st iteration over 10000
-0.42518742740858556
-relative decrease =  2.321912353543039e-05
-68 -st iteration over 10000
-0.4251772027648929
-relative decrease =  2.266354512992669e-05
-69 -st iteration over 10000
-0.42516740061295755
-relative decrease =  2.172706643233651e-05
-70 -st iteration over 10000
-0.4251577875252129
-relative decrease =  2.1307994145125157e-05
-71 -st iteration over 10000
-0.4251483448514305
-relative decrease =  2.0930261224460125e-05
-72 -st iteration over 10000
-0.42513906063006246
-relative decrease =  2.057904180286956e-05
-73 -st iteration over 10000
-0.4251300890402573
-relative decrease =  1.9886074913568352e-05
-74 -st iteration over 10000
-0.42512152310273243
-relative decrease =  1.8986921941740467e-05
-75 -st iteration over 10000
-0.4251132029059192
-relative decrease =  1.8442222695946655e-05
-76 -st iteration over 10000
-0.4251050896366283
-relative decrease =  1.7983555246778877e-05
-77 -st iteration over 10000
-0.4250971603407417
-relative decrease =  1.757576699751266e-05
-78 -st iteration over 10000
-0.4250893993508729
-relative decrease =  1.7202706463989846e-05
-79 -st iteration over 10000
-0.4250817948271244
-relative decrease =  1.6855889784244477e-05
-80 -st iteration over 10000
-0.4250743371803467
-relative decrease =  1.6530328037765103e-05
-81 -st iteration over 10000
-0.42506701828009996
-relative decrease =  1.6222787906304628e-05
-82 -st iteration over 10000
-0.4250598310212933
-relative decrease =  1.5930996641205557e-05
-83 -st iteration over 10000
-0.42505276906767164
-relative decrease =  1.565325007117755e-05
-84 -st iteration over 10000
-0.4250458755404215
-relative decrease =  1.5279922766415857e-05
-85 -st iteration over 10000
-0.4250399091178757
-relative decrease =  1.3224938755376952e-05
-86 -st iteration over 10000
-0.4250343045252842
-relative decrease =  1.2422920636741911e-05
-87 -st iteration over 10000
-0.4250289623065749
-relative decrease =  1.1841352955792798e-05
-88 -st iteration over 10000
-0.4250238380572128
-relative decrease =  1.1358210629731882e-05
-89 -st iteration over 10000
-0.4250189059230505
-relative decrease =  1.093237559498246e-05
-90 -st iteration over 10000
-0.42501414789182534
-relative decrease =  1.0546465837138387e-05
-91 -st iteration over 10000
-0.4250095500400141
-relative decrease =  1.0191418415812561e-05
-92 -st iteration over 10000
-0.42500510093519456
-relative decrease =  9.86171165438899e-06
-1e-05
-0 -st iteration over 10000
-0.37964997089190045
-1 -st iteration over 10000
-0.3788407702007023
-2 -st iteration over 10000
-0.37835785452200915
-relative decrease =  0.0012567355712573085
-3 -st iteration over 10000
-0.3780375726948368
-relative decrease =  0.0008334986474741716
-4 -st iteration over 10000
-0.3778210552605536
-relative decrease =  0.0005634630919365205
-5 -st iteration over 10000
-0.3776536016941483
-relative decrease =  0.0004357797079708414
-6 -st iteration over 10000
-0.3775191891220488
-relative decrease =  0.0003497941111350405
-7 -st iteration over 10000
-0.37740303247891327
-relative decrease =  0.00030228504003286945
-8 -st iteration over 10000
-0.3772990476087872
-relative decrease =  0.00027060932358558346
-9 -st iteration over 10000
-0.37720355800637273
-relative decrease =  0.0002485013126188475
-10 -st iteration over 10000
-0.37711573220452416
-relative decrease =  0.00022855710453632914
-11 -st iteration over 10000
-0.3770344669076591
-relative decrease =  0.00021148410330236114
-12 -st iteration over 10000
-0.37695922069806703
-relative decrease =  0.00019582008281979936
-13 -st iteration over 10000
-0.3768937133496636
-relative decrease =  0.00017047575498094228
-14 -st iteration over 10000
-0.37683578522155703
-relative decrease =  0.00015075165785646954
-15 -st iteration over 10000
-0.3767813963985298
-relative decrease =  0.0001415410010337612
-16 -st iteration over 10000
-0.3767297233392805
-relative decrease =  0.00013447352094681148
-17 -st iteration over 10000
-0.376682822454713
-relative decrease =  0.00012205445497008599
-18 -st iteration over 10000
-0.37664093997248693
-relative decrease =  0.0001089946082689123
-19 -st iteration over 10000
-0.3766012404791457
-relative decrease =  0.00010331361693992401
-20 -st iteration over 10000
-0.3765634557953981
-relative decrease =  9.833053307115874e-05
-21 -st iteration over 10000
-0.3765274845591232
-relative decrease =  9.361123310620384e-05
-22 -st iteration over 10000
-0.37649466409033566
-relative decrease =  8.541170314097163e-05
-23 -st iteration over 10000
-0.3764656036293953
-relative decrease =  7.56266913506031e-05
-24 -st iteration over 10000
-0.3764387930593149
-relative decrease =  6.977159490229752e-05
-25 -st iteration over 10000
-0.3764146955645615
-relative decrease =  6.271111121665479e-05
-26 -st iteration over 10000
-0.37639289498885276
-relative decrease =  5.673362902852707e-05
-27 -st iteration over 10000
-0.37637301890634023
-relative decrease =  5.172534463642973e-05
-28 -st iteration over 10000
-0.3763554391142251
-relative decrease =  4.5749498434582126e-05
-29 -st iteration over 10000
-0.37633916098122816
-relative decrease =  4.236207204176479e-05
-30 -st iteration over 10000
-0.37632386346176233
-relative decrease =  3.981013189866804e-05
-31 -st iteration over 10000
-0.37630938805604996
-relative decrease =  3.76706702013543e-05
-32 -st iteration over 10000
-0.37629561416543755
-relative decrease =  3.584505339331686e-05
-33 -st iteration over 10000
-0.3762824468667613
-relative decrease =  3.4266463802895355e-05
-34 -st iteration over 10000
-0.37626996584183586
-relative decrease =  3.248051094969934e-05
-35 -st iteration over 10000
-0.3762581396434214
-relative decrease =  3.077639612033189e-05
-36 -st iteration over 10000
-0.3762467287160604
-relative decrease =  2.9695698334798262e-05
-37 -st iteration over 10000
-0.37623568645674094
-relative decrease =  2.8736279822974217e-05
-38 -st iteration over 10000
-0.37622497481640493
-relative decrease =  2.7875879849665977e-05
-39 -st iteration over 10000
-0.3762146578562573
-relative decrease =  2.6848767552689377e-05
-40 -st iteration over 10000
-0.3762048157366971
-relative decrease =  2.5613046528774906e-05
-41 -st iteration over 10000
-0.37619527271389874
-relative decrease =  2.4834679711565962e-05
-42 -st iteration over 10000
-0.37618599452676116
-relative decrease =  2.414547368629585e-05
-43 -st iteration over 10000
-0.3761770351444634
-relative decrease =  2.331581873792833e-05
-44 -st iteration over 10000
-0.3761683990549049
-relative decrease =  2.247448451885933e-05
-45 -st iteration over 10000
-0.3761599820416704
-relative decrease =  2.1904362194607394e-05
-46 -st iteration over 10000
-0.3761517664853964
-relative decrease =  2.1380092348935884e-05
-47 -st iteration over 10000
-0.3761437373451693
-relative decrease =  2.089496484620717e-05
-48 -st iteration over 10000
-0.37613588159377337
-relative decrease =  2.044373925683581e-05
-49 -st iteration over 10000
-0.3761281878181
-relative decrease =  2.0022215042156864e-05
-50 -st iteration over 10000
-0.37612064592490824
-relative decrease =  1.9626957390027406e-05
-51 -st iteration over 10000
-0.37611326322428096
-relative decrease =  1.9212676041815788e-05
-52 -st iteration over 10000
-0.37610604798328146
-relative decrease =  1.8776880559787353e-05
-53 -st iteration over 10000
-0.37609896041934177
-relative decrease =  1.844461488737132e-05
-54 -st iteration over 10000
-0.37609199400186855
-relative decrease =  1.8129344374397778e-05
-55 -st iteration over 10000
-0.37608514287950945
-relative decrease =  1.7829301369991484e-05
-56 -st iteration over 10000
-0.37607840172697654
-relative decrease =  1.7543116848686222e-05
-57 -st iteration over 10000
-0.3760719120606994
-relative decrease =  1.6888651199202822e-05
-58 -st iteration over 10000
-0.37606623077512297
-relative decrease =  1.4784928279185081e-05
-59 -st iteration over 10000
-0.37606071243693645
-relative decrease =  1.4360875405807092e-05
-60 -st iteration over 10000
-0.3760553200066709
-relative decrease =  1.4033213724942942e-05
-61 -st iteration over 10000
-0.3760500402488942
-relative decrease =  1.3739995817814316e-05
-62 -st iteration over 10000
-0.3760448637722931
-relative decrease =  1.3471217782725525e-05
-63 -st iteration over 10000
-0.376039783403819
-relative decrease =  1.322110682720549e-05
-64 -st iteration over 10000
-0.3760347933358587
-relative decrease =  1.2986109553648536e-05
-65 -st iteration over 10000
-0.3760298886621217
-relative decrease =  1.2763880368015062e-05
-66 -st iteration over 10000
-0.376025065113186
-relative decrease =  1.2552761889241518e-05
-67 -st iteration over 10000
-0.3760203188974376
-relative decrease =  1.2351510673750881e-05
-68 -st iteration over 10000
-0.37601564659960335
-relative decrease =  1.2159147335388008e-05
-69 -st iteration over 10000
-0.3760110451120917
-relative decrease =  1.1974871166365436e-05
-70 -st iteration over 10000
-0.37600680787134666
-relative decrease =  1.1026958542120212e-05
-71 -st iteration over 10000
-0.37600332859012353
-relative decrease =  9.054451260200504e-06
-
-(-3.0168161717625686, 0.6624064706573191)
+jac obj 16190.60371998153
+6 -st iterations over 100
+jac obj 16190.963597567548
+7 -st iterations over 100
+jac obj 16191.587240250465
+8 -st iterations over 100
+jac obj 16192.340700482226
+9 -st iterations over 100
+jac obj 16193.137991137904
+10 -st iterations over 100
+jac obj 16193.926447520309
+11 -st iterations over 100
+jac obj 16194.675693290088
+12 -st iterations over 100
+jac obj 16195.369724446178
+13 -st iterations over 100
+jac obj 16196.001460943122
+14 -st iterations over 100
+jac obj 16196.569160462052
+15 -st iterations over 100
+jac obj 16197.074157046074
+16 -st iterations over 100
+jac obj 16197.519488025804
+17 -st iterations over 100
+jac obj 16197.909085165737
+18 -st iterations over 100
+jac obj 16198.247307422256
+19 -st iterations over 100
+jac obj 16198.538672082494
+20 -st iterations over 100
+jac obj 16198.78769723307
+21 -st iterations over 100
+jac obj 16198.998805347579
+22 -st iterations over 100
+jac obj 16199.176260468614
+23 -st iterations over 100
+jac obj 16199.324124659204
+24 -st iterations over 100
+jac obj 16199.446226649585
+25 -st iterations over 100
+jac obj 16199.546139334729
+26 -st iterations over 100
+jac obj 16199.62716453605
+27 -st iterations over 100
+jac obj 16199.692324162419
+28 -st iterations over 100
+jac obj 16199.74435712717
+29 -st iterations over 100
+jac obj 16199.78572138972
+30 -st iterations over 100
+jac obj 16199.818600440196
+31 -st iterations over 100
+jac obj 16199.844913499748
+32 -st iterations over 100
+jac obj 16199.86632869345
+33 -st iterations over 100
+jac obj 16199.884278470285
+34 -st iterations over 100
+jac obj 16199.899976590976
+35 -st iterations over 100
+jac obj 16199.914436071149
+36 -st iterations over 100
+jac obj 16199.928487546016
+37 -st iterations over 100
+jac obj 16199.942797607056
+38 -st iterations over 100
+jac obj 16199.957886744593
+39 -st iterations over 100
+jac obj 16199.974146609926
+40 -st iterations over 100
+jac obj 16199.99185638295
+41 -st iterations over 100
+jac obj 16200.011198095646
+42 -st iterations over 100
+jac obj 16200.032270816635
+43 -st iterations over 100
+jac obj 16200.055103648456
+44 -st iterations over 100
+jac obj 16200.079667526252
+45 -st iterations over 100
+jac obj 16200.10588583627
+46 -st iterations over 100
+jac obj 16200.133643894811
+47 -st iterations over 100
+jac obj 16200.16279734446
+48 -st iterations over 100
+jac obj 16200.193179535396
+49 -st iterations over 100
+jac obj 16200.224607966295
+50 -st iterations over 100
+jac obj 16200.256889862281
+51 -st iterations over 100
+jac obj 16200.289826967964
+52 -st iterations over 100
+jac obj 16200.323219631875
+53 -st iterations over 100
+jac obj 16200.356870255284
+54 -st iterations over 100
+jac obj 16200.390586174231
+55 -st iterations over 100
+jac obj 16200.424182038576
+56 -st iterations over 100
+jac obj 16200.457481746604
+57 -st iterations over 100
+jac obj 16200.490319988297
+58 -st iterations over 100
+jac obj 16200.522543445053
+59 -st iterations over 100
+jac obj 16200.554011688491
+60 -st iterations over 100
+jac obj 16200.584597816214
+61 -st iterations over 100
+jac obj 16200.614188857944
+62 -st iterations over 100
+jac obj 16200.642685981471
+63 -st iterations over 100
+jac obj 16200.670004524163
+64 -st iterations over 100
+jac obj 16200.696073872892
+65 -st iterations over 100
+jac obj 16200.720837212108
+66 -st iterations over 100
+jac obj 16200.74425115786
+67 -st iterations over 100
+jac obj 16200.766285293179
+68 -st iterations over 100
+jac obj 16200.786921618888
+69 -st iterations over 100
+jac obj 16200.806153932193
+70 -st iterations over 100
+jac obj 16200.823987144573
+71 -st iterations over 100
+jac obj 16200.840436549233
+72 -st iterations over 100
+jac obj 16200.855527047843
+73 -st iterations over 100
+jac obj 16200.86929234544
+74 -st iterations over 100
+jac obj 16200.881774121935
+75 -st iterations over 100
+jac obj 16200.893021188229
+76 -st iterations over 100
+jac obj 16200.903088634319
+77 -st iterations over 100
+jac obj 16200.912036976655
+78 -st iterations over 100
+jac obj 16200.919931311411
+79 -st iterations over 100
+jac obj 16200.926840480086
+80 -st iterations over 100
+jac obj 16200.932836253376
+81 -st iterations over 100
+jac obj 16200.937992539004
+82 -st iterations over 100
+jac obj 16200.9423846185
+83 -st iterations over 100
+jac obj 16200.94608841784
+84 -st iterations over 100
+jac obj 16200.94917981608
+85 -st iterations over 100
+jac obj 16200.951733995751
+86 -st iterations over 100
+jac obj 16200.95382483832
+87 -st iterations over 100
+jac obj 16200.95552436742
+88 -st iterations over 100
+jac obj 16200.956902242026
+grad lambda -0.0007922444691602303
+value of lambda_k -11.684351348360304
+[LibLinear]0 -st iterations over 100
+jac obj 16187.397551610493
+1 -st iterations over 100
+jac obj 16197.546773374097
+2 -st iterations over 100
+jac obj 16200.500208535306
+3 -st iterations over 100
+jac obj 16202.246113656709
+4 -st iterations over 100
+jac obj 16203.900279299123
+5 -st iterations over 100
+jac obj 16205.30654601017
+6 -st iterations over 100
+jac obj 16206.356876841985
+7 -st iterations over 100
+jac obj 16207.063992140762
+8 -st iterations over 100
+jac obj 16207.494087463092
+9 -st iterations over 100
+jac obj 16207.723847459863
+10 -st iterations over 100
+jac obj 16207.820277539277
+11 -st iterations over 100
+jac obj 16207.834303224494
+12 -st iterations over 100
+jac obj 16207.801194300933
+13 -st iterations over 100
+jac obj 16207.743598799067
+14 -st iterations over 100
+jac obj 16207.675035092572
+15 -st iterations over 100
+jac obj 16207.602929960873
+16 -st iterations over 100
+jac obj 16207.530935294722
+17 -st iterations over 100
+jac obj 16207.460548675092
+18 -st iterations over 100
+jac obj 16207.392169294519
+19 -st iterations over 100
+jac obj 16207.325738367721
+20 -st iterations over 100
+jac obj 16207.261094608093
+21 -st iterations over 100
+jac obj 16207.198146202973
+22 -st iterations over 100
+jac obj 16207.136932339929
+23 -st iterations over 100
+jac obj 16207.077623861345
+24 -st iterations over 100
+jac obj 16207.020494857274
+25 -st iterations over 100
+jac obj 16206.965884361052
+26 -st iterations over 100
+jac obj 16206.914158764439
+27 -st iterations over 100
+jac obj 16206.865680076373
+28 -st iterations over 100
+jac obj 16206.820781819688
+29 -st iterations over 100
+jac obj 16206.77975249352
+30 -st iterations over 100
+jac obj 16206.742825607644
+31 -st iterations over 100
+jac obj 16206.710174953047
+32 -st iterations over 100
+jac obj 16206.681913761246
+33 -st iterations over 100
+jac obj 16206.658096561941
+34 -st iterations over 100
+jac obj 16206.638722772932
+35 -st iterations over 100
+jac obj 16206.62374128906
+36 -st iterations over 100
+jac obj 16206.613055547641
+37 -st iterations over 100
+jac obj 16206.606528721344
+38 -st iterations over 100
+jac obj 16206.603988824001
+39 -st iterations over 100
+jac obj 16206.605233611874
+grad lambda -0.00042450817817993823
+value of lambda_k -11.672434062245609
+[LibLinear]0 -st iterations over 100
+jac obj 16245.449866699548
+1 -st iterations over 100
+jac obj 16207.35295887827
+2 -st iterations over 100
+jac obj 16193.525327325417
+3 -st iterations over 100
+jac obj 16194.54631103766
+4 -st iterations over 100
+jac obj 16197.394517415401
+5 -st iterations over 100
+jac obj 16199.194923787094
+6 -st iterations over 100
+jac obj 16199.830170812818
+7 -st iterations over 100
+jac obj 16199.776035226454
+8 -st iterations over 100
+jac obj 16199.419304333154
+9 -st iterations over 100
+jac obj 16198.98283754089
+10 -st iterations over 100
+jac obj 16198.574132224163
+11 -st iterations over 100
+jac obj 16198.234126098307
+12 -st iterations over 100
+jac obj 16197.969315223543
+13 -st iterations over 100
+jac obj 16197.770567383694
+14 -st iterations over 100
+jac obj 16197.623383779865
+15 -st iterations over 100
+jac obj 16197.513038361605
+16 -st iterations over 100
+jac obj 16197.426810978357
+17 -st iterations over 100
+jac obj 16197.35468028025
+18 -st iterations over 100
+jac obj 16197.289275459307
+19 -st iterations over 100
+jac obj 16197.225524785976
+20 -st iterations over 100
+jac obj 16197.160222300749
+21 -st iterations over 100
+jac obj 16197.091612739849
+22 -st iterations over 100
+jac obj 16197.019031835705
+23 -st iterations over 100
+jac obj 16196.942609359952
+24 -st iterations over 100
+jac obj 16196.863030009505
+25 -st iterations over 100
+jac obj 16196.781343470167
+26 -st iterations over 100
+jac obj 16196.698814912932
+27 -st iterations over 100
+jac obj 16196.616808398538
+28 -st iterations over 100
+jac obj 16196.536697114063
+29 -st iterations over 100
+jac obj 16196.459795629733
+30 -st iterations over 100
+jac obj 16196.387310343533
+31 -st iterations over 100
+jac obj 16196.32030499668
+32 -st iterations over 100
+jac obj 16196.259678657689
+33 -st iterations over 100
+jac obj 16196.206153947936
+34 -st iterations over 100
+jac obj 16196.16027356851
+35 -st iterations over 100
+jac obj 16196.122403422385
+36 -st iterations over 100
+jac obj 16196.092740829856
+37 -st iterations over 100
+jac obj 16196.071326522453
+38 -st iterations over 100
+jac obj 16196.058059277235
+39 -st iterations over 100
+jac obj 16196.052712221226
+40 -st iterations over 100
+jac obj 16196.054949994914
+41 -st iterations over 100
+jac obj 16196.064346112487
+42 -st iterations over 100
+jac obj 16196.080399993192
+43 -st iterations over 100
+jac obj 16196.102553260946
+44 -st iterations over 100
+jac obj 16196.130205018399
+45 -st iterations over 100
+jac obj 16196.16272589469
+46 -st iterations over 100
+jac obj 16196.199470745207
+47 -st iterations over 100
+jac obj 16196.2397899462
+48 -st iterations over 100
+jac obj 16196.28303927835
+49 -st iterations over 100
+jac obj 16196.328588433222
+50 -st iterations over 100
+jac obj 16196.375828205159
+51 -st iterations over 100
+jac obj 16196.424176451721
+52 -st iterations over 100
+jac obj 16196.47308291804
+53 -st iterations over 100
+jac obj 16196.522033027108
+54 -st iterations over 100
+jac obj 16196.570550739863
+55 -st iterations over 100
+jac obj 16196.618200586958
+56 -st iterations over 100
+jac obj 16196.664588969863
+57 -st iterations over 100
+jac obj 16196.709364822555
+58 -st iterations over 100
+jac obj 16196.75221971813
+59 -st iterations over 100
+jac obj 16196.792887496766
+60 -st iterations over 100
+jac obj 16196.831143483982
+61 -st iterations over 100
+jac obj 16196.866803360488
+62 -st iterations over 100
+jac obj 16196.89972173817
+63 -st iterations over 100
+jac obj 16196.929790490305
+64 -st iterations over 100
+jac obj 16196.956936878556
+65 -st iterations over 100
+jac obj 16196.981121514282
+66 -st iterations over 100
+jac obj 16197.002336187606
+67 -st iterations over 100
+jac obj 16197.020601593977
+68 -st iterations over 100
+jac obj 16197.035964984967
+69 -st iterations over 100
+jac obj 16197.048497767591
+70 -st iterations over 100
+jac obj 16197.058293074222
+71 -st iterations over 100
+jac obj 16197.065463323426
+72 -st iterations over 100
+jac obj 16197.07013779058
+73 -st iterations over 100
+jac obj 16197.072460205609
+74 -st iterations over 100
+jac obj 16197.0725863942
+grad lambda -8.633339301465366e-05
+value of lambda_k -11.670010411068334
+[LibLinear]0 -st iterations over 100
+jac obj 16192.84754568388
+1 -st iterations over 100
+jac obj 16185.993711979536
+2 -st iterations over 100
+jac obj 16183.903818054427
+3 -st iterations over 100
+jac obj 16183.914616018132
+4 -st iterations over 100
+jac obj 16184.751905359493
+5 -st iterations over 100
+jac obj 16185.819297300224
+6 -st iterations over 100
+jac obj 16186.864383129985
+7 -st iterations over 100
+jac obj 16187.791530444087
+8 -st iterations over 100
+jac obj 16188.576422561478
+9 -st iterations over 100
+jac obj 16189.224303279425
+10 -st iterations over 100
+jac obj 16189.750551591342
+11 -st iterations over 100
+jac obj 16190.17248433985
+12 -st iterations over 100
+jac obj 16190.506238516924
+13 -st iterations over 100
+jac obj 16190.765863568977
+14 -st iterations over 100
+jac obj 16190.963299081755
+15 -st iterations over 100
+jac obj 16191.108638737473
+16 -st iterations over 100
+jac obj 16191.21043530681
+17 -st iterations over 100
+jac obj 16191.27596570238
+18 -st iterations over 100
+jac obj 16191.311442391912
+19 -st iterations over 100
+jac obj 16191.322179439367
+20 -st iterations over 100
+jac obj 16191.312725089143
+21 -st iterations over 100
+jac obj 16191.286970603822
+22 -st iterations over 100
+jac obj 16191.248241954174
+23 -st iterations over 100
+jac obj 16191.199378484613
+24 -st iterations over 100
+jac obj 16191.142801059174
+25 -st iterations over 100
+jac obj 16191.080571252258
+26 -st iterations over 100
+jac obj 16191.014442650845
+27 -st iterations over 100
+jac obj 16190.94590509499
+28 -st iterations over 100
+jac obj 16190.876222579041
+29 -st iterations over 100
+jac obj 16190.806465492691
+30 -st iterations over 100
+jac obj 16190.737537859297
+31 -st iterations over 100
+jac obj 16190.670200207736
+32 -st iterations over 100
+jac obj 16190.60508868555
+33 -st iterations over 100
+jac obj 16190.542730982943
+34 -st iterations over 100
+jac obj 16190.483559590686
+35 -st iterations over 100
+jac obj 16190.427922862124
+36 -st iterations over 100
+jac obj 16190.376094293631
+37 -st iterations over 100
+jac obj 16190.328280381405
+38 -st iterations over 100
+jac obj 16190.28462735746
+39 -st iterations over 100
+jac obj 16190.245227056079
+40 -st iterations over 100
+jac obj 16190.210122114782
+41 -st iterations over 100
+jac obj 16190.17931067176
+42 -st iterations over 100
+jac obj 16190.152750685076
+43 -st iterations over 100
+jac obj 16190.13036396785
+44 -st iterations over 100
+jac obj 16190.112040007632
+45 -st iterations over 100
+jac obj 16190.097639616935
+46 -st iterations over 100
+jac obj 16190.08699844542
+47 -st iterations over 100
+jac obj 16190.079930370877
+48 -st iterations over 100
+jac obj 16190.076230776756
+49 -st iterations over 100
+jac obj 16190.075679716736
+grad lambda -4.1249436920978494e-05
+value of lambda_k -11.668791461538836
+[LibLinear]0 -st iterations over 100
+jac obj 16195.900888418584
+1 -st iterations over 100
+jac obj 16196.701136292722
+2 -st iterations over 100
+jac obj 16195.69873808357
+3 -st iterations over 100
+jac obj 16195.485379100519
+4 -st iterations over 100
+jac obj 16195.585448355132
+5 -st iterations over 100
+jac obj 16195.823485936658
+6 -st iterations over 100
+jac obj 16196.11749140731
+7 -st iterations over 100
+jac obj 16196.424117069766
+8 -st iterations over 100
+jac obj 16196.722535837243
+9 -st iterations over 100
+jac obj 16197.00289261886
+10 -st iterations over 100
+jac obj 16197.260760287467
+11 -st iterations over 100
+jac obj 16197.4946753388
+12 -st iterations over 100
+jac obj 16197.704865197695
+13 -st iterations over 100
+jac obj 16197.892481896743
+14 -st iterations over 100
+jac obj 16198.05911895024
+15 -st iterations over 100
+jac obj 16198.20651663349
+16 -st iterations over 100
+jac obj 16198.336395155397
+17 -st iterations over 100
+jac obj 16198.450370680097
+18 -st iterations over 100
+jac obj 16198.549921592165
+19 -st iterations over 100
+jac obj 16198.63638296708
+20 -st iterations over 100
+jac obj 16198.71095532376
+21 -st iterations over 100
+jac obj 16198.774719403284
+22 -st iterations over 100
+jac obj 16198.828652396249
+23 -st iterations over 100
+jac obj 16198.873643293162
+24 -st iterations over 100
+jac obj 16198.91050634036
+25 -st iterations over 100
+jac obj 16198.939992303223
+26 -st iterations over 100
+jac obj 16198.96279760617
+27 -st iterations over 100
+jac obj 16198.979571585385
+28 -st iterations over 100
+jac obj 16198.990922146817
+29 -st iterations over 100
+jac obj 16198.997420121505
+30 -st iterations over 100
+jac obj 16198.999602583452
+31 -st iterations over 100
+jac obj 16198.997975358092
+32 -st iterations over 100
+jac obj 16198.993014910886
+33 -st iterations over 100
+jac obj 16198.985169769921
+34 -st iterations over 100
+jac obj 16198.974861605087
+35 -st iterations over 100
+jac obj 16198.962486060016
+36 -st iterations over 100
+jac obj 16198.948413411577
+37 -st iterations over 100
+jac obj 16198.932989114297
+38 -st iterations over 100
+jac obj 16198.91653427353
+39 -st iterations over 100
+jac obj 16198.899346080416
+40 -st iterations over 100
+jac obj 16198.881698233705
+41 -st iterations over 100
+jac obj 16198.863841367214
+42 -st iterations over 100
+jac obj 16198.846003496852
+43 -st iterations over 100
+jac obj 16198.828390497803
+44 -st iterations over 100
+jac obj 16198.811186619518
+45 -st iterations over 100
+jac obj 16198.79455504418
+46 -st iterations over 100
+jac obj 16198.778638492444
+47 -st iterations over 100
+jac obj 16198.763559878978
+48 -st iterations over 100
+jac obj 16198.749423019019
+49 -st iterations over 100
+jac obj 16198.73631338595
+50 -st iterations over 100
+jac obj 16198.724298919116
+51 -st iterations over 100
+jac obj 16198.713430879783
+52 -st iterations over 100
+jac obj 16198.703744752569
+53 -st iterations over 100
+jac obj 16198.695261188532
+54 -st iterations over 100
+jac obj 16198.687986985497
+55 -st iterations over 100
+jac obj 16198.68191610034
+56 -st iterations over 100
+jac obj 16198.677030687431
+57 -st iterations over 100
+jac obj 16198.673302156847
+58 -st iterations over 100
+jac obj 16198.670692245492
+59 -st iterations over 100
+jac obj 16198.669154094185
+grad lambda -1.8065105671691284e-05
+value of lambda_k -11.668257625110934
+[LibLinear]0 -st iterations over 100
+jac obj 16411.146319593787
+1 -st iterations over 100
+jac obj 16353.074164058919
+2 -st iterations over 100
+jac obj 16290.49258291552
+3 -st iterations over 100
+jac obj 16255.613569501042
+4 -st iterations over 100
+jac obj 16236.614450333715
+5 -st iterations over 100
+jac obj 16226.480939687908
+6 -st iterations over 100
+jac obj 16221.209313429006
+7 -st iterations over 100
+jac obj 16218.463375504574
+8 -st iterations over 100
+jac obj 16216.935365973965
+9 -st iterations over 100
+jac obj 16215.939743232817
+10 -st iterations over 100
+jac obj 16215.142009482399
+11 -st iterations over 100
+jac obj 16214.39571744861
+12 -st iterations over 100
+jac obj 16213.649507973834
+13 -st iterations over 100
+jac obj 16212.896327831435
+14 -st iterations over 100
+jac obj 16212.146920352723
+15 -st iterations over 100
+jac obj 16211.416755596169
+16 -st iterations over 100
+jac obj 16210.720133861425
+17 -st iterations over 100
+jac obj 16210.067967025612
+18 -st iterations over 100
+jac obj 16209.467346613908
+19 -st iterations over 100
+jac obj 16208.921905049236
+20 -st iterations over 100
+jac obj 16208.432465519598
+21 -st iterations over 100
+jac obj 16207.997736431913
+22 -st iterations over 100
+jac obj 16207.614942141436
+23 -st iterations over 100
+jac obj 16207.280350394873
+24 -st iterations over 100
+jac obj 16206.989690301125
+25 -st iterations over 100
+jac obj 16206.738469649661
+26 -st iterations over 100
+jac obj 16206.522206076985
+27 -st iterations over 100
+jac obj 16206.336587692198
+28 -st iterations over 100
+jac obj 16206.177577786451
+29 -st iterations over 100
+jac obj 16206.041476427843
+30 -st iterations over 100
+jac obj 16205.924949707935
+31 -st iterations over 100
+jac obj 16205.825035451873
+32 -st iterations over 100
+jac obj 16205.739132453902
+33 -st iterations over 100
+jac obj 16205.664978792285
+34 -st iterations over 100
+jac obj 16205.600623510281
+35 -st iterations over 100
+jac obj 16205.544394902257
+36 -st iterations over 100
+jac obj 16205.494867790581
+37 -st iterations over 100
+jac obj 16205.450831492331
+38 -st iterations over 100
+jac obj 16205.411259629454
+39 -st iterations over 100
+jac obj 16205.375282509756
+40 -st iterations over 100
+jac obj 16205.342162478059
+41 -st iterations over 100
+jac obj 16205.31127239074
+42 -st iterations over 100
+jac obj 16205.28207718689
+43 -st iterations over 100
+jac obj 16205.25411840327
+44 -st iterations over 100
+jac obj 16205.227001396897
+45 -st iterations over 100
+jac obj 16205.200384989777
+46 -st iterations over 100
+jac obj 16205.17397322637
+47 -st iterations over 100
+jac obj 16205.147508930386
+48 -st iterations over 100
+jac obj 16205.12076875742
+49 -st iterations over 100
+jac obj 16205.093559459654
+50 -st iterations over 100
+jac obj 16205.065715104945
+51 -st iterations over 100
+jac obj 16205.037095022268
+52 -st iterations over 100
+jac obj 16205.00758227649
+53 -st iterations over 100
+jac obj 16204.977082506379
+54 -st iterations over 100
+jac obj 16204.945522989303
+55 -st iterations over 100
+jac obj 16204.912851823752
+56 -st iterations over 100
+jac obj 16204.879037145425
+57 -st iterations over 100
+jac obj 16204.84406631501
+58 -st iterations over 100
+jac obj 16204.807945034658
+59 -st iterations over 100
+jac obj 16204.770696366393
+60 -st iterations over 100
+jac obj 16204.732359639087
+61 -st iterations over 100
+jac obj 16204.692989241565
+62 -st iterations over 100
+jac obj 16204.652653307572
+63 -st iterations over 100
+jac obj 16204.611432305115
+64 -st iterations over 100
+jac obj 16204.569417546843
+65 -st iterations over 100
+jac obj 16204.526709641486
+66 -st iterations over 100
+jac obj 16204.483416907724
+67 -st iterations over 100
+jac obj 16204.43965377278
+68 -st iterations over 100
+jac obj 16204.39553917748
+69 -st iterations over 100
+jac obj 16204.351195008756
+70 -st iterations over 100
+jac obj 16204.306744578978
+71 -st iterations over 100
+jac obj 16204.262311169774
+72 -st iterations over 100
+jac obj 16204.218016655703
+73 -st iterations over 100
+jac obj 16204.173980221163
+74 -st iterations over 100
+jac obj 16204.130317181269
+75 -st iterations over 100
+jac obj 16204.087137915414
+76 -st iterations over 100
+jac obj 16204.044546919784
+77 -st iterations over 100
+jac obj 16204.002641982986
+78 -st iterations over 100
+jac obj 16203.961513486938
+79 -st iterations over 100
+jac obj 16203.921243833229
+80 -st iterations over 100
+jac obj 16203.881906993614
+81 -st iterations over 100
+jac obj 16203.843568181504
+82 -st iterations over 100
+jac obj 16203.806283640311
+83 -st iterations over 100
+jac obj 16203.77010054303
+84 -st iterations over 100
+jac obj 16203.73505699673
+85 -st iterations over 100
+jac obj 16203.701182144623
+86 -st iterations over 100
+jac obj 16203.66849635795
+87 -st iterations over 100
+jac obj 16203.637011509169
+88 -st iterations over 100
+jac obj 16203.606731317963
+89 -st iterations over 100
+jac obj 16203.577651761036
+90 -st iterations over 100
+jac obj 16203.549761536884
+91 -st iterations over 100
+jac obj 16203.523042576619
+92 -st iterations over 100
+jac obj 16203.497470592076
+93 -st iterations over 100
+jac obj 16203.473015652775
+94 -st iterations over 100
+jac obj 16203.449642783507
+95 -st iterations over 100
+jac obj 16203.42731257478
+96 -st iterations over 100
+jac obj 16203.405981798725
+97 -st iterations over 100
+jac obj 16203.385604023646
+98 -st iterations over 100
+jac obj 16203.366130220822
+99 -st iterations over 100
+jac obj 16203.347509357767
+grad lambda 2.980843878781455e-05
+value of lambda_k -11.669184846251076
+[LibLinear]0 -st iterations over 100
+jac obj 16213.834667869753
+1 -st iterations over 100
+jac obj 16209.135892718174
+2 -st iterations over 100
+jac obj 16204.29846887922
+3 -st iterations over 100
+jac obj 16200.963358310286
+4 -st iterations over 100
+jac obj 16198.37843214995
+5 -st iterations over 100
+jac obj 16196.32919787183
+6 -st iterations over 100
+jac obj 16194.697581397682
+7 -st iterations over 100
+jac obj 16193.39703256256
+8 -st iterations over 100
+jac obj 16192.360528798714
+9 -st iterations over 100
+jac obj 16191.534821312722
+10 -st iterations over 100
+jac obj 16190.8773013862
+11 -st iterations over 100
+jac obj 16190.353806287212
+12 -st iterations over 100
+jac obj 16189.93693888032
+13 -st iterations over 100
+jac obj 16189.604760435928
+14 -st iterations over 100
+jac obj 16189.339759180235
+15 -st iterations over 100
+jac obj 16189.128017148994
+16 -st iterations over 100
+jac obj 16188.95852316193
+17 -st iterations over 100
+jac obj 16188.822600895095
+18 -st iterations over 100
+jac obj 16188.713433721052
+19 -st iterations over 100
+jac obj 16188.625673767727
+20 -st iterations over 100
+jac obj 16188.5551245734
+21 -st iterations over 100
+jac obj 16188.498487150955
+22 -st iterations over 100
+jac obj 16188.453159504827
+23 -st iterations over 100
+jac obj 16188.417080162815
+24 -st iterations over 100
+jac obj 16188.388607153984
+25 -st iterations over 100
+jac obj 16188.366424971668
+26 -st iterations over 100
+jac obj 16188.349473260065
+27 -st iterations over 100
+jac obj 16188.336892133244
+28 -st iterations over 100
+jac obj 16188.327980097778
+29 -st iterations over 100
+jac obj 16188.322161464319
+30 -st iterations over 100
+jac obj 16188.318960887693
+31 -st iterations over 100
+jac obj 16188.317983276915
+grad lambda -2.623936356784852e-05
+value of lambda_k -11.668325686771999
+[LibLinear]0 -st iterations over 100
+jac obj 16206.457854962902
+1 -st iterations over 100
+jac obj 16203.738183225889
+2 -st iterations over 100
+jac obj 16202.949516588524
+3 -st iterations over 100
+jac obj 16202.724567190642
+4 -st iterations over 100
+jac obj 16202.819301578165
+5 -st iterations over 100
+jac obj 16203.02429424405
+6 -st iterations over 100
+jac obj 16203.223749976727
+7 -st iterations over 100
+jac obj 16203.372809810968
+8 -st iterations over 100
+jac obj 16203.467490683337
+9 -st iterations over 100
+jac obj 16203.518974684737
+10 -st iterations over 100
+jac obj 16203.541264597077
+11 -st iterations over 100
+jac obj 16203.546442490191
+12 -st iterations over 100
+jac obj 16203.543374320418
+13 -st iterations over 100
+jac obj 16203.53784074996
+14 -st iterations over 100
+jac obj 16203.533156770907
+15 -st iterations over 100
+jac obj 16203.530865419369
+16 -st iterations over 100
+jac obj 16203.531341136388
+grad lambda 2.5188924080421764e-05
+value of lambda_k -11.669150451550896
+/home/qbe/sparse-ho/examples/plot_sparse_log_reg.py:100: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+  plt.show(block=False)
 </pre></div>
 </div>
 <div class="line-block">
@@ -836,10 +1419,8 @@ relative decrease =  9.054451260200504e-06
 
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="c1"># import matplotlib.pyplot as plt</span>
-<span class="c1"># import seaborn as sns</span>
-<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">csc_matrix</span></a>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 
 <span class="kn">from</span> <span class="nn">sparse_ho.ho</span> <span class="kn">import</span> <span class="n">grad_search</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
@@ -848,57 +1429,83 @@ relative decrease =  9.054451260200504e-06
 <span class="kn">from</span> <span class="nn">sparse_ho.implicit_forward</span> <span class="kn">import</span> <span class="n">ImplicitForward</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.forward</span> <span class="kn">import</span> <span class="n">Forward</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.grid_search</span> <span class="kn">import</span> <span class="n">grid_search</span>
-<span class="c1"># from sparse_ho.bayesian import hyperopt_lasso</span>
-
 <span class="kn">from</span> <span class="nn">sparse_ho.datasets.real</span> <span class="kn">import</span> <span class="n">get_rcv1</span>
-<span class="c1"># from expes.utils import configure_plt</span>
+<span class="c1"># from sparse_ho.datasets.real import get_real_sim</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">get_rcv1</span><span class="p">()</span>
-
-<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">n_features</span> <span class="o">=</span> <span class="mi">1000</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">make_classification</span><span class="p">(</span>
-    <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span>
-    <span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_informative</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">random_state</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">flip_y</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">n_redundant</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train_s</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">csc_matrix</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">get_rcv1</span><span class="p">()</span>
+<span class="c1"># X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()</span>
+<span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix.shape" title="scipy.sparse.csc_matrix.shape" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-attribute"><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span></a>
 
 
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">make_classification</span><span class="p">(</span>
-    <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span>
-    <span class="n">n_features</span><span class="o">=</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_informative</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">random_state</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">flip_y</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">n_redundant</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="c1"># X_val_s = csc_matrix(X_val)</span>
-
-
-<span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="o">.</span><span class="n">shape</span>
-
-<span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span><span class="o">.</span><span class="n">T</span></a> <span class="o">@</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">))</span>
-<span class="n">alpha_max</span> <span class="o">/=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_samples</span>
+<span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csr_matrix" title="scipy.sparse.csr_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span><span class="o">.</span><span class="n">T</span></a> <span class="o">@</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">))</span>
+<span class="n">alpha_max</span> <span class="o">/=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n_samples</span>
 <span class="n">log_alpha_max</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span><span class="p">)</span>
-<span class="n">log_alpha_min</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">log_alpha_min</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
 <span class="n">maxit</span> <span class="o">=</span> <span class="mi">1000</span>
 
-<span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="mf">0.3</span> <span class="o">*</span> <span class="n">alpha_max</span><span class="p">)</span>
-<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">alpha_max</span><span class="p">)</span>
+<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-7</span>
+<span class="n">use_sk</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="c1"># use_sk = False</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">SparseLogreg</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">Logistic</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-<span class="n">monitor</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
-<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">tol_jac</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">n_iter_jac</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-<span class="n">grad_search</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span> <span class="n">monitor</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">10</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">log_alphas</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">)</span>
 
-
+<span class="c1"># grid search</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SparseLogreg</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">Logistic</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="n">algo_grid</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">use_sk</span><span class="o">=</span><span class="n">use_sk</span><span class="p">)</span>
 <span class="n">monitor_grid</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
-<span class="n">algo_grid</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
 <span class="n">grid_search</span><span class="p">(</span>
-    <span class="n">algo_grid</span><span class="p">,</span> <span class="n">log_alpha_min</span><span class="p">,</span> <span class="n">log_alpha_max</span><span class="p">,</span> <span class="n">monitor_grid</span><span class="p">,</span> <span class="n">max_evals</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">algo_grid</span><span class="p">,</span> <span class="n">log_alpha_min</span><span class="p">,</span> <span class="n">log_alpha_max</span><span class="p">,</span> <span class="n">monitor_grid</span><span class="p">,</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">log_alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">log_alphas</span></a><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grid</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
+
+
+<span class="c1"># grad search</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SparseLogreg</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">Logistic</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+<span class="n">monitor_grad</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
+<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">tol_jac</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">n_iter_jac</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">use_sk</span><span class="o">=</span><span class="n">use_sk</span><span class="p">)</span>
+<span class="n">grad_search</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span> <span class="n">monitor_grad</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
+
+
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.exp" title="numpy.exp" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">exp</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">log_alphas</span></a><span class="p">))</span> <span class="o">/</span> <span class="n">alpha_max</span>
+
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
+
+<span class="n">current_palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;colorblind&quot;</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">7.0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">,</span> <span class="s1">&#39;bo&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;0-order method (grid-search)&#39;</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a><span class="p">,</span> <span class="s1">&#39;bX&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1-st order method&#39;</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\lambda / \lambda_{\max}$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm</span><span class="si">{val}</span><span class="s2">} X_i^{\rm</span><span class="si">{val}</span><span class="s2">} \hat \beta^{(\lambda)} } \right ) $&quot;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">)</span>
+<span class="c1"># plt.ylabel(</span>
+<span class="c1">#     r&quot;$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$&quot;,</span>
+<span class="c1">#     fontsize=28)</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.715 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.867 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-sparse-log-reg-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a9588e66a2dbadd4c004d1e34b56758d/plot_sparse_log_reg.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_sparse_log_reg.py</span></code></a></p>
