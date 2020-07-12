@@ -13,1337 +13,8 @@
 Sparse logistic regression
 ===========================
 
-An example to show how to use this package for sparse logistic regression
-
-
-
-.. image:: /auto_examples/images/sphx_glr_plot_sparse_log_reg_001.png
-    :alt: plot sparse log reg
-    :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    [LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear]0 -st iterations over 100
-    jac obj 17244.26070895325
-    1 -st iterations over 100
-    jac obj 14799.16104267324
-    2 -st iterations over 100
-    jac obj 13776.975450288895
-    3 -st iterations over 100
-    jac obj 13308.947360859725
-    4 -st iterations over 100
-    jac obj 13122.091913256625
-    5 -st iterations over 100
-    jac obj 13064.829938004488
-    6 -st iterations over 100
-    jac obj 13060.35646509166
-    7 -st iterations over 100
-    jac obj 13073.94325550266
-    8 -st iterations over 100
-    jac obj 13090.932137217507
-    9 -st iterations over 100
-    jac obj 13105.67816403595
-    10 -st iterations over 100
-    jac obj 13116.534080748072
-    11 -st iterations over 100
-    jac obj 13123.579338743113
-    12 -st iterations over 100
-    jac obj 13127.516481746849
-    13 -st iterations over 100
-    jac obj 13129.12112169466
-    14 -st iterations over 100
-    jac obj 13129.009771220499
-    15 -st iterations over 100
-    jac obj 13127.59834936112
-    16 -st iterations over 100
-    jac obj 13125.156315582572
-    17 -st iterations over 100
-    jac obj 13121.886604439753
-    18 -st iterations over 100
-    jac obj 13117.989736733425
-    19 -st iterations over 100
-    jac obj 13113.695823340506
-    20 -st iterations over 100
-    jac obj 13109.265749264905
-    21 -st iterations over 100
-    jac obj 13104.971691274968
-    22 -st iterations over 100
-    jac obj 13101.06908061822
-    23 -st iterations over 100
-    jac obj 13097.769946496112
-    24 -st iterations over 100
-    jac obj 13095.22378602028
-    25 -st iterations over 100
-    jac obj 13093.508408060989
-    26 -st iterations over 100
-    jac obj 13092.63043397411
-    27 -st iterations over 100
-    jac obj 13092.533505913521
-    28 -st iterations over 100
-    jac obj 13093.11159090496
-    29 -st iterations over 100
-    jac obj 13094.224781753715
-    30 -st iterations over 100
-    jac obj 13095.715395627494
-    31 -st iterations over 100
-    jac obj 13097.422734427762
-    32 -st iterations over 100
-    jac obj 13099.195450217328
-    33 -st iterations over 100
-    jac obj 13100.900970256182
-    34 -st iterations over 100
-    jac obj 13102.431841947327
-    35 -st iterations over 100
-    jac obj 13103.709150534409
-    36 -st iterations over 100
-    jac obj 13104.683351686997
-    37 -st iterations over 100
-    jac obj 13105.332965883903
-    38 -st iterations over 100
-    jac obj 13105.661623070953
-    39 -st iterations over 100
-    jac obj 13105.693944246637
-    40 -st iterations over 100
-    jac obj 13105.470717425977
-    41 -st iterations over 100
-    jac obj 13105.043780201533
-    42 -st iterations over 100
-    jac obj 13104.470966864865
-    43 -st iterations over 100
-    jac obj 13103.811418479014
-    44 -st iterations over 100
-    jac obj 13103.121491179912
-    45 -st iterations over 100
-    jac obj 13102.451432462864
-    46 -st iterations over 100
-    jac obj 13101.842928703634
-    47 -st iterations over 100
-    jac obj 13101.327561840319
-    48 -st iterations over 100
-    jac obj 13100.926151902502
-    49 -st iterations over 100
-    jac obj 13100.648908183133
-    50 -st iterations over 100
-    jac obj 13100.496268391587
-    51 -st iterations over 100
-    jac obj 13100.460274465186
-    52 -st iterations over 100
-    jac obj 13100.526317085334
-    53 -st iterations over 100
-    jac obj 13100.675078267304
-    54 -st iterations over 100
-    jac obj 13100.884511336884
-    55 -st iterations over 100
-    jac obj 13101.131717831659
-    56 -st iterations over 100
-    jac obj 13101.394608392178
-    57 -st iterations over 100
-    jac obj 13101.653266332576
-    58 -st iterations over 100
-    jac obj 13101.890965240258
-    59 -st iterations over 100
-    jac obj 13102.094823016781
-    60 -st iterations over 100
-    jac obj 13102.25610220448
-    61 -st iterations over 100
-    jac obj 13102.370188878622
-    62 -st iterations over 100
-    jac obj 13102.43629909331
-    63 -st iterations over 100
-    jac obj 13102.456972676204
-    64 -st iterations over 100
-    jac obj 13102.437419336731
-    65 -st iterations over 100
-    jac obj 13102.38478216913
-    66 -st iterations over 100
-    jac obj 13102.307379492435
-    67 -st iterations over 100
-    jac obj 13102.213978491385
-    68 -st iterations over 100
-    jac obj 13102.113144273586
-    69 -st iterations over 100
-    jac obj 13102.012696698923
-    70 -st iterations over 100
-    jac obj 13101.919295575144
-    71 -st iterations over 100
-    jac obj 13101.838163364793
-    72 -st iterations over 100
-    jac obj 13101.772944106087
-    73 -st iterations over 100
-    jac obj 13101.725688356846
-    74 -st iterations over 100
-    jac obj 13101.696947002798
-    75 -st iterations over 100
-    jac obj 13101.685951932863
-    76 -st iterations over 100
-    jac obj 13101.690858908365
-    77 -st iterations over 100
-    jac obj 13101.70902732316
-    78 -st iterations over 100
-    jac obj 13101.737312723539
-    79 -st iterations over 100
-    jac obj 13101.772350594838
-    80 -st iterations over 100
-    jac obj 13101.810813633781
-    81 -st iterations over 100
-    jac obj 13101.849629101378
-    82 -st iterations over 100
-    jac obj 13101.88614749328
-    83 -st iterations over 100
-    jac obj 13101.918258317206
-    84 -st iterations over 100
-    jac obj 13101.944452932981
-    85 -st iterations over 100
-    jac obj 13101.963837966514
-    86 -st iterations over 100
-    jac obj 13101.97610560515
-    87 -st iterations over 100
-    jac obj 13101.981469044393
-    88 -st iterations over 100
-    jac obj 13101.980572477492
-    grad lambda 0.0830936573931528
-    value of lambda_k -11.742526035167026
-    [LibLinear]0 -st iterations over 100
-    jac obj 18663.51130106987
-    1 -st iterations over 100
-    jac obj 17593.0243499924
-    2 -st iterations over 100
-    jac obj 17185.237325834263
-    3 -st iterations over 100
-    jac obj 16954.30545185337
-    4 -st iterations over 100
-    jac obj 16803.46029252406
-    5 -st iterations over 100
-    jac obj 16695.93853976014
-    6 -st iterations over 100
-    jac obj 16614.569144825
-    7 -st iterations over 100
-    jac obj 16550.885380880896
-    8 -st iterations over 100
-    jac obj 16499.901006492244
-    9 -st iterations over 100
-    jac obj 16458.392103100556
-    10 -st iterations over 100
-    jac obj 16424.165184925678
-    11 -st iterations over 100
-    jac obj 16395.678189077396
-    12 -st iterations over 100
-    jac obj 16371.814993996026
-    13 -st iterations over 100
-    jac obj 16351.741535731007
-    14 -st iterations over 100
-    jac obj 16334.812779621223
-    15 -st iterations over 100
-    jac obj 16320.513264984747
-    16 -st iterations over 100
-    jac obj 16308.419680084444
-    17 -st iterations over 100
-    jac obj 16298.177456324154
-    18 -st iterations over 100
-    jac obj 16289.48596472686
-    19 -st iterations over 100
-    jac obj 16282.088813431163
-    20 -st iterations over 100
-    jac obj 16275.76709047678
-    21 -st iterations over 100
-    jac obj 16270.3342876011
-    22 -st iterations over 100
-    jac obj 16265.632199050458
-    23 -st iterations over 100
-    jac obj 16261.527420499842
-    24 -st iterations over 100
-    jac obj 16257.908258798701
-    25 -st iterations over 100
-    jac obj 16254.681960921625
-    26 -st iterations over 100
-    jac obj 16251.772217906051
-    27 -st iterations over 100
-    jac obj 16249.116920010083
-    28 -st iterations over 100
-    jac obj 16246.66614644938
-    29 -st iterations over 100
-    jac obj 16244.38037438921
-    30 -st iterations over 100
-    jac obj 16242.228891231334
-    31 -st iterations over 100
-    jac obj 16240.188393427166
-    32 -st iterations over 100
-    jac obj 16238.241754738
-    33 -st iterations over 100
-    jac obj 16236.376947178094
-    34 -st iterations over 100
-    jac obj 16234.586098711197
-    35 -st iterations over 100
-    jac obj 16232.864672950092
-    36 -st iterations over 100
-    jac obj 16231.210757463143
-    37 -st iterations over 100
-    jac obj 16229.62444868578
-    38 -st iterations over 100
-    jac obj 16228.10732277806
-    39 -st iterations over 100
-    jac obj 16226.661983003954
-    40 -st iterations over 100
-    jac obj 16225.291675308563
-    41 -st iterations over 100
-    jac obj 16223.999964728035
-    42 -st iterations over 100
-    jac obj 16222.790466090079
-    43 -st iterations over 100
-    jac obj 16221.66662316351
-    44 -st iterations over 100
-    jac obj 16220.6315310092
-    45 -st iterations over 100
-    jac obj 16219.68779678979
-    46 -st iterations over 100
-    jac obj 16218.83743472609
-    47 -st iterations over 100
-    jac obj 16218.081791259556
-    48 -st iterations over 100
-    jac obj 16217.421496803625
-    49 -st iterations over 100
-    jac obj 16216.856440752366
-    50 -st iterations over 100
-    jac obj 16216.385766670483
-    51 -st iterations over 100
-    jac obj 16216.007884820776
-    52 -st iterations over 100
-    jac obj 16215.7204993987
-    53 -st iterations over 100
-    jac obj 16215.52064804242
-    54 -st iterations over 100
-    jac obj 16215.404751373584
-    55 -st iterations over 100
-    jac obj 16215.368670501832
-    56 -st iterations over 100
-    jac obj 16215.407770595904
-    57 -st iterations over 100
-    jac obj 16215.516988787645
-    58 -st iterations over 100
-    jac obj 16215.690904833225
-    59 -st iterations over 100
-    jac obj 16215.923813109044
-    60 -st iterations over 100
-    jac obj 16216.209794668184
-    61 -st iterations over 100
-    jac obj 16216.542788227573
-    62 -st iterations over 100
-    jac obj 16216.916659095341
-    63 -st iterations over 100
-    jac obj 16217.325265182857
-    64 -st iterations over 100
-    jac obj 16217.762519375792
-    65 -st iterations over 100
-    jac obj 16218.222447662783
-    66 -st iterations over 100
-    jac obj 16218.699242538893
-    67 -st iterations over 100
-    jac obj 16219.187311313166
-    68 -st iterations over 100
-    jac obj 16219.681319054816
-    69 -st iterations over 100
-    jac obj 16220.176226010812
-    70 -st iterations over 100
-    jac obj 16220.667319417878
-    71 -st iterations over 100
-    jac obj 16221.150239714603
-    72 -st iterations over 100
-    jac obj 16221.62100123359
-    73 -st iterations over 100
-    jac obj 16222.076007519778
-    74 -st iterations over 100
-    jac obj 16222.512061478725
-    75 -st iterations over 100
-    jac obj 16222.926370608266
-    76 -st iterations over 100
-    jac obj 16223.316547608356
-    77 -st iterations over 100
-    jac obj 16223.680606697479
-    78 -st iterations over 100
-    jac obj 16224.016955990179
-    79 -st iterations over 100
-    jac obj 16224.324386309272
-    80 -st iterations over 100
-    jac obj 16224.602056818563
-    81 -st iterations over 100
-    jac obj 16224.849477868234
-    82 -st iterations over 100
-    jac obj 16225.06649144574
-    83 -st iterations over 100
-    jac obj 16225.253249620591
-    84 -st iterations over 100
-    jac obj 16225.410191362753
-    85 -st iterations over 100
-    jac obj 16225.538018101724
-    86 -st iterations over 100
-    jac obj 16225.637668377383
-    87 -st iterations over 100
-    jac obj 16225.71029191528
-    88 -st iterations over 100
-    jac obj 16225.75722343797
-    89 -st iterations over 100
-    jac obj 16225.779956501776
-    90 -st iterations over 100
-    jac obj 16225.780117624396
-    grad lambda -0.0014621835133897584
-    value of lambda_k -11.70548011400537
-    [LibLinear]0 -st iterations over 100
-    jac obj 16210.60566637552
-    1 -st iterations over 100
-    jac obj 16196.663648386322
-    2 -st iterations over 100
-    jac obj 16193.372532610087
-    3 -st iterations over 100
-    jac obj 16191.54874719428
-    4 -st iterations over 100
-    jac obj 16190.707206145817
-    5 -st iterations over 100
-    jac obj 16190.60371998153
-    6 -st iterations over 100
-    jac obj 16190.963597567548
-    7 -st iterations over 100
-    jac obj 16191.587240250465
-    8 -st iterations over 100
-    jac obj 16192.340700482226
-    9 -st iterations over 100
-    jac obj 16193.137991137904
-    10 -st iterations over 100
-    jac obj 16193.926447520309
-    11 -st iterations over 100
-    jac obj 16194.675693290088
-    12 -st iterations over 100
-    jac obj 16195.369724446178
-    13 -st iterations over 100
-    jac obj 16196.001460943122
-    14 -st iterations over 100
-    jac obj 16196.569160462052
-    15 -st iterations over 100
-    jac obj 16197.074157046074
-    16 -st iterations over 100
-    jac obj 16197.519488025804
-    17 -st iterations over 100
-    jac obj 16197.909085165737
-    18 -st iterations over 100
-    jac obj 16198.247307422256
-    19 -st iterations over 100
-    jac obj 16198.538672082494
-    20 -st iterations over 100
-    jac obj 16198.78769723307
-    21 -st iterations over 100
-    jac obj 16198.998805347579
-    22 -st iterations over 100
-    jac obj 16199.176260468614
-    23 -st iterations over 100
-    jac obj 16199.324124659204
-    24 -st iterations over 100
-    jac obj 16199.446226649585
-    25 -st iterations over 100
-    jac obj 16199.546139334729
-    26 -st iterations over 100
-    jac obj 16199.62716453605
-    27 -st iterations over 100
-    jac obj 16199.692324162419
-    28 -st iterations over 100
-    jac obj 16199.74435712717
-    29 -st iterations over 100
-    jac obj 16199.78572138972
-    30 -st iterations over 100
-    jac obj 16199.818600440196
-    31 -st iterations over 100
-    jac obj 16199.844913499748
-    32 -st iterations over 100
-    jac obj 16199.86632869345
-    33 -st iterations over 100
-    jac obj 16199.884278470285
-    34 -st iterations over 100
-    jac obj 16199.899976590976
-    35 -st iterations over 100
-    jac obj 16199.914436071149
-    36 -st iterations over 100
-    jac obj 16199.928487546016
-    37 -st iterations over 100
-    jac obj 16199.942797607056
-    38 -st iterations over 100
-    jac obj 16199.957886744593
-    39 -st iterations over 100
-    jac obj 16199.974146609926
-    40 -st iterations over 100
-    jac obj 16199.99185638295
-    41 -st iterations over 100
-    jac obj 16200.011198095646
-    42 -st iterations over 100
-    jac obj 16200.032270816635
-    43 -st iterations over 100
-    jac obj 16200.055103648456
-    44 -st iterations over 100
-    jac obj 16200.079667526252
-    45 -st iterations over 100
-    jac obj 16200.10588583627
-    46 -st iterations over 100
-    jac obj 16200.133643894811
-    47 -st iterations over 100
-    jac obj 16200.16279734446
-    48 -st iterations over 100
-    jac obj 16200.193179535396
-    49 -st iterations over 100
-    jac obj 16200.224607966295
-    50 -st iterations over 100
-    jac obj 16200.256889862281
-    51 -st iterations over 100
-    jac obj 16200.289826967964
-    52 -st iterations over 100
-    jac obj 16200.323219631875
-    53 -st iterations over 100
-    jac obj 16200.356870255284
-    54 -st iterations over 100
-    jac obj 16200.390586174231
-    55 -st iterations over 100
-    jac obj 16200.424182038576
-    56 -st iterations over 100
-    jac obj 16200.457481746604
-    57 -st iterations over 100
-    jac obj 16200.490319988297
-    58 -st iterations over 100
-    jac obj 16200.522543445053
-    59 -st iterations over 100
-    jac obj 16200.554011688491
-    60 -st iterations over 100
-    jac obj 16200.584597816214
-    61 -st iterations over 100
-    jac obj 16200.614188857944
-    62 -st iterations over 100
-    jac obj 16200.642685981471
-    63 -st iterations over 100
-    jac obj 16200.670004524163
-    64 -st iterations over 100
-    jac obj 16200.696073872892
-    65 -st iterations over 100
-    jac obj 16200.720837212108
-    66 -st iterations over 100
-    jac obj 16200.74425115786
-    67 -st iterations over 100
-    jac obj 16200.766285293179
-    68 -st iterations over 100
-    jac obj 16200.786921618888
-    69 -st iterations over 100
-    jac obj 16200.806153932193
-    70 -st iterations over 100
-    jac obj 16200.823987144573
-    71 -st iterations over 100
-    jac obj 16200.840436549233
-    72 -st iterations over 100
-    jac obj 16200.855527047843
-    73 -st iterations over 100
-    jac obj 16200.86929234544
-    74 -st iterations over 100
-    jac obj 16200.881774121935
-    75 -st iterations over 100
-    jac obj 16200.893021188229
-    76 -st iterations over 100
-    jac obj 16200.903088634319
-    77 -st iterations over 100
-    jac obj 16200.912036976655
-    78 -st iterations over 100
-    jac obj 16200.919931311411
-    79 -st iterations over 100
-    jac obj 16200.926840480086
-    80 -st iterations over 100
-    jac obj 16200.932836253376
-    81 -st iterations over 100
-    jac obj 16200.937992539004
-    82 -st iterations over 100
-    jac obj 16200.9423846185
-    83 -st iterations over 100
-    jac obj 16200.94608841784
-    84 -st iterations over 100
-    jac obj 16200.94917981608
-    85 -st iterations over 100
-    jac obj 16200.951733995751
-    86 -st iterations over 100
-    jac obj 16200.95382483832
-    87 -st iterations over 100
-    jac obj 16200.95552436742
-    88 -st iterations over 100
-    jac obj 16200.956902242026
-    grad lambda -0.0007922444691602303
-    value of lambda_k -11.684351348360304
-    [LibLinear]0 -st iterations over 100
-    jac obj 16187.397551610493
-    1 -st iterations over 100
-    jac obj 16197.546773374097
-    2 -st iterations over 100
-    jac obj 16200.500208535306
-    3 -st iterations over 100
-    jac obj 16202.246113656709
-    4 -st iterations over 100
-    jac obj 16203.900279299123
-    5 -st iterations over 100
-    jac obj 16205.30654601017
-    6 -st iterations over 100
-    jac obj 16206.356876841985
-    7 -st iterations over 100
-    jac obj 16207.063992140762
-    8 -st iterations over 100
-    jac obj 16207.494087463092
-    9 -st iterations over 100
-    jac obj 16207.723847459863
-    10 -st iterations over 100
-    jac obj 16207.820277539277
-    11 -st iterations over 100
-    jac obj 16207.834303224494
-    12 -st iterations over 100
-    jac obj 16207.801194300933
-    13 -st iterations over 100
-    jac obj 16207.743598799067
-    14 -st iterations over 100
-    jac obj 16207.675035092572
-    15 -st iterations over 100
-    jac obj 16207.602929960873
-    16 -st iterations over 100
-    jac obj 16207.530935294722
-    17 -st iterations over 100
-    jac obj 16207.460548675092
-    18 -st iterations over 100
-    jac obj 16207.392169294519
-    19 -st iterations over 100
-    jac obj 16207.325738367721
-    20 -st iterations over 100
-    jac obj 16207.261094608093
-    21 -st iterations over 100
-    jac obj 16207.198146202973
-    22 -st iterations over 100
-    jac obj 16207.136932339929
-    23 -st iterations over 100
-    jac obj 16207.077623861345
-    24 -st iterations over 100
-    jac obj 16207.020494857274
-    25 -st iterations over 100
-    jac obj 16206.965884361052
-    26 -st iterations over 100
-    jac obj 16206.914158764439
-    27 -st iterations over 100
-    jac obj 16206.865680076373
-    28 -st iterations over 100
-    jac obj 16206.820781819688
-    29 -st iterations over 100
-    jac obj 16206.77975249352
-    30 -st iterations over 100
-    jac obj 16206.742825607644
-    31 -st iterations over 100
-    jac obj 16206.710174953047
-    32 -st iterations over 100
-    jac obj 16206.681913761246
-    33 -st iterations over 100
-    jac obj 16206.658096561941
-    34 -st iterations over 100
-    jac obj 16206.638722772932
-    35 -st iterations over 100
-    jac obj 16206.62374128906
-    36 -st iterations over 100
-    jac obj 16206.613055547641
-    37 -st iterations over 100
-    jac obj 16206.606528721344
-    38 -st iterations over 100
-    jac obj 16206.603988824001
-    39 -st iterations over 100
-    jac obj 16206.605233611874
-    grad lambda -0.00042450817817993823
-    value of lambda_k -11.672434062245609
-    [LibLinear]0 -st iterations over 100
-    jac obj 16245.449866699548
-    1 -st iterations over 100
-    jac obj 16207.35295887827
-    2 -st iterations over 100
-    jac obj 16193.525327325417
-    3 -st iterations over 100
-    jac obj 16194.54631103766
-    4 -st iterations over 100
-    jac obj 16197.394517415401
-    5 -st iterations over 100
-    jac obj 16199.194923787094
-    6 -st iterations over 100
-    jac obj 16199.830170812818
-    7 -st iterations over 100
-    jac obj 16199.776035226454
-    8 -st iterations over 100
-    jac obj 16199.419304333154
-    9 -st iterations over 100
-    jac obj 16198.98283754089
-    10 -st iterations over 100
-    jac obj 16198.574132224163
-    11 -st iterations over 100
-    jac obj 16198.234126098307
-    12 -st iterations over 100
-    jac obj 16197.969315223543
-    13 -st iterations over 100
-    jac obj 16197.770567383694
-    14 -st iterations over 100
-    jac obj 16197.623383779865
-    15 -st iterations over 100
-    jac obj 16197.513038361605
-    16 -st iterations over 100
-    jac obj 16197.426810978357
-    17 -st iterations over 100
-    jac obj 16197.35468028025
-    18 -st iterations over 100
-    jac obj 16197.289275459307
-    19 -st iterations over 100
-    jac obj 16197.225524785976
-    20 -st iterations over 100
-    jac obj 16197.160222300749
-    21 -st iterations over 100
-    jac obj 16197.091612739849
-    22 -st iterations over 100
-    jac obj 16197.019031835705
-    23 -st iterations over 100
-    jac obj 16196.942609359952
-    24 -st iterations over 100
-    jac obj 16196.863030009505
-    25 -st iterations over 100
-    jac obj 16196.781343470167
-    26 -st iterations over 100
-    jac obj 16196.698814912932
-    27 -st iterations over 100
-    jac obj 16196.616808398538
-    28 -st iterations over 100
-    jac obj 16196.536697114063
-    29 -st iterations over 100
-    jac obj 16196.459795629733
-    30 -st iterations over 100
-    jac obj 16196.387310343533
-    31 -st iterations over 100
-    jac obj 16196.32030499668
-    32 -st iterations over 100
-    jac obj 16196.259678657689
-    33 -st iterations over 100
-    jac obj 16196.206153947936
-    34 -st iterations over 100
-    jac obj 16196.16027356851
-    35 -st iterations over 100
-    jac obj 16196.122403422385
-    36 -st iterations over 100
-    jac obj 16196.092740829856
-    37 -st iterations over 100
-    jac obj 16196.071326522453
-    38 -st iterations over 100
-    jac obj 16196.058059277235
-    39 -st iterations over 100
-    jac obj 16196.052712221226
-    40 -st iterations over 100
-    jac obj 16196.054949994914
-    41 -st iterations over 100
-    jac obj 16196.064346112487
-    42 -st iterations over 100
-    jac obj 16196.080399993192
-    43 -st iterations over 100
-    jac obj 16196.102553260946
-    44 -st iterations over 100
-    jac obj 16196.130205018399
-    45 -st iterations over 100
-    jac obj 16196.16272589469
-    46 -st iterations over 100
-    jac obj 16196.199470745207
-    47 -st iterations over 100
-    jac obj 16196.2397899462
-    48 -st iterations over 100
-    jac obj 16196.28303927835
-    49 -st iterations over 100
-    jac obj 16196.328588433222
-    50 -st iterations over 100
-    jac obj 16196.375828205159
-    51 -st iterations over 100
-    jac obj 16196.424176451721
-    52 -st iterations over 100
-    jac obj 16196.47308291804
-    53 -st iterations over 100
-    jac obj 16196.522033027108
-    54 -st iterations over 100
-    jac obj 16196.570550739863
-    55 -st iterations over 100
-    jac obj 16196.618200586958
-    56 -st iterations over 100
-    jac obj 16196.664588969863
-    57 -st iterations over 100
-    jac obj 16196.709364822555
-    58 -st iterations over 100
-    jac obj 16196.75221971813
-    59 -st iterations over 100
-    jac obj 16196.792887496766
-    60 -st iterations over 100
-    jac obj 16196.831143483982
-    61 -st iterations over 100
-    jac obj 16196.866803360488
-    62 -st iterations over 100
-    jac obj 16196.89972173817
-    63 -st iterations over 100
-    jac obj 16196.929790490305
-    64 -st iterations over 100
-    jac obj 16196.956936878556
-    65 -st iterations over 100
-    jac obj 16196.981121514282
-    66 -st iterations over 100
-    jac obj 16197.002336187606
-    67 -st iterations over 100
-    jac obj 16197.020601593977
-    68 -st iterations over 100
-    jac obj 16197.035964984967
-    69 -st iterations over 100
-    jac obj 16197.048497767591
-    70 -st iterations over 100
-    jac obj 16197.058293074222
-    71 -st iterations over 100
-    jac obj 16197.065463323426
-    72 -st iterations over 100
-    jac obj 16197.07013779058
-    73 -st iterations over 100
-    jac obj 16197.072460205609
-    74 -st iterations over 100
-    jac obj 16197.0725863942
-    grad lambda -8.633339301465366e-05
-    value of lambda_k -11.670010411068334
-    [LibLinear]0 -st iterations over 100
-    jac obj 16192.84754568388
-    1 -st iterations over 100
-    jac obj 16185.993711979536
-    2 -st iterations over 100
-    jac obj 16183.903818054427
-    3 -st iterations over 100
-    jac obj 16183.914616018132
-    4 -st iterations over 100
-    jac obj 16184.751905359493
-    5 -st iterations over 100
-    jac obj 16185.819297300224
-    6 -st iterations over 100
-    jac obj 16186.864383129985
-    7 -st iterations over 100
-    jac obj 16187.791530444087
-    8 -st iterations over 100
-    jac obj 16188.576422561478
-    9 -st iterations over 100
-    jac obj 16189.224303279425
-    10 -st iterations over 100
-    jac obj 16189.750551591342
-    11 -st iterations over 100
-    jac obj 16190.17248433985
-    12 -st iterations over 100
-    jac obj 16190.506238516924
-    13 -st iterations over 100
-    jac obj 16190.765863568977
-    14 -st iterations over 100
-    jac obj 16190.963299081755
-    15 -st iterations over 100
-    jac obj 16191.108638737473
-    16 -st iterations over 100
-    jac obj 16191.21043530681
-    17 -st iterations over 100
-    jac obj 16191.27596570238
-    18 -st iterations over 100
-    jac obj 16191.311442391912
-    19 -st iterations over 100
-    jac obj 16191.322179439367
-    20 -st iterations over 100
-    jac obj 16191.312725089143
-    21 -st iterations over 100
-    jac obj 16191.286970603822
-    22 -st iterations over 100
-    jac obj 16191.248241954174
-    23 -st iterations over 100
-    jac obj 16191.199378484613
-    24 -st iterations over 100
-    jac obj 16191.142801059174
-    25 -st iterations over 100
-    jac obj 16191.080571252258
-    26 -st iterations over 100
-    jac obj 16191.014442650845
-    27 -st iterations over 100
-    jac obj 16190.94590509499
-    28 -st iterations over 100
-    jac obj 16190.876222579041
-    29 -st iterations over 100
-    jac obj 16190.806465492691
-    30 -st iterations over 100
-    jac obj 16190.737537859297
-    31 -st iterations over 100
-    jac obj 16190.670200207736
-    32 -st iterations over 100
-    jac obj 16190.60508868555
-    33 -st iterations over 100
-    jac obj 16190.542730982943
-    34 -st iterations over 100
-    jac obj 16190.483559590686
-    35 -st iterations over 100
-    jac obj 16190.427922862124
-    36 -st iterations over 100
-    jac obj 16190.376094293631
-    37 -st iterations over 100
-    jac obj 16190.328280381405
-    38 -st iterations over 100
-    jac obj 16190.28462735746
-    39 -st iterations over 100
-    jac obj 16190.245227056079
-    40 -st iterations over 100
-    jac obj 16190.210122114782
-    41 -st iterations over 100
-    jac obj 16190.17931067176
-    42 -st iterations over 100
-    jac obj 16190.152750685076
-    43 -st iterations over 100
-    jac obj 16190.13036396785
-    44 -st iterations over 100
-    jac obj 16190.112040007632
-    45 -st iterations over 100
-    jac obj 16190.097639616935
-    46 -st iterations over 100
-    jac obj 16190.08699844542
-    47 -st iterations over 100
-    jac obj 16190.079930370877
-    48 -st iterations over 100
-    jac obj 16190.076230776756
-    49 -st iterations over 100
-    jac obj 16190.075679716736
-    grad lambda -4.1249436920978494e-05
-    value of lambda_k -11.668791461538836
-    [LibLinear]0 -st iterations over 100
-    jac obj 16195.900888418584
-    1 -st iterations over 100
-    jac obj 16196.701136292722
-    2 -st iterations over 100
-    jac obj 16195.69873808357
-    3 -st iterations over 100
-    jac obj 16195.485379100519
-    4 -st iterations over 100
-    jac obj 16195.585448355132
-    5 -st iterations over 100
-    jac obj 16195.823485936658
-    6 -st iterations over 100
-    jac obj 16196.11749140731
-    7 -st iterations over 100
-    jac obj 16196.424117069766
-    8 -st iterations over 100
-    jac obj 16196.722535837243
-    9 -st iterations over 100
-    jac obj 16197.00289261886
-    10 -st iterations over 100
-    jac obj 16197.260760287467
-    11 -st iterations over 100
-    jac obj 16197.4946753388
-    12 -st iterations over 100
-    jac obj 16197.704865197695
-    13 -st iterations over 100
-    jac obj 16197.892481896743
-    14 -st iterations over 100
-    jac obj 16198.05911895024
-    15 -st iterations over 100
-    jac obj 16198.20651663349
-    16 -st iterations over 100
-    jac obj 16198.336395155397
-    17 -st iterations over 100
-    jac obj 16198.450370680097
-    18 -st iterations over 100
-    jac obj 16198.549921592165
-    19 -st iterations over 100
-    jac obj 16198.63638296708
-    20 -st iterations over 100
-    jac obj 16198.71095532376
-    21 -st iterations over 100
-    jac obj 16198.774719403284
-    22 -st iterations over 100
-    jac obj 16198.828652396249
-    23 -st iterations over 100
-    jac obj 16198.873643293162
-    24 -st iterations over 100
-    jac obj 16198.91050634036
-    25 -st iterations over 100
-    jac obj 16198.939992303223
-    26 -st iterations over 100
-    jac obj 16198.96279760617
-    27 -st iterations over 100
-    jac obj 16198.979571585385
-    28 -st iterations over 100
-    jac obj 16198.990922146817
-    29 -st iterations over 100
-    jac obj 16198.997420121505
-    30 -st iterations over 100
-    jac obj 16198.999602583452
-    31 -st iterations over 100
-    jac obj 16198.997975358092
-    32 -st iterations over 100
-    jac obj 16198.993014910886
-    33 -st iterations over 100
-    jac obj 16198.985169769921
-    34 -st iterations over 100
-    jac obj 16198.974861605087
-    35 -st iterations over 100
-    jac obj 16198.962486060016
-    36 -st iterations over 100
-    jac obj 16198.948413411577
-    37 -st iterations over 100
-    jac obj 16198.932989114297
-    38 -st iterations over 100
-    jac obj 16198.91653427353
-    39 -st iterations over 100
-    jac obj 16198.899346080416
-    40 -st iterations over 100
-    jac obj 16198.881698233705
-    41 -st iterations over 100
-    jac obj 16198.863841367214
-    42 -st iterations over 100
-    jac obj 16198.846003496852
-    43 -st iterations over 100
-    jac obj 16198.828390497803
-    44 -st iterations over 100
-    jac obj 16198.811186619518
-    45 -st iterations over 100
-    jac obj 16198.79455504418
-    46 -st iterations over 100
-    jac obj 16198.778638492444
-    47 -st iterations over 100
-    jac obj 16198.763559878978
-    48 -st iterations over 100
-    jac obj 16198.749423019019
-    49 -st iterations over 100
-    jac obj 16198.73631338595
-    50 -st iterations over 100
-    jac obj 16198.724298919116
-    51 -st iterations over 100
-    jac obj 16198.713430879783
-    52 -st iterations over 100
-    jac obj 16198.703744752569
-    53 -st iterations over 100
-    jac obj 16198.695261188532
-    54 -st iterations over 100
-    jac obj 16198.687986985497
-    55 -st iterations over 100
-    jac obj 16198.68191610034
-    56 -st iterations over 100
-    jac obj 16198.677030687431
-    57 -st iterations over 100
-    jac obj 16198.673302156847
-    58 -st iterations over 100
-    jac obj 16198.670692245492
-    59 -st iterations over 100
-    jac obj 16198.669154094185
-    grad lambda -1.8065105671691284e-05
-    value of lambda_k -11.668257625110934
-    [LibLinear]0 -st iterations over 100
-    jac obj 16411.146319593787
-    1 -st iterations over 100
-    jac obj 16353.074164058919
-    2 -st iterations over 100
-    jac obj 16290.49258291552
-    3 -st iterations over 100
-    jac obj 16255.613569501042
-    4 -st iterations over 100
-    jac obj 16236.614450333715
-    5 -st iterations over 100
-    jac obj 16226.480939687908
-    6 -st iterations over 100
-    jac obj 16221.209313429006
-    7 -st iterations over 100
-    jac obj 16218.463375504574
-    8 -st iterations over 100
-    jac obj 16216.935365973965
-    9 -st iterations over 100
-    jac obj 16215.939743232817
-    10 -st iterations over 100
-    jac obj 16215.142009482399
-    11 -st iterations over 100
-    jac obj 16214.39571744861
-    12 -st iterations over 100
-    jac obj 16213.649507973834
-    13 -st iterations over 100
-    jac obj 16212.896327831435
-    14 -st iterations over 100
-    jac obj 16212.146920352723
-    15 -st iterations over 100
-    jac obj 16211.416755596169
-    16 -st iterations over 100
-    jac obj 16210.720133861425
-    17 -st iterations over 100
-    jac obj 16210.067967025612
-    18 -st iterations over 100
-    jac obj 16209.467346613908
-    19 -st iterations over 100
-    jac obj 16208.921905049236
-    20 -st iterations over 100
-    jac obj 16208.432465519598
-    21 -st iterations over 100
-    jac obj 16207.997736431913
-    22 -st iterations over 100
-    jac obj 16207.614942141436
-    23 -st iterations over 100
-    jac obj 16207.280350394873
-    24 -st iterations over 100
-    jac obj 16206.989690301125
-    25 -st iterations over 100
-    jac obj 16206.738469649661
-    26 -st iterations over 100
-    jac obj 16206.522206076985
-    27 -st iterations over 100
-    jac obj 16206.336587692198
-    28 -st iterations over 100
-    jac obj 16206.177577786451
-    29 -st iterations over 100
-    jac obj 16206.041476427843
-    30 -st iterations over 100
-    jac obj 16205.924949707935
-    31 -st iterations over 100
-    jac obj 16205.825035451873
-    32 -st iterations over 100
-    jac obj 16205.739132453902
-    33 -st iterations over 100
-    jac obj 16205.664978792285
-    34 -st iterations over 100
-    jac obj 16205.600623510281
-    35 -st iterations over 100
-    jac obj 16205.544394902257
-    36 -st iterations over 100
-    jac obj 16205.494867790581
-    37 -st iterations over 100
-    jac obj 16205.450831492331
-    38 -st iterations over 100
-    jac obj 16205.411259629454
-    39 -st iterations over 100
-    jac obj 16205.375282509756
-    40 -st iterations over 100
-    jac obj 16205.342162478059
-    41 -st iterations over 100
-    jac obj 16205.31127239074
-    42 -st iterations over 100
-    jac obj 16205.28207718689
-    43 -st iterations over 100
-    jac obj 16205.25411840327
-    44 -st iterations over 100
-    jac obj 16205.227001396897
-    45 -st iterations over 100
-    jac obj 16205.200384989777
-    46 -st iterations over 100
-    jac obj 16205.17397322637
-    47 -st iterations over 100
-    jac obj 16205.147508930386
-    48 -st iterations over 100
-    jac obj 16205.12076875742
-    49 -st iterations over 100
-    jac obj 16205.093559459654
-    50 -st iterations over 100
-    jac obj 16205.065715104945
-    51 -st iterations over 100
-    jac obj 16205.037095022268
-    52 -st iterations over 100
-    jac obj 16205.00758227649
-    53 -st iterations over 100
-    jac obj 16204.977082506379
-    54 -st iterations over 100
-    jac obj 16204.945522989303
-    55 -st iterations over 100
-    jac obj 16204.912851823752
-    56 -st iterations over 100
-    jac obj 16204.879037145425
-    57 -st iterations over 100
-    jac obj 16204.84406631501
-    58 -st iterations over 100
-    jac obj 16204.807945034658
-    59 -st iterations over 100
-    jac obj 16204.770696366393
-    60 -st iterations over 100
-    jac obj 16204.732359639087
-    61 -st iterations over 100
-    jac obj 16204.692989241565
-    62 -st iterations over 100
-    jac obj 16204.652653307572
-    63 -st iterations over 100
-    jac obj 16204.611432305115
-    64 -st iterations over 100
-    jac obj 16204.569417546843
-    65 -st iterations over 100
-    jac obj 16204.526709641486
-    66 -st iterations over 100
-    jac obj 16204.483416907724
-    67 -st iterations over 100
-    jac obj 16204.43965377278
-    68 -st iterations over 100
-    jac obj 16204.39553917748
-    69 -st iterations over 100
-    jac obj 16204.351195008756
-    70 -st iterations over 100
-    jac obj 16204.306744578978
-    71 -st iterations over 100
-    jac obj 16204.262311169774
-    72 -st iterations over 100
-    jac obj 16204.218016655703
-    73 -st iterations over 100
-    jac obj 16204.173980221163
-    74 -st iterations over 100
-    jac obj 16204.130317181269
-    75 -st iterations over 100
-    jac obj 16204.087137915414
-    76 -st iterations over 100
-    jac obj 16204.044546919784
-    77 -st iterations over 100
-    jac obj 16204.002641982986
-    78 -st iterations over 100
-    jac obj 16203.961513486938
-    79 -st iterations over 100
-    jac obj 16203.921243833229
-    80 -st iterations over 100
-    jac obj 16203.881906993614
-    81 -st iterations over 100
-    jac obj 16203.843568181504
-    82 -st iterations over 100
-    jac obj 16203.806283640311
-    83 -st iterations over 100
-    jac obj 16203.77010054303
-    84 -st iterations over 100
-    jac obj 16203.73505699673
-    85 -st iterations over 100
-    jac obj 16203.701182144623
-    86 -st iterations over 100
-    jac obj 16203.66849635795
-    87 -st iterations over 100
-    jac obj 16203.637011509169
-    88 -st iterations over 100
-    jac obj 16203.606731317963
-    89 -st iterations over 100
-    jac obj 16203.577651761036
-    90 -st iterations over 100
-    jac obj 16203.549761536884
-    91 -st iterations over 100
-    jac obj 16203.523042576619
-    92 -st iterations over 100
-    jac obj 16203.497470592076
-    93 -st iterations over 100
-    jac obj 16203.473015652775
-    94 -st iterations over 100
-    jac obj 16203.449642783507
-    95 -st iterations over 100
-    jac obj 16203.42731257478
-    96 -st iterations over 100
-    jac obj 16203.405981798725
-    97 -st iterations over 100
-    jac obj 16203.385604023646
-    98 -st iterations over 100
-    jac obj 16203.366130220822
-    99 -st iterations over 100
-    jac obj 16203.347509357767
-    grad lambda 2.980843878781455e-05
-    value of lambda_k -11.669184846251076
-    [LibLinear]0 -st iterations over 100
-    jac obj 16213.834667869753
-    1 -st iterations over 100
-    jac obj 16209.135892718174
-    2 -st iterations over 100
-    jac obj 16204.29846887922
-    3 -st iterations over 100
-    jac obj 16200.963358310286
-    4 -st iterations over 100
-    jac obj 16198.37843214995
-    5 -st iterations over 100
-    jac obj 16196.32919787183
-    6 -st iterations over 100
-    jac obj 16194.697581397682
-    7 -st iterations over 100
-    jac obj 16193.39703256256
-    8 -st iterations over 100
-    jac obj 16192.360528798714
-    9 -st iterations over 100
-    jac obj 16191.534821312722
-    10 -st iterations over 100
-    jac obj 16190.8773013862
-    11 -st iterations over 100
-    jac obj 16190.353806287212
-    12 -st iterations over 100
-    jac obj 16189.93693888032
-    13 -st iterations over 100
-    jac obj 16189.604760435928
-    14 -st iterations over 100
-    jac obj 16189.339759180235
-    15 -st iterations over 100
-    jac obj 16189.128017148994
-    16 -st iterations over 100
-    jac obj 16188.95852316193
-    17 -st iterations over 100
-    jac obj 16188.822600895095
-    18 -st iterations over 100
-    jac obj 16188.713433721052
-    19 -st iterations over 100
-    jac obj 16188.625673767727
-    20 -st iterations over 100
-    jac obj 16188.5551245734
-    21 -st iterations over 100
-    jac obj 16188.498487150955
-    22 -st iterations over 100
-    jac obj 16188.453159504827
-    23 -st iterations over 100
-    jac obj 16188.417080162815
-    24 -st iterations over 100
-    jac obj 16188.388607153984
-    25 -st iterations over 100
-    jac obj 16188.366424971668
-    26 -st iterations over 100
-    jac obj 16188.349473260065
-    27 -st iterations over 100
-    jac obj 16188.336892133244
-    28 -st iterations over 100
-    jac obj 16188.327980097778
-    29 -st iterations over 100
-    jac obj 16188.322161464319
-    30 -st iterations over 100
-    jac obj 16188.318960887693
-    31 -st iterations over 100
-    jac obj 16188.317983276915
-    grad lambda -2.623936356784852e-05
-    value of lambda_k -11.668325686771999
-    [LibLinear]0 -st iterations over 100
-    jac obj 16206.457854962902
-    1 -st iterations over 100
-    jac obj 16203.738183225889
-    2 -st iterations over 100
-    jac obj 16202.949516588524
-    3 -st iterations over 100
-    jac obj 16202.724567190642
-    4 -st iterations over 100
-    jac obj 16202.819301578165
-    5 -st iterations over 100
-    jac obj 16203.02429424405
-    6 -st iterations over 100
-    jac obj 16203.223749976727
-    7 -st iterations over 100
-    jac obj 16203.372809810968
-    8 -st iterations over 100
-    jac obj 16203.467490683337
-    9 -st iterations over 100
-    jac obj 16203.518974684737
-    10 -st iterations over 100
-    jac obj 16203.541264597077
-    11 -st iterations over 100
-    jac obj 16203.546442490191
-    12 -st iterations over 100
-    jac obj 16203.543374320418
-    13 -st iterations over 100
-    jac obj 16203.53784074996
-    14 -st iterations over 100
-    jac obj 16203.533156770907
-    15 -st iterations over 100
-    jac obj 16203.530865419369
-    16 -st iterations over 100
-    jac obj 16203.531341136388
-    grad lambda 2.5188924080421764e-05
-    value of lambda_k -11.669150451550896
-    /home/qbe/sparse-ho/examples/plot_sparse_log_reg.py:100: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show(block=False)
-
-
-
-
-
-
-|
+This example shows how to perform hyperparameter optimisation
+for sparse logistic regression using a held-out test set.
 
 
 .. code-block:: default
@@ -1367,14 +38,20 @@ An example to show how to use this package for sparse logistic regression
     from sparse_ho.forward import Forward
     from sparse_ho.grid_search import grid_search
     from sparse_ho.datasets.real import get_rcv1
-    # from sparse_ho.datasets.real import get_real_sim
+    from sparse_ho.datasets.real import get_real_sim
 
     print(__doc__)
 
-    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-    # X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
-    n_samples, n_features = X_train.shape
+    # dataset = 'rcv1'
+    dataset = 'simu'
 
+    if dataset == 'rcv1':
+        X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+    else:
+        X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+
+
+    n_samples, n_features = X_train.shape
 
     alpha_max = np.max(np.abs(X_train.T @ y_train))
     alpha_max /= 4 * n_samples
@@ -1392,7 +69,19 @@ An example to show how to use this package for sparse logistic regression
     alphas = alpha_max * p_alphas
     log_alphas = np.log(alphas)
 
-    # grid search
+
+
+
+
+
+
+
+Grid-search
+-----------
+
+
+.. code-block:: default
+
     model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100)
     criterion = Logistic(X_val, y_val, model)
     algo_grid = Forward(criterion, use_sk=use_sk)
@@ -1403,7 +92,26 @@ An example to show how to use this package for sparse logistic regression
     objs = np.array(monitor_grid.objs)
 
 
-    # grad search
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear][LibLinear]
+
+
+
+Grad-search
+-----------
+
+
+.. code-block:: default
+
     model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100, tol=tol)
     criterion = Logistic(X_val, y_val, model)
     monitor_grad = Monitor()
@@ -1418,33 +126,1112 @@ An example to show how to use this package for sparse logistic regression
 
     current_palette = sns.color_palette("colorblind")
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(5, 3))
     plt.semilogx(
-        p_alphas, objs, color=current_palette[0], linewidth=7.0)
+        p_alphas, objs, color=current_palette[0])
     plt.semilogx(
         p_alphas, objs, 'bo', label='0-order method (grid-search)',
-        color=current_palette[1], markersize=15)
+        color=current_palette[1])
     plt.semilogx(
         p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-        color=current_palette[2], markersize=25)
-    plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
+        color=current_palette[2])
+    plt.xlabel(r"$\lambda / \lambda_{\max}$")
     plt.ylabel(
-        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} \hat \beta^{(\lambda)} } \right ) $",
-        fontsize=28)
-    # plt.ylabel(
-    #     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
-    #     fontsize=28)
+        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+        r"\hat \beta^{(\lambda)} } \right ) $")
+
     axes = plt.gca()
     axes.set_ylim([0, 1])
     plt.tick_params(width=5)
-    plt.legend(fontsize=14, loc=1)
+    plt.legend(loc=1)
     plt.tight_layout()
     plt.show(block=False)
 
 
+
+.. image:: /auto_examples/images/sphx_glr_plot_sparse_log_reg_001.png
+    :alt: plot sparse log reg
+    :class: sphx-glr-single-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [LibLinear]0 -st iterations over 100
+    jac obj 138252.94362715786
+    1 -st iterations over 100
+    jac obj 44956.64069868779
+    2 -st iterations over 100
+    jac obj 40722.12306601943
+    3 -st iterations over 100
+    jac obj 43175.20351111472
+    4 -st iterations over 100
+    jac obj 44470.63875158392
+    5 -st iterations over 100
+    jac obj 44665.95731562911
+    6 -st iterations over 100
+    jac obj 44582.95827531478
+    7 -st iterations over 100
+    jac obj 44544.90697646414
+    8 -st iterations over 100
+    jac obj 44561.12167409281
+    9 -st iterations over 100
+    jac obj 44578.85793305785
+    10 -st iterations over 100
+    jac obj 44578.11660872997
+    11 -st iterations over 100
+    jac obj 44566.906227892214
+    12 -st iterations over 100
+    jac obj 44556.923351259116
+    13 -st iterations over 100
+    jac obj 44552.80599542364
+    14 -st iterations over 100
+    jac obj 44553.348312465714
+    15 -st iterations over 100
+    jac obj 44555.65255288349
+    16 -st iterations over 100
+    jac obj 44557.64268076949
+    17 -st iterations over 100
+    jac obj 44558.58541810439
+    18 -st iterations over 100
+    jac obj 44558.639657185806
+    19 -st iterations over 100
+    jac obj 44558.26774532288
+    20 -st iterations over 100
+    jac obj 44557.859571755645
+    21 -st iterations over 100
+    jac obj 44557.60467477348
+    22 -st iterations over 100
+    jac obj 44557.52246446181
+    23 -st iterations over 100
+    jac obj 44557.54817917326
+    24 -st iterations over 100
+    jac obj 44557.607168217735
+    25 -st iterations over 100
+    jac obj 44557.65238462501
+    26 -st iterations over 100
+    jac obj 44557.66932612934
+    27 -st iterations over 100
+    jac obj 44557.664224714164
+    28 -st iterations over 100
+    jac obj 44557.649807880814
+    29 -st iterations over 100
+    jac obj 44557.636125463745
+    30 -st iterations over 100
+    jac obj 44557.627615523605
+    31 -st iterations over 100
+    jac obj 44557.624232901704
+    grad lambda 0.10711470615900484
+    value of lambda_k -12.307391152555693
+    [LibLinear]0 -st iterations over 100
+    jac obj 132981.2836805739
+    1 -st iterations over 100
+    jac obj 75403.89128261353
+    2 -st iterations over 100
+    jac obj 77830.52816260916
+    3 -st iterations over 100
+    jac obj 80987.21558933763
+    4 -st iterations over 100
+    jac obj 82280.5869678538
+    5 -st iterations over 100
+    jac obj 82733.08193744047
+    6 -st iterations over 100
+    jac obj 82899.67510742336
+    7 -st iterations over 100
+    jac obj 82988.00269712933
+    8 -st iterations over 100
+    jac obj 83052.42514621027
+    9 -st iterations over 100
+    jac obj 83098.13944881136
+    10 -st iterations over 100
+    jac obj 83121.85432647246
+    11 -st iterations over 100
+    jac obj 83123.1849276076
+    12 -st iterations over 100
+    jac obj 83105.567125663
+    13 -st iterations over 100
+    jac obj 83074.5369307237
+    14 -st iterations over 100
+    jac obj 83036.02136815355
+    15 -st iterations over 100
+    jac obj 82995.25296198794
+    16 -st iterations over 100
+    jac obj 82956.26384897978
+    17 -st iterations over 100
+    jac obj 82921.77410573717
+    18 -st iterations over 100
+    jac obj 82893.30600452702
+    19 -st iterations over 100
+    jac obj 82871.40496455347
+    20 -st iterations over 100
+    jac obj 82855.89196164587
+    21 -st iterations over 100
+    jac obj 82846.10416833387
+    22 -st iterations over 100
+    jac obj 82841.10191902507
+    23 -st iterations over 100
+    jac obj 82839.83348211709
+    24 -st iterations over 100
+    jac obj 82841.25703986603
+    25 -st iterations over 100
+    jac obj 82844.42360955785
+    26 -st iterations over 100
+    jac obj 82848.5267201699
+    27 -st iterations over 100
+    jac obj 82852.92538045472
+    28 -st iterations over 100
+    jac obj 82857.14680412452
+    29 -st iterations over 100
+    jac obj 82860.87484006988
+    30 -st iterations over 100
+    jac obj 82863.9292957931
+    31 -st iterations over 100
+    jac obj 82866.240466189
+    32 -st iterations over 100
+    jac obj 82867.82227032179
+    33 -st iterations over 100
+    jac obj 82868.74651561117
+    34 -st iterations over 100
+    jac obj 82869.11999670987
+    35 -st iterations over 100
+    jac obj 82869.06542782097
+    36 -st iterations over 100
+    jac obj 82868.70662260246
+    37 -st iterations over 100
+    jac obj 82868.15788357287
+    38 -st iterations over 100
+    jac obj 82867.51724073356
+    39 -st iterations over 100
+    jac obj 82866.86297592115
+    40 -st iterations over 100
+    jac obj 82866.25276809004
+    41 -st iterations over 100
+    jac obj 82865.72477489014
+    42 -st iterations over 100
+    jac obj 82865.30000626094
+    43 -st iterations over 100
+    jac obj 82864.98542614323
+    44 -st iterations over 100
+    jac obj 82864.77732107138
+    45 -st iterations over 100
+    jac obj 82864.66458482874
+    46 -st iterations over 100
+    jac obj 82864.63167548401
+    47 -st iterations over 100
+    jac obj 82864.6610973245
+    48 -st iterations over 100
+    jac obj 82864.7353408603
+    49 -st iterations over 100
+    jac obj 82864.83827712819
+    50 -st iterations over 100
+    jac obj 82864.95604791542
+    51 -st iterations over 100
+    jac obj 82865.07752261053
+    52 -st iterations over 100
+    jac obj 82865.19440746716
+    53 -st iterations over 100
+    jac obj 82865.30109689548
+    54 -st iterations over 100
+    jac obj 82865.39435186442
+    55 -st iterations over 100
+    jac obj 82865.47288035278
+    56 -st iterations over 100
+    jac obj 82865.53688144204
+    57 -st iterations over 100
+    jac obj 82865.58760009598
+    58 -st iterations over 100
+    jac obj 82865.6269254432
+    59 -st iterations over 100
+    jac obj 82865.65705253147
+    60 -st iterations over 100
+    jac obj 82865.68021671257
+    61 -st iterations over 100
+    jac obj 82865.69850133713
+    62 -st iterations over 100
+    jac obj 82865.71371331523
+    63 -st iterations over 100
+    jac obj 82865.72731716548
+    64 -st iterations over 100
+    jac obj 82865.7404161139
+    65 -st iterations over 100
+    jac obj 82865.75376826372
+    66 -st iterations over 100
+    jac obj 82865.76782643636
+    67 -st iterations over 100
+    jac obj 82865.78279162687
+    68 -st iterations over 100
+    jac obj 82865.79867178612
+    69 -st iterations over 100
+    jac obj 82865.81533958453
+    70 -st iterations over 100
+    jac obj 82865.83258471041
+    71 -st iterations over 100
+    jac obj 82865.85015797633
+    72 -st iterations over 100
+    jac obj 82865.86780595317
+    73 -st iterations over 100
+    jac obj 82865.88529599534
+    74 -st iterations over 100
+    jac obj 82865.90243234164
+    75 -st iterations over 100
+    jac obj 82865.91906451191
+    76 -st iterations over 100
+    jac obj 82865.93508950059
+    77 -st iterations over 100
+    jac obj 82865.95044934897
+    78 -st iterations over 100
+    jac obj 82865.96512560359
+    79 -st iterations over 100
+    jac obj 82865.97913199544
+    80 -st iterations over 100
+    jac obj 82865.99250644023
+    81 -st iterations over 100
+    jac obj 82866.00530320346
+    82 -st iterations over 100
+    jac obj 82866.01758582219
+    83 -st iterations over 100
+    jac obj 82866.02942114622
+    84 -st iterations over 100
+    jac obj 82866.04087466755
+    85 -st iterations over 100
+    jac obj 82866.05200715676
+    86 -st iterations over 100
+    jac obj 82866.0628725121
+    87 -st iterations over 100
+    jac obj 82866.07351665721
+    88 -st iterations over 100
+    jac obj 82866.0839772851
+    89 -st iterations over 100
+    jac obj 82866.09428423425
+    90 -st iterations over 100
+    jac obj 82866.10446029401
+    91 -st iterations over 100
+    jac obj 82866.114522258
+    92 -st iterations over 100
+    jac obj 82866.12448207571
+    93 -st iterations over 100
+    jac obj 82866.13434798871
+    94 -st iterations over 100
+    jac obj 82866.14412556836
+    95 -st iterations over 100
+    jac obj 82866.15381860673
+    96 -st iterations over 100
+    jac obj 82866.16342983449
+    97 -st iterations over 100
+    jac obj 82866.17296146396
+    98 -st iterations over 100
+    jac obj 82866.18241556687
+    99 -st iterations over 100
+    jac obj 82866.19179430931
+    grad lambda 0.020199713594682582
+    value of lambda_k -12.704402117303934
+    [LibLinear]0 -st iterations over 100
+    jac obj 102832.12026138959
+    1 -st iterations over 100
+    jac obj 96402.39198111033
+    2 -st iterations over 100
+    jac obj 94342.36477849024
+    3 -st iterations over 100
+    jac obj 93654.90777374324
+    4 -st iterations over 100
+    jac obj 93427.705542639
+    5 -st iterations over 100
+    jac obj 93340.30040699523
+    6 -st iterations over 100
+    jac obj 93301.72780046056
+    7 -st iterations over 100
+    jac obj 93280.60383783994
+    8 -st iterations over 100
+    jac obj 93264.69499607108
+    9 -st iterations over 100
+    jac obj 93249.35897875913
+    10 -st iterations over 100
+    jac obj 93233.33406730546
+    11 -st iterations over 100
+    jac obj 93216.82439040356
+    12 -st iterations over 100
+    jac obj 93200.54005187748
+    13 -st iterations over 100
+    jac obj 93185.22959518872
+    14 -st iterations over 100
+    jac obj 93171.4810408708
+    15 -st iterations over 100
+    jac obj 93159.66371941623
+    16 -st iterations over 100
+    jac obj 93149.93805904311
+    17 -st iterations over 100
+    jac obj 93142.29374088238
+    18 -st iterations over 100
+    jac obj 93136.59571886048
+    19 -st iterations over 100
+    jac obj 93132.62806170799
+    20 -st iterations over 100
+    jac obj 93130.13119199027
+    21 -st iterations over 100
+    jac obj 93128.83109704056
+    22 -st iterations over 100
+    jac obj 93128.46066139302
+    23 -st iterations over 100
+    jac obj 93128.77404142416
+    24 -st iterations over 100
+    jac obj 93129.55530803326
+    25 -st iterations over 100
+    jac obj 93130.6226210037
+    26 -st iterations over 100
+    jac obj 93131.82909375384
+    27 -st iterations over 100
+    jac obj 93133.0613384386
+    28 -st iterations over 100
+    jac obj 93134.23649659196
+    29 -st iterations over 100
+    jac obj 93135.29838589314
+    30 -st iterations over 100
+    jac obj 93136.21324111964
+    31 -st iterations over 100
+    jac obj 93136.96540021544
+    32 -st iterations over 100
+    jac obj 93137.55318338652
+    33 -st iterations over 100
+    jac obj 93137.98513106779
+    34 -st iterations over 100
+    jac obj 93138.27670194389
+    35 -st iterations over 100
+    jac obj 93138.44748177493
+    36 -st iterations over 100
+    jac obj 93138.51891500366
+    37 -st iterations over 100
+    jac obj 93138.51254202884
+    grad lambda 0.010145629164668515
+    value of lambda_k -12.914302228472538
+    [LibLinear]0 -st iterations over 100
+    jac obj 102977.00517332989
+    1 -st iterations over 100
+    jac obj 100576.5928137922
+    2 -st iterations over 100
+    jac obj 99574.40977031722
+    3 -st iterations over 100
+    jac obj 99084.16383546844
+    4 -st iterations over 100
+    jac obj 98825.07704784372
+    5 -st iterations over 100
+    jac obj 98681.09449811645
+    6 -st iterations over 100
+    jac obj 98596.74062659466
+    7 -st iterations over 100
+    jac obj 98544.86645822761
+    8 -st iterations over 100
+    jac obj 98512.09226371611
+    9 -st iterations over 100
+    jac obj 98491.37833064499
+    10 -st iterations over 100
+    jac obj 98478.67757537219
+    11 -st iterations over 100
+    jac obj 98471.4643976754
+    12 -st iterations over 100
+    jac obj 98468.05839899369
+    13 -st iterations over 100
+    jac obj 98467.289558375
+    14 -st iterations over 100
+    jac obj 98468.31893624418
+    15 -st iterations over 100
+    jac obj 98470.5353113168
+    16 -st iterations over 100
+    jac obj 98473.49114469311
+    17 -st iterations over 100
+    jac obj 98476.8599378042
+    18 -st iterations over 100
+    jac obj 98480.40597651782
+    19 -st iterations over 100
+    jac obj 98483.96190575832
+    20 -st iterations over 100
+    jac obj 98487.41174887837
+    21 -st iterations over 100
+    jac obj 98490.67798903011
+    22 -st iterations over 100
+    jac obj 98493.7117794225
+    23 -st iterations over 100
+    jac obj 98496.48556722535
+    24 -st iterations over 100
+    jac obj 98498.98755165802
+    25 -st iterations over 100
+    jac obj 98501.21750802273
+    26 -st iterations over 100
+    jac obj 98503.18361117337
+    27 -st iterations over 100
+    jac obj 98504.89998357362
+    28 -st iterations over 100
+    jac obj 98506.38477101151
+    29 -st iterations over 100
+    jac obj 98507.65861092598
+    30 -st iterations over 100
+    jac obj 98508.74340417139
+    31 -st iterations over 100
+    jac obj 98509.66133266044
+    32 -st iterations over 100
+    jac obj 98510.43408539331
+    33 -st iterations over 100
+    jac obj 98511.0822668409
+    34 -st iterations over 100
+    jac obj 98511.62496724204
+    35 -st iterations over 100
+    jac obj 98512.07947637282
+    36 -st iterations over 100
+    jac obj 98512.46112248734
+    37 -st iterations over 100
+    jac obj 98512.7832176201
+    38 -st iterations over 100
+    jac obj 98513.05709004795
+    39 -st iterations over 100
+    jac obj 98513.29218483265
+    40 -st iterations over 100
+    jac obj 98513.4962141526
+    41 -st iterations over 100
+    jac obj 98513.67534055914
+    42 -st iterations over 100
+    jac obj 98513.83437823324
+    43 -st iterations over 100
+    jac obj 98513.97699960138
+    44 -st iterations over 100
+    jac obj 98514.10593711473
+    45 -st iterations over 100
+    jac obj 98514.2231724433
+    46 -st iterations over 100
+    jac obj 98514.33010764766
+    47 -st iterations over 100
+    jac obj 98514.4277149745
+    48 -st iterations over 100
+    jac obj 98514.51666370669
+    49 -st iterations over 100
+    jac obj 98514.59742396252
+    50 -st iterations over 100
+    jac obj 98514.67034846832
+    51 -st iterations over 100
+    jac obj 98514.73573414618
+    52 -st iterations over 100
+    jac obj 98514.79386589021
+    53 -st iterations over 100
+    jac obj 98514.8450451905
+    54 -st iterations over 100
+    jac obj 98514.88960634793
+    55 -st iterations over 100
+    jac obj 98514.9279229486
+    56 -st iterations over 100
+    jac obj 98514.96040707447
+    57 -st iterations over 100
+    jac obj 98514.9875034573
+    58 -st iterations over 100
+    jac obj 98515.00968046908
+    59 -st iterations over 100
+    jac obj 98515.0274195065
+    60 -st iterations over 100
+    jac obj 98515.04120399998
+    61 -st iterations over 100
+    jac obj 98515.05150896532
+    62 -st iterations over 100
+    jac obj 98515.0587917381
+    grad lambda 0.0061969038868837445
+    value of lambda_k -13.04925594194872
+    [LibLinear]0 -st iterations over 100
+    jac obj 105066.56570496326
+    1 -st iterations over 100
+    jac obj 103055.61941094362
+    2 -st iterations over 100
+    jac obj 102290.62157184184
+    3 -st iterations over 100
+    jac obj 101868.53863305086
+    4 -st iterations over 100
+    jac obj 101616.114581377
+    5 -st iterations over 100
+    jac obj 101447.6179577264
+    6 -st iterations over 100
+    jac obj 101330.39534606521
+    7 -st iterations over 100
+    jac obj 101249.1756143372
+    8 -st iterations over 100
+    jac obj 101193.85933352954
+    9 -st iterations over 100
+    jac obj 101157.05448521726
+    10 -st iterations over 100
+    jac obj 101133.33765037573
+    11 -st iterations over 100
+    jac obj 101118.7934445181
+    12 -st iterations over 100
+    jac obj 101110.63334732555
+    13 -st iterations over 100
+    jac obj 101106.88332438536
+    14 -st iterations over 100
+    jac obj 101106.14309783696
+    15 -st iterations over 100
+    jac obj 101107.41096363602
+    16 -st iterations over 100
+    jac obj 101109.96187583104
+    17 -st iterations over 100
+    jac obj 101113.26526191916
+    18 -st iterations over 100
+    jac obj 101116.93063859963
+    19 -st iterations over 100
+    jac obj 101120.67171526185
+    20 -st iterations over 100
+    jac obj 101124.2822794439
+    21 -st iterations over 100
+    jac obj 101127.61932747258
+    22 -st iterations over 100
+    jac obj 101130.59053686672
+    23 -st iterations over 100
+    jac obj 101133.14432589278
+    24 -st iterations over 100
+    jac obj 101135.26150954272
+    25 -st iterations over 100
+    jac obj 101136.94804141592
+    26 -st iterations over 100
+    jac obj 101138.22861293945
+    27 -st iterations over 100
+    jac obj 101139.14103107026
+    28 -st iterations over 100
+    jac obj 101139.73136156058
+    29 -st iterations over 100
+    jac obj 101140.04984128519
+    30 -st iterations over 100
+    jac obj 101140.14755334532
+    31 -st iterations over 100
+    jac obj 101140.07383786277
+    32 -st iterations over 100
+    jac obj 101139.87438883439
+    33 -st iterations over 100
+    jac obj 101139.58996829926
+    34 -st iterations over 100
+    jac obj 101139.25565571117
+    35 -st iterations over 100
+    jac obj 101138.90054340396
+    36 -st iterations over 100
+    jac obj 101138.54778787232
+    37 -st iterations over 100
+    jac obj 101138.21493025417
+    38 -st iterations over 100
+    jac obj 101137.91440663913
+    39 -st iterations over 100
+    jac obj 101137.6541784224
+    40 -st iterations over 100
+    jac obj 101137.4384237794
+    41 -st iterations over 100
+    jac obj 101137.26824254703
+    42 -st iterations over 100
+    jac obj 101137.14233767973
+    43 -st iterations over 100
+    jac obj 101137.05764650005
+    44 -st iterations over 100
+    jac obj 101137.00990387396
+    45 -st iterations over 100
+    jac obj 101136.99412703878
+    46 -st iterations over 100
+    jac obj 101137.0050180427
+    47 -st iterations over 100
+    jac obj 101137.03728465093
+    48 -st iterations over 100
+    jac obj 101137.08588422879
+    49 -st iterations over 100
+    jac obj 101137.14619765765
+    50 -st iterations over 100
+    jac obj 101137.21414192842
+    51 -st iterations over 100
+    jac obj 101137.2862308498
+    52 -st iterations over 100
+    jac obj 101137.35959346783
+    53 -st iterations over 100
+    jac obj 101137.43195945803
+    54 -st iterations over 100
+    jac obj 101137.50162007417
+    55 -st iterations over 100
+    jac obj 101137.56737231174
+    56 -st iterations over 100
+    jac obj 101137.62845289793
+    57 -st iterations over 100
+    jac obj 101137.6844676091
+    58 -st iterations over 100
+    jac obj 101137.7353203214
+    59 -st iterations over 100
+    jac obj 101137.7811451625
+    60 -st iterations over 100
+    jac obj 101137.82224418795
+    61 -st iterations over 100
+    jac obj 101137.85903217082
+    62 -st iterations over 100
+    jac obj 101137.89198938878
+    63 -st iterations over 100
+    jac obj 101137.92162271029
+    64 -st iterations over 100
+    jac obj 101137.94843482703
+    65 -st iterations over 100
+    jac obj 101137.97290113472
+    66 -st iterations over 100
+    jac obj 101137.99545353132
+    67 -st iterations over 100
+    jac obj 101138.01647024858
+    68 -st iterations over 100
+    jac obj 101138.03627076384
+    69 -st iterations over 100
+    jac obj 101138.05511482611
+    70 -st iterations over 100
+    jac obj 101138.07320466526
+    71 -st iterations over 100
+    jac obj 101138.09068952496
+    72 -st iterations over 100
+    jac obj 101138.10767175232
+    73 -st iterations over 100
+    jac obj 101138.12421378442
+    74 -st iterations over 100
+    jac obj 101138.1403454836
+    75 -st iterations over 100
+    jac obj 101138.15607138645
+    76 -st iterations over 100
+    jac obj 101138.17137753483
+    77 -st iterations over 100
+    jac obj 101138.186237656
+    78 -st iterations over 100
+    jac obj 101138.20061854178
+    79 -st iterations over 100
+    jac obj 101138.21448454984
+    80 -st iterations over 100
+    jac obj 101138.227801209
+    81 -st iterations over 100
+    jac obj 101138.2405379568
+    82 -st iterations over 100
+    jac obj 101138.25267007164
+    83 -st iterations over 100
+    jac obj 101138.26417988513
+    84 -st iterations over 100
+    jac obj 101138.27505737646
+    85 -st iterations over 100
+    jac obj 101138.28530025344
+    86 -st iterations over 100
+    jac obj 101138.29491362805
+    grad lambda 0.0035530246363377114
+    value of lambda_k -13.130704742408918
+    [LibLinear]0 -st iterations over 100
+    jac obj 103580.82624264815
+    1 -st iterations over 100
+    jac obj 103455.90716065349
+    2 -st iterations over 100
+    jac obj 102974.18687079303
+    3 -st iterations over 100
+    jac obj 102724.8890108954
+    4 -st iterations over 100
+    jac obj 102613.74145206854
+    5 -st iterations over 100
+    jac obj 102560.10432084843
+    6 -st iterations over 100
+    jac obj 102526.96554071493
+    7 -st iterations over 100
+    jac obj 102501.50658485245
+    8 -st iterations over 100
+    jac obj 102480.04824595469
+    9 -st iterations over 100
+    jac obj 102461.79831814134
+    10 -st iterations over 100
+    jac obj 102446.67259397345
+    11 -st iterations over 100
+    jac obj 102434.60139564652
+    12 -st iterations over 100
+    jac obj 102425.36780759225
+    13 -st iterations over 100
+    jac obj 102418.62338373276
+    14 -st iterations over 100
+    jac obj 102413.94831444335
+    15 -st iterations over 100
+    jac obj 102410.90841132148
+    16 -st iterations over 100
+    jac obj 102409.0956102967
+    17 -st iterations over 100
+    jac obj 102408.15173633413
+    18 -st iterations over 100
+    jac obj 102407.77921535831
+    19 -st iterations over 100
+    jac obj 102407.74281516505
+    20 -st iterations over 100
+    jac obj 102407.86578401204
+    21 -st iterations over 100
+    jac obj 102408.02287392317
+    22 -st iterations over 100
+    jac obj 102408.13197764732
+    23 -st iterations over 100
+    jac obj 102408.14552497154
+    24 -st iterations over 100
+    jac obj 102408.04235529626
+    25 -st iterations over 100
+    jac obj 102407.8204760892
+    26 -st iterations over 100
+    jac obj 102407.49090188694
+    27 -st iterations over 100
+    jac obj 102407.07262293472
+    28 -st iterations over 100
+    jac obj 102406.58865859974
+    29 -st iterations over 100
+    jac obj 102406.06309458162
+    30 -st iterations over 100
+    jac obj 102405.51897395491
+    31 -st iterations over 100
+    jac obj 102404.97690189719
+    32 -st iterations over 100
+    jac obj 102404.45422625032
+    33 -st iterations over 100
+    jac obj 102403.96466609807
+    34 -st iterations over 100
+    jac obj 102403.51827487367
+    35 -st iterations over 100
+    jac obj 102403.12164072877
+    36 -st iterations over 100
+    jac obj 102402.77824336615
+    37 -st iterations over 100
+    jac obj 102402.48890222257
+    38 -st iterations over 100
+    jac obj 102402.25226518228
+    39 -st iterations over 100
+    jac obj 102402.06529958599
+    40 -st iterations over 100
+    jac obj 102401.92375807706
+    41 -st iterations over 100
+    jac obj 102401.8226008222
+    42 -st iterations over 100
+    jac obj 102401.75636295581
+    43 -st iterations over 100
+    jac obj 102401.719461897
+    44 -st iterations over 100
+    jac obj 102401.70644362795
+    45 -st iterations over 100
+    jac obj 102401.71217030569
+    grad lambda 0.0020604834475826056
+    value of lambda_k -13.180424842990655
+    [LibLinear]0 -st iterations over 100
+    jac obj 104475.32608823011
+    1 -st iterations over 100
+    jac obj 104032.9069912905
+    2 -st iterations over 100
+    jac obj 103832.88619135806
+    3 -st iterations over 100
+    jac obj 103739.32078678625
+    4 -st iterations over 100
+    jac obj 103689.35261916979
+    5 -st iterations over 100
+    jac obj 103657.6149826775
+    6 -st iterations over 100
+    jac obj 103636.03440161145
+    7 -st iterations over 100
+    jac obj 103621.4536904114
+    8 -st iterations over 100
+    jac obj 103612.00198740071
+    9 -st iterations over 100
+    jac obj 103606.30965971893
+    10 -st iterations over 100
+    jac obj 103603.34472590603
+    11 -st iterations over 100
+    jac obj 103602.33327664497
+    12 -st iterations over 100
+    jac obj 103602.6920152141
+    13 -st iterations over 100
+    jac obj 103603.97695614312
+    14 -st iterations over 100
+    jac obj 103605.84829368134
+    15 -st iterations over 100
+    jac obj 103608.04683958841
+    16 -st iterations over 100
+    jac obj 103610.37757705752
+    17 -st iterations over 100
+    jac obj 103612.69737164144
+    18 -st iterations over 100
+    jac obj 103614.90516137063
+    19 -st iterations over 100
+    jac obj 103616.9337594714
+    20 -st iterations over 100
+    jac obj 103618.74285110498
+    21 -st iterations over 100
+    jac obj 103620.3129875094
+    22 -st iterations over 100
+    jac obj 103621.64047597224
+    23 -st iterations over 100
+    jac obj 103622.733094458
+    24 -st iterations over 100
+    jac obj 103623.60656188986
+    25 -st iterations over 100
+    jac obj 103624.28168867939
+    26 -st iterations over 100
+    jac obj 103624.78212640207
+    27 -st iterations over 100
+    jac obj 103625.13263383733
+    28 -st iterations over 100
+    jac obj 103625.35777918318
+    29 -st iterations over 100
+    jac obj 103625.48100407634
+    30 -st iterations over 100
+    jac obj 103625.5239827599
+    31 -st iterations over 100
+    jac obj 103625.506218185
+    32 -st iterations over 100
+    jac obj 103625.44482516535
+    33 -st iterations over 100
+    jac obj 103625.35445843554
+    34 -st iterations over 100
+    jac obj 103625.24735034339
+    35 -st iterations over 100
+    jac obj 103625.13342889027
+    36 -st iterations over 100
+    jac obj 103625.02049196212
+    37 -st iterations over 100
+    jac obj 103624.91441797093
+    38 -st iterations over 100
+    jac obj 103624.81939686822
+    39 -st iterations over 100
+    jac obj 103624.73816870114
+    40 -st iterations over 100
+    jac obj 103624.67225964586
+    41 -st iterations over 100
+    jac obj 103624.62220784405
+    42 -st iterations over 100
+    jac obj 103624.58777342814
+    43 -st iterations over 100
+    jac obj 103624.56812889542
+    44 -st iterations over 100
+    jac obj 103624.56202749144
+    grad lambda 0.0015059803025820931
+    value of lambda_k -13.218677231209925
+    [LibLinear]0 -st iterations over 100
+    jac obj 104735.93271107193
+    1 -st iterations over 100
+    jac obj 104877.81968659953
+    2 -st iterations over 100
+    jac obj 104924.63997632559
+    3 -st iterations over 100
+    jac obj 104910.69795420945
+    4 -st iterations over 100
+    jac obj 104877.34901617232
+    5 -st iterations over 100
+    jac obj 104842.6985278275
+    6 -st iterations over 100
+    jac obj 104814.82860498995
+    7 -st iterations over 100
+    jac obj 104795.55874684548
+    8 -st iterations over 100
+    jac obj 104783.58584784422
+    9 -st iterations over 100
+    jac obj 104776.6876517204
+    10 -st iterations over 100
+    jac obj 104772.80537556474
+    11 -st iterations over 100
+    jac obj 104770.4179179185
+    12 -st iterations over 100
+    jac obj 104768.55859317383
+    13 -st iterations over 100
+    jac obj 104766.69736718343
+    14 -st iterations over 100
+    jac obj 104764.60204778505
+    15 -st iterations over 100
+    jac obj 104762.22269441177
+    16 -st iterations over 100
+    jac obj 104759.60870352456
+    17 -st iterations over 100
+    jac obj 104756.85440473602
+    18 -st iterations over 100
+    jac obj 104754.06574268058
+    19 -st iterations over 100
+    jac obj 104751.34133415086
+    20 -st iterations over 100
+    jac obj 104748.76287828067
+    21 -st iterations over 100
+    jac obj 104746.39144924268
+    22 -st iterations over 100
+    jac obj 104744.26735289342
+    23 -st iterations over 100
+    jac obj 104742.41201717932
+    24 -st iterations over 100
+    jac obj 104740.83091245416
+    25 -st iterations over 100
+    jac obj 104739.51685083797
+    26 -st iterations over 100
+    jac obj 104738.45325423358
+    27 -st iterations over 100
+    jac obj 104737.61714660456
+    28 -st iterations over 100
+    jac obj 104736.98174083709
+    29 -st iterations over 100
+    jac obj 104736.51856861215
+    30 -st iterations over 100
+    jac obj 104736.1991531064
+    31 -st iterations over 100
+    jac obj 104735.99625618319
+    32 -st iterations over 100
+    jac obj 104735.88474948853
+    33 -st iterations over 100
+    jac obj 104735.84216673362
+    34 -st iterations over 100
+    jac obj 104735.84899567878
+    grad lambda 0.0008451151973917852
+    value of lambda_k -13.241273231384211
+    [LibLinear]0 -st iterations over 100
+    jac obj 105493.44159572628
+    1 -st iterations over 100
+    jac obj 105278.91595853632
+    2 -st iterations over 100
+    jac obj 105162.12647112239
+    3 -st iterations over 100
+    jac obj 105090.13168907733
+    4 -st iterations over 100
+    jac obj 105053.63538576804
+    5 -st iterations over 100
+    jac obj 105035.1680096402
+    6 -st iterations over 100
+    jac obj 105025.81488680642
+    7 -st iterations over 100
+    jac obj 105021.11613298066
+    8 -st iterations over 100
+    jac obj 105018.84409073782
+    9 -st iterations over 100
+    jac obj 105017.81411474811
+    10 -st iterations over 100
+    jac obj 105017.34674253844
+    11 -st iterations over 100
+    jac obj 105017.04821313056
+    12 -st iterations over 100
+    jac obj 105016.7058233829
+    13 -st iterations over 100
+    jac obj 105016.22278686751
+    14 -st iterations over 100
+    jac obj 105015.57262826197
+    15 -st iterations over 100
+    jac obj 105014.76793224456
+    16 -st iterations over 100
+    jac obj 105013.84029303901
+    17 -st iterations over 100
+    jac obj 105012.82830335324
+    18 -st iterations over 100
+    jac obj 105011.77080456454
+    19 -st iterations over 100
+    jac obj 105010.7033388018
+    20 -st iterations over 100
+    jac obj 105009.65645484401
+    21 -st iterations over 100
+    jac obj 105008.6550590354
+    22 -st iterations over 100
+    jac obj 105007.71835342459
+    23 -st iterations over 100
+    jac obj 105006.86010938819
+    24 -st iterations over 100
+    jac obj 105006.0891370214
+    25 -st iterations over 100
+    jac obj 105005.4098681116
+    26 -st iterations over 100
+    jac obj 105004.8229992453
+    27 -st iterations over 100
+    jac obj 105004.32615639223
+    28 -st iterations over 100
+    jac obj 105003.91455100816
+    29 -st iterations over 100
+    jac obj 105003.58160401945
+    30 -st iterations over 100
+    jac obj 105003.31951956027
+    31 -st iterations over 100
+    jac obj 105003.11979548763
+    32 -st iterations over 100
+    jac obj 105002.97366254014
+    33 -st iterations over 100
+    jac obj 105002.87244839245
+    34 -st iterations over 100
+    jac obj 105002.80786665113
+    35 -st iterations over 100
+    jac obj 105002.77223395361
+    36 -st iterations over 100
+    jac obj 105002.75862071589
+    37 -st iterations over 100
+    jac obj 105002.7609427588
+    grad lambda 0.0005573043890374448
+    value of lambda_k -13.256958231127983
+    [LibLinear]0 -st iterations over 100
+    jac obj 105617.092110017
+    1 -st iterations over 100
+    jac obj 105443.6787343236
+    2 -st iterations over 100
+    jac obj 105451.255620136
+    3 -st iterations over 100
+    jac obj 105466.93989759177
+    4 -st iterations over 100
+    jac obj 105473.33822797639
+    5 -st iterations over 100
+    jac obj 105474.49367934199
+    6 -st iterations over 100
+    jac obj 105474.20283679511
+    7 -st iterations over 100
+    jac obj 105473.84750279904
+    8 -st iterations over 100
+    jac obj 105473.71235325387
+    9 -st iterations over 100
+    jac obj 105473.7797478287
+    10 -st iterations over 100
+    jac obj 105473.98103284437
+    11 -st iterations over 100
+    jac obj 105474.26178950196
+    12 -st iterations over 100
+    jac obj 105474.59007057692
+    13 -st iterations over 100
+    jac obj 105474.94980630133
+    14 -st iterations over 100
+    jac obj 105475.33306420877
+    15 -st iterations over 100
+    jac obj 105475.734766997
+    16 -st iterations over 100
+    jac obj 105476.14997254209
+    17 -st iterations over 100
+    jac obj 105476.57291060878
+    18 -st iterations over 100
+    jac obj 105476.99698506291
+    19 -st iterations over 100
+    jac obj 105477.41519486615
+    20 -st iterations over 100
+    jac obj 105477.82065711188
+    21 -st iterations over 100
+    jac obj 105478.20707416689
+    22 -st iterations over 100
+    jac obj 105478.56908158778
+    23 -st iterations over 100
+    jac obj 105478.90246420167
+    24 -st iterations over 100
+    jac obj 105479.2042521007
+    25 -st iterations over 100
+    jac obj 105479.47271811402
+    26 -st iterations over 100
+    jac obj 105479.70730064523
+    27 -st iterations over 100
+    jac obj 105479.90847449884
+    28 -st iterations over 100
+    jac obj 105480.0775895248
+    29 -st iterations over 100
+    jac obj 105480.21669359064
+    30 -st iterations over 100
+    jac obj 105480.32835305303
+    31 -st iterations over 100
+    jac obj 105480.41548076387
+    32 -st iterations over 100
+    jac obj 105480.4811788262
+    33 -st iterations over 100
+    jac obj 105480.52860085398
+    34 -st iterations over 100
+    jac obj 105480.56083640881
+    35 -st iterations over 100
+    jac obj 105480.58081857896
+    36 -st iterations over 100
+    jac obj 105480.59125432186
+    grad lambda 0.0003306688294029769
+    value of lambda_k -13.26675452275582
+    /home/qbe/sparse-ho/examples/plot_sparse_log_reg.py:109: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
+      plt.show(block=False)
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  12.867 seconds)
+   **Total running time of the script:** ( 1 minutes  2.755 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

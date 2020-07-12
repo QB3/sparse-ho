@@ -3,7 +3,8 @@
 Sparse logistic regression
 ===========================
 
-An example to show how to use this package for sparse logistic regression
+This example shows how to perform hyperparameter optimisation
+for sparse logistic regression using a held-out test set.
 
 """
 
@@ -25,14 +26,20 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
 from sparse_ho.datasets.real import get_rcv1
-# from sparse_ho.datasets.real import get_real_sim
+from sparse_ho.datasets.real import get_real_sim
 
 print(__doc__)
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
-n_samples, n_features = X_train.shape
+# dataset = 'rcv1'
+dataset = 'simu'
 
+if dataset == 'rcv1':
+    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+else:
+    X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+
+
+n_samples, n_features = X_train.shape
 
 alpha_max = np.max(np.abs(X_train.T @ y_train))
 alpha_max /= 4 * n_samples
@@ -50,7 +57,9 @@ p_alphas = np.geomspace(1, 0.0001, n_alphas)
 alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
-# grid search
+##############################################################################
+# Grid-search
+# -----------
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100)
 criterion = Logistic(X_val, y_val, model)
 algo_grid = Forward(criterion, use_sk=use_sk)
@@ -61,7 +70,9 @@ grid_search(
 objs = np.array(monitor_grid.objs)
 
 
-# grad search
+##############################################################################
+# Grad-search
+# -----------
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100, tol=tol)
 criterion = Logistic(X_val, y_val, model)
 monitor_grad = Monitor()
@@ -76,25 +87,23 @@ objs_grad = np.array(monitor_grad.objs)
 
 current_palette = sns.color_palette("colorblind")
 
-fig = plt.figure()
+fig = plt.figure(figsize=(5, 3))
 plt.semilogx(
-    p_alphas, objs, color=current_palette[0], linewidth=7.0)
+    p_alphas, objs, color=current_palette[0])
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1], markersize=15)
+    color=current_palette[1])
 plt.semilogx(
     p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-    color=current_palette[2], markersize=25)
-plt.xlabel(r"$\lambda / \lambda_{\max}$", fontsize=28)
+    color=current_palette[2])
+plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
-    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} \hat \beta^{(\lambda)} } \right ) $",
-    fontsize=28)
-# plt.ylabel(
-#     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
-#     fontsize=28)
+    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+    r"\hat \beta^{(\lambda)} } \right ) $")
+
 axes = plt.gca()
 axes.set_ylim([0, 1])
 plt.tick_params(width=5)
-plt.legend(fontsize=14, loc=1)
+plt.legend(loc=1)
 plt.tight_layout()
 plt.show(block=False)

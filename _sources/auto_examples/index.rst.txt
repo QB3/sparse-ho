@@ -14,12 +14,12 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Example Lasso and the held-out loss">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimisation for a Lasso using a held-out test...">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_held_out_lasso_thumb.png
-     :alt: Example Lasso and the held-out loss
+     :alt: Lasso with held-out test set
 
      :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py`
 
@@ -35,12 +35,12 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimisation for a Lasso using a full cross-va...">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_grad_search_cv_thumb.png
-     :alt: Example with cross validation
+     :alt: Lasso with Cross-validation
 
      :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py`
 
@@ -56,7 +56,7 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="An example to show how to use this package for sparse logistic regression">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimisation for sparse logistic regression us...">
 
 .. only:: html
 

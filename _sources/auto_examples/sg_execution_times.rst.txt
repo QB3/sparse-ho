@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**02:18.832** total execution time for **auto_examples** files:
+**01:19.024** total execution time for **auto_examples** files:
 
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py` (``plot_grad_search_cv.py``) | 02:18.832 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``) | 01:02.755 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``) | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``) | 00:15.201 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``) | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py` (``plot_grad_search_cv.py``) | 00:01.067 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
