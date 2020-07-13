@@ -20,7 +20,7 @@ X_train, y_train, beta_star = make_regression(
 model = SVR(X_train, y_train, log_C, log_epsilon, max_iter=10000, tol=tol)
 
 
-def test_beta_jac(model):
+def test_beta_jac():
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
         X_train, y_train, np.array([log_C, log_epsilon]), tol=tol,
         model=model, compute_jac=True, max_iter=10000)
