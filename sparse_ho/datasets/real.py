@@ -21,9 +21,9 @@ from sklearn.model_selection import train_test_split
 myhost = os.uname()[1]
 
 if myhost.startswith("drago"):
-    PATH = pjoin('/storage/store/work/qbertran', 'imp_forward_data')
+    PATH = pjoin('/storage/store/work/qbertran', 'sparse_ho_data')
 else:
-    PATH = pjoin(str(Path.home()), 'imp_forward_data')
+    PATH = pjoin(str(Path.home()), 'sparse_ho_data')
 
 
 NAMES = {'rcv1_train': 'binary/rcv1_train.binary',

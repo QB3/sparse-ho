@@ -70,7 +70,7 @@ jobs:
         - save_cache:
             key: sparse_ho_data
             paths:
-              - $HOME/imp_forward_data
+              - $HOME/sparse_ho_data
 
         # Save the outputs
         - store_artifacts:
