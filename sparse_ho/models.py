@@ -1185,13 +1185,14 @@ class SVR():
                 beta[j] = proj_box_svm(zj, C)
                 r += (beta[j] - beta_old) * X[j, :]
                 if compute_jac:
-                    dF = np.array([np.sum(dr[:, 0].T * X[j, :]), epsilon + np.sum(dr[:, 1].T * X[j, :])])
-                    dbeta_old = dbeta[j, :]
+                    dF = np.array([np.sum(dr[:, 0] * X[j, :]), epsilon + np.sum(dr[:, 1] * X[j, :])])
+                    dbeta_old = dbeta[j, :].copy()
                     dzj = dbeta[j, :] - dF / L[j]
                     dbeta[j, :] = ind_box(zj, C) * dzj
                     dbeta[j, 0] += C * (C <= zj)
                     dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * X[j, :]
                     dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * X[j, :]
+
             if j >= n_samples:
                 F = - np.sum(r * X[j - n_samples, :]) + epsilon + y[j - n_samples]
                 beta_old = beta[j]
@@ -1199,8 +1200,8 @@ class SVR():
                 beta[j] = proj_box_svm(zj, C)
                 r -= (beta[j] - beta_old) * X[j - n_samples, :]
                 if compute_jac:
-                    dF = np.array([- np.sum(dr[:, 0].T * X[j - n_samples, :]), - np.sum(dr[:, 1].T * X[j - n_samples, :] + epsilon)])
-                    dbeta_old = dbeta[j, :]
+                    dF = np.array([- np.sum(dr[:, 0] * X[j - n_samples, :]), - np.sum(dr[:, 1] * X[j - n_samples, :]) + epsilon])
+                    dbeta_old = dbeta[j, :].copy()
                     dzj = dbeta[j, :] - dF / L[j - n_samples]
                     dbeta[j, :] = ind_box(zj, C) * dzj
                     dbeta[j, 0] += C * (C <= zj)
@@ -1279,15 +1280,10 @@ class SVR():
 
     @staticmethod
     def _init_dr(dbeta, X, y):
-        is_sparse = issparse(X)
-        if is_sparse:
-            res = np.array(np.sum(X.T.multiply(y * dbeta), axis=1))
-            return res.reshape((res.shape[0],))
-        else:
-            return X.T @ dbeta
+        return X.T @ dbeta
 
     @staticmethod
-    @njit
+    #@njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta):
         supp = np.where(sign_beta == 0.0)
         dbeta[sign_beta == 1.0, :] = np.array([hyperparam[0], 0])
@@ -1295,14 +1291,14 @@ class SVR():
         n_samples = L.shape[0]
         for j in supp[0]:
             if j < n_samples:
-                dF = np.array([np.sum(dr * Xs[j, :]), hyperparam[1]])
-                dbeta_old = dbeta[j, :]
+                dF = np.array([np.sum(dr[:, 0] * Xs[j, :]), hyperparam[1] + np.sum(dr[:, 1] * Xs[j, :])])
+                dbeta_old = dbeta[j, :].copy()
                 dzj = dbeta[j, :] - dF / L[j]
                 dbeta[j, :] = dzj
                 dr += (dbeta[j, :] - dbeta_old) * Xs[j, :]
             if j >= n_samples:
-                dF = np.array([- np.sum(dr * Xs[j - n_samples, :]), hyperparam[1]])
-                dbeta_old = dbeta[j, :]
+                dF = np.array([- np.sum(dr[:, 0] * Xs[j - n_samples, :]), hyperparam[1] - np.sum(dr[:, 1] * Xs[j - n_samples, :])])
+                dbeta_old = dbeta[j, :].copy()
                 dzj = dbeta[j, :] - dF / L[j - n_samples]
                 dbeta[j, :] = dzj
                 dr -= (dbeta[j, :] - dbeta_old) * Xs[j - n_samples, :]
@@ -1343,15 +1339,19 @@ class SVR():
             return norm(X, axis=1) ** 2
 
     def reduce_X(self, mask):
-        return self.X[mask, :]
+        n_samples = self.X.shape[0]
+        temp = mask[0:n_samples] + mask[n_samples:(2 * n_samples)]
+        return self.X[temp >= 1, :]
 
     def reduce_y(self, mask):
-        return self.y[mask]
+        n_samples = self.X.shape[0]
+        temp = mask[0:n_samples] + mask[n_samples:(2 * n_samples)]
+        return self.y[temp >= 1]
 
     def sign(self, x):
         sign = np.zeros(x.shape[0])
         sign[np.isclose(x, 0.0)] = -1.0
-        sign[np.isclose(x, np.exp(self.logC))] = 1.0
+        sign[np.isclose(x, np.exp(self.hyperparam[0]))] = 1.0
         return sign
 
     def get_jac_v(self, mask, dense, jac, v):
@@ -1465,15 +1465,10 @@ class SVR():
     def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
-        if issparse(Xs):
-            yXdbeta = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
-        else:
-            yXdbeta = (ys[full_supp, np.newaxis] * Xs[full_supp, :]).T @ dbeta[full_supp]
+
+        yXdbeta = Xs[full_supp, :].T @ dbeta[full_supp]
         q = yXdbeta.T @ yXdbeta
-        if issparse(Xs):
-            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
-        else:
-            linear_term = yXdbeta.T @ ((ys[maskC, np.newaxis] * Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
+        linear_term = yXdbeta.T @ ((Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
         res = q + linear_term - C * np.sum(dbeta[full_supp])
         return(
             norm(res))
