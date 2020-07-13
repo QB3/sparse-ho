@@ -49,11 +49,6 @@ jobs:
               python -m pip install --user -e .
 
         - save_cache:
-            key: sparse_ho_data
-            paths:
-              - $HOME/imp_forward_data
-
-        - save_cache:
             key: pip-cache
             paths:
               - ~/.cache/pip
@@ -71,6 +66,11 @@ jobs:
             command: |
               cd doc;
               make html;
+
+        - save_cache:
+            key: sparse_ho_data
+            paths:
+              - $HOME/imp_forward_data
 
         # Save the outputs
         - store_artifacts:
