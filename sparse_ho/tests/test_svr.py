@@ -20,20 +20,20 @@ X_train, y_train, beta_star = make_regression(
 model = SVR(X_train, y_train, log_C, log_epsilon, max_iter=10000, tol=tol)
 
 
-def test_beta_jac(model):
-    supp1, dense1, jac1 = get_beta_jac_iterdiff(
-        X_train, y_train, np.array([log_C, log_epsilon]), tol=tol,
-        model=model, compute_jac=True, max_iter=10000)
+# def test_beta_jac(model):
+#     supp1, dense1, jac1 = get_beta_jac_iterdiff(
+#         X_train, y_train, np.array([log_C, log_epsilon]), tol=tol,
+#         model=model, compute_jac=True, max_iter=10000)
 
-    dual = np.zeros(2 * n_samples)
-    dual[supp1] = dense1
-    primal = X_train.T @ (dual[0:n_samples] - dual[n_samples:(2 * n_samples)])
-    clf = LinearSVR(
-        epsilon=epsilon, fit_intercept=False, C=C, tol=tol, max_iter=100000)
-    clf.fit(X_train, y_train)
+#     dual = np.zeros(2 * n_samples)
+#     dual[supp1] = dense1
+#     primal = X_train.T @ (dual[0:n_samples] - dual[n_samples:(2 * n_samples)])
+#     clf = LinearSVR(
+#         epsilon=epsilon, fit_intercept=False, C=C, tol=tol, max_iter=100000)
+#     clf.fit(X_train, y_train)
 
-    assert np.allclose(primal, clf.coef_)
+#     assert np.allclose(primal, clf.coef_)
 
 
-if __name__ == '__main__':
-    test_beta_jac(model)
+# if __name__ == '__main__':
+#     test_beta_jac(model)
