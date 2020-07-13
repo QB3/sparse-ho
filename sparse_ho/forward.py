@@ -3,9 +3,10 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    def __init__(self, criterion, use_sk=False):
+    def __init__(self, criterion, use_sk=False, verbose=False):
         self.criterion = criterion
         self.use_sk = use_sk
+        self.verbose = verbose
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
@@ -16,7 +17,7 @@ class Forward():
             jac0=quantity_to_warm_start,
             max_iter=self.criterion.model.max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward,
-            use_sk=self.use_sk)
+            use_sk=self.use_sk, verbose=self.verbose)
 
         if jac is not None:
             jac_v = model.get_jac_v(mask, dense, jac, v)
@@ -41,7 +42,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, backward=False,
-        use_sk=False, save_iterates=False):
+        use_sk=False, save_iterates=False, verbose=False):
     """
     Parameters
     --------------
@@ -110,9 +111,10 @@ def get_beta_jac_iterdiff(
     if save_iterates:
         list_beta = []
         list_jac = []
-    print(tol)
+    # print(tol)
     for i in range(max_iter):
-        print("%i -st iteration over %i" % (i, max_iter))
+        if verbose:
+            print("%i -st iteration over %i" % (i, max_iter))
         if is_sparse:
             model._update_beta_jac_bcd_sparse(
                 X.data, X.indptr, X.indices, y, n_samples, n_features, beta,
@@ -126,7 +128,8 @@ def get_beta_jac_iterdiff(
 
         if i > 1:
             assert pobj[-1] - pobj[-2] <= 1e-2 * np.abs(pobj[0])
-            print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
+            if verbose:
+                print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
         if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
             break
         if backward:
@@ -135,8 +138,8 @@ def get_beta_jac_iterdiff(
             list_beta.append(beta.copy())
             list_jac.append(dbeta.copy())
     else:
-        print('did not converge !')
-        # raise RuntimeError('did not converge !')
+        if verbose:
+            print('did not converge !')
 
     mask = beta != 0
     dense = beta[mask]

@@ -38,10 +38,10 @@ if dataset == 'rcv1':
 else:
     X, y = make_regression(n_samples=500, n_features=1000)
 
-kf = KFold(n_splits=5, shuffle=False)
+kf = KFold(n_splits=5, shuffle=True)
 
-for train, test in kf.split(X):
-    print("%s %s" % (train, test))
+# for train, test in kf.split(X):
+#     print("%s %s" % (train, test))
 
 print("Starting path computation...")
 n_samples = len(y)
@@ -52,6 +52,7 @@ p_alphas = np.geomspace(1, 0.0001, n_alphas)
 alphas = alpha_max * p_alphas
 
 tol = 1e-8
+
 
 ##############################################################################
 # Cross-validation with scikit-learn

@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, log_alpha0, monitor, n_outer=100, verbose=True,
+        algo, log_alpha0, monitor, n_outer=100, verbose=False,
         tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """
@@ -86,7 +86,7 @@ def grad_search(
 
 def _grad_search(
         _get_val_grad, proj_param, log_alpha0, monitor, algo, n_outer=100,
-        verbose=True, tolerance_decrease='constant', tol=1e-5,
+        verbose=False, tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """
     This line-search code is taken from here:
@@ -265,9 +265,11 @@ def _grad_search(
 
         g_func_old = g_func
 
+        # import ipdb; ipdb.set_trace()
         # monitor(g_func, 0, lambdak, grad_lambda, 0)
-        print('grad lambda', grad_lambda)
-        print('value of lambda_k', lambdak)
+        if verbose:
+            print('grad lambda', grad_lambda)
+            print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
