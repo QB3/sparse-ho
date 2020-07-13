@@ -836,7 +836,7 @@ class SVM():
 class SparseLogreg():
     def __init__(
             self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3,
-            use_sk=False):
+            use_sk=False, verbose=False):
         self.X = X
         self.y = y
         self.log_alpha = log_alpha
@@ -847,7 +847,7 @@ class SparseLogreg():
         if use_sk:
             self.clf = linear_model.LogisticRegression(
                 fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', verbose=True)
+                penalty='l1', verbose=self.verbose)
         else:
             self.clf = None
 
