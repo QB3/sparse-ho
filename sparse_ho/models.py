@@ -1363,7 +1363,7 @@ class SVR():
             primal = np.squeeze(np.array(primal))
         else:
             primal_jac = self.X[mask, :].T @ jac
-            primal = self.X[mask, :].T 
+            primal = self.X[mask, :].T
         mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
