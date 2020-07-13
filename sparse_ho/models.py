@@ -206,7 +206,7 @@ class Lasso():
 
     @staticmethod
     def get_L(X, is_sparse=False):
-        print(is_sparse)
+        # print(is_sparse)
         if is_sparse:
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
@@ -835,14 +835,14 @@ class SVM():
 
 class SparseLogreg():
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3,
-            use_sk=False, verbose=False):
+            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False, verbose=False):
         self.X = X
         self.y = y
         self.log_alpha = log_alpha
         self.max_iter = max_iter
         self.tol = tol
         self.log_alpha_max = log_alpha_max
+        self.verbose = verbose
 
         if use_sk:
             self.clf = linear_model.LogisticRegression(
@@ -1111,7 +1111,7 @@ class SparseLogreg():
         if self.clf is None:
             self.clf = linear_model.LogisticRegression(
                 fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', solver='liblinear', verbose=True)
+                penalty='l1', solver='liblinear', verbose=self.verbose)
 
         self.clf.C = 1 / (alpha * n_samples)
         self.clf.tol = tol

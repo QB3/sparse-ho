@@ -14,6 +14,7 @@ for sparse logistic regression using a held-out test set.
 # License: BSD (3-clause)
 
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -60,6 +61,10 @@ log_alphas = np.log(alphas)
 ##############################################################################
 # Grid-search
 # -----------
+
+print('scikit started')
+t0 = time.time()
+
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100)
 criterion = Logistic(X_val, y_val, model)
 algo_grid = Forward(criterion, use_sk=use_sk)
@@ -69,16 +74,31 @@ grid_search(
     log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
+t_sk = time.time() - t0
+
+print('scikit finished')
+print("Time to compute CV for scikit-learn: %.2f" % t_sk)
+
 
 ##############################################################################
 # Grad-search
 # -----------
+
+print('sparse-ho started')
+
+t0 = time.time()
+
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100, tol=tol)
 criterion = Logistic(X_val, y_val, model)
 monitor_grad = Monitor()
 algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100, use_sk=use_sk)
 grad_search(algo, log_alpha0, monitor_grad, n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
+
+t_grad_search = time.time() - t0
+
+print('sparse-ho finished')
+print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
 
 
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
