@@ -1177,36 +1177,43 @@ class SVR():
         C = hyperparam[0]
         epsilon = hyperparam[1]
         n_samples = X.shape[0]
-        for j in range(2 * n_samples):
-            if j < n_samples:
-                F = np.sum(r * X[j, :]) + epsilon - y[j]
-                beta_old = beta[j]
-                zj = beta[j] - F / L[j]
-                beta[j] = proj_box_svm(zj, C)
-                r += (beta[j] - beta_old) * X[j, :]
+        for i in range(2 * n_samples):
+            if i < n_samples:
+                gradi = np.sum(r * X[i, :]) + epsilon - y[i]  # size 1
+                beta_old = beta[i]
+                zj = beta[i] - gradi / L[i]
+                beta[i] = proj_box_svm(zj, C)
+                r += (beta[i] - beta_old) * X[i, :]
                 if compute_jac:
-                    dF = np.array([np.sum(dr[:, 0] * X[j, :]), epsilon + np.sum(dr[:, 1] * X[j, :])])
-                    dbeta_old = dbeta[j, :].copy()
-                    dzj = dbeta[j, :] - dF / L[j]
-                    dbeta[j, :] = ind_box(zj, C) * dzj
-                    dbeta[j, 0] += C * (C <= zj)
-                    dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * X[j, :]
-                    dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * X[j, :]
+                    dgradi = np.zeros(2)  # size 2
+                    # diff wrt C
+                    dgradi[0] = np.sum(dr[:, 0] * X[i, :])
+                    # diff wrt epsilon
+                    dgradi[1] = epsilon + np.sum(dr[:, 1] * X[i, :])
+                    # copy old beta for cheap update
+                    dbeta_old = dbeta[i, :].copy()
+                    # diff of beta[i, :] - gradi / L_i
+                    dzi = dbeta[i, :] - dgradi / L[i]
+                    dbeta[i, :] = ind_box(zj, C) * dzi
+                    dbeta[i, 0] += C * (C <= zj)
+                    # update residuals
+                    dr[:, 0] += (dbeta[i, 0] - dbeta_old[0]) * X[i, :]
+                    dr[:, 1] += (dbeta[i, 1] - dbeta_old[1]) * X[i, :]
 
-            if j >= n_samples:
-                F = - np.sum(r * X[j - n_samples, :]) + epsilon + y[j - n_samples]
-                beta_old = beta[j]
-                zj = beta[j] - F / L[j - n_samples]
-                beta[j] = proj_box_svm(zj, C)
-                r -= (beta[j] - beta_old) * X[j - n_samples, :]
+            if i >= n_samples:
+                F = - np.sum(r * X[i - n_samples, :]) + epsilon + y[i - n_samples]
+                beta_old = beta[i]
+                zj = beta[i] - F / L[i - n_samples]
+                beta[i] = proj_box_svm(zj, C)
+                r -= (beta[i] - beta_old) * X[i - n_samples, :]
                 if compute_jac:
-                    dF = np.array([- np.sum(dr[:, 0] * X[j - n_samples, :]), - np.sum(dr[:, 1] * X[j - n_samples, :]) + epsilon])
-                    dbeta_old = dbeta[j, :].copy()
-                    dzj = dbeta[j, :] - dF / L[j - n_samples]
-                    dbeta[j, :] = ind_box(zj, C) * dzj
-                    dbeta[j, 0] += C * (C <= zj)
-                    dr[:, 0] -= (dbeta[j, 0] - dbeta_old[0]) * X[j - n_samples, :]
-                    dr[:, 1] -= (dbeta[j, 1] - dbeta_old[1]) * X[j - n_samples, :]
+                    dF = np.array([- np.sum(dr[:, 0] * X[i - n_samples, :]), - np.sum(dr[:, 1] * X[i - n_samples, :]) + epsilon])
+                    dbeta_old = dbeta[i, :].copy()
+                    dzj = dbeta[i, :] - dF / L[i - n_samples]
+                    dbeta[i, :] = ind_box(zj, C) * dzj
+                    dbeta[i, 0] += C * (C <= zj)
+                    dr[:, 0] -= (dbeta[i, 0] - dbeta_old[0]) * X[i - n_samples, :]
+                    dr[:, 1] -= (dbeta[i, 1] - dbeta_old[1]) * X[i - n_samples, :]
 
     @staticmethod
     @njit
