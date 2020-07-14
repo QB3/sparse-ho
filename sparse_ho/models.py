@@ -1270,7 +1270,7 @@ class SVR():
         if jac0 is not None:
             dbeta0_new = init_dbeta0_new(jac0, mask, mask0)
         else:
-            dbeta0_new = np.zeros(size_mat)
+            dbeta0_new = np.zeros((size_mat, 2))
         return dbeta0_new
 
     @staticmethod
@@ -1283,7 +1283,7 @@ class SVR():
         return X.T @ dbeta
 
     @staticmethod
-    #@njit
+    # @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta):
         supp = np.where(sign_beta == 0.0)
         dbeta[sign_beta == 1.0, :] = np.array([hyperparam[0], 0])
@@ -1295,13 +1295,15 @@ class SVR():
                 dbeta_old = dbeta[j, :].copy()
                 dzj = dbeta[j, :] - dF / L[j]
                 dbeta[j, :] = dzj
-                dr += (dbeta[j, :] - dbeta_old) * Xs[j, :]
+                dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * Xs[j, :]
+                dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * Xs[j, :]
             if j >= n_samples:
                 dF = np.array([- np.sum(dr[:, 0] * Xs[j - n_samples, :]), hyperparam[1] - np.sum(dr[:, 1] * Xs[j - n_samples, :])])
                 dbeta_old = dbeta[j, :].copy()
                 dzj = dbeta[j, :] - dF / L[j - n_samples]
                 dbeta[j, :] = dzj
-                dr -= (dbeta[j, :] - dbeta_old) * Xs[j - n_samples, :]
+                dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * Xs[j - n_samples, :]
+                dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * Xs[j - n_samples, :]
 
     @staticmethod
     @njit
@@ -1462,13 +1464,16 @@ class SVR():
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
+        C = np.exp(hyperparam[0])
+        epsilon = np.exp(hyperparam[1])
 
-        yXdbeta = Xs[full_supp, :].T @ dbeta[full_supp]
-        q = yXdbeta.T @ yXdbeta
-        linear_term = yXdbeta.T @ ((Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
-        res = q + linear_term - C * np.sum(dbeta[full_supp])
+        yXdbeta = Xs[full_supp, :].T @ dbeta[full_supp, :]
+        q = Xs[full_supp, :] @ yXdbeta
+        linear_term = Xs[full_supp, :] @ np.array([((Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C)), np.zeros(Xs.shape[1])]).T
+        res = q + linear_term - np.array([C * np.sum(dbeta[full_supp, 0]), epsilon * np.sum(dbeta[full_supp, 1])])
+        print(norm(res))
         return(
             norm(res))
