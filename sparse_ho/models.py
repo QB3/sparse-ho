@@ -1152,8 +1152,9 @@ class SVR():
     def _init_beta_r(self, X, y, mask0, dense0):
         n_samples, n_features = X.shape
         beta = np.zeros(2 * n_samples)
+        beta[0] = 1 / n_samples
         if dense0 is None:
-            r = np.zeros(n_features)
+            r = X.T @ (beta[0:n_samples] - beta[n_samples:(2 * n_samples)])
         else:
             beta[mask0] = dense0
             if issparse(self.X):
@@ -1253,18 +1254,17 @@ class SVR():
         # import ipdb; ipdb.set_trace()
 
     def _get_pobj0(self, r, beta, hyperparam, y):
-        n_samples = self.X.shape[0]
-        obj_prim = hyperparam[0] * np.sum(np.maximum(
-            np.abs(y) - hyperparam[1], np.zeros(n_samples)))
-        return obj_prim
+        obj_dual = 0.5 * r.T @ r + hyperparam[1]
+        obj_dual -= y[0]
+        return obj_dual
 
     def _get_pobj(self, r, beta, hyperparam, y):
         n_samples = self.X.shape[0]
-        obj_prim = 0.5 * norm(r) ** 2 + hyperparam[0] * np.sum(np.maximum(
-            np.abs(self.X @ r - y) - hyperparam[1], np.zeros(n_samples)))
+        # obj_prim = 0.5 * norm(r) ** 2 + hyperparam[0] * np.sum(np.maximum(
+        #     np.abs(self.X @ r - y) - hyperparam[1], np.zeros(n_samples)))
         obj_dual = 0.5 * r.T @ r + hyperparam[1] * np.sum(beta)
         obj_dual -= np.sum(y * (beta[0:n_samples] - beta[n_samples:(2 * n_samples)]))
-        return (obj_dual + obj_prim)
+        return obj_dual
 
     @staticmethod
     def _get_jac(dbeta, mask):
@@ -1274,7 +1274,19 @@ class SVR():
     def _init_dbeta0(mask, mask0, jac0):
         size_mat = mask.sum()
         if jac0 is not None:
-            dbeta0_new = init_dbeta0_new(jac0, mask, mask0)
+            mask_both = np.logical_and(mask0, mask)
+            size_mat = mask.sum()
+            dbeta0_new = np.zeros((size_mat, 2))
+            count = 0
+            count_old = 0
+            n_features = mask.shape[0]
+            for j in range(n_features):
+                if mask_both[j]:
+                    dbeta0_new[count, :] = jac0[count_old, :]
+                if mask0[j]:
+                    count_old += 1
+                if mask[j]:
+                    count += 1
         else:
             dbeta0_new = np.zeros((size_mat, 2))
         return dbeta0_new
@@ -1294,7 +1306,7 @@ class SVR():
         return X[full_supp, :].T @ dbeta_full_supp
 
     @staticmethod
-    @njit
+    # @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta, mask):
         n_samples = L.shape[0]
         full_jac = np.zeros((2 * n_samples, 2))
@@ -1370,24 +1382,20 @@ class SVR():
 
     def get_jac_v(self, mask, dense, jac, v):
         n_samples, n_features = self.X.shape
-        if issparse(self.X):
-            primal_jac = np.sum(self.X[mask, :].T.multiply(self.y[mask] * jac), axis=1)
-            primal_jac = np.squeeze(np.array(primal_jac))
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
-            primal = np.squeeze(np.array(primal))
-        else:
-            primal_jac = self.X[mask, :].T @ jac
-            primal = self.X[mask, :].T
+        full_jac = np.zeros((2 * n_samples, 2))
+        full_jac[mask, :] = jac
+        full_beta = np.zeros(2 * n_samples)
+        full_beta[mask] = dense
+        primal_jac = self.X.T @ (full_jac[0:n_samples] - full_jac[n_samples:(2 * n_samples)])
+        primal = self.X.T @ (full_beta[0:n_samples] - full_beta[n_samples:(2 * n_samples)])
         mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
-        return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
+        return primal_jac.T @ v(mask_primal, dense_primal)
 
     def get_primal(self, mask, dense):
-        if issparse(self.X):
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
-            primal = np.squeeze(np.array(primal))
-        else:
-            primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+        n_samples = self.X.shape[0]
+        full_dual = np.zeros((2 * n_samples))
+        primal = self.X.T @ (full_dual[0:n_samples] - full_dual[n_samples:(2 * n_samples)])
         mask_primal = primal != 0
         dense_primal = primal[mask_primal]
         return mask_primal, dense_primal
@@ -1397,10 +1405,11 @@ class SVR():
         return jac_v
 
     def get_hessian(self, mask, dense):
-        beta = np.zeros(self.X.shape[0])
+        n_samples = self.X.shape[0]
+        beta = np.zeros(2 * n_samples)
         beta[mask] = dense
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
-        Q = self.X[full_supp, :] @ self.X[full_supp, :].T
+        Q = (beta[0:n_samples] - beta[n_samples:(2 * n_samples)]).T @ self.X
+        Q = Q @ Q.T
         return Q
 
     def _get_jac_t_v(self, jac, mask, dense, C, v):
@@ -1470,10 +1479,10 @@ class SVR():
         # return - res
 
     def proj_param(self, log_alpha):
-        if log_alpha < -16.0:
-            log_alpha = -16.0
-        elif log_alpha > 4:
-            log_alpha = 4
+        if log_alpha[0] < -16.0:
+            log_alpha[0] = -16.0
+        elif log_alpha[0] > 4:
+            log_alpha[0] = 4
         return log_alpha
 
     def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam, mask):

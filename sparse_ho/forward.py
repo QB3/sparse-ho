@@ -18,7 +18,6 @@ class Forward():
             max_iter=self.criterion.model.max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward,
             use_sk=self.use_sk, verbose=self.verbose)
-
         if jac is not None:
             jac_v = model.get_jac_v(mask, dense, jac, v)
             if full_jac_v:
@@ -143,7 +142,6 @@ def get_beta_jac_iterdiff(
 
     mask = beta != 0
     dense = beta[mask]
-
     jac = model._get_jac(dbeta, mask)
 
     if save_iterates:
