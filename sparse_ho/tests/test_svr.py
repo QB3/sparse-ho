@@ -75,26 +75,31 @@ def test_val_grad():
     algo = ImplicitForward(criterion, tol_jac=1e-2, n_iter_jac=1000)
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
         np.array([log_C, log_epsilon]), tol=tol)
+    # import ipdb; ipdb.set_trace()
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-3)
 
 
 def test_grad_search():
 
-    n_outer = 3
+    n_outer = 2
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward(criterion)
-    grad_search(algo, np.array([np.log(1e-1), log_epsilon]), monitor1, n_outer=n_outer,
-                tol=1e-13)
+    grad_search(
+        algo, np.array([np.log(C), log_epsilon]), monitor1, n_outer=n_outer,
+        tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=1e-6, n_iter_jac=1000)
-    grad_search(algo, np.array([np.log(1e-1), log_epsilon]), monitor3, n_outer=n_outer,
-                tol=1e-13)
+    grad_search(
+        algo, np.array([np.log(C), log_epsilon]), monitor3, n_outer=n_outer,
+        tol=1e-16)
 
-    # import ipdb; ipdb.set_trace()
+    # [np.linalg.norm(grad) for grad in monitor1.grads]
+    # [np.exp(alpha) for alpha in monitor1.log_alphas]
+
     # assert np.allclose(
     #     np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     # assert np.allclose(
@@ -106,6 +111,6 @@ def test_grad_search():
 
 
 if __name__ == '__main__':
-    test_beta_jac()
+    # test_beta_jac()
     test_val_grad()
     test_grad_search()
