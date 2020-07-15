@@ -145,7 +145,7 @@ class Lasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, mask):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -379,7 +379,7 @@ class wLasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, mask):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -635,7 +635,7 @@ class SVM():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, mask):
         is_sparse = issparse(X)
         if is_sparse:
             res = np.array(np.sum(X.T.multiply(y * dbeta), axis=1))
@@ -989,7 +989,7 @@ class SparseLogreg():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, mask):
         return y * (X @ dbeta)
 
     def _init_g_backward(self, jac_v0):
