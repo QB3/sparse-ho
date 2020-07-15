@@ -89,7 +89,7 @@ def get_only_jac(
     else:
         dbeta = dbeta.copy()
 
-    dr = model._init_dr(dbeta, Xs, y)
+    dr = model._init_dr(dbeta, Xs, y, mask)
     for i in range(niter_jac):
         if verbose:
             print("%i -st iterations over %i" % (i, niter_jac))
@@ -114,7 +114,7 @@ def get_only_jac(
         # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
         # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
         # crit =
-        # print('jac obj', objs[-1])
+        print('jac obj', objs[-1])
         # if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
         #     break
         # dbeta_old = dbeta.copy()

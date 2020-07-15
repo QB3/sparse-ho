@@ -1164,7 +1164,7 @@ class SVR():
         return beta, r
 
     @staticmethod
-    # @njit
+    @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, hyperparam, L, compute_jac=True):
 
@@ -1259,7 +1259,6 @@ class SVR():
         return obj_prim
 
     def _get_pobj(self, r, beta, hyperparam, y):
-        # r = y.copy()
         n_samples = self.X.shape[0]
         obj_prim = 0.5 * norm(r) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(self.X @ r - y) - hyperparam[1], np.zeros(n_samples)))
@@ -1285,9 +1284,14 @@ class SVR():
         dbeta = np.zeros((2 * n_features, 2))
         return dbeta
 
-    @staticmethod
-    def _init_dr(dbeta, X, y):
-        return X.T @ dbeta
+    def _init_dr(self, dbeta, X, y, mask):
+        n_samples = X.shape[0]
+        full_jac = np.zeros((2 * n_samples, 2))
+        full_jac[mask] = dbeta
+        sum_dual = full_jac[0:n_samples, 0] - full_jac[n_samples:(2 * n_samples), 0]
+        full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != np.exp(self.hyperparam[0]))
+        dbeta_full_supp = sum_dual[full_supp]
+        return X[full_supp, :].T @ dbeta_full_supp
 
     @staticmethod
     @njit
@@ -1475,7 +1479,7 @@ class SVR():
     def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam, mask):
         n_samples = Xs.shape[0]
         C = hyperparam[0]
-        # epsilon = hyperparam[1]
+        epsilon = hyperparam[1]
         full_jac = np.zeros((2 * n_samples, 2))
         full_jac[mask, :] = dbeta
         sum_dual = full_jac[0:n_samples, 0] - full_jac[n_samples:(2 * n_samples), 0]
@@ -1486,15 +1490,12 @@ class SVR():
         q = yXdbeta.T @ yXdbeta
         linear_term = yXdbeta.T @ (Xs[maskC, :]).T @ sum_dual[maskC]
         res = q + linear_term
-
         sum_dual = full_jac[0:n_samples, 1] - full_jac[n_samples:(2 * n_samples), 1]
         full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != C)
-        maskC = np.isclose(np.abs(sum_dual), C)
         dbeta_full_supp = sum_dual[full_supp]
         yXdbeta = Xs[full_supp, :].T @ dbeta_full_supp
         q = yXdbeta.T @ yXdbeta
-        linear_term = yXdbeta.T @ (Xs[maskC, :]).T @ sum_dual[maskC]
-        res += q + linear_term
-        print(norm(res))
+        linear_term = dbeta_full_supp @ (np.ones(full_supp.sum()) * epsilon)
+        res2 = q + linear_term
         return(
-            norm(res))
+            norm(res) + norm(res2))
