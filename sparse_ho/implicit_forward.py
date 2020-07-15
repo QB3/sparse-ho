@@ -99,10 +99,10 @@ def get_only_jac(
                 n_features, dbeta, r, dr, L, alpha, sign_beta)
         else:
             model._update_only_jac(
-                Xs, y, r, dbeta, dr, L, alpha, sign_beta)
+                Xs, y, r, dbeta, dr, L, alpha, sign_beta, mask)
 
         objs.append(
-            model.get_jac_obj(Xs, y, sign_beta, dbeta, r, dr, alpha))
+            model.get_jac_obj(Xs, y, sign_beta, dbeta, r, dr, alpha, mask))
 
         # m1 = norm(- v.T @ Xs.T @ dr + sign_beta * n_samples * alpha)
         # m2 = tol_jac * np.sqrt(n_features) * n_samples * alpha * norm(v)
@@ -115,8 +115,8 @@ def get_only_jac(
         # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
         # crit =
         # print('jac obj', objs[-1])
-        if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
-            break
+        # if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
+        #     break
         # dbeta_old = dbeta.copy()
         # dr_old = dr.copy()
 

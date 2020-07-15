@@ -156,7 +156,7 @@ class Lasso():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta, mask):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             # dbeta_old = dbeta[j].copy()
@@ -254,7 +254,7 @@ class Lasso():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha, mask):
         n_samples = self.X.shape[0]
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
@@ -390,7 +390,7 @@ class wLasso():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta, mask):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             dbeta_old = dbeta[j, :].copy()
@@ -493,7 +493,7 @@ class wLasso():
     def restrict_full_supp(self, mask, dense, v):
         return v
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha, mask):
         n_samples = self.X.shape[0]
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
@@ -645,7 +645,7 @@ class SVM():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, ys, r, dbeta, dr, L, C, sign_beta):
+    def _update_only_jac(Xs, ys, r, dbeta, dr, L, C, sign_beta, mask):
         supp = np.where(sign_beta == 0.0)
         dbeta[sign_beta == 1.0] = C
         dr = np.sum(ys * dbeta * Xs.T, axis=1)
@@ -816,7 +816,7 @@ class SVM():
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C, mask):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
         if issparse(Xs):
@@ -1000,7 +1000,7 @@ class SparseLogreg():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta, mask):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             sigmar = sigma(r)
@@ -1101,7 +1101,7 @@ class SparseLogreg():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha, mask):
         n_samples = self.X.shape[0]
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
@@ -1291,26 +1291,31 @@ class SVR():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta):
-        supp = np.where(sign_beta == 0.0)
-        dbeta[sign_beta == 1.0, :] = np.array([hyperparam[0], 0])
-        dr = Xs.T @ dbeta
+    def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta, mask):
         n_samples = L.shape[0]
+        full_jac = np.zeros((2 * n_samples, 2))
+        dbeta[sign_beta == 1.0, :] = np.array([hyperparam[0], 0])
+        full_jac[mask, :] = dbeta.copy()
+        full_sign_beta = - np.ones((2 * n_samples))
+        full_sign_beta[mask] = sign_beta
+        supp = np.where(full_sign_beta == 0.0)
+        dr = Xs.T @ (full_jac[0:n_samples, :] - full_jac[n_samples:(2 * n_samples)])
         for j in supp[0]:
             if j < n_samples:
                 dF = np.array([np.sum(dr[:, 0] * Xs[j, :]), hyperparam[1] + np.sum(dr[:, 1] * Xs[j, :])])
-                dbeta_old = dbeta[j, :].copy()
-                dzj = dbeta[j, :] - dF / L[j]
-                dbeta[j, :] = dzj
-                dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * Xs[j, :]
-                dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * Xs[j, :]
+                dbeta_old = full_jac[j, :].copy()
+                dzj = full_jac[j, :] - dF / L[j]
+                full_jac[j, :] = dzj
+                dr[:, 0] += (full_jac[j, 0] - dbeta_old[0]) * Xs[j, :]
+                dr[:, 1] += (full_jac[j, 1] - dbeta_old[1]) * Xs[j, :]
             if j >= n_samples:
                 dF = np.array([- np.sum(dr[:, 0] * Xs[j - n_samples, :]), hyperparam[1] - np.sum(dr[:, 1] * Xs[j - n_samples, :])])
-                dbeta_old = dbeta[j, :].copy()
-                dzj = dbeta[j, :] - dF / L[j - n_samples]
-                dbeta[j, :] = dzj
-                dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * Xs[j - n_samples, :]
-                dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * Xs[j - n_samples, :]
+                dbeta_old = full_jac[j, :].copy()
+                dzj = full_jac[j, :] - dF / L[j - n_samples]
+                full_jac[j, :] = dzj
+                dr[:, 0] -= (full_jac[j, 0] - dbeta_old[0]) * Xs[j - n_samples, :]
+                dr[:, 1] -= (full_jac[j, 1] - dbeta_old[1]) * Xs[j - n_samples, :]
+        dbeta[:] = full_jac[mask, :].copy()
 
     @staticmethod
     @njit
@@ -1348,14 +1353,10 @@ class SVR():
             return norm(X, axis=1) ** 2
 
     def reduce_X(self, mask):
-        n_samples = self.X.shape[0]
-        temp = mask[0:n_samples] + mask[n_samples:(2 * n_samples)]
-        return self.X[temp >= 1, :]
+        return self.X
 
     def reduce_y(self, mask):
-        n_samples = self.X.shape[0]
-        temp = mask[0:n_samples] + mask[n_samples:(2 * n_samples)]
-        return self.y[temp >= 1]
+        return self.y
 
     def sign(self, x):
         sign = np.zeros(x.shape[0])
@@ -1471,16 +1472,29 @@ class SVR():
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam):
-        full_supp = sign_beta == 0.0
-        maskC = sign_beta == 1.0
-        C = np.exp(hyperparam[0])
-        epsilon = np.exp(hyperparam[1])
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam, mask):
+        n_samples = Xs.shape[0]
+        C = hyperparam[0]
+        # epsilon = hyperparam[1]
+        full_jac = np.zeros((2 * n_samples, 2))
+        full_jac[mask, :] = dbeta
+        sum_dual = full_jac[0:n_samples, 0] - full_jac[n_samples:(2 * n_samples), 0]
+        full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != C)
+        maskC = np.isclose(np.abs(sum_dual), C)
+        dbeta_full_supp = sum_dual[full_supp]
+        yXdbeta = Xs[full_supp, :].T @ dbeta_full_supp
+        q = yXdbeta.T @ yXdbeta
+        linear_term = yXdbeta.T @ (Xs[maskC, :]).T @ sum_dual[maskC]
+        res = q + linear_term
 
-        yXdbeta = Xs[full_supp, :].T @ dbeta[full_supp, :]
-        q = Xs[full_supp, :] @ yXdbeta
-        linear_term = Xs[full_supp, :] @ np.array([((Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C)), np.zeros(Xs.shape[1])]).T
-        res = q + linear_term - np.array([C * np.sum(dbeta[full_supp, 0]), epsilon * np.sum(dbeta[full_supp, 1])])
+        sum_dual = full_jac[0:n_samples, 1] - full_jac[n_samples:(2 * n_samples), 1]
+        full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != C)
+        maskC = np.isclose(np.abs(sum_dual), C)
+        dbeta_full_supp = sum_dual[full_supp]
+        yXdbeta = Xs[full_supp, :].T @ dbeta_full_supp
+        q = yXdbeta.T @ yXdbeta
+        linear_term = yXdbeta.T @ (Xs[maskC, :]).T @ sum_dual[maskC]
+        res += q + linear_term
         print(norm(res))
         return(
             norm(res))
