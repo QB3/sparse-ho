@@ -1141,11 +1141,6 @@ class SVR():
             dr = np.zeros((n_features, 2))
         else:
             dbeta[mask0, :] = jac0.copy()
-        if issparse(self.X):
-            dr = (self.X.T).multiply(y * dbeta)
-            dr = np.sum(dr, axis=1)
-            dr = np.squeeze(np.array(dr))
-        else:
             dr = X.T @ (dbeta[0:n_samples] - dbeta[n_samples:(2 * n_samples)])
         return dbeta, dr
 
@@ -1157,11 +1152,7 @@ class SVR():
             r = X.T @ (beta[0:n_samples] - beta[n_samples:(2 * n_samples)])
         else:
             beta[mask0] = dense0
-            if issparse(self.X):
-                r = np.sum(self.X.T.multiply(y * beta), axis=1)
-                r = np.squeeze(np.array(r))
-            else:
-                r = X.T @ (beta[0:n_samples] - beta[n_samples:(2 * n_samples)])
+            r = X.T @ (beta[0:n_samples] - beta[n_samples:(2 * n_samples)])
         return beta, r
 
     @staticmethod
@@ -1182,8 +1173,8 @@ class SVR():
             if i < n_samples:
                 gradi = np.sum(r * X[i, :]) + epsilon - y[i]  # size 1
                 beta_old = beta[i]
-                zj = beta[i] - gradi / L[i]
-                beta[i] = proj_box_svm(zj, C)
+                zi = beta[i] - gradi / L[i]
+                beta[i] = proj_box_svm(zi, C)
                 r += (beta[i] - beta_old) * X[i, :]
                 if compute_jac:
                     dgradi = np.zeros(2)  # size 2
@@ -1195,24 +1186,26 @@ class SVR():
                     dbeta_old = dbeta[i, :].copy()
                     # diff of beta[i, :] - gradi / L_i
                     dzi = dbeta[i, :] - dgradi / L[i]
-                    dbeta[i, :] = ind_box(zj, C) * dzi
-                    dbeta[i, 0] += C * (C <= zj)
+                    dbeta[i, :] = ind_box(zi, C) * dzi
+                    dbeta[i, 0] += C * (C <= zi)
                     # update residuals
                     dr[:, 0] += (dbeta[i, 0] - dbeta_old[0]) * X[i, :]
                     dr[:, 1] += (dbeta[i, 1] - dbeta_old[1]) * X[i, :]
 
             if i >= n_samples:
-                F = - np.sum(r * X[i - n_samples, :]) + epsilon + y[i - n_samples]
+                gradi = - np.sum(r * X[i - n_samples, :]) + epsilon + y[i - n_samples]
                 beta_old = beta[i]
-                zj = beta[i] - F / L[i - n_samples]
-                beta[i] = proj_box_svm(zj, C)
+                zi = beta[i] - gradi / L[i - n_samples]
+                beta[i] = proj_box_svm(zi, C)
                 r -= (beta[i] - beta_old) * X[i - n_samples, :]
                 if compute_jac:
-                    dF = np.array([- np.sum(dr[:, 0] * X[i - n_samples, :]), - np.sum(dr[:, 1] * X[i - n_samples, :]) + epsilon])
+                    dgradi = np.zeros(2)
+                    dgradi[0] = - np.sum(dr[:, 0] * X[i - n_samples, :])
+                    dgradi[1] = - np.sum(dr[:, 1] * X[i - n_samples, :]) + epsilon
                     dbeta_old = dbeta[i, :].copy()
-                    dzj = dbeta[i, :] - dF / L[i - n_samples]
-                    dbeta[i, :] = ind_box(zj, C) * dzj
-                    dbeta[i, 0] += C * (C <= zj)
+                    dzi = dbeta[i, :] - dgradi / L[i - n_samples]
+                    dbeta[i, :] = ind_box(zi, C) * dzi
+                    dbeta[i, 0] += C * (C <= zi)
                     dr[:, 0] -= (dbeta[i, 0] - dbeta_old[0]) * X[i - n_samples, :]
                     dr[:, 1] -= (dbeta[i, 1] - dbeta_old[1]) * X[i - n_samples, :]
 
@@ -1316,21 +1309,25 @@ class SVR():
         full_sign_beta[mask] = sign_beta
         supp = np.where(full_sign_beta == 0.0)
         dr = Xs.T @ (full_jac[0:n_samples, :] - full_jac[n_samples:(2 * n_samples)])
-        for j in supp[0]:
-            if j < n_samples:
-                dF = np.array([np.sum(dr[:, 0] * Xs[j, :]), hyperparam[1] + np.sum(dr[:, 1] * Xs[j, :])])
-                dbeta_old = full_jac[j, :].copy()
-                dzj = full_jac[j, :] - dF / L[j]
-                full_jac[j, :] = dzj
-                dr[:, 0] += (full_jac[j, 0] - dbeta_old[0]) * Xs[j, :]
-                dr[:, 1] += (full_jac[j, 1] - dbeta_old[1]) * Xs[j, :]
-            if j >= n_samples:
-                dF = np.array([- np.sum(dr[:, 0] * Xs[j - n_samples, :]), hyperparam[1] - np.sum(dr[:, 1] * Xs[j - n_samples, :])])
-                dbeta_old = full_jac[j, :].copy()
-                dzj = full_jac[j, :] - dF / L[j - n_samples]
-                full_jac[j, :] = dzj
-                dr[:, 0] -= (full_jac[j, 0] - dbeta_old[0]) * Xs[j - n_samples, :]
-                dr[:, 1] -= (full_jac[j, 1] - dbeta_old[1]) * Xs[j - n_samples, :]
+        for i in supp[0]:
+            if i < n_samples:
+                dgradi = np.zeros(2)
+                dgradi[0] = np.sum(dr[:, 0] * Xs[i, :])
+                dgradi[1] = hyperparam[1] + np.sum(dr[:, 1] * Xs[i, :])
+                dbeta_old = full_jac[i, :].copy()
+                dzi = full_jac[i, :] - dgradi / L[i]
+                full_jac[i, :] = dzi
+                dr[:, 0] += (full_jac[i, 0] - dbeta_old[0]) * Xs[i, :]
+                dr[:, 1] += (full_jac[i, 1] - dbeta_old[1]) * Xs[i, :]
+            if i >= n_samples:
+                dgradi = np.zeros(2)
+                dgradi[0] = - np.sum(dr[:, 0] * Xs[i - n_samples, :])
+                dgradi[1] = hyperparam[1] - np.sum(dr[:, 1] * Xs[i - n_samples, :])
+                dbeta_old = full_jac[i, :].copy()
+                dzi = full_jac[i, :] - dgradi / L[i - n_samples]
+                full_jac[i, :] = dzi
+                dr[:, 0] -= (full_jac[i, 0] - dbeta_old[0]) * Xs[i - n_samples, :]
+                dr[:, 1] -= (full_jac[i, 1] - dbeta_old[1]) * Xs[i - n_samples, :]
         dbeta[:] = full_jac[mask, :].copy()
 
     @staticmethod
@@ -1395,6 +1392,7 @@ class SVR():
     def get_primal(self, mask, dense):
         n_samples = self.X.shape[0]
         full_dual = np.zeros((2 * n_samples))
+        full_dual[mask] = dense
         primal = self.X.T @ (full_dual[0:n_samples] - full_dual[n_samples:(2 * n_samples)])
         mask_primal = primal != 0
         dense_primal = primal[mask_primal]
@@ -1486,25 +1484,4 @@ class SVR():
         return log_alpha
 
     def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, hyperparam, mask):
-        n_samples = Xs.shape[0]
-        C = hyperparam[0]
-        epsilon = hyperparam[1]
-        full_jac = np.zeros((2 * n_samples, 2))
-        full_jac[mask, :] = dbeta
-        sum_dual = full_jac[0:n_samples, 0] - full_jac[n_samples:(2 * n_samples), 0]
-        full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != C)
-        maskC = np.isclose(np.abs(sum_dual), C)
-        dbeta_full_supp = sum_dual[full_supp]
-        yXdbeta = Xs[full_supp, :].T @ dbeta_full_supp
-        q = yXdbeta.T @ yXdbeta
-        linear_term = yXdbeta.T @ (Xs[maskC, :]).T @ sum_dual[maskC]
-        res = q + linear_term
-        sum_dual = full_jac[0:n_samples, 1] - full_jac[n_samples:(2 * n_samples), 1]
-        full_supp = np.logical_and(sum_dual != 0.0, np.abs(sum_dual) != C)
-        dbeta_full_supp = sum_dual[full_supp]
-        yXdbeta = Xs[full_supp, :].T @ dbeta_full_supp
-        q = yXdbeta.T @ yXdbeta
-        linear_term = dbeta_full_supp @ (np.ones(full_supp.sum()) * epsilon)
-        res2 = q + linear_term
-        return(
-            norm(res) + norm(res2))
+        

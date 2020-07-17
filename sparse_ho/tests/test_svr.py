@@ -16,7 +16,7 @@ n_features = 100
 n_active = 100
 SNR = 5.0
 tol = 1e-16
-C = 1.0
+C = 2.0
 log_C = np.log(C)
 epsilon = 0.05
 log_epsilon = np.log(epsilon)
@@ -52,8 +52,8 @@ def test_beta_jac():
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X_train, y_train, np.array([log_C, log_epsilon]), None, None,
-        get_v, tol=tol, model=model, tol_jac=1e-1, max_iter=max_iter, niter_jac=10000)
-
+        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+    import ipdb; ipdb.set_trace()
     assert np.allclose(primal, clf.coef_)
     assert np.allclose(dense1, dense2)
     assert np.all(supp1 == supp2)
@@ -72,7 +72,7 @@ def test_val_grad():
         np.array([log_C, log_epsilon]), tol=tol)
 
     criterion = CV(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-2, n_iter_jac=1000)
+    algo = ImplicitForward(criterion, tol_jac=1e-16, n_iter_jac=1000)
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
         np.array([log_C, log_epsilon]), tol=tol)
     assert np.allclose(val_fwd, val_imp_fwd)
@@ -85,24 +85,24 @@ def test_grad_search():
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward(criterion)
-    grad_search(algo, np.array([np.log(1e-1), log_epsilon]), monitor1, n_outer=n_outer,
+    grad_search(algo, np.array([np.log(10), log_epsilon]), monitor1, n_outer=n_outer,
                 tol=1e-13)
 
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-6, n_iter_jac=1000)
-    grad_search(algo, np.array([np.log(1e-1), log_epsilon]), monitor3, n_outer=n_outer,
+    algo = ImplicitForward(criterion, tol_jac=1e-16, n_iter_jac=1000)
+    grad_search(algo, np.array([np.log(10), log_epsilon]), monitor3, n_outer=n_outer,
                 tol=1e-13)
 
-    # import ipdb; ipdb.set_trace()
-    # assert np.allclose(
-    #     np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    # assert np.allclose(
-    #     np.array(monitor1.grads), np.array(monitor3.grads))
-    # assert np.allclose(
-    #     np.array(monitor1.objs), np.array(monitor3.objs))
-    # assert not np.allclose(
-    #     np.array(monitor1.times), np.array(monitor3.times))
+    import ipdb; ipdb.set_trace()
+    assert np.allclose(
+        np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
+    assert np.allclose(
+        np.array(monitor1.grads), np.array(monitor3.grads))
+    assert np.allclose(
+        np.array(monitor1.objs), np.array(monitor3.objs))
+    assert not np.allclose(
+        np.array(monitor1.times), np.array(monitor3.times))
 
 
 if __name__ == '__main__':

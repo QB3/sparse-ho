@@ -160,6 +160,6 @@ def test_grad_search(model):
 
 if __name__ == '__main__':
     for model in models:
-        # test_beta_jac(model)
-        # test_val_grad(model)
+        test_beta_jac(model)
+        test_val_grad(model)
         test_grad_search(model)
