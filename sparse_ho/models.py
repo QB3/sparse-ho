@@ -1283,7 +1283,7 @@ class SVR():
         return X.T @ dbeta
 
     @staticmethod
-    #@njit
+    @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, hyperparam, sign_beta):
         supp = np.where(sign_beta == 0.0)
         dbeta[sign_beta == 1.0, :] = np.array([hyperparam[0], 0])
