@@ -174,6 +174,7 @@ def solver(y_train, X_train, n_orient):
 
     return X, active_set
 
+
 loose, depth = 0., .8  # corresponds to free orientation
 stc = apply_solver(solver, evoked, forward, noise_cov, loose, depth)
 
