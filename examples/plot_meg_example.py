@@ -145,8 +145,8 @@ def solver(y_train, X_train, n_orient):
     y_train = y_train[:, idx_max]
 
     n_samples, n_features = X_train.shape
-    alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
-    X_train /= alpha_max
+    alpha_max_old = (np.abs(X_train.T @ y_train)).max() / n_samples
+    X_train /= alpha_max_old
 
     alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
     alpha0 = 0.7 * alpha_max
@@ -170,7 +170,7 @@ def solver(y_train, X_train, n_orient):
 
     X = criterion.dense0[:, np.newaxis] * np.ones((1, n_times))
     active_set = criterion.mask0
-    X /= alpha_max
+    X /= alpha_max_old
 
     return X, active_set
 
