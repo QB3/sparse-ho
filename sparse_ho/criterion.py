@@ -75,6 +75,7 @@ class CV():
         if self.convexify:
             val += self.gamma_convex + np.sum(np.exp(log_alpha) ** 2)
             grad += 2 * self.gamma_convex * np.exp(log_alpha)
+
         return val, grad
 
 

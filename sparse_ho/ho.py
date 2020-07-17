@@ -199,8 +199,8 @@ def _grad_search(
         #     lambdak, tol=tol, beta_star=beta_star)
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
 
-        monitor(g_func, algo.criterion.val_test, lambdak,
-                grad_lambda, algo.criterion.rmse)
+        monitor(g_func, algo.criterion.val_test, lambdak.copy(),
+                grad_lambda.copy(), algo.criterion.rmse)
 
         if convexify:
             g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)

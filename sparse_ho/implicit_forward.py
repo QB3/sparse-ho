@@ -18,6 +18,7 @@ class ImplicitForward():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
+
         mask, dense, jac = get_beta_jac_fast_iterdiff(
             X, y, log_alpha, self.criterion.X_val, self.criterion.y_val,
             get_v, mask0=mask0, dense0=dense0,
@@ -26,9 +27,11 @@ class ImplicitForward():
             tol_jac=tol, use_sk=self.use_sk,
             tol=tol, niter_jac=self.n_iter_jac, model=model,
             max_iter=self.criterion.model.max_iter, verbose=self.verbose)
+
         jac_v = model.get_jac_v(mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
+
         return mask, dense, jac_v, jac
 
     def get_val_grad(
