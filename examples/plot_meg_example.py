@@ -82,7 +82,8 @@ def apply_solver(
 
     n_orient = 1 if is_fixed_orient(forward) else 3
 
-    X, active_set, monitor = solver(M, gain, n_orient, p_alpha0=p_alpha0)
+    X, active_set, monitor = solver(M, gain, n_orient, evoked.nave, p_alpha0=p_alpha0)
+    # X, active_set, monitor = solver(M, gain, n_orient, )
     X = _reapply_source_weighting(X, source_weighting, active_set)
 
     # import ipdb; ipdb.set_trace()
@@ -95,7 +96,7 @@ def apply_solver(
 ###############################################################################
 # Define your solver
 
-def solver(y_train, X_train, n_orient, p_alpha0=0.7):
+def solver(y_train, X_train, n_orient, nave, p_alpha0=0.7):
     """Run L2 penalized regression and keep 10 strongest locations.
 
     Parameters
@@ -110,6 +111,8 @@ def solver(y_train, X_train, n_orient, p_alpha0=0.7):
         Can be 1 or 3 depending if one works with fixed or free orientations.
         If n_orient is 3, then ``G[:, 2::3]`` corresponds to the dipoles that
         are normal to the cortex.
+    nave : int
+        The number of epochs averaged.
 
     Returns
     -------
@@ -142,7 +145,7 @@ def solver(y_train, X_train, n_orient, p_alpha0=0.7):
         log_alpha0 = log_alpha0 * np.ones(n_features)
 
     model = wLasso(X_train, y_train, log_alpha0)
-    sigma = 1 / np.sqrt(50)
+    sigma = 1 / np.sqrt(nave)
     criterion = SURE(X_train, y_train, model, sigma)
     algo = ImplicitForward(criterion)
     monitor_grad = Monitor()
