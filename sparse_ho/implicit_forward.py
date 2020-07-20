@@ -5,10 +5,10 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 class ImplicitForward():
     def __init__(
-            self, criterion, tol_jac=1e-3, n_iter=100, n_iter_jac=100,
+            self, criterion, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
             use_sk=False, verbose=False):
         self.criterion = criterion
-        self.n_iter = n_iter
+        self.max_iter = max_iter
         self.tol_jac = tol_jac
         self.n_iter_jac = n_iter_jac
         self.use_sk = use_sk
@@ -19,13 +19,12 @@ class ImplicitForward():
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
         mask, dense, jac = get_beta_jac_fast_iterdiff(
-            X, y, log_alpha, self.criterion.X_val, self.criterion.y_val,
-            get_v, mask0=mask0, dense0=dense0,
+            X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             # tol_jac=self.tol_jac,
             tol_jac=tol, use_sk=self.use_sk,
             tol=tol, niter_jac=self.n_iter_jac, model=model,
-            max_iter=self.criterion.model.max_iter, verbose=self.verbose)
+            max_iter=self.max_iter, verbose=self.verbose)
         jac_v = model.get_jac_v(mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
@@ -49,7 +48,7 @@ class ImplicitForward():
 
 
 def get_beta_jac_fast_iterdiff(
-        X, y, log_alpha, X_val, y_val, get_v, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, use_sk=False, verbose=False):
+        X, y, log_alpha, get_v, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, use_sk=False, verbose=False):
     n_samples, n_features = X.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
