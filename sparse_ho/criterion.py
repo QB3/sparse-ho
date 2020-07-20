@@ -1,9 +1,11 @@
 from numpy.linalg import norm
 import numpy as np
+from scipy.sparse import issparse
+from sklearn.model_selection import train_test_split
+
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
-from scipy.sparse import issparse
 
 
 class CV():
@@ -309,6 +311,67 @@ class SURE():
 
 
 class CrossVal():
-    def __init__(self, X, y):
+    def __init__(self, X, y, Model, cv=5, test_size=0.33, max_iter=1000):
+        """
+        cv can be an integer or predefined folds
+        """
         self.X = X
         self.y = y
+        self.dict_crits = {}
+        self.val_test = None
+        self.rmse = None
+
+        # init dict of models
+        if isinstance(cv, int):
+            for i in range(cv):
+                X_train, X_val, y_train, y_val = train_test_split(
+                    X, y, test_size=test_size, random_state=cv)
+
+                if issparse(X_train):
+                    X_train = X_train.tocsc().copy()
+                if issparse(X_val):
+                    X_val = X_val.tocsc().copy()
+
+                model = Model(X_train, y_train, 1)
+
+                criterion = CV(
+                    X_val, y_val, model, X_test=X_val, y_test=y_val)
+
+                self.dict_crits[i] = criterion
+            self.n_splits = cv
+        else:
+            for i, (train, val) in enumerate(cv.split(X)):
+                X_train = X[train, :]
+                y_train = y[train]
+                X_val = X[val, :]
+                y_val = y[val]
+
+                if issparse(X_train):
+                    X_train = X_train.tocsc().copy()
+                if issparse(X_val):
+                    X_val = X_val.tocsc().copy()
+
+                model = Model(X_train, y_train, 1, max_iter=max_iter)
+
+                criterion = CV(
+                    X_val, y_val, model, X_test=X_val, y_test=y_val)
+
+                self.dict_crits[i] = criterion
+            self.n_splits = cv.n_splits
+        self.model = self.dict_crits[0].model
+
+    def get_val_grad(
+            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            compute_jac=True, backward=False, beta_star=None):
+        val = 0
+        grad = 0
+        for i in range(self.n_splits):
+            vali, gradi = self.dict_crits[i].get_val_grad(
+                log_alpha, get_beta_jac_v, max_iter=max_iter, tol=tol,
+                compute_jac=compute_jac, backward=backward,
+                beta_star=beta_star)
+            val += vali
+            grad += gradi
+        val /= self.n_splits
+        grad /= self.n_splits
+        return val, grad
