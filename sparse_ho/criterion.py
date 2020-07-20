@@ -9,9 +9,25 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class CV():
+    """Held out loss (we should change the name CV here).
+    """
+
     def __init__(self, X_val, y_val, model, convexify=False,
                  gamma_convex=1e-2, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        convexify: this param should be remove from here
+        gamma_convex: this param should be removed from here
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -83,7 +99,18 @@ class CV():
 
 class Logistic():
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -147,7 +174,18 @@ class Logistic():
 
 class SmoothedHinge():
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -313,7 +351,17 @@ class SURE():
 class CrossVal():
     def __init__(self, X, y, Model, cv=5, test_size=0.33, max_iter=1000):
         """
-        cv can be an integer or predefined folds
+        Parameters
+        ----------
+        X : {ndarray, sparse matrix} of (n_samples, n_features)
+            Data
+        y : {ndarray, sparse matrix} of (n_samples)
+            Target
+        Model: class from Model (e.g. Lasso or Sparse logistic regression)
+        cv: can be an integer or predefined folds
+        test_size: float
+        max_iter: int
+            Maximal number of iteration for the soa solver
         """
         self.X = X
         self.y = y
@@ -332,7 +380,7 @@ class CrossVal():
                 if issparse(X_val):
                     X_val = X_val.tocsc().copy()
 
-                model = Model(X_train, y_train, 1)
+                model = Model(X_train, y_train, 1, max_iter=max_iter)
 
                 criterion = CV(
                     X_val, y_val, model, X_test=X_val, y_test=y_val)

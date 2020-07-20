@@ -51,7 +51,7 @@ print("Starting path computation...")
 n_samples = len(y)
 alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 
-n_alphas = 10
+n_alphas = 100
 p_alphas = np.geomspace(1, 0.001, n_alphas)
 alphas = alpha_max * p_alphas
 
