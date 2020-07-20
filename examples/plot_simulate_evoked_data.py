@@ -48,7 +48,7 @@ labels = [mne.read_label(data_path + '/MEG/sample/labels/%s.label' % ln)
 ###############################################################################
 # Generate source time courses from 2 dipoles and the correspond evoked data
 
-times = np.arange(300, dtype=np.float) / raw.info['sfreq'] - 0.1
+times = np.arange(200, dtype=np.float) / raw.info['sfreq'] - 0.1
 
 rng = np.random.RandomState(42)
 
@@ -67,9 +67,9 @@ stc = simulate_sparse_stc(fwd['src'], n_dipoles=len(labels), times=times,
 # Generate noisy evoked data
 picks = mne.pick_types(raw.info, eeg=False, meg=True, exclude='bads')
 iir_filter = None  # do not add autocorrelated noise
-nave = 50  # simulate average of 100 epochs
+nave = 200  # simulate average of 100 epochs
 evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
-                         iir_filter=iir_filter, random_state=rng)
+                         iir_filter=iir_filter, random_state=66)
 
 ###############################################################################
 # Plot
@@ -81,7 +81,7 @@ evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
 # evoked.plot(time_unit='s')
 
 
-stc_recovered, monitor = apply_solver(evoked, fwd, cov, p_alpha0=0.6)
+stc_recovered, monitor = apply_solver(evoked, fwd, cov, p_alpha0=0.5)
 
 print(evoked.data.sum())
 
