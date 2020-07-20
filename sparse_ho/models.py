@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
-from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p
+from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
 from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
 from sparse_ho.utils import sigma
 import scipy.sparse.linalg as slinalg
@@ -1477,3 +1477,252 @@ class SVR():
         res = q + linear_term - C * np.sum(dbeta[full_supp])
         return(
             norm(res))
+
+
+class ElasticNet():
+    def __init__(self, X, y, log_alpha1, log_alpha2, log_alpha_max=None, max_iter=100, tol=1e-3):
+        self.X = X
+        self.y = y
+        self.log_alpha = np.array([log_alpha1, log_alpha2])
+        self.max_iter = max_iter
+        self.tol = tol
+        self.log_alpha_max = log_alpha_max
+
+    def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
+                       dense0=None, compute_jac=True):
+        n_samples, n_features = X.shape
+        dbeta = np.zeros((n_features, 2))
+        if jac0 is None or not compute_jac:
+            dr = np.zeros((n_samples, 2))
+        else:
+            dbeta[mask0, :] = jac0.copy()
+            dr = - X[:, mask0] @ jac0.copy()
+        return dbeta, dr
+
+    def _init_beta_r(self, X, y, mask0=None, dense0=None):
+        beta = np.zeros(X.shape[1])
+        if dense0 is None or len(dense0) == 0:
+            r = y.copy()
+            r = r.astype(np.float)
+        else:
+            beta[mask0] = dense0.copy()
+            r = y - X[:, mask0] @ dense0
+        return beta, r
+
+    @staticmethod
+    @njit
+    def _update_beta_jac_bcd(
+            X, y, beta, dbeta, r, dr, alpha, L, compute_jac=True):
+        n_samples, n_features = X.shape
+        non_zeros = np.where(L != 0)[0]
+        for j in non_zeros:
+            beta_old = beta[j]
+            if compute_jac:
+                dbeta_old = dbeta[j, :].copy()
+                # compute derivatives
+            zj = beta[j] + r @ X[:, j] / (L[j] * n_samples)
+            beta[j] = prox_elasticnet(zj, alpha[0] / L[j], alpha[1])
+            if compute_jac:
+                dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
+                dbeta[j:j+1, :] = (1 / (1 + alpha[0] * alpha[1])) * np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= alpha[0] * np.sign(beta[j]) / L[j] / (1 + (alpha[0] / L[j]) * alpha[1])
+                dbeta[j:j+1, 0] -= ST(zj, alpha[0] / L[j]) * (- alpha[1]) / (1 + (alpha[0] / L[j]) + alpha[1]) ** 2
+                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) * (- alpha[0] / L[j]) / (1 + (alpha[0] / L[j]) * alpha[1]) ** 2
+                # update residuals
+                dr[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
+                dr[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
+            r -= X[:, j] * (beta[j] - beta_old)
+
+    @staticmethod
+    @njit
+    def _update_beta_jac_bcd_sparse(
+            data, indptr, indices, y, n_samples, n_features, beta,
+            dbeta, r, dr, alphas, L, compute_jac=True):
+
+        non_zeros = np.where(L != 0)[0]
+
+        for j in non_zeros:
+            # get the j-st column of X in sparse format
+            Xjs = data[indptr[j]:indptr[j+1]]
+            # get the non zero indices
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            beta_old = beta[j]
+            if compute_jac:
+                dbeta_old = dbeta[j, :].copy()
+            zj = beta[j] + r[idx_nz] @ Xjs / (L[j] * n_samples)
+            beta[j:j+1] = prox_elasticnet(zj, alphas[0] / L[j], alphas[1])
+            if compute_jac:
+                dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
+                dbeta[j:j+1, :] = (1 / (1 + alphas[0] * alphas[1])) * np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= alphas[0] * np.sign(beta[j]) / L[j] / (1 + (alphas[0] / L[j]) * alphas[1])
+                dbeta[j:j+1, 0] -= ST(zj, alphas[0] / L[j]) * (- alphas[1]) / (1 + (alphas[0] / L[j]) + alphas[1]) ** 2
+                dbeta[j:j+1, 1] -= ST(zj, alphas[0] / L[j]) * (- alphas[0] / L[j]) / (1 + (alphas[0] / L[j]) * alphas[1]) ** 2
+                # update residuals
+                dr[:, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
+                dr[:, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
+            r[idx_nz] -= Xjs * (beta[j] - beta_old)
+
+    @staticmethod
+    @njit
+    def _update_bcd_jac_backward(X, alpha, grad, beta, v_t_jac, L):
+        sign_beta = np.sign(beta)
+        n_samples, n_features = X.shape
+        for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+            grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
+            v_t_jac[j] *= np.abs(sign_beta[j])
+            v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X[:, j] @ X
+
+        return grad
+
+    @staticmethod
+    def _get_pobj0(r, beta, alphas, y=None):
+        n_samples = r.shape[0]
+        return norm(y) ** 2 / (2 * n_samples)
+
+    @staticmethod
+    def _get_pobj(r, beta, alphas, y=None):
+        n_samples = r.shape[0]
+        pobj = norm(r) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
+        pobj += 0.5 * alphas[1] * alphas[0] * norm(beta) ** 2
+        return pobj
+
+    @staticmethod
+    def _get_jac(dbeta, mask):
+        return dbeta[mask, :]
+
+    @staticmethod
+    def get_full_jac_v(mask, jac_v, n_features):
+        return jac_v
+
+    @staticmethod
+    def get_mask_jac_v(mask, jac_v):
+        return jac_v
+
+    @staticmethod
+    def _init_dbeta0(mask, mask0, jac0):
+        size_mat = mask.sum()
+        if jac0 is not None:
+            dbeta0_new = init_dbeta0_new(jac0, mask, mask0)
+        else:
+            dbeta0_new = np.zeros(size_mat)
+        return dbeta0_new
+
+    @staticmethod
+    def _init_dbeta(n_features):
+        dbeta = np.zeros((n_features, 2))
+        return dbeta
+
+    @staticmethod
+    def _init_dr(dbeta, X, y):
+        return - X @ dbeta
+
+    def _init_g_backward(self, jac_v0):
+        if jac_v0 is None:
+            return 0.0
+        else:
+            return jac_v0
+
+    @staticmethod
+    @njit
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+        n_samples, n_features = Xs.shape
+        for j in range(n_features):
+            # dbeta_old = dbeta[j].copy()
+            dbeta_old = dbeta[j]
+            dbeta[j] += Xs[:, j].T @ dr / (L[j] * n_samples)
+            dbeta[j] -= alpha * sign_beta[j] / L[j]
+            dr -= Xs[:, j] * (dbeta[j] - dbeta_old)
+
+    @staticmethod
+    @njit
+    def _update_only_jac_sparse(
+            data, indptr, indices, y, n_samples, n_features,
+            dbeta, r, dr, L, alpha, sign_beta):
+        for j in range(n_features):
+            # get the j-st column of X in sparse format
+            Xjs = data[indptr[j]:indptr[j+1]]
+            # get the non zero idices
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            # store old beta j for fast update
+            dbeta_old = dbeta[j]
+            # update of the Jacobian dbeta
+            dbeta[j] += Xjs @ dr[idx_nz] / (L[j] * n_samples)
+            dbeta[j] -= alpha * sign_beta[j] / L[j]
+            dr[idx_nz] -= Xjs * (dbeta[j] - dbeta_old)
+
+    @staticmethod
+    @njit
+    def _reduce_alpha(alpha, mask):
+        return alpha
+
+    # @staticmethod
+    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
+        n_samples = self.X.shape[0]
+        return n_samples * alphas[mask] * np.sign(dense) @ jac
+
+    def proj_param(self, log_alpha):
+        if self.log_alpha_max is None:
+            alpha_max = np.max(np.abs(self.X.T @ self.y))
+            alpha_max /= self.X.shape[0]
+            self.log_alpha_max = np.log(alpha_max)
+        if log_alpha < self.log_alpha_max - 7:
+            return self.log_alpha_max - 7
+        elif log_alpha > self.log_alpha_max + np.log(0.9):
+            return self.log_alpha_max + np.log(0.9)
+        else:
+            return log_alpha
+
+    @staticmethod
+    def get_L(X, is_sparse=False):
+        # print(is_sparse)
+        if is_sparse:
+            return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
+        else:
+            return norm(X, axis=0) ** 2 / (X.shape[0])
+
+    def sk(self, X, y, alpha, tol, max_iter):
+        if self.clf is None:
+            self.clf = linear_model.Lasso(
+                fit_intercept=False, max_iter=max_iter, warm_start=True)
+        self.clf.alpha = alpha
+        self.clf.tol = tol
+        # clf = linear_model.Lasso(
+        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
+        self.clf.fit(X, y)
+        mask = self.clf.coef_ != 0
+        dense = self.clf.coef_[mask]
+        return mask, dense, None
+
+    def reduce_X(self, mask):
+        return self.X[:, mask]
+
+    def reduce_y(self, mask):
+        return self.y
+
+    def sign(self, x):
+        return np.sign(x)
+
+    def get_primal(self, mask, dense):
+        return mask, dense
+
+    def get_jac_v(self, mask, dense, jac, v):
+        return jac.T @ v(mask, dense)
+
+    def get_hessian(self, mask, dense):
+        hessian = self.X[:, mask].T @ self.X[:, mask]
+        return hessian
+
+    def restrict_full_supp(self, mask, dense, v):
+        return v
+
+    def compute_alpha_max(self):
+        if self.log_alpha_max is None:
+            alpha_max = np.max(np.abs(self.X.T @ self.y))
+            alpha_max /= self.X.shape[0]
+            self.log_alpha_max = np.log(alpha_max)
+        return self.log_alpha_max
+
+    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+        n_samples = self.X.shape[0]
+        return(
+            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
