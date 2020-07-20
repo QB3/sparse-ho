@@ -13,34 +13,12 @@ from sparse_ho.criterion import SURE
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.ho import grad_search
 
-data_path = sample.data_path()
-fwd_fname = data_path + '/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif'
-ave_fname = data_path + '/MEG/sample/sample_audvis-ave.fif'
-cov_fname = data_path + '/MEG/sample/sample_audvis-shrunk-cov.fif'
-subjects_dir = data_path + '/subjects'
-# condition = 'Right Auditory'
-condition = 'Left Auditory'
-
-if condition == 'Left Auditory':
-    tmax = 0.18
-else:
-    tmax = 0.15
-
-# Read noise covariance matrix
-noise_cov = mne.read_cov(cov_fname)
-# Handling average file
-evoked = mne.read_evokeds(ave_fname, condition=condition, baseline=(None, 0))
-evoked.crop(tmin=0.04, tmax=0.18)
-
-evoked = evoked.pick_types(eeg=False, meg=True)
-# Handling forward solution
-forward = mne.read_forward_solution(fwd_fname)
-
 
 ###############################################################################
 # Auxiliary function to run the solver
 
-def apply_solver(solver, evoked, forward, noise_cov, loose=0.2, depth=0.8):
+
+def apply_solver(evoked, forward, noise_cov, loose=0.2, depth=0.8):
     """Call a custom solver on evoked data.
 
     This function does all the necessary computation:
@@ -92,7 +70,7 @@ def apply_solver(solver, evoked, forward, noise_cov, loose=0.2, depth=0.8):
     # Handle depth weighting and whitening (here is no weights)
     forward, gain, gain_info, whitener, source_weighting, mask = _prepare_gain(
         forward, evoked.info, noise_cov, pca=False, depth=depth,
-        loose=loose, weights=None, weights_min=None, rank=None)
+        loose=0, weights=None, weights_min=None, rank=None)
 
     # Select channels of interest
     sel = [all_ch_names.index(name) for name in gain_info['ch_names']]
@@ -103,13 +81,14 @@ def apply_solver(solver, evoked, forward, noise_cov, loose=0.2, depth=0.8):
 
     n_orient = 1 if is_fixed_orient(forward) else 3
 
-    X, active_set = solver(M, gain, n_orient)
+    X, active_set, monitor = solver(M, gain, n_orient)
     X = _reapply_source_weighting(X, source_weighting, active_set)
 
+    # import ipdb; ipdb.set_trace()
     stc = _make_sparse_stc(X, active_set, forward, tmin=evoked.times[0],
                            tstep=1. / evoked.info['sfreq'])
 
-    return stc
+    return stc, monitor
 
 
 ###############################################################################
@@ -172,13 +151,39 @@ def solver(y_train, X_train, n_orient):
     active_set = criterion.mask0
     X /= alpha_max_old
 
-    return X, active_set
+    return X, active_set, monitor_grad
 
 
-loose, depth = 0., .8  # corresponds to free orientation
-stc = apply_solver(solver, evoked, forward, noise_cov, loose, depth)
+if __name__ == '__main__':
+    data_path = sample.data_path()
+    fwd_fname = data_path + '/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif'
+    ave_fname = data_path + '/MEG/sample/sample_audvis-ave.fif'
+    cov_fname = data_path + '/MEG/sample/sample_audvis-shrunk-cov.fif'
+    subjects_dir = data_path + '/subjects'
+    # condition = 'Right Auditory'
+    condition = 'Left Auditory'
 
-###############################################################################
-# View in 2D and 3D ("glass" brain like 3D plot)
-plot_sparse_source_estimates(forward['src'], stc, bgcolor=(1, 1, 1),
-                             opacity=0.1)
+    if condition == 'Left Auditory':
+        tmax = 0.18
+    else:
+        tmax = 0.15
+
+    # Read noise covariance matrix
+    noise_cov = mne.read_cov(cov_fname)
+    # Handling average file
+    evoked = mne.read_evokeds(ave_fname, condition=condition, baseline=(None, 0))
+    evoked.crop(tmin=0.04, tmax=0.18)
+
+    evoked = evoked.pick_types(eeg=False, meg=True)
+    # Handling forward solution
+    forward = mne.read_forward_solution(fwd_fname)
+
+    loose, depth = 0., .8  # corresponds to free orientation
+    stc, monitor = apply_solver(
+        solver, evoked, forward, noise_cov, loose, depth)
+    print("Value of objectives:")
+    print(monitor.objs)
+    ###############################################################################
+    # View in 2D and 3D ("glass" brain like 3D plot)
+    plot_sparse_source_estimates(
+        forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
