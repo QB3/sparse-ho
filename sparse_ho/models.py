@@ -1526,8 +1526,8 @@ class ElasticNet():
                 dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alpha[0] * alpha[1])) * np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, 0] -= alpha[0] * np.sign(beta[j]) / L[j] / (1 + (alpha[0] / L[j]) * alpha[1])
-                dbeta[j:j+1, 0] -= ST(zj, alpha[0] / L[j]) * (- alpha[1]) / (1 + (alpha[0] / L[j]) + alpha[1]) ** 2
-                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) * (- alpha[0] / L[j]) / (1 + (alpha[0] / L[j]) * alpha[1]) ** 2
+                dbeta[j:j+1, 0] -= ST(zj, alpha[0] / L[j]) * (alpha[1]) / (1 + (alpha[0] / L[j]) + alpha[1]) ** 2
+                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) * (alpha[0] / L[j]) / (1 + (alpha[0] / L[j]) * alpha[1]) ** 2
                 # update residuals
                 dr[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
                 dr[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
