@@ -306,3 +306,9 @@ class SURE():
             grad = None
 
         return val, grad
+
+
+class CrossVal():
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
