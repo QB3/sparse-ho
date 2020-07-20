@@ -598,7 +598,6 @@ class SVM():
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
-
     def _get_pobj0(self, r, beta, C, y):
         C = C[0]
         n_samples = self.X.shape[0]
@@ -1239,7 +1238,6 @@ class SVR():
                     dbeta[j:j+1] += C * (C <= zj)
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
-
 
     def _get_pobj0(self, r, beta, hyperparam, y):
         n_samples = self.X.shape[0]
