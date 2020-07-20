@@ -215,7 +215,7 @@ class Lasso():
     def sk(self, X, y, alpha, tol, max_iter):
         if self.clf is None:
             self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=max_iter, warm_start=True)
+                fit_intercept=False, max_iter=self.max_iter, warm_start=True)
         self.clf.alpha = alpha
         self.clf.tol = tol
         # clf = linear_model.Lasso(
@@ -598,7 +598,6 @@ class SVM():
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
-        # import ipdb; ipdb.set_trace()
 
     def _get_pobj0(self, r, beta, C, y):
         C = C[0]
@@ -1121,7 +1120,6 @@ class SparseLogreg():
         self.clf.fit(X, y)
         mask = self.clf.coef_ != 0
         dense = self.clf.coef_[mask]
-        # import ipdb; ipdb.set_trace()
         return mask[0], dense, None
 
 
@@ -1242,7 +1240,6 @@ class SVR():
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
-        # import ipdb; ipdb.set_trace()
 
     def _get_pobj0(self, r, beta, hyperparam, y):
         n_samples = self.X.shape[0]
