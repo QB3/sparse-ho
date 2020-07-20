@@ -1525,8 +1525,8 @@ class ElasticNet():
             if compute_jac:
                 dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1, 0] -= np.sign(beta[j]) / L[j] / (1 + alpha[1] / L[j])
-                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) / (1 + alpha[1] / L[j]) ** 2
+                dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
+                dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
                 # update residuals
                 dr[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
                 dr[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
@@ -1552,10 +1552,9 @@ class ElasticNet():
             beta[j:j+1] = prox_elasticnet(zj, alphas[0] / L[j], alphas[1])
             if compute_jac:
                 dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
-                dbeta[j:j+1, :] = (1 / (1 + alphas[0] * alphas[1])) * np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1, 0] -= alphas[0] * np.sign(beta[j]) / L[j] / (1 + (alphas[0] / L[j]) * alphas[1])
-                dbeta[j:j+1, 0] -= ST(zj, alphas[0] / L[j]) * (- alphas[1]) / (1 + (alphas[0] / L[j]) + alphas[1]) ** 2
-                dbeta[j:j+1, 1] -= ST(zj, alphas[0] / L[j]) * (- alphas[0] / L[j]) / (1 + (alphas[0] / L[j]) * alphas[1]) ** 2
+                dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= alphas[0] * np.sign(beta[j]) / L[j] / (1 + (alphas[1] / L[j]))
+                dbeta[j:j+1, 1] -= (alphas[1] / L[j] * beta[j]) / (1 + (alphas[1] / L[j]))
                 # update residuals
                 dr[:, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
                 dr[:, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
@@ -1601,9 +1600,21 @@ class ElasticNet():
     def _init_dbeta0(mask, mask0, jac0):
         size_mat = mask.sum()
         if jac0 is not None:
-            dbeta0_new = init_dbeta0_new(jac0, mask, mask0)
+            mask_both = np.logical_and(mask0, mask)
+            size_mat = mask.sum()
+            dbeta0_new = np.zeros((size_mat, 2))
+            count = 0
+            count_old = 0
+            n_features = mask.shape[0]
+            for j in range(n_features):
+                if mask_both[j]:
+                    dbeta0_new[count, :] = jac0[count_old, :]
+                if mask0[j]:
+                    count_old += 1
+                if mask[j]:
+                    count += 1
         else:
-            dbeta0_new = np.zeros(size_mat)
+            dbeta0_new = np.zeros((size_mat, 2))
         return dbeta0_new
 
     @staticmethod
@@ -1623,14 +1634,18 @@ class ElasticNet():
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
-            # dbeta_old = dbeta[j].copy()
-            dbeta_old = dbeta[j]
-            dbeta[j] += Xs[:, j].T @ dr / (L[j] * n_samples)
-            dbeta[j] -= alpha * sign_beta[j] / L[j]
-            dr -= Xs[:, j] * (dbeta[j] - dbeta_old)
+            dbeta_old = dbeta[j, :].copy()
+            dzj = dbeta[j, :] + Xs[:, j] @ dr / (L[j] * n_samples)
+            dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
+
+            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
+            # update residuals
+            dr[:, 0] -= Xs[:, j] * (dbeta[j, 0] - dbeta_old[0])
+            dr[:, 1] -= Xs[:, j] * (dbeta[j, 1] - dbeta_old[1])
 
     @staticmethod
     @njit
@@ -1656,18 +1671,21 @@ class ElasticNet():
 
     # @staticmethod
     def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
-        return n_samples * alphas[mask] * np.sign(dense) @ jac
+        return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
     def proj_param(self, log_alpha):
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= self.X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < self.log_alpha_max - 7:
-            return self.log_alpha_max - 7
-        elif log_alpha > self.log_alpha_max + np.log(0.9):
-            return self.log_alpha_max + np.log(0.9)
+        if log_alpha[0] < self.log_alpha_max - 7:
+            log_alpha[0] = self.log_alpha_max - 7
+        elif log_alpha[0] > self.log_alpha_max + np.log(0.9):
+            log_alpha[0] = self.log_alpha_max + np.log(0.9)
+        if log_alpha[1] < self.log_alpha_max - 7:
+            log_alpha[1] = self.log_alpha_max - 7
+        elif log_alpha[1] > self.log_alpha_max + np.log(0.9):
+            log_alpha[1] = self.log_alpha_max + np.log(0.9)
         else:
             return log_alpha
 
@@ -1699,7 +1717,7 @@ class ElasticNet():
         return self.y
 
     def sign(self, x):
-        return np.sign(x)
+        return x
 
     def get_primal(self, mask, dense):
         return mask, dense
@@ -1708,7 +1726,8 @@ class ElasticNet():
         return jac.T @ v(mask, dense)
 
     def get_hessian(self, mask, dense):
-        hessian = self.X[:, mask].T @ self.X[:, mask]
+        n_samples = self.X.shape[0]
+        hessian = np.exp(self.log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
@@ -1721,7 +1740,9 @@ class ElasticNet():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
+    def get_jac_obj(self, Xs, ys, beta, dbeta, r, dr, alpha):
         n_samples = self.X.shape[0]
+        res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * np.sign(beta) @ dbeta[:, 0]
+        res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
         return(
-            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+            norm(res2) + norm(res1))
