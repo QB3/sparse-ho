@@ -48,10 +48,11 @@ labels = [mne.read_label(data_path + '/MEG/sample/labels/%s.label' % ln)
 # Generate source time courses from 2 dipoles and the correspond evoked data
 
 times = np.arange(300, dtype=np.float) / raw.info['sfreq'] - 0.1
-rng = np.random.RandomState(42)
 
 
 def data_fun(times):
+    rng = np.random.RandomState(42)
+
     """Function to generate random source time courses"""
     return (50e-9 * np.sin(30. * times) *
             np.exp(- (times - 0.15 + 0.05 * rng.randn(1)) ** 2 / 0.01))
@@ -76,10 +77,11 @@ evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
 
 # evoked.plot(time_unit='s')
 
-
 from plot_meg_example import apply_solver
 
 stc, monitor = apply_solver(evoked, fwd, cov)
+
+print(evoked.data.sum())
 
 plot_sparse_source_estimates(fwd['src'], stc, bgcolor=(1, 1, 1),
                              opacity=0.1, high_resolution=True)
