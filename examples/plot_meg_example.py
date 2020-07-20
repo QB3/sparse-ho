@@ -18,7 +18,8 @@ from sparse_ho.ho import grad_search
 # Auxiliary function to run the solver
 
 
-def apply_solver(evoked, forward, noise_cov, loose=0.2, depth=0.8):
+def apply_solver(
+        evoked, forward, noise_cov, loose=0.2, depth=0.8, p_alpha0=0.7):
     """Call a custom solver on evoked data.
 
     This function does all the necessary computation:
@@ -81,7 +82,7 @@ def apply_solver(evoked, forward, noise_cov, loose=0.2, depth=0.8):
 
     n_orient = 1 if is_fixed_orient(forward) else 3
 
-    X, active_set, monitor = solver(M, gain, n_orient)
+    X, active_set, monitor = solver(M, gain, n_orient, p_alpha0=p_alpha0)
     X = _reapply_source_weighting(X, source_weighting, active_set)
 
     # import ipdb; ipdb.set_trace()
@@ -94,7 +95,7 @@ def apply_solver(evoked, forward, noise_cov, loose=0.2, depth=0.8):
 ###############################################################################
 # Define your solver
 
-def solver(y_train, X_train, n_orient):
+def solver(y_train, X_train, n_orient, p_alpha0=0.7):
     """Run L2 penalized regression and keep 10 strongest locations.
 
     Parameters
@@ -128,7 +129,8 @@ def solver(y_train, X_train, n_orient):
     X_train /= alpha_max_old
 
     alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
-    alpha0 = 0.7 * alpha_max
+    alpha0 = p_alpha0 * alpha_max
+    # alpha0 = 0.7 * alpha_max
     log_alpha0 = np.log(alpha0)
 
     tol = 1e-5

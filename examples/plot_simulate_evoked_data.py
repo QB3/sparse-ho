@@ -49,9 +49,10 @@ labels = [mne.read_label(data_path + '/MEG/sample/labels/%s.label' % ln)
 
 times = np.arange(300, dtype=np.float) / raw.info['sfreq'] - 0.1
 
+rng = np.random.RandomState(42)
+
 
 def data_fun(times):
-    rng = np.random.RandomState(42)
 
     """Function to generate random source time courses"""
     return (50e-9 * np.sin(30. * times) *
@@ -67,21 +68,25 @@ picks = mne.pick_types(raw.info, eeg=False, meg=True, exclude='bads')
 iir_filter = fit_iir_model_raw(raw, order=5, picks=picks, tmin=60, tmax=180)[1]
 nave = 50  # simulate average of 100 epochs
 evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
-                         iir_filter=iir_filter)
+                         iir_filter=iir_filter, random_state=rng)
 
 ###############################################################################
 # Plot
 
 # plt.figure()
 # plt.psd(evoked.data[0])
+# plt.show(block=False)
 
 # evoked.plot(time_unit='s')
 
 from plot_meg_example import apply_solver
 
-stc, monitor = apply_solver(evoked, fwd, cov)
+stc_recovered, monitor = apply_solver(evoked, fwd, cov)
 
 print(evoked.data.sum())
+
+plot_sparse_source_estimates(fwd['src'], stc_recovered, bgcolor=(1, 1, 1),
+                             opacity=0.1, high_resolution=True)
 
 plot_sparse_source_estimates(fwd['src'], stc, bgcolor=(1, 1, 1),
                              opacity=0.1, high_resolution=True)
