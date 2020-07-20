@@ -11,11 +11,9 @@ Use :func:`~mne.simulation.simulate_sparse_stc` to simulate evoked data.
 # License: BSD (3-clause)
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 import mne
 from mne.datasets import sample
-from mne.time_frequency import fit_iir_model_raw
 from mne.viz import plot_sparse_source_estimates
 from mne.simulation import simulate_sparse_stc, simulate_evoked
 
@@ -40,7 +38,8 @@ fwd = mne.convert_forward_solution(fwd, force_fixed=True)
 cov = mne.read_cov(cov_fname)
 info = mne.io.read_info(ave_fname)
 
-label_names = ['Aud-lh', 'Aud-rh']
+label_names = ['Aud-lh', 'Aud-rh', 'Vis-rh']
+# label_names = ['Aud-lh', 'Aud-rh']
 labels = [mne.read_label(data_path + '/MEG/sample/labels/%s.label' % ln)
           for ln in label_names]
 
@@ -58,24 +57,21 @@ def data_fun(times):
             np.exp(- (times - 0.15 + 0.05 * rng.randn(1)) ** 2 / 0.01))
 
 
-stc = simulate_sparse_stc(fwd['src'], n_dipoles=2, times=times,
+stc = simulate_sparse_stc(fwd['src'], n_dipoles=len(labels), times=times,
                           random_state=42, labels=labels, data_fun=data_fun)
 
 ###############################################################################
 # Generate noisy evoked data
 picks = mne.pick_types(raw.info, eeg=False, meg=True, exclude='bads')
-iir_filter = fit_iir_model_raw(raw, order=5, picks=picks, tmin=60, tmax=180)[1]
+iir_filter = None  # do not add autocorrelated noise
 nave = 50  # simulate average of 100 epochs
 evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
-                         iir_filter=iir_filter)
+                         iir_filter=iir_filter, random_state=66)
 
 ###############################################################################
 # Plot
 
-# plt.figure()
-# plt.psd(evoked.data[0])
-
-# evoked.plot(time_unit='s')
+evoked.plot(time_unit='s')
 
 from plot_meg_example import apply_solver
 
