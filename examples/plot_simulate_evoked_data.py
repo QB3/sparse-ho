@@ -81,11 +81,18 @@ evoked = simulate_evoked(fwd, stc, info, cov, nave=nave, use_cps=True,
 # evoked.plot(time_unit='s')
 
 
-stc_recovered, monitor = apply_solver(evoked, fwd, cov, p_alpha0=0.5)
+stc_wlasso, monitor = apply_solver(
+    evoked, fwd, cov, p_alpha0=0.5, model="wlasso")
+
+stc_lasso, monitor_lasso = apply_solver(
+    evoked, fwd, cov, p_alpha0=0.5, model="lasso")
 
 print(evoked.data.sum())
 
-plot_sparse_source_estimates(fwd['src'], stc_recovered, bgcolor=(1, 1, 1),
+plot_sparse_source_estimates(fwd['src'], stc_wlasso, bgcolor=(1, 1, 1),
+                             opacity=0.1, high_resolution=True)
+
+plot_sparse_source_estimates(fwd['src'], stc_lasso, bgcolor=(1, 1, 1),
                              opacity=0.1, high_resolution=True)
 
 plot_sparse_source_estimates(fwd['src'], stc, bgcolor=(1, 1, 1),

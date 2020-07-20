@@ -8,7 +8,7 @@ from mne.datasets import sample
 from mne.viz import plot_sparse_source_estimates
 
 from sparse_ho.utils import Monitor
-from sparse_ho.models import wLasso
+from sparse_ho.models import wLasso, Lasso
 from sparse_ho.criterion import SURE
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.ho import grad_search
@@ -19,7 +19,8 @@ from sparse_ho.ho import grad_search
 
 
 def apply_solver(
-        evoked, forward, noise_cov, loose=0.2, depth=0.8, p_alpha0=0.7):
+        evoked, forward, noise_cov, loose=0.2, depth=0.8, p_alpha0=0.7,
+        model="wlasso"):
     """Call a custom solver on evoked data.
 
     This function does all the necessary computation:
@@ -82,7 +83,8 @@ def apply_solver(
 
     n_orient = 1 if is_fixed_orient(forward) else 3
 
-    X, active_set, monitor = solver(M, gain, n_orient, evoked.nave, p_alpha0=p_alpha0)
+    X, active_set, monitor = solver(
+        M, gain, n_orient, evoked.nave, p_alpha0=p_alpha0, model=model)
     # X, active_set, monitor = solver(M, gain, n_orient, )
     X = _reapply_source_weighting(X, source_weighting, active_set)
 
@@ -96,7 +98,8 @@ def apply_solver(
 ###############################################################################
 # Define your solver
 
-def solver(y_train, X_train, n_orient, nave, p_alpha0=0.7):
+def solver(
+        y_train, X_train, n_orient, nave, p_alpha0=0.7, model="wlasso"):
     """Run L2 penalized regression and keep 10 strongest locations.
 
     Parameters
@@ -137,14 +140,15 @@ def solver(y_train, X_train, n_orient, nave, p_alpha0=0.7):
     log_alpha0 = np.log(alpha0)
 
     tol = 1e-5
-    model = "wlasso"
     criterion = "sure"
     n_outer = 10
 
     if model == "wlasso":
         log_alpha0 = log_alpha0 * np.ones(n_features)
+        model = wLasso(X_train, y_train, log_alpha0)
+    else:
+        model = Lasso(X_train, y_train, log_alpha0)
 
-    model = wLasso(X_train, y_train, log_alpha0)
     sigma = 1 / np.sqrt(nave)
     criterion = SURE(X_train, y_train, model, sigma)
     algo = ImplicitForward(criterion)
