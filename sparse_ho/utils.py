@@ -10,7 +10,7 @@ def ST(x, alpha):
 
 @njit
 def prox_elasticnet(x, alpha_1, alpha_2):
-    return (1 / (1 + (alpha_1 * alpha_2))) * ST(x, alpha_1)
+    return (1 / (1 + (alpha_2))) * ST(x, alpha_1)
 
 
 @njit

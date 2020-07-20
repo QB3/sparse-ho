@@ -1521,13 +1521,12 @@ class ElasticNet():
                 dbeta_old = dbeta[j, :].copy()
                 # compute derivatives
             zj = beta[j] + r @ X[:, j] / (L[j] * n_samples)
-            beta[j] = prox_elasticnet(zj, alpha[0] / L[j], alpha[1])
+            beta[j] = prox_elasticnet(zj, alpha[0] / L[j], alpha[1] / L[j])
             if compute_jac:
                 dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
-                dbeta[j:j+1, :] = (1 / (1 + alpha[0] * alpha[1])) * np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1, 0] -= alpha[0] * np.sign(beta[j]) / L[j] / (1 + (alpha[0] / L[j]) * alpha[1])
-                dbeta[j:j+1, 0] -= ST(zj, alpha[0] / L[j]) * (alpha[1]) / (1 + (alpha[0] / L[j]) + alpha[1]) ** 2
-                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) * (alpha[0] / L[j]) / (1 + (alpha[0] / L[j]) * alpha[1]) ** 2
+                dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= np.sign(beta[j]) / L[j] / (1 + alpha[1] / L[j])
+                dbeta[j:j+1, 1] -= ST(zj, alpha[0] / L[j]) / (1 + alpha[1] / L[j]) ** 2
                 # update residuals
                 dr[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
                 dr[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
@@ -1583,7 +1582,7 @@ class ElasticNet():
     def _get_pobj(r, beta, alphas, y=None):
         n_samples = r.shape[0]
         pobj = norm(r) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
-        pobj += 0.5 * alphas[1] * alphas[0] * norm(beta) ** 2
+        pobj += 0.5 * alphas[1] * norm(beta) ** 2
         return pobj
 
     @staticmethod

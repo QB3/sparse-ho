@@ -15,7 +15,7 @@ n_samples = 100
 n_features = 100
 n_active = 100
 tol = 1e-16
-alpha_1 = 1
+alpha_1 = 0.01
 alpha_2 = 0.2
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
@@ -43,10 +43,12 @@ def test_beta_jac():
         model=model, compute_jac=True, max_iter=max_iter)
 
     clf = ElasticNetsk(
-        alpha=(alpha_1 + alpha_2 * alpha_1), fit_intercept=False,
-        l1_ratio=alpha_1 / (alpha_1 + alpha_2 * alpha_1),
+        alpha=(alpha_1 + alpha_2), fit_intercept=False,
+        l1_ratio=alpha_1 / (alpha_1 + alpha_2),
         tol=1e-12, max_iter=max_iter)
     clf.fit(X_train, y_train)
+    import ipdb; ipdb.set_trace()
+
     assert np.allclose(dense1, clf.coef_[clf.coef_ != 0])
 
 
