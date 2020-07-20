@@ -47,7 +47,6 @@ def test_beta_jac():
         l1_ratio=alpha_1 / (alpha_1 + alpha_2),
         tol=1e-12, max_iter=max_iter)
     clf.fit(X_train, y_train)
-    import ipdb; ipdb.set_trace()
 
     assert np.allclose(dense1, clf.coef_[clf.coef_ != 0])
 
