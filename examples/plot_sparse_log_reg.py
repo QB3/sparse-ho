@@ -29,7 +29,6 @@ from sparse_ho.grid_search import grid_search
 from sparse_ho.datasets.real import get_rcv1
 
 from sklearn.datasets import make_classification
-# from sklearn.datasets import make_regression
 
 from sklearn.model_selection import train_test_split
 
@@ -131,7 +130,6 @@ plt.ylabel(
     r"\hat \beta^{(\lambda)} } \right ) $")
 
 axes = plt.gca()
-# axes.set_ylim([0, 1])
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

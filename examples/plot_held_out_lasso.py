@@ -40,7 +40,6 @@ dataset = 'simu'
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 else:
-    # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
     X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(

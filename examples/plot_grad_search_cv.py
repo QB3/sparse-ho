@@ -3,7 +3,7 @@
 Lasso with Cross-validation
 =============================
 
-This example shows how to perform hyperparameter optimisation
+This example shows how to perform hyperparameter optimization
 for a Lasso using a full cross-validation score.
 """
 
@@ -19,15 +19,15 @@ import seaborn as sns
 
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
+from sklearn.model_selection import KFold
+
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV, CrossVal
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-# from sparse_ho.grad_search_CV import grad_search_CV
 from sparse_ho.datasets.real import load_libsvm
 
-from sklearn.model_selection import KFold
 
 print(__doc__)
 
@@ -36,16 +36,12 @@ dataset = 'simu'
 
 if dataset == 'rcv1':
     X, y = load_libsvm('rcv1_train')
-    # X = X[:, 5000]
 else:
     X, y = make_regression(
         n_samples=500, n_features=1000, noise=40,
         random_state=42)
 
 kf = KFold(n_splits=5, shuffle=True)
-
-# for train, test in kf.split(X):
-#     print("%s %s" % (train, test))
 
 print("Starting path computation...")
 n_samples = len(y)
@@ -81,8 +77,6 @@ print('sparse-ho started')
 t0 = time.time()
 Model = Lasso
 Criterion = CV
-# Algo = ImplicitForward
-# Algo = ImplicitForward
 log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
 criterion = CrossVal(X, y, Lasso, cv=kf)
