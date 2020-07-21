@@ -71,7 +71,7 @@ class CV():
 
     def get_val(self, log_alpha, tol=1e-3):
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol)
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
         return self.value(mask, dense)
 
     def get_val_grad(
@@ -275,6 +275,9 @@ class SURE():
         self.dense02 = None
         self.quantity_to_warm_start2 = None
 
+        self.val_test = None
+        self.rmse = None
+
     def v(self, mask, dense):
         return (2 * self.X_val[:, mask].T @ (
                 self.X_val[:, mask] @ dense - self.y_val -
@@ -310,6 +313,19 @@ class SURE():
             self.rmse = norm(diff_beta)
         else:
             self.rmse = None
+
+    def get_val(self, log_alpha, tol=1e-3):
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True,
+            tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
+        mask2, dense2, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y + self.epsilon * self.delta,
+            log_alpha, self.model, use_sk=True,
+            tol=tol, compute_jac=False)
+
+        val = self.value(mask, dense, mask2, dense2)
+
+        return val
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v,
@@ -407,6 +423,14 @@ class CrossVal():
                 self.dict_crits[i] = criterion
             self.n_splits = cv.n_splits
         self.model = self.dict_crits[0].model
+
+    def get_val(self, log_alpha, tol=1e-3):
+        val = 0
+        for i in range(self.n_splits):
+            vali = self.dict_crits[i].get_val(log_alpha, tol=tol)
+            val += vali
+        val /= self.n_splits
+        return val
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
