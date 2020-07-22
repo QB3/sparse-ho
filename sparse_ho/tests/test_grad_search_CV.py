@@ -73,26 +73,20 @@ def test_grad_search():
 
 
 def test_cross_val_criterion():
-    alpha_min = alpha_max / 100
+    alpha_min = alpha_max / 10
     log_alpha_max = np.log(alpha_max)
     log_alpha_min = np.log(alpha_min)
     # log_alpha0 = np.log(alpha_max / 10)
     max_iter = 10000
     n_alphas = 10
-    kf = KFold(n_splits=2, shuffle=True, random_state=42)
-    # kf = KFold(n_splits=5, shuffle=True)
-
-    # monitor_grad = Monitor()
-    # criterion = CrossVal(X, y, Lasso, cv=kf)
-    # algo = ImplicitForward(criterion, use_sk=True, max_iter=max_iter)
-    # grad_search(
-    #     algo, log_alpha0, monitor_grad, n_outer=3, tol=tol)
+    kf = KFold(n_splits=5, shuffle=True, random_state=56)
 
     monitor_grid = Monitor()
     criterion = CrossVal(X, y, Lasso, cv=kf)
     algo = Forward(criterion, use_sk=True)
     grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=n_alphas)
+        algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=n_alphas,
+        tol=tol)
 
     reg = LassoCV(
         cv=kf, verbose=True, tol=tol, fit_intercept=False,
@@ -101,6 +95,7 @@ def test_cross_val_criterion():
     reg.score(X, y)
     objs_grid_sk = reg.mse_path_.mean(axis=1)
     # these 2 value should be the same or I did not understand smth
+    (objs_grid_sk - np.array(monitor_grid.objs))
     assert np.allclose(objs_grid_sk, monitor_grid.objs)
 
 
