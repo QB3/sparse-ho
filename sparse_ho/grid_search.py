@@ -11,7 +11,6 @@ def grid_search(
         algo, log_alpha_min, log_alpha_max, monitor, max_evals=50,
         tol=1e-5,
         beta_star=None, random_state=42, samp="grid", log_alphas=None,
-
         t_max=1000):
 
     if log_alphas is None and samp == "grid":

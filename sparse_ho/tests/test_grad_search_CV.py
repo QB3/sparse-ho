@@ -79,7 +79,8 @@ def test_cross_val_criterion():
     # log_alpha0 = np.log(alpha_max / 10)
     max_iter = 10000
     n_alphas = 10
-    kf = KFold(n_splits=5, shuffle=True)
+    kf = KFold(n_splits=2, shuffle=True, random_state=42)
+    # kf = KFold(n_splits=5, shuffle=True)
 
     # monitor_grad = Monitor()
     # criterion = CrossVal(X, y, Lasso, cv=kf)
