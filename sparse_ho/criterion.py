@@ -1,7 +1,7 @@
 from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.model_selection import KFold
+from sklearn.model_selection import check_cv
 
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
@@ -414,9 +414,9 @@ class CrossVal():
         self.rmse = None
 
         # init dict of models
-        if isinstance(cv, int):
-            cv = KFold(n_splits=cv, shuffle=True, random_state=42)
-
+        # if isinstance(cv, int):
+        #     cv = KFold(n_splits=cv, shuffle=True, random_state=42)
+        cv = check_cv(cv)
         #     for i in range(cv):
         #         X_train, X_val, y_train, y_val = train_test_split(
         #             X, y, test_size=test_size, random_state=cv)
