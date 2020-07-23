@@ -11,8 +11,8 @@ from scipy.sparse import issparse, csc_matrix
 
 class Lasso():
     """Linear Model trained with L1 prior as regularizer (aka the Lasso)
-    The optimization objective for Lasso is::
-        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
+    The optimization objective for Lasso is:
+    (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
 
     Parameters
     ----------
@@ -275,8 +275,8 @@ class Lasso():
 
 class wLasso():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
-    The optimization objective for weighted Lasso is::
-        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |w_i|
+    The optimization objective for weighted Lasso is:
+    (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |wi|
 
     Parameters
     ----------
@@ -527,7 +527,7 @@ class wLasso():
 class SVM():
     """Support vector machines.
     The optimization objective for the SVM is:
-        TODO
+    TODO
 
     Parameters
     ----------
@@ -869,8 +869,7 @@ class SVM():
 
 
 class SparseLogreg():
-    """
-    Sparse Logistic Regression classifier.
+    """Sparse Logistic Regression classifier.
     The objective function is:
 
     sum_1^n_samples log(1 + e^{-y_i x_i^T w}) + 1. / C * ||w||_1
