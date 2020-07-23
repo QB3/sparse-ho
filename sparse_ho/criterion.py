@@ -9,7 +9,7 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class CV():
-    """Held out loss (we should change the name CV here).
+    """Held out loss for quadratic datafit (we should change the name CV here).
     """
 
     def __init__(self, X_val, y_val, model, convexify=False,
@@ -99,6 +99,8 @@ class CV():
 
 
 class Logistic():
+    """Logistic loss.
+    """
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -181,6 +183,8 @@ class Logistic():
 
 
 class SmoothedHinge():
+    """Smooth Hinge loss.
+    """
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -260,6 +264,8 @@ class SmoothedHinge():
 
 
 class SURE():
+    """Stein Unbiased Risk Estimator (SURE).
+    """
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
                  X_test=None, y_test=None):
@@ -385,6 +391,8 @@ class SURE():
 
 
 class CrossVal():
+    """Crossvalidation loss.
+    """
     def __init__(self, X, y, Model, cv=5, test_size=0.33, max_iter=1000):
         """
         Parameters
