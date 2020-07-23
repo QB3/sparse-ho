@@ -41,13 +41,13 @@ else:
         n_samples=500, n_features=1000, noise=40,
         random_state=42)
 
-kf = KFold(n_splits=5, shuffle=True)
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
 print("Starting path computation...")
 n_samples = len(y)
 alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 
-n_alphas = 100
+n_alphas = 10
 p_alphas = np.geomspace(1, 0.001, n_alphas)
 alphas = alpha_max * p_alphas
 
