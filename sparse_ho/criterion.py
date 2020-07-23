@@ -412,9 +412,9 @@ class CrossVal():
                     X, y, test_size=test_size, random_state=cv)
 
                 if issparse(X_train):
-                    X_train = X_train.tocsc().copy()
+                    X_train = X_train.tocsc()
                 if issparse(X_val):
-                    X_val = X_val.tocsc().copy()
+                    X_val = X_val.tocsc()
 
                 model = Model(X_train, y_train, 1, max_iter=max_iter)
 
@@ -431,9 +431,9 @@ class CrossVal():
                 y_val = y[val]
 
                 if issparse(X_train):
-                    X_train = X_train.tocsc().copy()
+                    X_train = X_train.tocsc()
                 if issparse(X_val):
-                    X_val = X_val.tocsc().copy()
+                    X_val = X_val.tocsc()
 
                 model = Model(X_train, y_train, 1, max_iter=max_iter)
 
