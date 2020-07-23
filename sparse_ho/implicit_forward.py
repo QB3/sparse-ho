@@ -4,6 +4,22 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class ImplicitForward():
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.
+
+    Parameters
+    ----------
+    criterion: criterion object
+        HeldOIut, CrossVal or SURE
+        max_iter: int
+            maximum number of iteration for the inner solver
+        tol_jac: float
+            tolerance for the Jacobian computation
+        n_iter_jac: int
+            maximum number of iteration for the Jacobian computation
+        use_sk: bool
+            TODO: remove this parameter
+        verbose: bool
+    """
     def __init__(
             self, criterion, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
             use_sk=False, verbose=False):
