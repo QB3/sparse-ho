@@ -873,7 +873,7 @@ class SparseLogreg():
     Sparse Logistic Regression classifier.
     The objective function is:
 
-    \sum_1^n_samples log(1 + e^{-y_i x_i^T w}) + 1. / C * ||w||_1
+    sum_1^n_samples log(1 + e^{-y_i x_i^T w}) + 1. / C * ||w||_1
 
     Parameters
     ----------
