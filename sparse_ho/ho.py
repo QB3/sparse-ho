@@ -9,49 +9,21 @@ def grad_search(
         algo, log_alpha0, monitor, n_outer=100, verbose=False,
         tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
-    """
-    This line-search code is taken from here:
+    """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
     Parameters
-    --------------
-
-    X_train: np.array, shape (n_samples, n_features)
-        observation used for training
-    y_train: np.array, shape (n_samples, n_features)
-        targets used for training
-    log_alpha: float
+    ----------
+    log_alpha0: float
         log of the regularization coefficient alpha
-    X_val: np.array, shape (n_samples, n_features)
-        observation used for cross-validation
-    y_val: np.array, shape (n_samples, n_features)
-        targets used for cross-validation
-    X_test: np.array, shape (n_samples, n_features)
-        observation used for testing
-    y_test: np.array, shape (n_samples, n_features)
-        targets used for testing
     tol : float
         tolerance for the inner optimization solver
     monitor: Monitor object
         used to store the value of the cross-validation function
-    warm_start: WarmStart object
-        used for warm start for all methods
-    method: string
-        method used to compute the hypergradient, you may want to use
-        "implicit" "forward" "backward" "fast_forward_iterdiff"
-    maxit: int
-        maximum number of iterations in the inner optimization solver
     n_outer: int
         number of maximum iteration in the outer loop (for the line search)
     tolerance_decrease: string
         tolerance decrease strategy for approximate gradient
-    niter_jac: int
-        maximum number of iteration for the fast_forward_iterdiff
-        method in the Jacobian computation
-    model: string
-        model used, "lasso", "wlasso", "mcp"
-    tol_jac: float
-        tolerance for the Jacobian loop
     convexify: bool
         True if you want to regularize the problem
     gamma: non negative float
@@ -59,8 +31,6 @@ def grad_search(
     criterion: string
         criterion to optimize during hyperparameter optimization
         you may choose between "cv" and "sure"
-    C: float
-        constant for sure problem
     gamma_sure:
         constant for sure problem
      sigma,
@@ -69,7 +39,6 @@ def grad_search(
     beta_star: np.array, shape (n_features,)
         True coefficients of the underlying model (if known)
         used to compute metrics
-
     """
 
     def _get_val_grad(lambdak, tol=tol):
@@ -195,13 +164,12 @@ def _grad_search(
         except Exception:
             old_tol = seq_tol[0]
 
-        # g_func, grad_lambda = algo.get_val_grad(
-        #     lambdak, tol=tol, beta_star=beta_star)
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
 
         monitor(g_func, algo.criterion.val_test, lambdak,
                 grad_lambda, algo.criterion.rmse)
 
+        # TODO this should be removed into the SURE class no?
         if convexify:
             g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
             grad_lambda += gamma_convex * np.exp(lambdak)

@@ -1,15 +1,33 @@
 from numpy.linalg import norm
 import numpy as np
+from scipy.sparse import issparse
+from sklearn.model_selection import KFold
+
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
-from scipy.sparse import issparse
 
 
 class CV():
+    """Held out loss for quadratic datafit (we should change the name CV here).
+    """
+
     def __init__(self, X_val, y_val, model, convexify=False,
                  gamma_convex=1e-2, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        convexify: this param should be remove from here
+        gamma_convex: this param should be removed from here
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -52,8 +70,9 @@ class CV():
             self.rmse = None
 
     def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol)
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
         return self.value(mask, dense)
 
     def get_val_grad(
@@ -80,8 +99,21 @@ class CV():
 
 
 class Logistic():
+    """Logistic loss.
+    """
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -93,6 +125,7 @@ class Logistic():
         self.dense0 = None
         self.quantity_to_warm_start = None
         self.val_test = None
+        self.rmse = None
 
     def get_v(self, mask, dense):
         temp = sigma(self.y_val * (self.X_val[:, mask] @ dense))
@@ -122,6 +155,12 @@ class Logistic():
         else:
             self.rmse = None
 
+    def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+        return self.value(mask, dense)
+
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, backward=False, beta_star=None):
@@ -144,8 +183,21 @@ class Logistic():
 
 
 class SmoothedHinge():
+    """Smooth Hinge loss.
+    """
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
         """
         self.X_val = X_val
         self.y_val = y_val
@@ -212,10 +264,23 @@ class SmoothedHinge():
 
 
 class SURE():
+    """Stein Unbiased Risk Estimator (SURE).
+    """
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
                  X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_ : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        sigma: float
+            Noise level
+        random_state: int
+        X_test, y_test: TODO we should remove these parameters no?
         """
         self.X_val = X
         self.y_val = y
@@ -234,6 +299,9 @@ class SURE():
         self.mask02 = None
         self.dense02 = None
         self.quantity_to_warm_start2 = None
+
+        self.val_test = None
+        self.rmse = None
 
     def v(self, mask, dense):
         return (2 * self.X_val[:, mask].T @ (
@@ -271,6 +339,20 @@ class SURE():
         else:
             self.rmse = None
 
+    def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True,
+            tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
+        mask2, dense2, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y + self.epsilon * self.delta,
+            log_alpha, self.model, use_sk=True,
+            tol=tol, compute_jac=False)
+
+        val = self.value(mask, dense, mask2, dense2)
+
+        return val
+
     def get_val_grad(
             self, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
@@ -305,4 +387,93 @@ class SURE():
         else:
             grad = None
 
+        return val, grad
+
+
+class CrossVal():
+    """Crossvalidation loss.
+    """
+    def __init__(self, X, y, Model, cv=5, max_iter=1000):
+        """
+        Parameters
+        ----------
+        X : {ndarray, sparse matrix} of (n_samples, n_features)
+            Data
+        y : {ndarray, sparse matrix} of (n_samples)
+            Target
+        Model: class from Model (e.g. Lasso or Sparse logistic regression)
+        cv: can be an integer or predefined folds
+        test_size: float
+        max_iter: int
+            Maximal number of iteration for the state of the art solver
+        """
+        self.X = X
+        self.y = y
+        self.dict_crits = {}
+        self.val_test = None
+        self.rmse = None
+
+        # init dict of models
+        if isinstance(cv, int):
+            cv = KFold(n_splits=cv, shuffle=True, random_state=42)
+
+        #     for i in range(cv):
+        #         X_train, X_val, y_train, y_val = train_test_split(
+        #             X, y, test_size=test_size, random_state=cv)
+
+        #         if issparse(X_train):
+        #             X_train = X_train.tocsc()
+        #         if issparse(X_val):
+        #             X_val = X_val.tocsc()
+
+        #         model = Model(X_train, y_train, 1, max_iter=max_iter)
+
+        #         criterion = CV(
+        #             X_val, y_val, model, X_test=X_val, y_test=y_val)
+
+        #         self.dict_crits[i] = criterion
+        #     self.n_splits = cv
+        # else:
+        for i, (train, val) in enumerate(cv.split(X)):
+            X_train = X[train, :]
+            y_train = y[train]
+            X_val = X[val, :]
+            y_val = y[val]
+
+            if issparse(X_train):
+                X_train = X_train.tocsc()
+            if issparse(X_val):
+                X_val = X_val.tocsc()
+
+            model = Model(X_train, y_train, 1, max_iter=max_iter)
+
+            criterion = CV(
+                X_val, y_val, model, X_test=X_val, y_test=y_val)
+
+            self.dict_crits[i] = criterion
+        self.n_splits = cv.n_splits
+        self.model = self.dict_crits[0].model
+
+    def get_val(self, log_alpha, tol=1e-3):
+        val = 0
+        for i in range(self.n_splits):
+            vali = self.dict_crits[i].get_val(log_alpha, tol=tol)
+            val += vali
+        val /= self.n_splits
+        return val
+
+    def get_val_grad(
+            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            compute_jac=True, backward=False, beta_star=None):
+        val = 0
+        grad = 0
+        for i in range(self.n_splits):
+            vali, gradi = self.dict_crits[i].get_val_grad(
+                log_alpha, get_beta_jac_v, max_iter=max_iter, tol=tol,
+                compute_jac=compute_jac, backward=backward,
+                beta_star=beta_star)
+            val += vali
+            grad += gradi
+        val /= self.n_splits
+        grad /= self.n_splits
         return val, grad

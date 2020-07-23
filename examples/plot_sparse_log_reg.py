@@ -27,7 +27,11 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
 from sparse_ho.datasets.real import get_rcv1
-from sparse_ho.datasets.real import get_real_sim
+
+from sklearn.datasets import make_classification
+
+from sklearn.model_selection import train_test_split
+
 
 print(__doc__)
 
@@ -37,7 +41,11 @@ dataset = 'simu'
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 else:
-    X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+    X, y = make_classification(
+        n_samples=1000, n_features=1000, random_state=42, flip_y=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5)
 
 
 n_samples, n_features = X_train.shape
@@ -122,7 +130,6 @@ plt.ylabel(
     r"\hat \beta^{(\lambda)} } \right ) $")
 
 axes = plt.gca()
-axes.set_ylim([0, 1])
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

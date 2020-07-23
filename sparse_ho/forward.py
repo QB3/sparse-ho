@@ -3,6 +3,16 @@ from scipy.sparse import issparse
 
 
 class Forward():
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.
+
+    Parameters
+    ----------
+    criterion: criterion object
+        HeldOIut, CrossVal or SURE
+        use_sk: bool
+            TODO: remove this parameter
+        verbose: bool
+    """
     def __init__(self, criterion, use_sk=False, verbose=False):
         self.criterion = criterion
         self.use_sk = use_sk

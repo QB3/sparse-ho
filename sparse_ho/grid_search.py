@@ -11,7 +11,6 @@ def grid_search(
         algo, log_alpha_min, log_alpha_max, monitor, max_evals=50,
         tol=1e-5,
         beta_star=None, random_state=42, samp="grid", log_alphas=None,
-
         t_max=1000):
 
     if log_alphas is None and samp == "grid":
@@ -24,8 +23,6 @@ def grid_search(
         log_alphas = -np.sort(-log_alphas)
 
     elif samp == "lhs":
-        # # XXX WIP
-        # pass
         xlimits = np.array([[log_alpha_min, log_alpha_max]])
         sampling = LHS(xlimits=xlimits)
         num = max_evals
@@ -39,10 +36,14 @@ def grid_search(
     for log_alpha in log_alphas:
         if samp == "lhs":
             log_alpha = log_alpha[0]
-        g_func, grad_lambda = algo.get_val_grad(
-            log_alpha, tol=tol,
-            # log_alpha, tol=algo.criterion.model.tol,
-            beta_star=beta_star, compute_jac=False)
+        g_func = algo.criterion.get_val(
+            log_alpha, tol=tol)
+        # log_alpha, tol=algo.criterion.model.tol,
+        # beta_star=beta_star, compute_jac=False)
+        # g_func, grad_lambda = algo.get_val_grad(
+        #     log_alpha, tol=tol,
+        #     # log_alpha, tol=algo.criterion.model.tol,
+        #     beta_star=beta_star, compute_jac=False)
 
         if g_func < min_g_func:
             min_g_func = g_func
