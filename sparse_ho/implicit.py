@@ -7,6 +7,15 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class Implicit():
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit differentiation.
+
+    Parameters
+    ----------
+    criterion: criterion object
+        HeldOIut, CrossVal or SURE
+        max_iter: int
+            maximum number of iteration for the inner solver
+    """
     def __init__(self, criterion):
         self.criterion = criterion
 

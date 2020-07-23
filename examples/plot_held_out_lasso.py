@@ -13,6 +13,7 @@ for a Lasso using a held-out test set.
 #
 # License: BSD (3-clause)
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,7 +25,11 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-from sparse_ho.datasets.real import get_real_sim
+from sklearn.datasets import make_regression
+
+from sklearn.model_selection import train_test_split
+
+
 from sparse_ho.datasets.real import get_rcv1
 
 print(__doc__)
@@ -35,8 +40,10 @@ dataset = 'simu'
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 else:
-    X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
-
+    X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5)
 
 n_samples, n_features = X_train.shape
 
@@ -51,11 +58,16 @@ alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
 tol = 1e-7
+max_iter = 1e5
 
 ##############################################################################
 # Grid-search
 # -----------
-model = Lasso(X_train, y_train, np.log(alpha_max / 10))
+print('scikit started')
+
+t0 = time.time()
+model = Lasso(
+    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=True)
 monitor_grid_sk = Monitor()
@@ -63,16 +75,26 @@ grid_search(
     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
     tol=tol)
 objs = np.array(monitor_grid_sk.objs)
+t_sk = time.time() - t0
+
+print('scikit finished')
+
 
 ##############################################################################
 # Grad-search
 # -----------
-model = Lasso(X_train, y_train, np.log(alpha_max / 10))
+print('sparse-ho started')
+
+t0 = time.time()
+model = Lasso(
+    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion, use_sk=True)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
+
+t_grad_search = time.time() - t0
 
 
 ##############################################################################
@@ -81,6 +103,14 @@ grad_search(
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
+
+print('sparse-ho finished')
+print("Time to compute CV for scikit-learn: %.2f" % t_sk)
+print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
+
+print('Minimum objective grid-search %.5f' % objs.min())
+print('Minimum objective grad-search %.5f' % objs_grad.min())
+
 
 current_palette = sns.color_palette("colorblind")
 

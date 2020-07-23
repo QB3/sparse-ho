@@ -75,7 +75,7 @@ def test_beta_jac(model):
     dense_sk = clf.coef_[supp_sk]
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-        X_train, y_train, log_alpha, None, None,
+        X_train, y_train, log_alpha,
         get_v, tol=tol, model=model, tol_jac=1e-12)
 
     supp3, dense3, jac3 = get_beta_jac_iterdiff(
@@ -83,7 +83,7 @@ def test_beta_jac(model):
         model=model, compute_jac=True, max_iter=1000)
 
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-        X_train_s, y_train, log_alpha, None, None,
+        X_train_s, y_train, log_alpha,
         get_v, tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)

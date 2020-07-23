@@ -73,13 +73,13 @@ def test_beta_jac():
             X_train, y_train, dict_log_alpha[key], tol=tol,
             model=models[key], use_sk=True)
         supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-            X_train, y_train, dict_log_alpha[key], X_test, y_test, get_v,
+            X_train, y_train, dict_log_alpha[key], get_v,
             tol=tol, model=models[key], tol_jac=tol)
         supp3, dense3, jac3 = get_beta_jac_iterdiff(
             X_train_s, y_train, dict_log_alpha[key], tol=tol,
             model=models[key])
         supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, dict_log_alpha[key], X_test, y_test, get_v,
+            X_train_s, y_train, dict_log_alpha[key], get_v,
             tol=tol, model=models[key], tol_jac=tol)
 
         assert np.all(supp1 == supp1sk)
