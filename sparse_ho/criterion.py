@@ -70,6 +70,7 @@ class CV():
             self.rmse = None
 
     def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
         return self.value(mask, dense)
@@ -122,6 +123,7 @@ class Logistic():
         self.dense0 = None
         self.quantity_to_warm_start = None
         self.val_test = None
+        self.rmse = None
 
     def get_v(self, mask, dense):
         temp = sigma(self.y_val * (self.X_val[:, mask] @ dense))
@@ -150,6 +152,12 @@ class Logistic():
             self.rmse = norm(diff_beta)
         else:
             self.rmse = None
+
+    def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+        return self.value(mask, dense)
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -326,6 +334,7 @@ class SURE():
             self.rmse = None
 
     def get_val(self, log_alpha, tol=1e-3):
+        # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y, log_alpha, self.model, use_sk=True,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
