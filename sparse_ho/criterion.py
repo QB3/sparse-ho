@@ -255,7 +255,18 @@ class SURE():
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
                  X_test=None, y_test=None):
-        """TODO
+        """
+        Parameters
+        ----------
+        X_ : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        sigma: float
+            Noise level
+        random_state: int
+        X_test, y_test: TODO we should remove these parameters no?
         """
         self.X_val = X
         self.y_val = y
@@ -377,7 +388,7 @@ class CrossVal():
         cv: can be an integer or predefined folds
         test_size: float
         max_iter: int
-            Maximal number of iteration for the soa solver
+            Maximal number of iteration for the state of the art solver
         """
         self.X = X
         self.y = y

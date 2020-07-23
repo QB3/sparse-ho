@@ -11,7 +11,6 @@ from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.grid_search import grid_search
-# from sparse_ho.ho import grad_search
 from sparse_ho.grad_search_CV import grad_search_CV
 
 n_samples = 10
@@ -62,9 +61,6 @@ models = [
     wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
 
-# @pytest.mark.parametrize('model', models)
-# @pytest.mark.parametrize('crit', ['cv', 'sure'])
-
 
 def test_grad_search():
     monitor = Monitor()
@@ -94,7 +90,7 @@ def test_cross_val_criterion():
         max_iter=max_iter).fit(X, y)
     reg.score(X, y)
     objs_grid_sk = reg.mse_path_.mean(axis=1)
-    # these 2 value should be the same or I did not understand smth
+    # these 2 value should be the same
     (objs_grid_sk - np.array(monitor_grid.objs))
     assert np.allclose(objs_grid_sk, monitor_grid.objs)
 
