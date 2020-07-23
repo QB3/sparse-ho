@@ -10,6 +10,19 @@ from scipy.sparse import issparse, csc_matrix
 
 
 class Lasso():
+    """Linear Model trained with L1 prior as regularizer (aka the Lasso)
+    The optimization objective for Lasso is::
+        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
+
+    Parameters
+    ----------
+    log_alpha : float
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+        Data.
+    y: {ndarray, sparse matrix} of (n_samples)
+        Target
+    TODO: other parameters should be remove
+    """
     def __init__(
             self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False):
         self.X = X
@@ -261,6 +274,18 @@ class Lasso():
 
 
 class wLasso():
+    """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+    The optimization objective for weighted Lasso is::
+        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |w_i|
+
+    Parameters
+    ----------
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+        Data.
+    y: {ndarray, sparse matrix} of (n_samples)
+        Target
+    TODO: other parameters should be remove
+    """
     def __init__(self, X, y, log_alpha, log_alpha_max=None,
                  max_iter=100, tol=1e-3):
         self.X = X
@@ -500,6 +525,18 @@ class wLasso():
 
 
 class SVM():
+    """Support vector machines.
+    The optimization objective for the SVM is:
+        TODO
+
+    Parameters
+    ----------
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+        Data.
+    y: {ndarray, sparse matrix} of (n_samples)
+        Target
+    TODO: other parameters should be remove
+    """
     def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
         self.logC = logC
         self.max_iter = max_iter
@@ -832,6 +869,20 @@ class SVM():
 
 
 class SparseLogreg():
+    """
+    Sparse Logistic Regression classifier.
+    The objective function is:
+
+    \sum_1^n_samples log(1 + e^{-y_i x_i^T w}) + 1. / C * ||w||_1
+
+    Parameters
+    ----------
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+        Data.
+    y: {ndarray, sparse matrix} of (n_samples)
+        Target
+    TODO: other parameters should be remove
+    """
     def __init__(
             self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False, verbose=False):
         self.X = X
@@ -1123,6 +1174,22 @@ class SparseLogreg():
 
 
 class SVR():
+    """
+    Should we remove the SVR?
+
+    Sparse Logistic Regression classifier.
+    The objective function is:
+
+    TODO
+
+    Parameters
+    ----------
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+        Data.
+    y: {ndarray, sparse matrix} of (n_samples)
+        Target
+    TODO: other parameters should be remove
+    """
     def __init__(self, X, y, logC, log_epsilon, max_iter=100, tol=1e-3):
         self.hyperparam = np.array([logC, log_epsilon])
         self.max_iter = max_iter
