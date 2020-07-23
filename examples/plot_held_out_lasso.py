@@ -1,12 +1,12 @@
-# """
-# ============================
-# Lasso with held-out test set
-# ============================
+"""
+============================
+Lasso with held-out test set
+============================
 
-# This example shows how to perform hyperparameter optimisation
-# for a Lasso using a held-out test set.
+This example shows how to perform hyperparameter optimisation
+for a Lasso using a held-out test set.
 
-# """
+"""
 
 # # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 # #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
