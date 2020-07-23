@@ -118,7 +118,6 @@ def get_only_jac(
 
         objs.append(
             model.get_jac_obj(Xs, y, sign_beta, dbeta, r, dr, alpha))
-
         # m1 = norm(- v.T @ Xs.T @ dr + sign_beta * n_samples * alpha)
         # m2 = tol_jac * np.sqrt(n_features) * n_samples * alpha * norm(v)
         # crit = m1 <= m2

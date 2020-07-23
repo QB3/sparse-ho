@@ -196,7 +196,6 @@ def _grad_search(
         lambdak -= step_size * grad_lambda
 
         incr = norm(step_size * grad_lambda)
-
         C = 0.25
         # C = 0.25 / algo.criterion.model.X.shape[0]
         factor_L_lambda = 1.0
@@ -221,6 +220,7 @@ def _grad_search(
             g_func, grad_lambda = _get_val_grad(
                 lambdak, tol=tol)
             # g_func, grad_lambda = algo.get_val_grad(lambdak, tol=tol,
+            #
             #                                         beta_star=beta_star)
             if convexify:
                 g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
@@ -229,6 +229,7 @@ def _grad_search(
         else:
             old_lambdak = lambdak.copy()
             lambdak -= step_size * grad_lambda
+
         lambdak = proj_param(lambdak)
 
         g_func_old = g_func

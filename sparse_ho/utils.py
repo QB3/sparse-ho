@@ -9,6 +9,11 @@ def ST(x, alpha):
 
 
 @njit
+def prox_elasticnet(x, alpha_1, alpha_2):
+    return (1 / (1 + (alpha_2))) * ST(x, alpha_1)
+
+
+@njit
 def proj_box_svm(x, C):
     return min(max(0, x), C)
 
