@@ -2,6 +2,7 @@ from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
@@ -393,7 +394,7 @@ class SURE():
 class CrossVal():
     """Crossvalidation loss.
     """
-    def __init__(self, X, y, Model, cv=5, test_size=0.33, max_iter=1000):
+    def __init__(self, X, y, Model, cv=5, max_iter=1000):
         """
         Parameters
         ----------
@@ -415,41 +416,43 @@ class CrossVal():
 
         # init dict of models
         if isinstance(cv, int):
-            for i in range(cv):
-                X_train, X_val, y_train, y_val = train_test_split(
-                    X, y, test_size=test_size, random_state=cv)
+            cv = KFold(n_splits=cv, shuffle=True, random_state=42)
 
-                if issparse(X_train):
-                    X_train = X_train.tocsc()
-                if issparse(X_val):
-                    X_val = X_val.tocsc()
+        #     for i in range(cv):
+        #         X_train, X_val, y_train, y_val = train_test_split(
+        #             X, y, test_size=test_size, random_state=cv)
 
-                model = Model(X_train, y_train, 1, max_iter=max_iter)
+        #         if issparse(X_train):
+        #             X_train = X_train.tocsc()
+        #         if issparse(X_val):
+        #             X_val = X_val.tocsc()
 
-                criterion = CV(
-                    X_val, y_val, model, X_test=X_val, y_test=y_val)
+        #         model = Model(X_train, y_train, 1, max_iter=max_iter)
 
-                self.dict_crits[i] = criterion
-            self.n_splits = cv
-        else:
-            for i, (train, val) in enumerate(cv.split(X)):
-                X_train = X[train, :]
-                y_train = y[train]
-                X_val = X[val, :]
-                y_val = y[val]
+        #         criterion = CV(
+        #             X_val, y_val, model, X_test=X_val, y_test=y_val)
 
-                if issparse(X_train):
-                    X_train = X_train.tocsc()
-                if issparse(X_val):
-                    X_val = X_val.tocsc()
+        #         self.dict_crits[i] = criterion
+        #     self.n_splits = cv
+        # else:
+        for i, (train, val) in enumerate(cv.split(X)):
+            X_train = X[train, :]
+            y_train = y[train]
+            X_val = X[val, :]
+            y_val = y[val]
 
-                model = Model(X_train, y_train, 1, max_iter=max_iter)
+            if issparse(X_train):
+                X_train = X_train.tocsc()
+            if issparse(X_val):
+                X_val = X_val.tocsc()
 
-                criterion = CV(
-                    X_val, y_val, model, X_test=X_val, y_test=y_val)
+            model = Model(X_train, y_train, 1, max_iter=max_iter)
 
-                self.dict_crits[i] = criterion
-            self.n_splits = cv.n_splits
+            criterion = CV(
+                X_val, y_val, model, X_test=X_val, y_test=y_val)
+
+            self.dict_crits[i] = criterion
+        self.n_splits = cv.n_splits
         self.model = self.dict_crits[0].model
 
     def get_val(self, log_alpha, tol=1e-3):
