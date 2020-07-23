@@ -14,6 +14,7 @@ for sparse logistic regression using a held-out test set.
 # License: BSD (3-clause)
 
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -26,7 +27,11 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
 from sparse_ho.datasets.real import get_rcv1
-from sparse_ho.datasets.real import get_real_sim
+
+from sklearn.datasets import make_classification
+
+from sklearn.model_selection import train_test_split
+
 
 print(__doc__)
 
@@ -36,7 +41,11 @@ dataset = 'simu'
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 else:
-    X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
+    X, y = make_classification(
+        n_samples=1000, n_features=1000, random_state=42, flip_y=0.1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5)
 
 
 n_samples, n_features = X_train.shape
@@ -60,6 +69,10 @@ log_alphas = np.log(alphas)
 ##############################################################################
 # Grid-search
 # -----------
+
+print('scikit started')
+t0 = time.time()
+
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100)
 criterion = Logistic(X_val, y_val, model)
 algo_grid = Forward(criterion, use_sk=use_sk)
@@ -69,16 +82,31 @@ grid_search(
     log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
+t_sk = time.time() - t0
+
+print('scikit finished')
+print("Time to compute CV for scikit-learn: %.2f" % t_sk)
+
 
 ##############################################################################
 # Grad-search
 # -----------
+
+print('sparse-ho started')
+
+t0 = time.time()
+
 model = SparseLogreg(X_train, y_train, log_alpha0, max_iter=100, tol=tol)
 criterion = Logistic(X_val, y_val, model)
 monitor_grad = Monitor()
 algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100, use_sk=use_sk)
 grad_search(algo, log_alpha0, monitor_grad, n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
+
+t_grad_search = time.time() - t0
+
+print('sparse-ho finished')
+print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
 
 
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
@@ -102,7 +130,6 @@ plt.ylabel(
     r"\hat \beta^{(\lambda)} } \right ) $")
 
 axes = plt.gca()
-axes.set_ylim([0, 1])
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

@@ -105,13 +105,13 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>(X, y, log_alpha[, log_alpha_max, …])</p></td>
-<td><p></p></td>
+<td><p>Linear Model trained with L1 prior as regularizer (aka the Lasso) The optimization objective for Lasso is: (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.wLasso.html#sparse_ho.models.wLasso" title="sparse_ho.models.wLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wLasso</span></code></a>(X, y, log_alpha[, log_alpha_max, …])</p></td>
-<td><p></p></td>
+<td><p>Linear Model trained with L1 prior as regularizer (aka the weight Lasso) The optimization objective for weighted Lasso is: (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i <a href="#id2"><span class="problematic" id="id3">|wi|</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>(X, y, logC[, max_iter, tol])</p></td>
-<td><p></p></td>
+<td><p>Support vector machines.</p></td>
 </tr>
 </tbody>
 </table>
@@ -126,13 +126,13 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.CV.html#sparse_ho.criterion.CV" title="sparse_ho.criterion.CV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CV</span></code></a>(X_val, y_val, model[, convexify, …])</p></td>
-<td><p></p></td>
+<td><p>Held out loss for quadratic datafit (we should change the name CV here).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.SURE.html#sparse_ho.criterion.SURE" title="sparse_ho.criterion.SURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SURE</span></code></a>(X, y, model, sigma[, C, gamma_sure, …])</p></td>
-<td><p></p></td>
+<td><p>Stein Unbiased Risk Estimator (SURE).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.Logistic.html#sparse_ho.criterion.Logistic" title="sparse_ho.criterion.Logistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Logistic</span></code></a>(X_val, y_val, model[, X_test, y_test])</p></td>
-<td><p></p></td>
+<td><p>Logistic loss.</p></td>
 </tr>
 </tbody>
 </table>
@@ -147,13 +147,13 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>(criterion[, tol_jac, …])</p></td>
-<td><p></p></td>
+<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>(criterion[, use_sk])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>(criterion[, use_sk, verbose])</p></td>
+<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>(criterion)</p></td>
-<td><p></p></td>
+<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the bacward differentiation.</p></td>
 </tr>
 </tbody>
 </table>

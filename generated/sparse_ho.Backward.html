@@ -97,7 +97,16 @@
 <dl class="class">
 <dt id="sparse_ho.Backward">
 <em class="property">class </em><code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">Backward</code><span class="sig-paren">(</span><em class="sig-param">criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.Backward" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the bacward differentiation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>criterion: criterion object</strong></dt><dd><p>HeldOIut, CrossVal or SURE</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
 <dt id="sparse_ho.Backward.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">criterion</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.Backward.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>

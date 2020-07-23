@@ -97,10 +97,25 @@
 <dl class="class">
 <dt id="sparse_ho.criterion.Logistic">
 <em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">Logistic</code><span class="sig-paren">(</span><em class="sig-param">X_val</em>, <em class="sig-param">y_val</em>, <em class="sig-param">model</em>, <em class="sig-param">X_test=None</em>, <em class="sig-param">y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.Logistic" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<dd><p>Logistic loss.</p>
+<dl class="method">
 <dt id="sparse_ho.criterion.Logistic.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X_val</em>, <em class="sig-param">y_val</em>, <em class="sig-param">model</em>, <em class="sig-param">X_test=None</em>, <em class="sig-param">y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.Logistic.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X_val</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples, n_features)</span></dt><dd><p>Validation data</p>
+</dd>
+<dt><strong>y_val</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples)</span></dt><dd><p>Validation target</p>
+</dd>
+<dt><strong>model: object of the class Model (e.g. Lasso or Sparse logistic regression)</strong></dt><dd></dd>
+<dt><strong>X_test</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples_test, n_features)</span></dt><dd><p>Test data</p>
+</dd>
+<dt><strong>y_test</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples_test)</span></dt><dd><p>Test target</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
@@ -111,7 +126,11 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.Logistic.__init__" title="sparse_ho.criterion.Logistic.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, X_val, y_val, model[, …])</p></td>
-<td><p>TODO</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rmse</span></code>(self, mask, dense, beta_star)</p></td>
 <td><p></p></td>

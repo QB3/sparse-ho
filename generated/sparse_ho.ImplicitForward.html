@@ -96,10 +96,32 @@
 <h1>sparse_ho.ImplicitForward<a class="headerlink" href="#sparse-ho-implicitforward" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sparse_ho.ImplicitForward">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">ImplicitForward</code><span class="sig-paren">(</span><em class="sig-param">criterion</em>, <em class="sig-param">tol_jac=0.001</em>, <em class="sig-param">n_iter=100</em>, <em class="sig-param">n_iter_jac=100</em>, <em class="sig-param">use_sk=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">ImplicitForward</code><span class="sig-paren">(</span><em class="sig-param">criterion</em>, <em class="sig-param">tol_jac=0.001</em>, <em class="sig-param">max_iter=100</em>, <em class="sig-param">n_iter_jac=100</em>, <em class="sig-param">use_sk=False</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>criterion: criterion object</strong></dt><dd><p>HeldOIut, CrossVal or SURE
+max_iter: int</p>
+<blockquote>
+<div><p>maximum number of iteration for the inner solver</p>
+</div></blockquote>
+<dl class="simple">
+<dt>tol_jac: float</dt><dd><p>tolerance for the Jacobian computation</p>
+</dd>
+<dt>n_iter_jac: int</dt><dd><p>maximum number of iteration for the Jacobian computation</p>
+</dd>
+<dt>use_sk: bool</dt><dd><p>TODO: remove this parameter</p>
+</dd>
+</dl>
+<p>verbose: bool</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
 <dt id="sparse_ho.ImplicitForward.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">criterion</em>, <em class="sig-param">tol_jac=0.001</em>, <em class="sig-param">n_iter=100</em>, <em class="sig-param">n_iter_jac=100</em>, <em class="sig-param">use_sk=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">criterion</em>, <em class="sig-param">tol_jac=0.001</em>, <em class="sig-param">max_iter=100</em>, <em class="sig-param">n_iter_jac=100</em>, <em class="sig-param">use_sk=False</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -110,7 +132,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.ImplicitForward.__init__" title="sparse_ho.ImplicitForward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, criterion[, tol_jac, n_iter, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.ImplicitForward.__init__" title="sparse_ho.ImplicitForward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, criterion[, tol_jac, …])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_beta_jac_v</span></code>(self, X, y, log_alpha, model, …)</p></td>

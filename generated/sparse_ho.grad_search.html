@@ -96,47 +96,21 @@
 <h1>sparse_ho.grad_search<a class="headerlink" href="#sparse-ho-grad-search" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="sparse_ho.grad_search">
-<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param">algo</em>, <em class="sig-param">log_alpha0</em>, <em class="sig-param">monitor</em>, <em class="sig-param">n_outer=100</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">tolerance_decrease='constant'</em>, <em class="sig-param">tol=1e-05</em>, <em class="sig-param">convexify=False</em>, <em class="sig-param">gamma_convex=False</em>, <em class="sig-param">beta_star=None</em>, <em class="sig-param">t_max=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param">algo</em>, <em class="sig-param">log_alpha0</em>, <em class="sig-param">monitor</em>, <em class="sig-param">n_outer=100</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">tolerance_decrease='constant'</em>, <em class="sig-param">tol=1e-05</em>, <em class="sig-param">convexify=False</em>, <em class="sig-param">gamma_convex=False</em>, <em class="sig-param">beta_star=None</em>, <em class="sig-param">t_max=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>This line-search code is taken from here:
 <a class="reference external" href="https://github.com/fabianp/hoag/blob/master/hoag/hoag.py">https://github.com/fabianp/hoag/blob/master/hoag/hoag.py</a></p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>X_train: np.array, shape (n_samples, n_features)</strong></dt><dd><p>observation used for training</p>
-</dd>
-<dt><strong>y_train: np.array, shape (n_samples, n_features)</strong></dt><dd><p>targets used for training</p>
-</dd>
-<dt><strong>log_alpha: float</strong></dt><dd><p>log of the regularization coefficient alpha</p>
-</dd>
-<dt><strong>X_val: np.array, shape (n_samples, n_features)</strong></dt><dd><p>observation used for cross-validation</p>
-</dd>
-<dt><strong>y_val: np.array, shape (n_samples, n_features)</strong></dt><dd><p>targets used for cross-validation</p>
-</dd>
-<dt><strong>X_test: np.array, shape (n_samples, n_features)</strong></dt><dd><p>observation used for testing</p>
-</dd>
-<dt><strong>y_test: np.array, shape (n_samples, n_features)</strong></dt><dd><p>targets used for testing</p>
+<dt><strong>log_alpha0: float</strong></dt><dd><p>log of the regularization coefficient alpha</p>
 </dd>
 <dt><strong>tol</strong><span class="classifier">float</span></dt><dd><p>tolerance for the inner optimization solver</p>
 </dd>
 <dt><strong>monitor: Monitor object</strong></dt><dd><p>used to store the value of the cross-validation function</p>
 </dd>
-<dt><strong>warm_start: WarmStart object</strong></dt><dd><p>used for warm start for all methods</p>
-</dd>
-<dt><strong>method: string</strong></dt><dd><p>method used to compute the hypergradient, you may want to use
-“implicit” “forward” “backward” “fast_forward_iterdiff”</p>
-</dd>
-<dt><strong>maxit: int</strong></dt><dd><p>maximum number of iterations in the inner optimization solver</p>
-</dd>
 <dt><strong>n_outer: int</strong></dt><dd><p>number of maximum iteration in the outer loop (for the line search)</p>
 </dd>
 <dt><strong>tolerance_decrease: string</strong></dt><dd><p>tolerance decrease strategy for approximate gradient</p>
-</dd>
-<dt><strong>niter_jac: int</strong></dt><dd><p>maximum number of iteration for the fast_forward_iterdiff
-method in the Jacobian computation</p>
-</dd>
-<dt><strong>model: string</strong></dt><dd><p>model used, “lasso”, “wlasso”, “mcp”</p>
-</dd>
-<dt><strong>tol_jac: float</strong></dt><dd><p>tolerance for the Jacobian loop</p>
 </dd>
 <dt><strong>convexify: bool</strong></dt><dd><p>True if you want to regularize the problem</p>
 </dd>
@@ -144,8 +118,6 @@ method in the Jacobian computation</p>
 </dd>
 <dt><strong>criterion: string</strong></dt><dd><p>criterion to optimize during hyperparameter optimization
 you may choose between “cv” and “sure”</p>
-</dd>
-<dt><strong>C: float</strong></dt><dd><p>constant for sure problem</p>
 </dd>
 <dt><strong>gamma_sure:</strong></dt><dd><blockquote>
 <div><p>constant for sure problem</p>
