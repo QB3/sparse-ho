@@ -60,7 +60,7 @@ def test_beta_jac():
     clf.fit(X_train, y_train)
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-        X_train, y_train, np.array([log_alpha1, log_alpha2]), None, None,
+        X_train, y_train, np.array([log_alpha1, log_alpha2]),
         get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
     assert np.allclose(dense1, clf.coef_[clf.coef_ != 0])
     assert np.all(supp1 == supp2)
