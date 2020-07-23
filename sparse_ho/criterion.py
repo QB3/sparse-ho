@@ -1,7 +1,6 @@
 from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 
 from sparse_ho.utils import sigma, smooth_hinge
