@@ -2,6 +2,7 @@ from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
+from sklearn.utils import check_random_state
 
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
@@ -10,22 +11,31 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 class CV():
     """Held out loss for quadratic datafit (we should change the name CV here).
+
+    Attributes
+    ----------
+    TODO
     """
+    # XXX : this code should be the same as CrossVal as you can pass
+    # cv as [(train, test)] ie directly the indices of the train
+    # and test splits.
 
     def __init__(self, X_val, y_val, model, convexify=False,
                  gamma_convex=1e-2, X_test=None, y_test=None):
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
             Validation data
-        y_val : {ndarray, sparse matrix} of (n_samples)
+        y_val : {ndarray, sparse matrix} of shape (n_samples,)
             Validation target
-        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
-        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+        model: object of the class Model (e.g. Lasso or SparseLogreg)
+        X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
-        convexify: this param should be remove from here
-        gamma_convex: this param should be removed from here
+        convexify: bool
+            this param should be remove from here XXX
+        gamma_convex: bool
+            this param should be removed from here XXX
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
@@ -184,19 +194,24 @@ class Logistic():
 
 class SmoothedHinge():
     """Smooth Hinge loss.
+
+    Attributes
+    ----------
+    TODO
     """
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
             Validation data
-        y_val : {ndarray, sparse matrix} of (n_samples)
+        y_val : {ndarray, sparse matrix} of shape (n_samples)
             Validation target
-        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
-        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+        model: instance of Model
+            Object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
-        y_test : {ndarray, sparse matrix} of (n_samples_test)
+        y_test : {ndarray, sparse matrix} of shape (n_samples_test,)
             Test target
         """
         self.X_val = X_val
@@ -265,6 +280,10 @@ class SmoothedHinge():
 
 class SURE():
     """Stein Unbiased Risk Estimator (SURE).
+
+    Attributes
+    ----------
+    TODO
     """
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
@@ -276,11 +295,14 @@ class SURE():
             Validation data
         y : {ndarray, sparse matrix} of (n_samples)
             Validation target
-        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        model: instance of Model
+            The model (e.g. instance of Lasso or SparseLogreg)
         sigma: float
             Noise level
-        random_state: int
-        X_test, y_test: TODO we should remove these parameters no?
+        random_state : int, RandomState instance, default=42
+            The seed of the pseudo random number generator.
+            Pass an int for reproducible output across multiple function calls.
+        X_test, y_test: TODO we should remove these parameters no? -> YES !
         """
         self.X_val = X
         self.y_val = y
@@ -289,7 +311,7 @@ class SURE():
         self.C = C
         self.gamma_sure = gamma_sure
         self.epsilon = C * sigma / (X.shape[0]) ** gamma_sure
-        rng = np.random.RandomState(random_state)
+        rng = check_random_state(random_state)
         self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
 
         self.mask0 = None
@@ -391,21 +413,39 @@ class SURE():
 
 
 class CrossVal():
-    """Crossvalidation loss.
+    """Cross-validation loss.
+
+    Attributes
+    ----------
+    dict_crits : dict
+        The instances of criterion used for each fold.
+    val_test : None
+        XXX
+    rmse : None
+        XXX
     """
-    def __init__(self, X, y, Model, cv=5, max_iter=1000):
+    def __init__(self, X, y, Model, cv=None, max_iter=1000):
         """
         Parameters
         ----------
-        X : {ndarray, sparse matrix} of (n_samples, n_features)
+        X : {ndarray, sparse matrix} of shape (n_samples, n_features)
             Data
-        y : {ndarray, sparse matrix} of (n_samples)
+        y : {ndarray, sparse matrix} of shape (n_samples,)
             Target
-        Model: class from Model (e.g. Lasso or Sparse logistic regression)
-        cv: can be an integer or predefined folds
-        test_size: float
+        Model: class
+            The Model class definition (e.g. Lasso or SparseLogreg)
+        cv : int, cross-validation generator or iterable, default=None
+            Determines the cross-validation splitting strategy.
+            Possible inputs for cv are:
+
+            - None, to use the default 5-fold cross-validation,
+            - int, to specify the number of folds.
+            - scikit-learn CV splitter
+            - An iterable yielding (train, test) splits as arrays of indices.
+
+            For int/None inputs, KFold is used.
         max_iter: int
-            Maximal number of iteration for the state of the art solver
+            Maximal number of iteration for the state-of-the-art solver
         """
         self.X = X
         self.y = y
@@ -413,27 +453,8 @@ class CrossVal():
         self.val_test = None
         self.rmse = None
 
-        # init dict of models
-        # if isinstance(cv, int):
-        #     cv = KFold(n_splits=cv, shuffle=True, random_state=42)
         cv = check_cv(cv)
-        #     for i in range(cv):
-        #         X_train, X_val, y_train, y_val = train_test_split(
-        #             X, y, test_size=test_size, random_state=cv)
 
-        #         if issparse(X_train):
-        #             X_train = X_train.tocsc()
-        #         if issparse(X_val):
-        #             X_val = X_val.tocsc()
-
-        #         model = Model(X_train, y_train, 1, max_iter=max_iter)
-
-        #         criterion = CV(
-        #             X_val, y_val, model, X_test=X_val, y_test=y_val)
-
-        #         self.dict_crits[i] = criterion
-        #     self.n_splits = cv
-        # else:
         for i, (train, val) in enumerate(cv.split(X)):
             X_train = X[train, :]
             y_train = y[train]
