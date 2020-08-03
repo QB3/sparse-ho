@@ -1610,15 +1610,15 @@ class ElasticNet():
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
             zj = beta[j] + r[idx_nz] @ Xjs / (L[j] * n_samples)
-            beta[j:j+1] = prox_elasticnet(zj, alphas[0] / L[j], alphas[1])
+            beta[j:j+1] = prox_elasticnet(zj, alphas[0] / L[j], alphas[1] / L[j])
             if compute_jac:
                 dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, 0] -= alphas[0] * np.sign(beta[j]) / L[j] / (1 + (alphas[1] / L[j]))
                 dbeta[j:j+1, 1] -= (alphas[1] / L[j] * beta[j]) / (1 + (alphas[1] / L[j]))
                 # update residuals
-                dr[:, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
-                dr[:, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
+                dr[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
+                dr[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
             r[idx_nz] -= Xjs * (beta[j] - beta_old)
 
     @staticmethod
@@ -1712,18 +1712,22 @@ class ElasticNet():
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, r, dr, L, alpha, sign_beta):
+            dbeta, r, dr, L, alpha, beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
             # get the non zero idices
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
-            dbeta_old = dbeta[j]
-            # update of the Jacobian dbeta
-            dbeta[j] += Xjs @ dr[idx_nz] / (L[j] * n_samples)
-            dbeta[j] -= alpha * sign_beta[j] / L[j]
-            dr[idx_nz] -= Xjs * (dbeta[j] - dbeta_old)
+            dbeta_old = dbeta[j, :].copy()
+            dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
+            dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
+
+            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
+            # update residuals
+            dr[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
+            dr[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
 
     @staticmethod
     @njit
@@ -1747,8 +1751,7 @@ class ElasticNet():
             log_alpha[1] = self.log_alpha_max - 7
         elif log_alpha[1] > self.log_alpha_max + np.log(0.9):
             log_alpha[1] = self.log_alpha_max + np.log(0.9)
-        else:
-            return log_alpha
+        return log_alpha
 
     @staticmethod
     def get_L(X, is_sparse=False):

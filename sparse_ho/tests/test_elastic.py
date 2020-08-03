@@ -10,6 +10,7 @@ from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
+from scipy.sparse import csc_matrix
 
 
 n_samples = 10
@@ -23,17 +24,17 @@ X_train, y_train, beta_star, noise, sigma_star = get_synt_data(
     dictionary_type="Gaussian", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
     SNR=SNR, seed=0)
-
+X_train = csc_matrix(X_train)
 X_test, y_test, beta_star, noise, sigma = get_synt_data(
     dictionary_type="Gaussian", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
     SNR=SNR, seed=1)
-
+X_test = csc_matrix(X_test)
 X_val, y_val, beta_star, noise, sigma = get_synt_data(
     dictionary_type="Gaussian", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
     SNR=SNR, seed=2)
-
+X_val = csc_matrix(X_val)
 alpha_max = (X_train.T @ y_train).max() / n_samples
 p_alpha = 0.7
 alpha_1 = p_alpha * alpha_max

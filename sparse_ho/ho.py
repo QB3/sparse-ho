@@ -163,11 +163,13 @@ def _grad_search(
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
-
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
-
-        monitor(g_func, algo.criterion.val_test, lambdak,
-                grad_lambda, algo.criterion.rmse)
+        try:
+            monitor(g_func, algo.criterion.val_test, lambdak.copy(),
+                    grad_lambda, algo.criterion.rmse)
+        except Exception:
+            monitor(g_func, algo.criterion.val_test, lambdak,
+                    grad_lambda, algo.criterion.rmse)
 
         # TODO this should be removed into the SURE class no?
         if convexify:
@@ -234,8 +236,6 @@ def _grad_search(
 
         g_func_old = g_func
 
-        # import ipdb; ipdb.set_trace()
-        # monitor(g_func, 0, lambdak, grad_lambda, 0)
         if verbose:
             print('grad lambda', grad_lambda)
             print('value of lambda_k', lambdak)

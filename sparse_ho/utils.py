@@ -186,7 +186,10 @@ class Monitor():
             self, obj, obj_test=None, log_alpha=None, grad=None, rmse=None):
         self.objs.append(obj)
         self.objs_test.append(obj_test)
-        self.log_alphas.append(log_alpha)
+        try:
+            self.log_alphas.append(log_alpha.copy())
+        except Exception:
+            self.log_alphas.append(log_alpha)
         self.times.append(time.time() - self.t0)
         self.grads.append(grad)
         self.rmse.append(rmse)
