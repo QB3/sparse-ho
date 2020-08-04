@@ -91,12 +91,15 @@ algo = ImplicitForward(
     max_iter=max_iter)
 _, _, _ = grad_search(
     algo=algo, verbose=True,
-    log_alpha0=np.array([log_alphas_1[8], log_alphas_2[8]]), tol=tol,
-    n_outer=n_outer, monitor=monitor,
-    tolerance_decrease='exponential')
+    log_alpha0=np.array([np.log(alpha_max/10), np.log(alpha_max/10)]),
+    tol=tol, n_outer=n_outer, monitor=monitor, tolerance_decrease='exponential')
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
 alphas_grad /= alpha_max
+
+
+print("Time grid-search %f" % t_grid_search)
+print("Time grad-search %f" % t_grad_search)
 
 
 # plot results
@@ -114,7 +117,3 @@ ax.set_xlabel("lambda1")
 ax.set_ylabel("lambda2")
 ax.set_label("Loss on validation set")
 fig.show()
-
-
-print("Time grid-search %f" % t_grid_search)
-print("Time grad-search %f" % t_grad_search)
