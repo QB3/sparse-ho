@@ -22,8 +22,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
-from sklearn.datasets import openml
-from scipy.sparse import csc_matrix
 
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import CV
@@ -108,7 +106,6 @@ _, _, _ = grad_search(
     algo=algo, verbose=True,
     log_alpha0=np.array([np.log(alpha_max/10), np.log(alpha_max/10)]),
     tol=tol, n_outer=n_outer, monitor=monitor)
-    # tol=tol, n_outer=n_outer, monitor=monitor, tolerance_decrease='exponential')
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
 alphas_grad /= alpha_max
