@@ -3,8 +3,8 @@
 Lasso with held-out test set
 ============================
 
-This example shows how to perform hyperparameter optimisation
-for a Lasso using a held-out test set.
+This example shows how to perform hyperparameter optimization
+for a Lasso using a held-out validation set.
 
 """
 
