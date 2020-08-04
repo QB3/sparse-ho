@@ -28,7 +28,8 @@ from sparse_ho.utils import Monitor
 
 Axes3D  # hack for weird matplotlib bug
 
-dataset = "rcv1"
+dataset = "real-sim"
+# dataset = "rcv1"
 # use_small_part = False
 use_small_part = True
 
