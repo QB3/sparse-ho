@@ -1,14 +1,29 @@
+"""
+============================
+Lasso with held-out test set
+============================
+
+This example shows how to perform hyperparameter optimization
+for an elastic-net using a held-out validation set.
+
+"""
+
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
+
 from sparse_ho.datasets.real import get_data
 import numpy as np
 from sklearn.linear_model import ElasticNet as ElasticNet_sk
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import CV
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
-from bcdsugar.utils import Monitor
-
+from sparse_ho.utils import Monitor
 
 dataset = "rcv1"
 # use_small_part = False
@@ -83,4 +98,5 @@ ax.scatter3D(
 ax.set_xlabel("lambda1")
 ax.set_ylabel("lambda2")
 ax.set_label("Loss on validation set")
+Axes3D(fig)
 fig.show()

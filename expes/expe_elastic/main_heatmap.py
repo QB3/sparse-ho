@@ -83,5 +83,6 @@ ax.scatter3D(
     monitor.objs, c="red", s=200, marker="X")
 ax.set_xlabel("lambda1")
 ax.set_ylabel("lambda2")
-ax.set_label("Loss on validation set")
+ax.set_zlabel("Loss on validation set")
+ax.title.set_text(dataset)
 fig.show()
