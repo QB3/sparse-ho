@@ -20,6 +20,11 @@ from sklearn.linear_model import ElasticNet as ElasticNet_sk
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import openml
+from scipy.sparse import csc_matrix
+
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import CV
 from sparse_ho.models import ElasticNet
@@ -28,20 +33,29 @@ from sparse_ho.utils import Monitor
 
 Axes3D  # hack for weird matplotlib bug
 
-dataset = "real-sim"
 # dataset = "rcv1"
+dataset = 'simu'
 # use_small_part = False
 use_small_part = True
 
 #############################
 print("Started to load data")
 
-X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
-if use_small_part:
-    idx = np.abs((X_train.T @ y_train)).argsort()[-1000:]
-    X_train = X_train[:, idx]
-    X_val = X_val[:, idx]
-    X_test = X_test[:, idx]
+if dataset == 'rcv1':
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+else:
+    X, y = make_regression(n_samples=300, n_features=3000, noise=20)
+    y -= y.mean()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.5)
+
+# X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+# if use_small_part:
+#     idx = np.abs((X_train.T @ y_train)).argsort()[-1000:]
+#     X_train = X_train[:, idx]
+#     X_val = X_val[:, idx]
+#     X_test = X_test[:, idx]
 
 print("Finished loading data")
 
@@ -51,7 +65,7 @@ log_alpha_max = np.log(alpha_max)
 
 alpha_min = 1e-4 * alpha_max
 
-n_grid = 20
+n_grid = 10
 alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
 log_alphas_1 = np.log(alphas_1)
 alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
@@ -88,12 +102,13 @@ model = ElasticNet(
 criterion = CV(
     X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(
-    criterion, tol_jac=1e-3, n_iter_jac=100, use_sk=True,
+    criterion, tol_jac=1e-3, n_iter_jac=1000, use_sk=True,
     max_iter=max_iter)
 _, _, _ = grad_search(
     algo=algo, verbose=True,
     log_alpha0=np.array([np.log(alpha_max/10), np.log(alpha_max/10)]),
-    tol=tol, n_outer=n_outer, monitor=monitor, tolerance_decrease='exponential')
+    tol=tol, n_outer=n_outer, monitor=monitor)
+    # tol=tol, n_outer=n_outer, monitor=monitor, tolerance_decrease='exponential')
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
 alphas_grad /= alpha_max
@@ -105,11 +120,11 @@ print("Time grad-search %f" % t_grad_search)
 
 # plot results
 
-X, Y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
+x, y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
 fig = plt.figure()
 ax = plt.axes(projection='3d')
 ax.plot_surface(
-    np.log(X), np.log(Y), results, rstride=1, cstride=1,
+    np.log(x), np.log(y), results, rstride=1, cstride=1,
     cmap='viridis', edgecolor='none', alpha=0.5)
 ax.scatter3D(
     np.log(alphas_grad[:, 0]), np.log(alphas_grad[:, 1]),
