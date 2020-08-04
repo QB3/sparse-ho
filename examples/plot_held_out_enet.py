@@ -10,10 +10,9 @@ from sparse_ho.ho import grad_search
 from bcdsugar.utils import Monitor
 
 
-# dataset = "rcv1"
-dataset = "real-sim"
-use_small_part = False
-# use_small_part = True
+dataset = "rcv1"
+# use_small_part = False
+use_small_part = True
 
 #############################
 print("Started to load data")
