@@ -78,9 +78,8 @@ def get_beta_jac_fast_iterdiff(
     v = None
     _, r = model._init_beta_r(X, y, mask, dense)
     jac = get_only_jac(
-        model.reduce_X(mask), model.reduce_y(mask), r, reduce_alpha, model.sign(dense), v,
+        model.reduce_X(mask), model.reduce_y(mask), r, reduce_alpha, model.sign(dense, log_alpha), v,
         dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose)
-
     return mask, dense, jac
 
 
@@ -103,8 +102,7 @@ def get_only_jac(
         #     dbeta = np.zeros((n_features, n_features))
     else:
         dbeta = dbeta.copy()
-
-    dr = model._init_dr(dbeta, Xs, y)
+    dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
     for i in range(niter_jac):
         if verbose:
             print("%i -st iterations over %i" % (i, niter_jac))
@@ -133,5 +131,4 @@ def get_only_jac(
             break
         # dbeta_old = dbeta.copy()
         # dr_old = dr.copy()
-
     return dbeta

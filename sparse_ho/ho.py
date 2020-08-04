@@ -233,7 +233,6 @@ def _grad_search(
             lambdak -= step_size * grad_lambda
 
         lambdak = proj_param(lambdak)
-
         g_func_old = g_func
 
         if verbose:

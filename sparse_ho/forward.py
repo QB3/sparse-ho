@@ -43,7 +43,6 @@ class Forward():
             beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
             backward=False):
-
         return self.criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)

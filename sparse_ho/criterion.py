@@ -83,6 +83,7 @@ class CV():
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+        self.value_test(mask, dense)
         return self.value(mask, dense)
 
     def get_val_grad(
@@ -168,6 +169,7 @@ class Logistic():
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+        self.value_test(mask, dense)
         return self.value(mask, dense)
 
     def get_val_grad(
@@ -223,6 +225,7 @@ class SmoothedHinge():
         self.dense0 = None
         self.quantity_to_warm_start = None
         self.val_test = None
+        self.rmse = None
 
     def get_v(self, mask, dense):
         Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
@@ -238,12 +241,18 @@ class SmoothedHinge():
         return v
 
     def value(self, mask, dense):
-        Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
+        if issparse(self.X_val):
+            Xbeta_y = (self.X_val[:, mask].T).multiply(self.y_val).T @ dense
+        else:
+            Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
         return np.sum(smooth_hinge(Xbeta_y)) / self.X_val.shape[0]
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
-            Xbeta_y = self.y_test * (self.X_test[:, mask] @ dense)
+            if issparse(self.X_test):
+                Xbeta_y = (self.X_test[:, mask].T).multiply(self.y_test).T @ dense
+            else:
+                Xbeta_y = self.y_test * (self.X_test[:, mask] @ dense)
             self.val_test = np.sum(smooth_hinge(Xbeta_y)) / self.X_test.shape[0]
         else:
             self.val_test = None
@@ -275,6 +284,15 @@ class SmoothedHinge():
         self.compute_rmse(mask, dense, beta_star)
 
         return val, grad
+
+    def get_val(self, log_alpha, tol=1e-3):
+        mask, dense, _ = get_beta_jac_iterdiff(
+            self.model.X, self.model.y, log_alpha, self.model,
+            max_iter=self.model.max_iter, tol=tol, compute_jac=False)
+        mask, dense = self.model.get_primal(mask, dense)
+        val = self.value(mask, dense)
+        self.value_test(mask, dense)
+        return val
 
 
 class SURE():

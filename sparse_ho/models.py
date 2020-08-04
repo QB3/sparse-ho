@@ -158,7 +158,7 @@ class Lasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -244,7 +244,7 @@ class Lasso():
     def reduce_y(self, mask):
         return self.y
 
-    def sign(self, x):
+    def sign(self, x, log_alpha):
         return np.sign(x)
 
     def get_primal(self, mask, dense):
@@ -404,7 +404,7 @@ class wLasso():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -506,7 +506,7 @@ class wLasso():
     def reduce_y(self, mask):
         return self.y
 
-    def sign(self, x):
+    def sign(self, x, log_alpha):
         return np.sign(x)
 
     def get_primal(self, mask, dense):
@@ -670,7 +670,8 @@ class SVM():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, C):
+        dbeta[sign_beta == 1] = C
         is_sparse = issparse(X)
         if is_sparse:
             res = np.array(np.sum(X.T.multiply(y * dbeta), axis=1))
@@ -681,10 +682,7 @@ class SVM():
     @staticmethod
     @njit
     def _update_only_jac(Xs, ys, r, dbeta, dr, L, C, sign_beta):
-        supp = np.where(sign_beta == 0.0)
-        dbeta[sign_beta == 1.0] = C
-        dr = np.sum(ys * dbeta * Xs.T, axis=1)
-        for j in supp[0]:
+        for j in np.arange(0, Xs.shape[0])[sign_beta == 0.0]:
             dF = ys[j] * np.sum(dr * Xs[j, :])
             dbeta_old = dbeta[j]
             dzj = dbeta[j] - (dF / L[j])
@@ -696,13 +694,7 @@ class SVM():
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
             dbeta, r, dr, L, C, sign_beta):
-        supp = np.where(sign_beta == 0.0)
-        for j in np.where(sign_beta == 1.0)[0]:
-            Xis = data[indptr[j]:indptr[j+1]]
-            idx_nz = indices[indptr[j]:indptr[j+1]]
-            dr[idx_nz] += ((C - dbeta[j]) * y[j] * Xis)
-        dbeta[sign_beta == 1.0] = C
-        for j in supp[0]:
+        for j in np.arange(0, n_samples)[sign_beta == 0.0]:
             # get the i-st row of X in sparse format
             Xis = data[indptr[j]:indptr[j+1]]
             # get the non zero idices
@@ -732,10 +724,10 @@ class SVM():
     def reduce_y(self, mask):
         return self.y[mask]
 
-    def sign(self, x):
+    def sign(self, x, log_C):
         sign = np.zeros(x.shape[0])
         sign[np.isclose(x, 0.0)] = -1.0
-        sign[np.isclose(x, np.exp(self.logC))] = 1.0
+        sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
     def get_jac_v(self, mask, dense, jac, v):
@@ -785,15 +777,14 @@ class SVM():
         beta[mask] = dense
         maskC = np.isclose(beta, C)
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
-
         full_jac = np.zeros(n_samples)
-        full_jac[full_supp] = jac
+        if full_supp.sum() != 0:
+            full_jac[full_supp] = jac
         full_jac[maskC] = C
-
+        maskp, densep = self.get_primal(mask, dense)
         # primal dual relation
         jac_primal = (self.y[mask] * full_jac[mask]) @ self.X[mask, :]
-
-        return jac_primal @ v
+        return jac_primal[maskp] @ v
 
         # if issparse(self.X):
         #     mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
@@ -1037,7 +1028,7 @@ class SparseLogreg():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, alpha):
         return y * (X @ dbeta)
 
     def _init_g_backward(self, jac_v0):
@@ -1119,7 +1110,7 @@ class SparseLogreg():
     def reduce_y(self, mask):
         return self.y
 
-    def sign(self, x):
+    def sign(self, x, log_alpha):
         return np.sign(x)
 
     def get_primal(self, mask, dense):
@@ -1339,7 +1330,7 @@ class SVR():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, alpha):
         is_sparse = issparse(X)
         if is_sparse:
             res = np.array(np.sum(X.T.multiply(y * dbeta), axis=1))
@@ -1409,7 +1400,7 @@ class SVR():
     def reduce_y(self, mask):
         return self.y[mask]
 
-    def sign(self, x):
+    def sign(self, x, log_alpha):
         sign = np.zeros(x.shape[0])
         sign[np.isclose(x, 0.0)] = -1.0
         sign[np.isclose(x, np.exp(self.logC))] = 1.0
@@ -1548,6 +1539,7 @@ class ElasticNet():
         self.max_iter = max_iter
         self.tol = tol
         self.log_alpha_max = log_alpha_max
+        self.clf = None
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -1684,7 +1676,7 @@ class ElasticNet():
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y):
+    def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -1763,9 +1755,10 @@ class ElasticNet():
 
     def sk(self, X, y, alpha, tol, max_iter):
         if self.clf is None:
-            self.clf = linear_model.Lasso(
+            self.clf = linear_model.ElasticNet(
                 fit_intercept=False, max_iter=max_iter, warm_start=True)
-        self.clf.alpha = alpha
+        self.clf.alpha = alpha[0] + alpha[1]
+        self.clf.l1ratio = alpha[0] / (alpha[0] + alpha[1])
         self.clf.tol = tol
         # clf = linear_model.Lasso(
         #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
@@ -1780,7 +1773,7 @@ class ElasticNet():
     def reduce_y(self, mask):
         return self.y
 
-    def sign(self, x):
+    def sign(self, x, log_alpha):
         return x
 
     def get_primal(self, mask, dense):
