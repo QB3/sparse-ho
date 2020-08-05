@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
-
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import CV
 from sparse_ho.models import ElasticNet
@@ -42,12 +41,11 @@ print("Started to load data")
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
 else:
-    X, y = make_regression(n_samples=300, n_features=3000, noise=20)
-    y -= y.mean()
+    X, y, beta = make_regression(n_samples=300, n_features=1000, noise=1.0, coef=True, n_informative=1000)
+    # y -= y.mean()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)
-
 # X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
 # if use_small_part:
 #     idx = np.abs((X_train.T @ y_train)).argsort()[-1000:]
