@@ -41,12 +41,10 @@ print("Started to load data")
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
 else:
-    X, y, beta = make_regression(n_samples=1000, n_features=1000, noise=3.0, coef=True, n_informative=100)
-    y -= y.mean()
-    y /= (norm(y) / np.sqrt(X.shape[0]))
-    # y -= y.mean()
-    X -= X.mean()
-    X /= norm(X, axis=0)
+    X, y, beta = make_regression(n_samples=100, n_features=1000, noise=3.0, coef=True, n_informative=10)
+    X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+    beta = beta / norm(beta)
+    y = X @ beta + np.random.randn(X.shape[0])
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)
@@ -85,7 +83,7 @@ for i in range(n_grid):
         clf = ElasticNet_sk(
             alpha=(alphas_1[i] + alphas_2[j]), fit_intercept=False,
             l1_ratio=alphas_1[i] / (alphas_1[i] + alphas_2[j]),
-            tol=tol, max_iter=max_iter, warm_start=True)
+            tol=tol, max_iter=max_iter, warm_start=False)
         clf.fit(X_train, y_train)
         results[i, j] = norm(y_val - X_val @ clf.coef_) ** 2 / X_val.shape[0]
 t_grid_search += time.time()
@@ -106,7 +104,7 @@ algo = ImplicitForward(
     max_iter=max_iter)
 _, _, _ = grad_search(
     algo=algo, verbose=True,
-    log_alpha0=np.array([np.log(alpha_max/10), np.log(alpha_max/10)]),
+    log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max/10)]),
     tol=tol, n_outer=n_outer, monitor=monitor)
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
