@@ -24,11 +24,11 @@ class Lasso():
     TODO: other parameters should be remove
     """
     def __init__(
-            self, X, y, max_iter=1000, clf=None, log_alpha_max=None):
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
         self.max_iter = max_iter
-        self.clf = clf
+        self.estimator = estimator
         self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
@@ -219,17 +219,17 @@ class Lasso():
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     def sk(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
+        if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-            # self.clf = linear_model.Lasso(
+            # self.estimator = linear_model.Lasso(
             #     fit_intercept=False, max_iter=self.max_iter, warm_start=True)
-        self.clf.alpha = alpha
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
+        self.estimator.alpha = alpha
+        self.estimator.tol = tol
+        # estimator = linear_model.Lasso(
         #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):

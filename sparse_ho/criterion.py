@@ -441,7 +441,7 @@ class CrossVal():
     rmse : None
         XXX
     """
-    def __init__(self, X, y, Model, cv=None, max_iter=1000, clf=None):
+    def __init__(self, X, y, Model, cv=None, max_iter=1000, estimator=None):
         """
         Parameters
         ----------
@@ -463,14 +463,14 @@ class CrossVal():
             For int/None inputs, KFold is used.
         max_iter: int
             Maximal number of iteration for the state-of-the-art solver
-        clf: sklearn Base Estimator
+        estimator: sklearn Base Estimator
         """
         self.X = X
         self.y = y
         self.dict_crits = {}
         self.val_test = None
         self.rmse = None
-        self.clf = clf
+        self.estimator = estimator
 
         cv = check_cv(cv)
 
@@ -485,7 +485,8 @@ class CrossVal():
             if issparse(X_val):
                 X_val = X_val.tocsc()
 
-            model = Model(X_train, y_train, max_iter=max_iter, clf=clf)
+            model = Model(
+                X_train, y_train, max_iter=max_iter, estimator=estimator)
 
             criterion = CV(
                 X_val, y_val, model, X_test=X_val, y_test=y_val)

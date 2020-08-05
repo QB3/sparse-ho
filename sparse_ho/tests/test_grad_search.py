@@ -56,11 +56,11 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 
-clf = sklearn.linear_model.Lasso(
+estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
 models = [
-    Lasso(X_train, y_train, max_iter=max_iter, clf=clf),
+    Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator),
     # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
     # wLasso(X_train, y_train, dict_log_alpha0["wlasso"])
 ]
@@ -140,7 +140,7 @@ def test_grad_search(model, crit):
 
 if __name__ == '__main__':
     models = [
-        Lasso(X_train, y_train, max_iter=max_iter, clf=clf)]
+        Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator)]
     crits = ['cv']
     # crits = ['cv', 'sure']
     for model in models:

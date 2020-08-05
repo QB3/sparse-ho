@@ -46,7 +46,7 @@ max_iter = 1000
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(0.0001 * alpha_max)
 
-clf = sklearn.linear_model.Lasso(
+estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
 
@@ -54,7 +54,7 @@ def test_grid_search():
     max_evals = 5
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, clf=clf)
+    model = Lasso(X_train, y_train, estimator=estimator)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward(criterion)
     log_alpha_opt_grid, _ = grid_search(
@@ -74,7 +74,7 @@ def test_grid_search():
         np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, clf=clf)
+    model = Lasso(X_train, y_train, estimator=estimator)
     criterion = SURE(
         X_train, y_train, model, sigma=sigma_star, X_test=X_test,
         y_test=y_test)

@@ -78,10 +78,10 @@ def test_cross_val_criterion():
     n_alphas = 10
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
 
-    clf = sklearn.linear_model.Lasso(
+    estimator = sklearn.linear_model.Lasso(
         fit_intercept=False, max_iter=1000, warm_start=True)
     monitor_grid = Monitor()
-    criterion = CrossVal(X, y, Lasso, cv=kf, clf=clf)
+    criterion = CrossVal(X, y, Lasso, cv=kf, estimator=estimator)
     algo = Forward(criterion, use_sk=True)
     grid_search(
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=n_alphas,

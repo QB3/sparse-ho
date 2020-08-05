@@ -74,7 +74,7 @@ print('scikit finished')
 # Now do the hyperparameter optimization with implicit differentiation
 # --------------------------------------------------------------------
 
-clf = sklearn.linear_model.Lasso(
+estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
 
 print('sparse-ho started')
@@ -84,7 +84,7 @@ Model = Lasso
 Criterion = CV
 log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
-criterion = CrossVal(X, y, Lasso, cv=kf, clf=clf)
+criterion = CrossVal(X, y, Lasso, cv=kf, estimator=estimator)
 algo = ImplicitForward(criterion, use_sk=True)
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)

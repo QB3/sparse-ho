@@ -65,13 +65,13 @@ max_iter = 1e5
 # Grid-search
 # -----------
 
-clf = sklearn.linear_model.Lasso(
+estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
 print('scikit started')
 
 t0 = time.time()
-model = Lasso(X_train, y_train, clf=clf)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion, use_sk=True)
 monitor_grid_sk = Monitor()
@@ -90,7 +90,7 @@ print('scikit finished')
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso(X_train, y_train, clf=clf)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion, use_sk=True)
 monitor_grad = Monitor()

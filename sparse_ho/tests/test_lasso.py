@@ -52,10 +52,10 @@ dict_log_alpha["lasso"] = log_alpha
 tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
-clf = sklearn.linear_model.Lasso(
+estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models = {}
-models["lasso"] = Lasso(X_train, y_train, clf=clf)
+models["lasso"] = Lasso(X_train, y_train, estimator=estimator)
 models["wlasso"] = wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 
 
