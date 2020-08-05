@@ -80,12 +80,12 @@ for i in range(n_grid):
     print("lambda %i / %i" % (i, n_grid))
     for j in range(n_grid):
         print("lambda %i / %i" % (j, n_grid))
-        clf = ElasticNet_sk(
+        estimator = ElasticNet_sk(
             alpha=(alphas_1[i] + alphas_2[j]), fit_intercept=False,
             l1_ratio=alphas_1[i] / (alphas_1[i] + alphas_2[j]),
             tol=tol, max_iter=max_iter, warm_start=False)
-        clf.fit(X_train, y_train)
-        results[i, j] = norm(y_val - X_val @ clf.coef_) ** 2 / X_val.shape[0]
+        estimator.fit(X_train, y_train)
+        results[i, j] = norm(y_val - X_val @ estimator.coef_) ** 2 / X_val.shape[0]
 t_grid_search += time.time()
 print("Finished grid-search")
 
