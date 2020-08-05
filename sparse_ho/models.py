@@ -24,19 +24,12 @@ class Lasso():
     TODO: other parameters should be remove
     """
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False):
+            self, X, y, max_iter=1000, clf=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = log_alpha
         self.max_iter = max_iter
-        self.tol = tol
+        self.clf = clf
         self.log_alpha_max = log_alpha_max
-        if use_sk:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                solver='liblinear')
-        else:
-            self.clf = None
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -227,8 +220,9 @@ class Lasso():
 
     def sk(self, X, y, alpha, tol, max_iter):
         if self.clf is None:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=self.max_iter, warm_start=True)
+            raise ValueError("You did not pass a solver with sklearn API")
+            # self.clf = linear_model.Lasso(
+            #     fit_intercept=False, max_iter=self.max_iter, warm_start=True)
         self.clf.alpha = alpha
         self.clf.tol = tol
         # clf = linear_model.Lasso(

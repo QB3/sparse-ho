@@ -1,11 +1,12 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 import pytest
+import sklearn
 
 from sparse_ho.utils import Monitor
 
 from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.models import Lasso, wLasso
+from sparse_ho.models import Lasso
 
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
@@ -47,16 +48,21 @@ log_alpha = np.log(alpha)
 
 log_alphas = np.log(alpha_max * np.geomspace(1, 0.1))
 tol = 1e-16
+max_iter = 1000
 
-dict_log_alpha = {}
-dict_log_alpha["lasso"] = log_alpha
+dict_log_alpha0 = {}
+dict_log_alpha0["lasso"] = log_alpha
 tab = np.linspace(1, 1000, n_features)
-dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
+dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
+
+
+clf = sklearn.linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
 
 models = [
-    Lasso(X_train, y_train, dict_log_alpha["lasso"]),
+    Lasso(X_train, y_train, max_iter=max_iter, clf=clf),
     # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
-    wLasso(X_train, y_train, dict_log_alpha["wlasso"])
+    # wLasso(X_train, y_train, dict_log_alpha0["wlasso"])
 ]
 
 
@@ -78,7 +84,7 @@ def test_grad_search(model, crit):
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
     algo = Forward(criterion)
-    grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
     # criterion = SURE(
@@ -87,7 +93,7 @@ def test_grad_search(model, crit):
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
     algo = Implicit(criterion)
-    grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
     # criterion = SURE(
@@ -96,7 +102,7 @@ def test_grad_search(model, crit):
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
                 tol=1e-16)
 
     # criterion = SURE(
@@ -134,9 +140,7 @@ def test_grad_search(model, crit):
 
 if __name__ == '__main__':
     models = [
-        Lasso(X_train, y_train, dict_log_alpha["lasso"]),
-        # Lasso(X_train_s, y_train, dict_log_alpha["lasso"]),
-        wLasso(X_train, y_train, dict_log_alpha["wlasso"])]
+        Lasso(X_train, y_train, max_iter=max_iter, clf=clf)]
     crits = ['cv']
     # crits = ['cv', 'sure']
     for model in models:
