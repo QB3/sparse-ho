@@ -84,7 +84,7 @@ Model = Lasso
 Criterion = CV
 log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
-criterion = CrossVal(X, y, Lasso, cv=kf, estimator=estimator)
+criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)
 algo = ImplicitForward(criterion, use_sk=True)
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
