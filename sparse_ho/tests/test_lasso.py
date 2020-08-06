@@ -56,7 +56,7 @@ estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models = {}
 models["lasso"] = Lasso(X_train, y_train, estimator=estimator)
-models["wlasso"] = wLasso(X_train, y_train, dict_log_alpha["wlasso"])
+models["wlasso"] = wLasso(X_train, y_train, estimator=estimator)
 
 
 def get_v(mask, dense):

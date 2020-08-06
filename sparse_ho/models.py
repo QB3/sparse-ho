@@ -21,7 +21,9 @@ class Lasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: sklearn Base Estimator
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
     def __init__(
             self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
@@ -278,16 +280,17 @@ class wLasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: sklearn Base Estimator
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
-    def __init__(self, X, y, log_alpha, log_alpha_max=None,
-                 max_iter=100, tol=1e-3):
+    def __init__(
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = log_alpha
-        self.log_alpha_max = log_alpha_max
         self.max_iter = max_iter
-        self.tol = tol
+        self.estimator = estimator
+        self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -403,7 +406,7 @@ class wLasso():
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
-            return np.zeros(self.log_alpha.shape[0])
+            return np.zeros(self.X.shape[1])
         else:
             return jac_v0
 
