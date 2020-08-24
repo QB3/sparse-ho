@@ -14,12 +14,13 @@ for an elastic-net using a held-out validation set.
 # License: BSD (3-clause)
 
 import time
-from sparse_ho.datasets.real import get_data
 import numpy as np
-from sklearn.linear_model import ElasticNet as ElasticNet_sk
+from sklearn import linear_model
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+from sparse_ho.datasets.real import get_data
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sparse_ho.implicit_forward import ImplicitForward
@@ -48,13 +49,6 @@ else:
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)
-# X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
-# if use_small_part:
-#     idx = np.abs((X_train.T @ y_train)).argsort()[-1000:]
-#     X_train = X_train[:, idx]
-#     X_val = X_val[:, idx]
-#     X_test = X_test[:, idx]
-
 print("Finished loading data")
 
 alpha_max = np.max(np.abs(X_train.T @ y_train))
@@ -74,7 +68,7 @@ tol = 1e-4
 max_iter = 50000
 
 
-estimator = ElasticNet_sk(
+estimator = linear_model.ElasticNet(
     fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
 # grid search with scikit
 print("Started grid-search")
@@ -92,7 +86,7 @@ print("Finished grid-search")
 
 
 # grad search
-estimator = ElasticNet_sk(
+estimator = linear_model.ElasticNet(
     fit_intercept=False, max_iter=max_iter, warm_start=True)
 print("Started grad-search")
 t_grad_search = - time.time()
