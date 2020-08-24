@@ -41,7 +41,7 @@ print("Started to load data")
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
 else:
-    X, y, beta = make_regression(n_samples=100, n_features=1000, noise=3.0, coef=True, n_informative=10)
+    X, y, beta = make_regression(n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10)
     X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
     beta = beta / norm(beta)
     y = X @ beta + np.random.randn(X.shape[0])
@@ -70,9 +70,12 @@ alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
 log_alphas_2 = np.log(alphas_2)
 
 results = np.zeros((n_grid, n_grid))
-tol = 1e-9
+tol = 1e-4
 max_iter = 50000
 
+
+estimator = ElasticNet_sk(
+    fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
 # grid search with scikit
 print("Started grid-search")
 t_grid_search = - time.time()
@@ -80,10 +83,8 @@ for i in range(n_grid):
     print("lambda %i / %i" % (i, n_grid))
     for j in range(n_grid):
         print("lambda %i / %i" % (j, n_grid))
-        estimator = ElasticNet_sk(
-            alpha=(alphas_1[i] + alphas_2[j]), fit_intercept=False,
-            l1_ratio=alphas_1[i] / (alphas_1[i] + alphas_2[j]),
-            tol=tol, max_iter=max_iter, warm_start=False)
+        estimator.alpha = (alphas_1[i] + alphas_2[j])
+        estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
         estimator.fit(X_train, y_train)
         results[i, j] = norm(y_val - X_val @ estimator.coef_) ** 2 / X_val.shape[0]
 t_grid_search += time.time()
@@ -91,12 +92,14 @@ print("Finished grid-search")
 
 
 # grad search
+estimator = ElasticNet_sk(
+    fit_intercept=False, max_iter=max_iter, warm_start=True)
 print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
-n_outer = 3
+n_outer = 10
 model = ElasticNet(
-    X_train, y_train, log_alphas_1[-1], log_alphas_2[-1], log_alpha_max, max_iter=max_iter, tol=tol)
+    X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = CV(
     X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(
@@ -127,7 +130,7 @@ ax.plot_surface(
     cmap='viridis', edgecolor='none', alpha=0.5)
 ax.scatter3D(
     np.log(a), np.log(b), results,
-    monitor.objs, c="black", s=200, marker="o")
+    monitor.objs, c="black", s=20, marker="o")
 ax.scatter3D(
     np.log(alphas_grad[:, 0]), np.log(alphas_grad[:, 1]),
     monitor.objs, c="red", s=200, marker="X")
