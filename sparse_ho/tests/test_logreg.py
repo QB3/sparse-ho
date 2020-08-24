@@ -39,21 +39,16 @@ alpha = 0.3 * alpha_max
 log_alpha = np.log(alpha)
 tol = 1e-16
 
+estimator = LogisticRegression(
+    penalty="l1", tol=1e-12, fit_intercept=False, max_iter=100000,
+    solver="saga")
+
 models = [
     SparseLogreg(
-        X_train, y_train, max_iter=10000),
+        X_train, y_train, max_iter=10000, estimator=estimator),
     SparseLogreg(
-        X_train_s, y_train, max_iter=10000)
+        X_train_s, y_train, max_iter=10000, estimator=estimator)
 ]
-# models = {}
-
-# models["SparseLogReg_sparse"] = SparseLogreg(
-#                             X_train_s, y_train,
-#                             log_alpha, max_iter=10000,
-#                             tol=tol)
-
-# dict_log_alpha = {}
-# dict_log_alpha["SparseLogReg"] =
 
 
 def get_v(mask, dense):
@@ -111,6 +106,12 @@ def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(log_alpha, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model)
+    algo = ImplicitForward(
+        criterion, tol_jac=1e-8, n_iter_jac=5000, use_sk=True)
+    val_imp_fwd_custom, grad_imp_fwd_custom = algo.get_val_grad(
+        log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     algo = Implicit(criterion)

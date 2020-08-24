@@ -41,7 +41,7 @@ alpha_1 = p_alpha * alpha_max
 alpha_2 = 0.01
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
-model = Elastic(X_train, y_train, log_alpha1, log_alpha2, max_iter=max_iter, tol=tol)
+model = Elastic(X_train, y_train, max_iter=max_iter)
 
 
 def get_v(mask, dense):

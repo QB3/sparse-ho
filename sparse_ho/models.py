@@ -223,8 +223,6 @@ class Lasso():
     def _use_estimator(self, X, y, alpha, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-            # self.estimator = linear_model.Lasso(
-            #     fit_intercept=False, max_iter=self.max_iter, warm_start=True)
         self.estimator.alpha = alpha
         self.estimator.tol = tol
         # estimator = linear_model.Lasso(
@@ -876,6 +874,7 @@ class SparseLogreg():
         self.y = y
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -1134,11 +1133,8 @@ class SparseLogreg():
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
         n_samples = X.shape[0]
-        if self.clf is None:
-            self.clf = linear_model.LogisticRegression(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', solver='liblinear', verbose=self.verbose)
-
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
         self.estimator.C = 1 / (alpha * n_samples)
         self.estimator.tol = tol
         self.estimator.max_iter = max_iter
@@ -1517,14 +1513,13 @@ class SVR():
 
 
 class ElasticNet():
-    def __init__(self, X, y, log_alpha1, log_alpha2, log_alpha_max=None, max_iter=100, tol=1e-3):
+    def __init__(
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = np.array([log_alpha1, log_alpha2])
         self.max_iter = max_iter
-        self.tol = tol
         self.log_alpha_max = log_alpha_max
-        self.clf = None
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
