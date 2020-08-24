@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
 from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
@@ -488,11 +487,9 @@ class wLasso():
         """TODO
         """
         X /= alpha
-        clf = linear_model.Lasso(
-            alpha=1, fit_intercept=False, tol=tol, max_iter=max_iter)
-        clf.fit(X, y)
-        mask = clf.coef_ != 0
-        dense = (clf.coef_ / alpha)[mask]
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = (self.estimator.coef_ / alpha)[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):
@@ -1734,17 +1731,14 @@ class ElasticNet():
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
-            self.clf = linear_model.ElasticNet(
-                fit_intercept=False, max_iter=max_iter, warm_start=True)
-        self.clf.alpha = alpha[0] + alpha[1]
-        self.clf.l1ratio = alpha[0] / (alpha[0] + alpha[1])
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.alpha = alpha[0] + alpha[1]
+        self.estimator.l1ratio = alpha[0] / (alpha[0] + alpha[1])
+        self.estimator.tol = tol
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):

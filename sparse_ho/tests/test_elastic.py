@@ -41,7 +41,12 @@ alpha_1 = p_alpha * alpha_max
 alpha_2 = 0.01
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
-model = Elastic(X_train, y_train, max_iter=max_iter)
+
+estimator = ElasticNetsk(
+    alpha=(alpha_1 + alpha_2), fit_intercept=False,
+    l1_ratio=alpha_1 / (alpha_1 + alpha_2),
+    tol=1e-16, max_iter=max_iter)
+model = Elastic(X_train, y_train, max_iter=max_iter, estimator=estimator)
 
 
 def get_v(mask, dense):
@@ -54,16 +59,16 @@ def test_beta_jac():
         X_train, y_train, np.array([log_alpha1, log_alpha2]), tol=tol,
         model=model, compute_jac=True, max_iter=max_iter)
 
-    clf = ElasticNetsk(
+    estimator = ElasticNetsk(
         alpha=(alpha_1 + alpha_2), fit_intercept=False,
         l1_ratio=alpha_1 / (alpha_1 + alpha_2),
         tol=1e-16, max_iter=max_iter)
-    clf.fit(X_train, y_train)
+    estimator.fit(X_train, y_train)
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X_train, y_train, np.array([log_alpha1, log_alpha2]),
         get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
-    assert np.allclose(dense1, clf.coef_[clf.coef_ != 0])
+    assert np.allclose(dense1, estimator.coef_[estimator.coef_ != 0])
     assert np.all(supp1 == supp2)
     assert np.allclose(dense1, dense2)
 
@@ -84,15 +89,23 @@ def test_val_grad():
         np.array([log_alpha1, log_alpha2]), tol=tol)
 
     criterion = CV(X_val, y_val, model)
+    algo = ImplicitForward(
+        criterion, tol_jac=1e-16, n_iter_jac=5000, use_sk=True)
+    val_imp_fwd_custom, grad_imp_fwd_custom = algo.get_val_grad(
+        np.array([log_alpha1, log_alpha2]), tol=tol)
+
+    criterion = CV(X_val, y_val, model)
     algo = Implicit(criterion)
     val_imp, grad_imp = algo.get_val_grad(
         np.array([log_alpha1, log_alpha2]), tol=tol)
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
     assert np.allclose(val_imp_fwd, val_imp)
+    assert np.allclose(val_imp_fwd, val_imp_fwd_custom)
     # for the implcit the conjugate grad does not converge
     # hence the rtol=1e-2
     assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
+    assert np.allclose(grad_imp_fwd, grad_imp_fwd_custom)
 
 
 def test_grad_search():
