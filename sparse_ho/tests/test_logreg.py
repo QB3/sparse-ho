@@ -41,9 +41,9 @@ tol = 1e-16
 
 models = [
     SparseLogreg(
-        X_train, y_train, log_alpha, max_iter=10000, tol=tol),
+        X_train, y_train, max_iter=10000),
     SparseLogreg(
-        X_train_s, y_train, log_alpha, max_iter=10000, tol=tol)
+        X_train_s, y_train, max_iter=10000)
 ]
 # models = {}
 
@@ -135,19 +135,19 @@ def test_grad_search(model, crit):
     criterion = Logistic(X_val, y_val, model)
     monitor1 = Monitor()
     algo = Forward(criterion)
-    grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     monitor2 = Monitor()
     algo = Implicit(criterion)
-    grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
 
     assert np.allclose(
