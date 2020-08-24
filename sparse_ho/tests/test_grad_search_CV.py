@@ -10,7 +10,6 @@ from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 
 from sparse_ho.forward import Forward
-# from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.grid_search import grid_search
 
 n_samples = 10
@@ -58,22 +57,13 @@ dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
     Lasso(X_train, y_train, dict_log_alpha["lasso"])
-    # ,
-    # wLasso(X_train, y_train, dict_log_alpha["wlasso"])
 ]
-
-
-# def test_grad_search():
-#     monitor = Monitor()
-#     grad_search_CV(
-#         X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=15)
 
 
 def test_cross_val_criterion():
     alpha_min = alpha_max / 10
     log_alpha_max = np.log(alpha_max)
     log_alpha_min = np.log(alpha_min)
-    # log_alpha0 = np.log(alpha_max / 10)
     max_iter = 10000
     n_alphas = 10
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
@@ -99,5 +89,4 @@ def test_cross_val_criterion():
 
 
 if __name__ == '__main__':
-    # test_grad_search()
     test_cross_val_criterion()

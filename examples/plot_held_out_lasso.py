@@ -17,7 +17,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import sklearn
+from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
@@ -65,7 +65,7 @@ max_iter = 1e5
 # Grid-search
 # -----------
 
-estimator = sklearn.linear_model.Lasso(
+estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
 print('scikit started')
