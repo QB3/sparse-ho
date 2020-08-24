@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.linear_model import ElasticNet as ElasticNetsk
+from sklearn import linear_model
 from sparse_ho.models import ElasticNet as Elastic
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.synthetic import get_synt_data
@@ -42,7 +42,7 @@ alpha_2 = 0.01
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
 
-estimator = ElasticNetsk(
+estimator = linear_model.ElasticNet(
     alpha=(alpha_1 + alpha_2), fit_intercept=False,
     l1_ratio=alpha_1 / (alpha_1 + alpha_2),
     tol=1e-16, max_iter=max_iter)
@@ -59,7 +59,7 @@ def test_beta_jac():
         X_train, y_train, np.array([log_alpha1, log_alpha2]), tol=tol,
         model=model, compute_jac=True, max_iter=max_iter)
 
-    estimator = ElasticNetsk(
+    estimator = linear_model.ElasticNet(
         alpha=(alpha_1 + alpha_2), fit_intercept=False,
         l1_ratio=alpha_1 / (alpha_1 + alpha_2),
         tol=1e-16, max_iter=max_iter)
