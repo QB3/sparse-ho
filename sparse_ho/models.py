@@ -247,7 +247,7 @@ class Lasso():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         hessian = self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
@@ -480,7 +480,7 @@ class wLasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         hessian = self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
@@ -753,7 +753,7 @@ class SVM():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
@@ -1105,7 +1105,7 @@ class SparseLogreg():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         a = self.y * (self.X[:, mask] @ dense)
         temp = sigma(a) * (1 - sigma(a))
         is_sparse = issparse(self.X)
@@ -1415,7 +1415,7 @@ class SVR():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
@@ -1762,9 +1762,9 @@ class ElasticNet():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         n_samples = self.X.shape[0]
-        hessian = np.exp(self.log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
+        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
