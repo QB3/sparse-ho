@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
-import sklearn
+from sklearn.linear_model import Lasso as Lassosk
+
 
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import get_beta_jac_iterdiff
@@ -40,7 +41,7 @@ X_test_s = csc_matrix(X_test)
 
 
 alpha_max = (X_train.T @ y_train).max() / n_samples
-p_alpha = 0.7
+p_alpha = 0.9
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
 
@@ -52,7 +53,7 @@ dict_log_alpha["lasso"] = log_alpha
 tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
-estimator = sklearn.linear_model.Lasso(
+estimator = Lassosk(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models = {}
 models["lasso"] = Lasso(X_train, y_train, estimator=estimator)

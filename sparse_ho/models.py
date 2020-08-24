@@ -487,6 +487,7 @@ class wLasso():
         """TODO
         """
         X /= alpha
+        self.estimator.alpha = 1
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = (self.estimator.coef_ / alpha)[mask]
