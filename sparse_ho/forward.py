@@ -92,7 +92,7 @@ def get_beta_jac_iterdiff(
     ############################################
     alpha = np.exp(log_alpha)
     if use_sk:
-        return model.sk(X, y, alpha, tol, max_iter)
+        return model._use_estimator(X, y, alpha, tol, max_iter)
 
     try:
         alpha.shape[0]

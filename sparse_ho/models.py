@@ -220,7 +220,7 @@ class Lasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
             # self.estimator = linear_model.Lasso(
@@ -486,7 +486,7 @@ class wLasso():
         hessian = self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         """TODO
         """
         X /= alpha
@@ -1142,7 +1142,7 @@ class SparseLogreg():
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         n_samples = X.shape[0]
         if self.clf is None:
             self.clf = linear_model.LogisticRegression(
@@ -1750,7 +1750,7 @@ class ElasticNet():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         if self.clf is None:
             self.clf = linear_model.ElasticNet(
                 fit_intercept=False, max_iter=max_iter, warm_start=True)
