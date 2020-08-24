@@ -222,10 +222,7 @@ class Lasso():
     def _use_estimator(self, X, y, alpha, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.alpha = alpha
-        self.estimator.tol = tol
-        # estimator = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
+        self.estimator.set_params(tol=tol, alpha=alpha)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]
@@ -487,7 +484,7 @@ class wLasso():
         """TODO
         """
         X /= alpha
-        self.estimator.alpha = 1
+        self.estimator.set_params(tol=tol, alpha=1)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = (self.estimator.coef_ / alpha)[mask]
@@ -1133,8 +1130,7 @@ class SparseLogreg():
         n_samples = X.shape[0]
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.C = 1 / (alpha * n_samples)
-        self.estimator.tol = tol
+        self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
         self.estimator.max_iter = self.max_iter
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
@@ -1734,9 +1730,9 @@ class ElasticNet():
     def _use_estimator(self, X, y, alpha, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.alpha = alpha[0] + alpha[1]
-        self.estimator.l1ratio = alpha[0] / (alpha[0] + alpha[1])
-        self.estimator.tol = tol
+        self.estimator.set_params(
+            tol=tol, alpha=alpha[0]+alpha[1],
+            l1_ratio=alpha[0]/(alpha[0]+alpha[1]))
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]
