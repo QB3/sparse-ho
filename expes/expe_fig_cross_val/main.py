@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
@@ -42,7 +43,9 @@ tol = 1e-7
 # np.save("objs.npy", objs)
 
 # grad_search
-model = Lasso(X_train, y_train, np.log(alpha_max/10))
+estimator = linear_model.Lasso(
+    fit_intercept=False, warm_start=True)
+model = Lasso(X_train, y_train, np.log(alpha_max/10), estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
