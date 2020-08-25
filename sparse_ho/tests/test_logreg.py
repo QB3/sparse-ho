@@ -149,17 +149,12 @@ def test_val_grad_custom(model, model_custom):
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     val, grad = algo.get_val_grad(log_alpha, tol=tol)
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val, model_custom)
     algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
     val_custom, grad_custom = algo.get_val_grad(log_alpha, tol=tol)
 
-    assert np.allclose(val, val_custom, atol=1e-4)
-    assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
-    assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
-
-    # for the implcit the conjugate grad does not converge
-    # hence the rtol=1e-2
-    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
+    assert np.allclose(val, val_custom)
+    assert np.allclose(grad, grad_custom)
 
 
 @pytest.mark.parametrize('model', models)
@@ -194,6 +189,32 @@ def test_grad_search(model, crit):
         np.array(monitor1.objs), np.array(monitor3.objs))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
+
+
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+@pytest.mark.parametrize('crit', ['cv'])
+def test_grad_search_custom(model, model_custom, crit):
+    """check that the paths are the same in the line search"""
+    n_outer = 5
+
+    criterion = Logistic(X_val, y_val, model)
+    monitor = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, log_alpha, monitor, n_outer=n_outer, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model_custom)
+    monitor_custom = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, log_alpha, monitor_custom, n_outer=n_outer, tol=tol)
+
+    assert np.allclose(
+        np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas))
+    assert np.allclose(
+        np.array(monitor.grads), np.array(monitor_custom.grads), atol=1e-4)
+    assert np.allclose(
+        np.array(monitor.objs), np.array(monitor_custom.objs))
+    assert not np.allclose(
+        np.array(monitor.times), np.array(monitor_custom.times))
 
 
 if __name__ == '__main__':
