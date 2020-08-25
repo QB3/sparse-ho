@@ -53,11 +53,9 @@ dict_log_alpha["lasso"] = log_alpha
 tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
-estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
 models = {}
-models["lasso"] = Lasso(X_train, y_train, estimator=estimator)
-models["wlasso"] = wLasso(X_train, y_train, estimator=estimator)
+models["lasso"] = Lasso(X_train, y_train, estimator=None)
+models["wlasso"] = wLasso(X_train, y_train, estimator=None)
 
 
 def get_v(mask, dense):
@@ -103,6 +101,30 @@ def test_beta_jac():
         get_beta_jac_t_v_implicit(
             X_train, y_train, dict_log_alpha[key], X_test, y_test, get_v,
             model=models[key])
+
+
+estimator = linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
+models_custom = {}
+models_custom["lasso"] = Lasso(X_train, y_train, estimator=estimator)
+models_custom["wlasso"] = wLasso(X_train, y_train, estimator=estimator)
+
+
+def test_beta_jac2():
+    #########################################################################
+    # check that the methods computing the full Jacobian compute the same sol
+    # maybe we could add a test comparing with sklearn
+    for key in models.keys():
+        supp, dense, jac = get_beta_jac_iterdiff(
+            X_train, y_train, dict_log_alpha[key], tol=tol,
+            model=models[key])
+        supp_custom, dense_custom, jac_custom = get_beta_jac_iterdiff(
+            X_train, y_train, dict_log_alpha[key], tol=tol,
+            model=models_custom[key])
+
+        assert np.all(supp == supp_custom)
+        assert np.allclose(dense, dense_custom)
+        assert np.allclose(jac, jac_custom)
 
 
 def test_val_grad():

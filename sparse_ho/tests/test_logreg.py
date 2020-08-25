@@ -39,11 +39,18 @@ alpha = 0.3 * alpha_max
 log_alpha = np.log(alpha)
 tol = 1e-16
 
+models = [
+    SparseLogreg(
+        X_train, y_train, max_iter=10000, estimator=None),
+    SparseLogreg(
+        X_train_s, y_train, max_iter=10000, estimator=None)
+]
+
 estimator = LogisticRegression(
     penalty="l1", tol=1e-12, fit_intercept=False, max_iter=100000,
     solver="saga")
 
-models = [
+models_custom = [
     SparseLogreg(
         X_train, y_train, max_iter=10000, estimator=estimator),
     SparseLogreg(
@@ -97,6 +104,21 @@ def test_beta_jac(model):
     assert np.allclose(jac3, jac4, atol=1e-4)
 
 
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+def test_beta_jac_custom_solver(model, model_custom):
+    supp, dense, jac = get_beta_jac_fast_iterdiff(
+        X_train, y_train, log_alpha,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
+
+    supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+        X_train, y_train, log_alpha, get_v, tol=tol, model=model_custom,
+        tol_jac=1e-12)
+
+    assert np.all(supp == supp_custom)
+    assert np.allclose(dense, dense_custom)
+    assert np.allclose(jac, jac_custom)
+
+
 @pytest.mark.parametrize('model', models)
 def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
@@ -108,17 +130,30 @@ def test_val_grad(model):
     val_imp_fwd, grad_imp_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = ImplicitForward(
-        criterion, tol_jac=1e-8, n_iter_jac=5000, use_sk=True)
-    val_imp_fwd_custom, grad_imp_fwd_custom = algo.get_val_grad(
-        log_alpha, tol=tol)
-
-    criterion = Logistic(X_val, y_val, model)
     algo = Implicit(criterion)
     val_imp, grad_imp = algo.get_val_grad(
         log_alpha, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd, atol=1e-4)
+    assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
+    assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
+
+    # for the implcit the conjugate grad does not converge
+    # hence the rtol=1e-2
+    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
+
+
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+def test_val_grad_custom(model, model_custom):
+    criterion = Logistic(X_val, y_val, model)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    val, grad = algo.get_val_grad(log_alpha, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    val_custom, grad_custom = algo.get_val_grad(log_alpha, tol=tol)
+
+    assert np.allclose(val, val_custom, atol=1e-4)
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
     assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
 
