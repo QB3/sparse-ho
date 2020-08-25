@@ -75,8 +75,7 @@ model = ElasticNet(
 criterion = CV(
     X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(
-    criterion, tol_jac=1e-2, n_iter_jac=1000, use_sk=True,
-    max_iter=max_iter)
+    criterion, tol_jac=1e-2, n_iter_jac=1000, max_iter=max_iter)
 
 _, _, _ = grad_search(
     algo=algo, verbose=True,

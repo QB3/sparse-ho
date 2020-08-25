@@ -10,7 +10,8 @@ def grad_search_CV(
         verbose=True, cv=5, random_state=0, test_size=0.33,
         tolerance_decrease='constant', tol=1e-5,
         t_max=10000, beta_star=None,):
-
+    """Depreciated fucntion, CV is now a proper criterion
+    """
     dict_algo = {}
 
     if isinstance(cv, int):
@@ -28,7 +29,7 @@ def grad_search_CV(
             criterion = Criterion(
                 X_val, y_val, model, X_test=X_val, y_test=y_val)
 
-            algo = Algo(criterion, tol_jac=1e-3, n_iter_jac=100, use_sk=True)
+            algo = Algo(criterion, tol_jac=1e-3, n_iter_jac=100)
             dict_algo[i] = algo
         n_splits = cv
     else:
@@ -49,7 +50,7 @@ def grad_search_CV(
             criterion = Criterion(
                 X_val, y_val, model, X_test=X_val, y_test=y_val)
 
-            algo = Algo(criterion, tol_jac=1e-3, n_iter_jac=100, use_sk=True)
+            algo = Algo(criterion, tol_jac=1e-3, n_iter_jac=100)
             dict_algo[i] = algo
         n_splits = cv.n_splits
 

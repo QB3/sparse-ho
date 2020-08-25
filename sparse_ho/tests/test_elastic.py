@@ -104,7 +104,7 @@ def test_val_grad():
 
     criterion = CV(X_val, y_val, model)
     algo = ImplicitForward(
-        criterion, tol_jac=1e-16, n_iter_jac=5000, use_sk=True)
+        criterion, tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd_custom, grad_imp_fwd_custom = algo.get_val_grad(
         np.array([log_alpha1, log_alpha2]), tol=tol)
 

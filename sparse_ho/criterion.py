@@ -82,7 +82,7 @@ class CV():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
         return self.value(mask, dense)
 
@@ -168,7 +168,7 @@ class Logistic():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
         return self.value(mask, dense)
 
@@ -381,11 +381,11 @@ class SURE():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True,
+            self.model.X, self.model.y, log_alpha, self.model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y + self.epsilon * self.delta,
-            log_alpha, self.model, use_sk=True,
+            log_alpha, self.model,
             tol=tol, compute_jac=False)
 
         val = self.value(mask, dense, mask2, dense2)

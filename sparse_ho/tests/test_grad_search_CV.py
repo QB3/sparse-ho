@@ -72,7 +72,7 @@ def test_cross_val_criterion():
         fit_intercept=False, max_iter=1000, warm_start=True)
     monitor_grid = Monitor()
     criterion = CrossVal(X, y, Lasso, cv=kf, estimator=estimator)
-    algo = Forward(criterion, use_sk=True)
+    algo = Forward(criterion)
     grid_search(
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=n_alphas,
         tol=tol)

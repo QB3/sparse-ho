@@ -9,13 +9,10 @@ class Forward():
     ----------
     criterion: criterion object
         HeldOIut, CrossVal or SURE
-        use_sk: bool
-            TODO: remove this parameter
         verbose: bool
     """
-    def __init__(self, criterion, use_sk=False, verbose=False):
+    def __init__(self, criterion, verbose=False):
         self.criterion = criterion
-        self.use_sk = use_sk
         self.verbose = verbose
 
     def get_beta_jac_v(
@@ -26,8 +23,7 @@ class Forward():
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             max_iter=self.criterion.model.max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward,
-            use_sk=self.use_sk, verbose=self.verbose)
+            compute_jac=compute_jac, backward=backward, verbose=self.verbose)
 
         if jac is not None:
             jac_v = model.get_jac_v(mask, dense, jac, v)
@@ -51,7 +47,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, backward=False,
-        use_sk=False, save_iterates=False, verbose=False):
+        save_iterates=False, verbose=False):
     """
     Parameters
     --------------

@@ -31,7 +31,7 @@ tol = 1e-7
 # grid search
 # model = Lasso(X_train, y_train, np.log(alpha_max/10))
 # criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# algo = Forward(criterion, use_sk=True)
+# algo = Forward(criterion)
 # monitor_grid_sk = Monitor()
 # grid_search(
 #     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -44,7 +44,7 @@ tol = 1e-7
 # grad_search
 model = Lasso(X_train, y_train, np.log(alpha_max/10))
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion, use_sk=True)
+algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)
