@@ -115,13 +115,12 @@ def test_beta_jac2():
     # check that the methods computing the full Jacobian compute the same sol
     # maybe we could add a test comparing with sklearn
     for key in models.keys():
-        supp, dense, jac = get_beta_jac_iterdiff(
-            X_train, y_train, dict_log_alpha[key], tol=tol,
-            model=models[key])
-        supp_custom, dense_custom, jac_custom = get_beta_jac_iterdiff(
-            X_train, y_train, dict_log_alpha[key], tol=tol,
-            model=models_custom[key])
-
+        supp, dense, jac = get_beta_jac_fast_iterdiff(
+            X_train_s, y_train, dict_log_alpha[key], get_v,
+            tol=tol, model=models[key], tol_jac=tol)
+        supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+            X_train_s, y_train, dict_log_alpha[key], get_v,
+            tol=tol, model=models[key], tol_jac=tol)
         assert np.all(supp == supp_custom)
         assert np.allclose(dense, dense_custom)
         assert np.allclose(jac, jac_custom)
@@ -207,3 +206,4 @@ def test_val_grad():
 if __name__ == '__main__':
     test_beta_jac()
     test_val_grad()
+    test_beta_jac2()
