@@ -20,7 +20,8 @@ class Lasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    estimator: sklearn Base Estimator
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
@@ -265,7 +266,9 @@ class Lasso():
 
 class wLasso():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+
     The optimization objective for weighted Lasso is:
+
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |wi|
 
     Parameters
@@ -274,7 +277,8 @@ class wLasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    estimator: sklearn Base Estimator
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """

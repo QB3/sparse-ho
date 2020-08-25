@@ -42,10 +42,14 @@ print("Started to load data")
 if dataset == 'rcv1':
     X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
 else:
-    X, y, beta = make_regression(n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10)
+    rng = np.random.RandomState(42)
+    X, y, beta = make_regression(
+        n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10,
+        random_state=rng,
+    )
     X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
-    beta = beta / norm(beta)
-    y = X @ beta + np.random.randn(X.shape[0])
+    beta /= norm(beta)
+    y = X @ beta + rng.randn(X.shape[0])
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)

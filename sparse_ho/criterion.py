@@ -463,7 +463,8 @@ class CrossVal():
             For int/None inputs, KFold is used.
         max_iter: int
             Maximal number of iteration for the state-of-the-art solver
-        estimator: sklearn Base Estimator
+        estimator: instance of ``sklearn.base.BaseEstimator``
+            An estimator that follows the scikit-learn API.
         """
         self.X = X
         self.y = y
