@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn import linear_model
-from sparse_ho.models import ElasticNet as Elastic
+from sparse_ho.models import ElasticNet
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
@@ -42,12 +42,12 @@ alpha_2 = 0.01
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
 
-model = Elastic(X_train, y_train, max_iter=max_iter, estimator=None)
+model = ElasticNet(X_train, y_train, max_iter=max_iter, estimator=None)
 estimator = linear_model.ElasticNet(
     alpha=(alpha_1 + alpha_2), fit_intercept=False,
     l1_ratio=alpha_1 / (alpha_1 + alpha_2),
     tol=1e-16, max_iter=max_iter)
-model_custom = Elastic(X_train, y_train, max_iter=max_iter, estimator=estimator)
+model_custom = ElasticNet(X_train, y_train, max_iter=max_iter, estimator=estimator)
 
 
 def get_v(mask, dense):
