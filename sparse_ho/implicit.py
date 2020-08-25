@@ -12,7 +12,7 @@ class Implicit():
     Parameters
     ----------
     criterion: criterion object
-        HeldOIut, CrossVal or SURE
+        HeldOut, CrossVal or SURE
         max_iter: int
             maximum number of iteration for the inner solver
     """

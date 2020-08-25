@@ -8,7 +8,7 @@ class Forward():
     Parameters
     ----------
     criterion: criterion object
-        HeldOIut, CrossVal or SURE
+        HeldOut, CrossVal or SURE
         verbose: bool
     """
     def __init__(self, criterion, verbose=False):

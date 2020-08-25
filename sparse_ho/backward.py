@@ -11,7 +11,7 @@ class Backward():
     Parameters
     ----------
     criterion: criterion object
-        HeldOIut, CrossVal or SURE
+        HeldOut, CrossVal or SURE
     """
     def __init__(self, criterion):
         self.criterion = criterion
