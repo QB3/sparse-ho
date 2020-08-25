@@ -17,6 +17,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
@@ -63,13 +64,16 @@ max_iter = 1e5
 ##############################################################################
 # Grid-search
 # -----------
+
+estimator = linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
+
 print('scikit started')
 
 t0 = time.time()
-model = Lasso(
-    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = Forward(criterion, use_sk=True)
+algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(
     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -86,10 +90,9 @@ print('scikit finished')
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso(
-    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion, use_sk=True)
+algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)

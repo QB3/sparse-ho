@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import csc_matrix
+import sklearn
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso
@@ -40,16 +41,20 @@ log_alpha = np.log(alpha)
 
 log_alphas = np.log(alpha_max * np.geomspace(1, 0.1))
 tol = 1e-16
+max_iter = 1000
 
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(0.0001 * alpha_max)
+
+estimator = sklearn.linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
 
 
 def test_grid_search():
     max_evals = 5
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, log_alpha)
+    model = Lasso(X_train, y_train, estimator=estimator)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward(criterion)
     log_alpha_opt_grid, _ = grid_search(
@@ -69,9 +74,10 @@ def test_grid_search():
         np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, log_alpha)
-    criterion = SURE(X_train, y_train, model, sigma=sigma_star,
-                     X_test=X_test, y_test=y_test)
+    model = Lasso(X_train, y_train, estimator=estimator)
+    criterion = SURE(
+        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+        y_test=y_test)
     algo = Forward(criterion)
     log_alpha_opt_grid, _ = grid_search(
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,

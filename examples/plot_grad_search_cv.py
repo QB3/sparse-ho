@@ -16,6 +16,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sklearn
 
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
@@ -72,6 +73,10 @@ print('scikit finished')
 ##############################################################################
 # Now do the hyperparameter optimization with implicit differentiation
 # --------------------------------------------------------------------
+
+estimator = sklearn.linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
+
 print('sparse-ho started')
 
 t0 = time.time()
@@ -79,8 +84,8 @@ Model = Lasso
 Criterion = CV
 log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
-criterion = CrossVal(X, y, Lasso, cv=kf)
-algo = ImplicitForward(criterion, use_sk=True, max_iter=max_iter)
+criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)
+algo = ImplicitForward(criterion)
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 

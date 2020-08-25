@@ -12,7 +12,7 @@ class Implicit():
     Parameters
     ----------
     criterion: criterion object
-        HeldOIut, CrossVal or SURE
+        HeldOut, CrossVal or SURE
         max_iter: int
             maximum number of iteration for the inner solver
     """
@@ -55,7 +55,7 @@ def get_beta_jac_t_v_implicit(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
 
-    mat_to_inv = model.get_hessian(mask, dense)
+    mat_to_inv = model.get_hessian(mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
 
     maskp, densep = model.get_primal(mask, dense)

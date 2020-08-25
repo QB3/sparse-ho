@@ -41,19 +41,21 @@ tol = 1e-16
 
 models = [
     SparseLogreg(
-        X_train, y_train, log_alpha, max_iter=10000, tol=tol),
+        X_train, y_train, max_iter=10000, estimator=None),
     SparseLogreg(
-        X_train_s, y_train, log_alpha, max_iter=10000, tol=tol)
+        X_train_s, y_train, max_iter=10000, estimator=None)
 ]
-# models = {}
 
-# models["SparseLogReg_sparse"] = SparseLogreg(
-#                             X_train_s, y_train,
-#                             log_alpha, max_iter=10000,
-#                             tol=tol)
+estimator = LogisticRegression(
+    penalty="l1", tol=1e-12, fit_intercept=False, max_iter=100000,
+    solver="saga")
 
-# dict_log_alpha = {}
-# dict_log_alpha["SparseLogReg"] =
+models_custom = [
+    SparseLogreg(
+        X_train, y_train, max_iter=10000, estimator=estimator),
+    SparseLogreg(
+        X_train_s, y_train, max_iter=10000, estimator=estimator)
+]
 
 
 def get_v(mask, dense):
@@ -102,6 +104,21 @@ def test_beta_jac(model):
     assert np.allclose(jac3, jac4, atol=1e-4)
 
 
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+def test_beta_jac_custom_solver(model, model_custom):
+    supp, dense, jac = get_beta_jac_fast_iterdiff(
+        X_train, y_train, log_alpha,
+        get_v, tol=tol, model=model, tol_jac=1e-12)
+
+    supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+        X_train, y_train, log_alpha, get_v, tol=tol, model=model_custom,
+        tol_jac=1e-12)
+
+    assert np.all(supp == supp_custom)
+    assert np.allclose(dense, dense_custom)
+    assert np.allclose(jac, jac_custom)
+
+
 @pytest.mark.parametrize('model', models)
 def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
@@ -126,6 +143,20 @@ def test_val_grad(model):
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
 
 
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+def test_val_grad_custom(model, model_custom):
+    criterion = Logistic(X_val, y_val, model)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    val, grad = algo.get_val_grad(log_alpha, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model_custom)
+    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    val_custom, grad_custom = algo.get_val_grad(log_alpha, tol=tol)
+
+    assert np.allclose(val, val_custom)
+    assert np.allclose(grad, grad_custom)
+
+
 @pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('crit', ['cv'])
 def test_grad_search(model, crit):
@@ -135,19 +166,19 @@ def test_grad_search(model, crit):
     criterion = Logistic(X_val, y_val, model)
     monitor1 = Monitor()
     algo = Forward(criterion)
-    grad_search(algo, model.log_alpha, monitor1, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     monitor2 = Monitor()
     algo = Implicit(criterion)
-    grad_search(algo, model.log_alpha, monitor2, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     monitor3 = Monitor()
     algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, model.log_alpha, monitor3, n_outer=n_outer,
+    grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
 
     assert np.allclose(
@@ -158,6 +189,32 @@ def test_grad_search(model, crit):
         np.array(monitor1.objs), np.array(monitor3.objs))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
+
+
+@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+@pytest.mark.parametrize('crit', ['cv'])
+def test_grad_search_custom(model, model_custom, crit):
+    """check that the paths are the same in the line search"""
+    n_outer = 5
+
+    criterion = Logistic(X_val, y_val, model)
+    monitor = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, log_alpha, monitor, n_outer=n_outer, tol=tol)
+
+    criterion = Logistic(X_val, y_val, model_custom)
+    monitor_custom = Monitor()
+    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, log_alpha, monitor_custom, n_outer=n_outer, tol=tol)
+
+    assert np.allclose(
+        np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas))
+    assert np.allclose(
+        np.array(monitor.grads), np.array(monitor_custom.grads), atol=1e-4)
+    assert np.allclose(
+        np.array(monitor.objs), np.array(monitor_custom.objs))
+    assert not np.allclose(
+        np.array(monitor.times), np.array(monitor_custom.times))
 
 
 if __name__ == '__main__':

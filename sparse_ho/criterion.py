@@ -82,7 +82,7 @@ class CV():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
         return self.value(mask, dense)
 
@@ -168,7 +168,7 @@ class Logistic():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True, tol=tol, compute_jac=False)
+            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
         return self.value(mask, dense)
 
@@ -381,11 +381,11 @@ class SURE():
     def get_val(self, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, use_sk=True,
+            self.model.X, self.model.y, log_alpha, self.model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
             self.model.X, self.model.y + self.epsilon * self.delta,
-            log_alpha, self.model, use_sk=True,
+            log_alpha, self.model,
             tol=tol, compute_jac=False)
 
         val = self.value(mask, dense, mask2, dense2)
@@ -441,7 +441,7 @@ class CrossVal():
     rmse : None
         XXX
     """
-    def __init__(self, X, y, Model, cv=None, max_iter=1000):
+    def __init__(self, X, y, Model, cv=None, max_iter=1000, estimator=None):
         """
         Parameters
         ----------
@@ -463,12 +463,15 @@ class CrossVal():
             For int/None inputs, KFold is used.
         max_iter: int
             Maximal number of iteration for the state-of-the-art solver
+        estimator: instance of ``sklearn.base.BaseEstimator``
+            An estimator that follows the scikit-learn API.
         """
         self.X = X
         self.y = y
         self.dict_crits = {}
         self.val_test = None
         self.rmse = None
+        self.estimator = estimator
 
         cv = check_cv(cv)
 
@@ -483,7 +486,8 @@ class CrossVal():
             if issparse(X_val):
                 X_val = X_val.tocsc()
 
-            model = Model(X_train, y_train, 1, max_iter=max_iter)
+            model = Model(
+                X_train, y_train, max_iter=max_iter, estimator=estimator)
 
             criterion = CV(
                 X_val, y_val, model, X_test=X_val, y_test=y_val)

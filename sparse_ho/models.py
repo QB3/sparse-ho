@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
 from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
@@ -21,22 +20,18 @@ class Lasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False):
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = log_alpha
         self.max_iter = max_iter
-        self.tol = tol
+        self.estimator = estimator
         self.log_alpha_max = log_alpha_max
-        if use_sk:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                solver='liblinear')
-        else:
-            self.clf = None
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -225,17 +220,13 @@ class Lasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=self.max_iter, warm_start=True)
-        self.clf.alpha = alpha
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(tol=tol, alpha=alpha)
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):
@@ -253,7 +244,7 @@ class Lasso():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         hessian = self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
@@ -275,7 +266,9 @@ class Lasso():
 
 class wLasso():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+
     The optimization objective for weighted Lasso is:
+
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |wi|
 
     Parameters
@@ -284,16 +277,18 @@ class wLasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
-    def __init__(self, X, y, log_alpha, log_alpha_max=None,
-                 max_iter=100, tol=1e-3):
+    def __init__(
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = log_alpha
-        self.log_alpha_max = log_alpha_max
         self.max_iter = max_iter
-        self.tol = tol
+        self.estimator = estimator
+        self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -409,7 +404,7 @@ class wLasso():
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
-            return np.zeros(self.log_alpha.shape[0])
+            return np.zeros(self.X.shape[1])
         else:
             return jac_v0
 
@@ -485,19 +480,18 @@ class wLasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         hessian = self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         """TODO
         """
         X /= alpha
-        clf = linear_model.Lasso(
-            alpha=1, fit_intercept=False, tol=tol, max_iter=max_iter)
-        clf.fit(X, y)
-        mask = clf.coef_ != 0
-        dense = (clf.coef_ / alpha)[mask]
+        self.estimator.set_params(tol=tol, alpha=1)
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = (self.estimator.coef_ / alpha)[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):
@@ -758,7 +752,7 @@ class SVM():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
@@ -874,21 +868,12 @@ class SparseLogreg():
     TODO: other parameters should be remove
     """
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False, verbose=False):
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = log_alpha
         self.max_iter = max_iter
-        self.tol = tol
         self.log_alpha_max = log_alpha_max
-        self.verbose = verbose
-
-        if use_sk:
-            self.clf = linear_model.LogisticRegression(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', verbose=self.verbose)
-        else:
-            self.clf = None
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -1119,7 +1104,7 @@ class SparseLogreg():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         a = self.y * (self.X[:, mask] @ dense)
         temp = sigma(a) * (1 - sigma(a))
         is_sparse = issparse(self.X)
@@ -1145,21 +1130,15 @@ class SparseLogreg():
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         n_samples = X.shape[0]
-        if self.clf is None:
-            self.clf = linear_model.LogisticRegression(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', solver='liblinear', verbose=self.verbose)
-
-        self.clf.C = 1 / (alpha * n_samples)
-        self.clf.tol = tol
-        self.clf.max_iter = max_iter
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
+        self.estimator.max_iter = self.max_iter
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask[0], dense, None
 
 
@@ -1434,7 +1413,7 @@ class SVR():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
@@ -1532,14 +1511,13 @@ class SVR():
 
 
 class ElasticNet():
-    def __init__(self, X, y, log_alpha1, log_alpha2, log_alpha_max=None, max_iter=100, tol=1e-3):
+    def __init__(
+            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
         self.y = y
-        self.log_alpha = np.array([log_alpha1, log_alpha2])
         self.max_iter = max_iter
-        self.tol = tol
         self.log_alpha_max = log_alpha_max
-        self.clf = None
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -1753,18 +1731,15 @@ class ElasticNet():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
-            self.clf = linear_model.ElasticNet(
-                fit_intercept=False, max_iter=max_iter, warm_start=True)
-        self.clf.alpha = alpha[0] + alpha[1]
-        self.clf.l1ratio = alpha[0] / (alpha[0] + alpha[1])
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(
+            tol=tol, alpha=alpha[0]+alpha[1],
+            l1_ratio=alpha[0]/(alpha[0]+alpha[1]))
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):
@@ -1782,9 +1757,9 @@ class ElasticNet():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, mask, dense, log_alpha):
         n_samples = self.X.shape[0]
-        hessian = np.exp(self.log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
+        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):

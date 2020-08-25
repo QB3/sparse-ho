@@ -1,17 +1,16 @@
 import numpy as np
 from scipy.sparse import csc_matrix
+import sklearn
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LassoCV
 
-from sparse_ho.models import Lasso, wLasso
-from sparse_ho.criterion import CV, CrossVal
+from sparse_ho.models import Lasso
+from sparse_ho.criterion import CrossVal
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 
 from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.grad_search_CV import grad_search_CV
 
 n_samples = 10
 n_features = 10
@@ -57,29 +56,23 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
-    Lasso(X_train, y_train, dict_log_alpha["lasso"]),
-    wLasso(X_train, y_train, dict_log_alpha["wlasso"])
+    Lasso(X_train, y_train, dict_log_alpha["lasso"])
 ]
-
-
-def test_grad_search():
-    monitor = Monitor()
-    grad_search_CV(
-        X, y, Lasso, CV, ImplicitForward, log_alpha, monitor, n_outer=15)
 
 
 def test_cross_val_criterion():
     alpha_min = alpha_max / 10
     log_alpha_max = np.log(alpha_max)
     log_alpha_min = np.log(alpha_min)
-    # log_alpha0 = np.log(alpha_max / 10)
     max_iter = 10000
     n_alphas = 10
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
 
+    estimator = sklearn.linear_model.Lasso(
+        fit_intercept=False, max_iter=1000, warm_start=True)
     monitor_grid = Monitor()
-    criterion = CrossVal(X, y, Lasso, cv=kf)
-    algo = Forward(criterion, use_sk=True)
+    criterion = CrossVal(X, y, Lasso, cv=kf, estimator=estimator)
+    algo = Forward(criterion)
     grid_search(
         algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=n_alphas,
         tol=tol)
@@ -96,5 +89,4 @@ def test_cross_val_criterion():
 
 
 if __name__ == '__main__':
-    test_grad_search()
     test_cross_val_criterion()
