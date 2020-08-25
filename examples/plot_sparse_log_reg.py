@@ -59,8 +59,6 @@ max_iter = 100
 
 log_alpha0 = np.log(0.1 * alpha_max)
 tol = 1e-4
-use_sk = True
-# use_sk = False
 
 n_alphas = 10
 p_alphas = np.geomspace(1, 0.0001, n_alphas)
@@ -78,7 +76,7 @@ estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, solver='saga', max_iter=max_iter)
 model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = Logistic(X_val, y_val, model)
-algo_grid = Forward(criterion, use_sk=use_sk)
+algo_grid = Forward(criterion)
 monitor_grid = Monitor()
 grid_search(
     algo_grid, log_alpha_min, log_alpha_max, monitor_grid,
@@ -103,7 +101,7 @@ estimator = LogisticRegression(
 model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = Logistic(X_val, y_val, model)
 monitor_grad = Monitor()
-algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100, use_sk=use_sk)
+algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100)
 grad_search(algo, np.log(0.1 * alpha_max), monitor_grad, n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 

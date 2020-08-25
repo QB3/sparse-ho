@@ -73,7 +73,7 @@ print('scikit started')
 t0 = time.time()
 model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = Forward(criterion, use_sk=True)
+algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(
     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -92,7 +92,7 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion, use_sk=True)
+algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
