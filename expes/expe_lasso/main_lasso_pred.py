@@ -7,23 +7,38 @@ It is recommended to run this script on a cluster with several CPUs.
 import numpy as np
 from numpy.linalg import norm
 from joblib import Parallel, delayed
-import pandas
-from sparse_ho.utils import Monitor, WarmStart
-from sparse_ho.grid_search import grid_searchCV
-from sparse_ho.ho import grad_search
-from sparse_ho.bayesian import hyperopt_lasso
 from itertools import product
+import pandas
 
 from sparse_ho.datasets.real import get_data
 
+from sparse_ho.models import Lasso
+from sparse_ho.criterion import CV
+from sparse_ho.utils import Monitor
 
+from sparse_ho.forward import Forward
+from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.implicit import Implicit
+from sparse_ho.grid_search import grid_search
+# from sparse_ho.bayesian import hyperopt_lasso
+
+from sparse_ho.ho import grad_search
+
+
+#######################################################################
+n_jobs = 1
+
+#######################################################################
 dataset_names = ["rcv1"]
 # uncomment the following line to launch the experiments on other
 # datasets:
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
 methods = [
-    "implicit_forward", "implicit", "forward", 'grid_search', "bayesian",
-    "random"]
+    "implicit_forward",
+    # "implicit",
+    "forward", 'grid_search']
+        # "bayesian",
+        # "random"]
 tolerance_decreases = ["constant"]
 tols = [1e-5]
 n_outers = [75]
@@ -42,6 +57,11 @@ dict_n_outers["finance", "implicit"] = 6
 dict_n_outers["finance", "bayesian"] = 75
 dict_n_outers["finance", "random"] = 50
 
+dict_algo = {}
+dict_algo["implicit_forward"] = ImplicitForward
+dict_algo["implicit"] = Implicit
+dict_algo["forward"] = Forward
+
 
 def parallel_function(
         dataset_name, method, tol=1e-5, n_outer=50,
@@ -54,37 +74,40 @@ def parallel_function(
     alpha_max = np.abs(X_train.T @ y_train).max() / n_samples
     log_alpha0 = np.log(0.1 * alpha_max)
 
+    model = Lasso(X_train, y_train)
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    monitor = Monitor()
+
     try:
         n_outer = dict_n_outers[dataset_name, method]
     except Exception:
-        n_outer = 50
+        n_outer = 20
 
     if dataset_name == "rcv1":
         size_loop = 2
     else:
         size_loop = 1
-    for _ in range(size_loop):
-        monitor = Monitor()
-        warm_start = WarmStart()
 
+    for _ in range(size_loop):
         if method == 'grid_search':
-            n_alpha = 100
-            p_alphas = np.geomspace(1, 0.0001, n_alpha)
-            log_alphas = np.log(alpha_max * p_alphas)
-            grid_searchCV(
-                X_train, y_train, log_alphas, X_val, y_val, X_test,
-                y_test, tol, monitor)
+            algo = Forward(criterion)
+            log_alphas = np.log(np.geomspace(
+                alpha_max, alpha_max/1000, num=10))
+            grid_search(
+                algo, None, None, monitor, log_alphas=log_alphas,
+                tol=tol)
         elif method in ("bayesian", "random"):
-            monitor = hyperopt_lasso(
-                X_train, y_train, log_alpha0, X_val, y_val, X_test,
-                y_test, tol, max_evals=n_outer, method=method)
+            # TODO
+            1 / 0
+            # monitor = hyperopt_lasso(
+            #     X_train, y_train, log_alpha0, X_val, y_val, X_test,
+            #     y_test, tol, max_evals=n_outer, method=method)
         else:
             # do line search to find the optimal lambda
-            log_alpha, val, grad = grad_search(
-                X_train, y_train, log_alpha0, X_val, y_val, X_test,
-                y_test, tol, monitor, method=method, maxit=10000,
-                n_outer=n_outer, warm_start=warm_start, niter_jac=100)
-            del log_alpha, val, grad  # as not used
+            # import ipdb; ipdb.set_trace()
+            algo = dict_algo[method](criterion)
+            grad_search(
+                algo, log_alpha0, monitor, n_outer=n_outer, tol=tol)
 
     monitor.times = np.array(monitor.times)
     monitor.objs = np.array(monitor.objs)
@@ -97,7 +120,6 @@ def parallel_function(
 
 print("enter sequential")
 backend = 'loky'
-n_jobs = 1
 results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
     delayed(parallel_function)(
         dataset_name, method, n_outer=n_outer,
