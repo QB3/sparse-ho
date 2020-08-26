@@ -26,8 +26,8 @@ from sparse_ho.ho import grad_search
 
 #######################################################################
 dataset_names = ["rcv1"]
-dataset_names = ["20newsgroups"]
-dataset_names = ["finance"]
+# dataset_names = ["20newsgroups"]
+# dataset_names = ["finance"]
 # uncomment the following line to launch the experiments on other
 # datasets:
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
@@ -77,7 +77,6 @@ def parallel_function(
 
     model = Lasso(X_train, y_train)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    monitor = Monitor()
 
     try:
         n_outer = dict_n_outers[dataset_name, method]
@@ -90,6 +89,7 @@ def parallel_function(
         size_loop = 1
 
     for _ in range(size_loop):
+        monitor = Monitor()
         if method == 'grid_search':
             algo = Forward(criterion)
             log_alphas = np.log(np.geomspace(
@@ -110,13 +110,13 @@ def parallel_function(
             grad_search(
                 algo, log_alpha0, monitor, n_outer=n_outer, tol=tol)
 
-    monitor.times = np.array(monitor.times)
-    monitor.objs = np.array(monitor.objs)
-    monitor.objs_test = np.array(monitor.objs_test)
-    monitor.log_alphas = np.array(monitor.log_alphas)
-    return (dataset_name, method, tol, n_outer, tolerance_decrease,
-            monitor.times, monitor.objs, monitor.objs_test,
-            monitor.log_alphas, norm(y_val), norm(y_test))
+        monitor.times = np.array(monitor.times)
+        monitor.objs = np.array(monitor.objs)
+        monitor.objs_test = np.array(monitor.objs_test)
+        monitor.log_alphas = np.array(monitor.log_alphas)
+        return (dataset_name, method, tol, n_outer, tolerance_decrease,
+                monitor.times, monitor.objs, monitor.objs_test,
+                monitor.log_alphas, norm(y_val), norm(y_test))
 
 
 print("enter sequential")

@@ -59,7 +59,7 @@ markersize = 8
 
 dataset_names = ["rcv1"]
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
-dataset_names = ["rcv1", "20newsgroups"]
+# dataset_names = ["rcv1", "20newsgroups"]
 
 
 plt.close('all')
