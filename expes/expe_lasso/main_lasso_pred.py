@@ -8,7 +8,7 @@ import numpy as np
 from numpy.linalg import norm
 from joblib import Parallel, delayed
 from itertools import product
-import pandas
+import pandas as pd
 
 from sparse_ho.datasets.real import get_data
 
@@ -24,12 +24,10 @@ from sparse_ho.grid_search import grid_search
 
 from sparse_ho.ho import grad_search
 
-
-#######################################################################
-n_jobs = 1
-
 #######################################################################
 dataset_names = ["rcv1"]
+dataset_names = ["20newsgroups"]
+dataset_names = ["finance"]
 # uncomment the following line to launch the experiments on other
 # datasets:
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
@@ -43,6 +41,9 @@ tolerance_decreases = ["constant"]
 tols = [1e-7]
 n_outers = [75]
 
+#######################################################################
+n_jobs = 1
+# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
 
 dict_n_outers = {}
 dict_n_outers["20newsgroups", "implicit_forward"] = 50
@@ -129,21 +130,7 @@ results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
         dataset_names, methods, n_outers, tolerance_decreases))
 print('OK finished parallel')
 
-# uncomment the following lines to launch the code in parallel
-
-# print("enter parallel")
-# backend = 'loky'
-# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
-# results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
-#     delayed(parallel_function)(
-#         dataset_name, method, n_outer=n_outer,
-#         tolerance_decrease=tolerance_decrease)
-#     for dataset_name, method, n_outer,
-#     tolerance_decrease in product(
-#         dataset_names, methods, n_outers, tolerance_decreases))
-# print('OK finished parallel')
-
-df = pandas.DataFrame(results)
+df = pd.DataFrame(results)
 df.columns = [
     'dataset', 'method', 'tol', 'n_outer', 'tolerance_decrease',
     'times', 'objs', 'objs_test', 'log_alphas', 'norm y_val',

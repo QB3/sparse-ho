@@ -1,5 +1,5 @@
 import numpy as np
-import pandas
+import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -59,6 +59,7 @@ markersize = 8
 
 dataset_names = ["rcv1"]
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
+dataset_names = ["rcv1", "20newsgroups"]
 
 
 plt.close('all')
@@ -70,7 +71,7 @@ fig2, axarr2 = plt.subplots(
 
 
 for idx, dataset in enumerate(dataset_names):
-    df_data = pandas.read_pickle("%s.pkl" % dataset)
+    df_data = pd.read_pickle("%s.pkl" % dataset)
 
     df_data = df_data[df_data['tolerance_decrease'] == 'constant']
 
@@ -87,8 +88,7 @@ for idx, dataset in enumerate(dataset_names):
 
     min_objs = np.infty
     for obj in objs:
-        min_objs = np.minimum(min_objs, obj.min())
-        # obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
+        min_objs = min(min_objs, obj.min())
 
     lines = []
 
@@ -129,7 +129,7 @@ for idx, dataset in enumerate(dataset_names):
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
             axarr.flat[idx].semilogy(
-                time, (obj-min_objs),
+                time, obj - min_objs,
                 color=dict_color[method], label="%s" % (dict_method[method]),
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
@@ -167,12 +167,12 @@ for method in methods:
 
 fig3 = plt.figure(figsize=[18, 4])
 fig3.legend([l[0] for l in lines], labels,
-            ncol=6, loc='upper center', fontsize=fontsize-4)
+            ncol=6, loc='upper center', fontsize=fontsize - 4)
 fig3.tight_layout()
 fig3.show()
 
 fig4 = plt.figure(figsize=[18, 4])
 fig4.legend([l[0] for l in lines], labels,
-            ncol=3, loc='upper center', fontsize=fontsize-4)
+            ncol=3, loc='upper center', fontsize=fontsize - 4)
 fig4.tight_layout()
 fig4.show()

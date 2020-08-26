@@ -20,7 +20,7 @@ from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from sparse_ho.datasets.real import get_data
+from sparse_ho.datasets import get_data
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sparse_ho.implicit_forward import ImplicitForward
