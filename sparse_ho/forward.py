@@ -130,7 +130,7 @@ def get_beta_jac_iterdiff(
                 X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
 
         pobj.append(model._get_pobj(r, beta, alphas, y))
-        print(pobj[-1])
+        # print(pobj[-1])
 
         if i > 1:
             assert pobj[-1] - pobj[-2] <= 1e-2 * np.abs(pobj[0])

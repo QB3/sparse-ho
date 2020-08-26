@@ -40,7 +40,7 @@ methods = [
         # "bayesian",
         # "random"]
 tolerance_decreases = ["constant"]
-tols = [1e-5]
+tols = [1e-7]
 n_outers = [75]
 
 
@@ -92,7 +92,7 @@ def parallel_function(
         if method == 'grid_search':
             algo = Forward(criterion)
             log_alphas = np.log(np.geomspace(
-                alpha_max, alpha_max/1000, num=10))
+                alpha_max, alpha_max/1000, num=100))
             grid_search(
                 algo, None, None, monitor, log_alphas=log_alphas,
                 tol=tol)
