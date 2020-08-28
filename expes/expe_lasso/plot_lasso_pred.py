@@ -92,6 +92,7 @@ for idx, dataset in enumerate(dataset_names):
 
     lines = []
 
+    # plot for performance on test set
     plt.figure()
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
@@ -123,6 +124,7 @@ for idx, dataset in enumerate(dataset_names):
     axarr2.flat[idx].tick_params(labelsize=fontsize)
     axarr.flat[idx].tick_params(labelsize=fontsize)
 
+    # plot for objective minus optimum on validation set
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
         marker = dict_markers[method]

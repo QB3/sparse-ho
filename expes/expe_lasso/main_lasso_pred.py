@@ -25,6 +25,13 @@ from sparse_ho.grid_search import grid_search
 from sparse_ho.ho import grad_search
 
 #######################################################################
+n_jobs = 1
+# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
+#######################################################################
+
+
+
+#######################################################################
 dataset_names = ["rcv1"]
 # dataset_names = ["20newsgroups"]
 # dataset_names = ["finance"]
@@ -34,16 +41,12 @@ dataset_names = ["rcv1"]
 methods = [
     "implicit_forward",
     # "implicit",
-    "forward", 'grid_search']
-        # "bayesian",
-        # "random"]
+    "forward", 'grid_search',
+    "random"]  # "bayesian",
 tolerance_decreases = ["constant"]
 tols = [1e-7]
 n_outers = [75]
 
-#######################################################################
-n_jobs = 1
-# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
 
 dict_n_outers = {}
 dict_n_outers["20newsgroups", "implicit_forward"] = 50
@@ -73,6 +76,8 @@ def parallel_function(
     n_samples, _ = X_train.shape
     # compute alpha_max
     alpha_max = np.abs(X_train.T @ y_train).max() / n_samples
+    log_alpha_max = np.log(alpha_max)
+    log_alpha_min = np.log(alpha_max/1000)
     log_alpha0 = np.log(0.1 * alpha_max)
 
     model = Lasso(X_train, y_train)
@@ -97,6 +102,10 @@ def parallel_function(
             grid_search(
                 algo, None, None, monitor, log_alphas=log_alphas,
                 tol=tol)
+        elif method == 'random':
+            algo = Forward(criterion)
+            grid_search(
+                algo, log_alpha_max, log_alpha_min, monitor, tol=tol, max_evals=n_outer)
         elif method in ("bayesian", "random"):
             # TODO
             1 / 0
@@ -114,9 +123,9 @@ def parallel_function(
         monitor.objs = np.array(monitor.objs)
         monitor.objs_test = np.array(monitor.objs_test)
         monitor.log_alphas = np.array(monitor.log_alphas)
-        return (dataset_name, method, tol, n_outer, tolerance_decrease,
-                monitor.times, monitor.objs, monitor.objs_test,
-                monitor.log_alphas, norm(y_val), norm(y_test))
+    return (dataset_name, method, tol, n_outer, tolerance_decrease,
+            monitor.times, monitor.objs, monitor.objs_test,
+            monitor.log_alphas, norm(y_val), norm(y_test))
 
 
 print("enter sequential")
