@@ -44,22 +44,25 @@ dict_title["finance"] = "finance"
 dict_title["kdda_train"] = "kdda"
 dict_title["climate"] = "climate"
 dict_title["leukemia"] = "leukemia"
+dict_title["real-sim"] = "real-sim"
 
 dict_markevery = {}
 dict_markevery["20newsgroups"] = 5
 dict_markevery["finance"] = 10
 dict_markevery["rcv1"] = 1
+dict_markevery["real-sim"] = 1
 
 dict_n_feature = {}
 dict_n_feature["rcv1"] = r"($p=19,959$)"
+dict_n_feature["real-sim"] = r"($p=20,958$)"
 dict_n_feature["20newsgroups"] = r"($p=130,107$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
 
 markersize = 8
 
-dataset_names = ["rcv1"]
+# dataset_names = ["rcv1"]
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
-# dataset_names = ["rcv1", "20newsgroups"]
+dataset_names = ["rcv1", "real-sim", "20newsgroups"]
 
 
 plt.close('all')
@@ -73,6 +76,7 @@ fig2, axarr2 = plt.subplots(
 for idx, dataset in enumerate(dataset_names):
     df_data = pd.read_pickle("%s.pkl" % dataset)
 
+    # df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
     df_data = df_data[df_data['tolerance_decrease'] == 'constant']
 
     methods = df_data['method']
@@ -111,6 +115,10 @@ for idx, dataset in enumerate(dataset_names):
         axarr2.flat[idx].set_xlim(0, 1.3)
         axarr2.flat[idx].set_xticks((0, 0.5, 1))
         axarr2.flat[idx].set_yticks((0.1, 1))
+    elif dataset == "real-sim":
+        axarr2.flat[idx].set_xlim(0, 10)
+        axarr2.flat[idx].set_xticks((0, 5, 10))
+        axarr2.flat[idx].set_yticks((0.1, 1))
     elif dataset == "20newsgroups":
         axarr2.flat[idx].set_xlim(0, 15.5)
         axarr2.flat[idx].set_xticks((0, 5, 10, 15))
@@ -136,12 +144,16 @@ for idx, dataset in enumerate(dataset_names):
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
     if dataset == "rcv1":
-        axarr.flat[idx].set_xlim(0, 1.3)
-        axarr.flat[idx].set_xticks((0, 0.5, 1))
+        # axarr.flat[idx].set_xlim(0, 3)
+        axarr.flat[idx].set_xticks((0, 1, 2))
         axarr.flat[idx].set_yticks((0.00001, 0.0001, 0.001, 0.01, 0.1, 1))
     elif dataset == "20newsgroups":
         axarr.flat[idx].set_xlim(0, 15.5)
         axarr.flat[idx].set_xticks((0, 5, 10, 15))
+        axarr.flat[idx].set_yticks((0.001, 0.01, 0.1, 1, 10, 100))
+    elif dataset == "real-sim":
+        axarr.flat[idx].set_xlim(0, 10)
+        axarr.flat[idx].set_xticks((0, 5, 10))
         axarr.flat[idx].set_yticks((0.001, 0.01, 0.1, 1, 10, 100))
     elif dataset == "finance":
         axarr.flat[idx].set_xlim(0, 390)
@@ -149,6 +161,9 @@ for idx, dataset in enumerate(dataset_names):
         axarr.flat[idx].set_yticks((0.0001, 0.001, 0.01, 0.1, 1, 10))
 
     axarr.flat[idx].set_title("%s %s" % (
+        dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
+
+    axarr2.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
     # axarr.flat[idx].title.set_text(dict_title[dataset], size=18)
 

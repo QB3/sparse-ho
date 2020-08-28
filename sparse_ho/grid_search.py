@@ -59,14 +59,12 @@ def grid_search(
             log_alpha = log_alphas[i]
         if samp == "lhs":
             log_alpha = log_alpha[0]
-        g_func = algo.criterion.get_val(
-            log_alpha, tol=tol)
+        # g_func = algo.criterion.get_val(
+        #     log_alpha, tol=tol)
         # log_alpha, tol=algo.criterion.model.tol,
         # beta_star=beta_star, compute_jac=False)
-        # g_func, grad_lambda = algo.get_val_grad(
-        #     log_alpha, tol=tol,
-        #     # log_alpha, tol=algo.criterion.model.tol,
-        #     beta_star=beta_star, compute_jac=False)
+        g_func, grad_lambda = algo.get_val_grad(
+            log_alpha, tol=tol, beta_star=beta_star, compute_jac=False)
 
         if g_func < min_g_func:
             min_g_func = g_func

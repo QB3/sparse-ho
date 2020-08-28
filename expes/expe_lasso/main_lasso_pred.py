@@ -20,20 +20,18 @@ from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
 from sparse_ho.grid_search import grid_search
+from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
 # from sparse_ho.bayesian import hyperopt_lasso
 
 from sparse_ho.ho import grad_search
 
-#######################################################################
-n_jobs = 1
-# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
-#######################################################################
 
 
 
 #######################################################################
-dataset_names = ["rcv1"]
-# dataset_names = ["20newsgroups"]
+# dataset_names = ["rcv1"]
+# dataset_names = ["real-sim"]
+dataset_names = ["20newsgroups"]
 # dataset_names = ["finance"]
 # uncomment the following line to launch the experiments on other
 # datasets:
@@ -41,12 +39,12 @@ dataset_names = ["rcv1"]
 methods = [
     "implicit_forward",
     # "implicit",
-    "forward", 'grid_search',
-    "random"]  # "bayesian",
+    "forward", 'grid_search', "bayesian", "random"]
+# tolerance_decreases = ["exponential"]
 tolerance_decreases = ["constant"]
 tols = [1e-7]
 n_outers = [75]
-
+n_alphas = 100
 
 dict_n_outers = {}
 dict_n_outers["20newsgroups", "implicit_forward"] = 50
@@ -65,6 +63,14 @@ dict_algo = {}
 dict_algo["implicit_forward"] = ImplicitForward
 dict_algo["implicit"] = Implicit
 dict_algo["forward"] = Forward
+dict_algo["random"] = Forward
+dict_algo["bayesian"] = Forward
+dict_algo["grid_search"] = Forward
+
+#######################################################################
+n_jobs = 1
+# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
+#######################################################################
 
 
 def parallel_function(
@@ -81,43 +87,40 @@ def parallel_function(
     log_alpha0 = np.log(0.1 * alpha_max)
 
     model = Lasso(X_train, y_train)
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 
     try:
         n_outer = dict_n_outers[dataset_name, method]
     except Exception:
         n_outer = 20
 
-    if dataset_name == "rcv1":
-        size_loop = 2
-    else:
-        size_loop = 1
+    size_loop = 2
+    # if dataset_name == "rcv1":
+    #     size_loop = 2
+    # else:
+    #     size_loop = 1
 
     for _ in range(size_loop):
+        criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+        algo = dict_algo[method](criterion)
         monitor = Monitor()
         if method == 'grid_search':
-            algo = Forward(criterion)
             log_alphas = np.log(np.geomspace(
                 alpha_max, alpha_max/1000, num=100))
             grid_search(
                 algo, None, None, monitor, log_alphas=log_alphas,
                 tol=tol)
         elif method == 'random':
-            algo = Forward(criterion)
             grid_search(
-                algo, log_alpha_max, log_alpha_min, monitor, tol=tol, max_evals=n_outer)
-        elif method in ("bayesian", "random"):
-            # TODO
-            1 / 0
-            # monitor = hyperopt_lasso(
-            #     X_train, y_train, log_alpha0, X_val, y_val, X_test,
-            #     y_test, tol, max_evals=n_outer, method=method)
+                algo, log_alpha_max, log_alpha_min, monitor, tol=tol, max_evals=n_alphas)
+        elif method in ("bayesian"):
+            hyperopt_wrapper(
+                algo, log_alpha_min, log_alpha_max, monitor,
+                max_evals=n_alphas, tol=tol, method='bayesian')
         else:
             # do line search to find the optimal lambda
-            # import ipdb; ipdb.set_trace()
-            algo = dict_algo[method](criterion)
             grad_search(
-                algo, log_alpha0, monitor, n_outer=n_outer, tol=tol)
+                algo, log_alpha0, monitor, n_outer=n_outer, tol=tol,
+                tolerance_decrease=tolerance_decrease)
 
         monitor.times = np.array(monitor.times)
         monitor.objs = np.array(monitor.objs)
