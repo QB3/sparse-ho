@@ -139,7 +139,7 @@ def solver(
     # alpha0 = 0.7 * alpha_max
     log_alpha0 = np.log(alpha0)
 
-    tol = 1e-5
+    tol = 1e-9
     criterion = "sure"
     n_outer = 10
 
@@ -188,11 +188,11 @@ if __name__ == '__main__':
     forward = mne.read_forward_solution(fwd_fname)
 
     loose, depth = 0., .8  # corresponds to free orientation
-    stc, monitor = apply_solver(
-        solver, evoked, forward, noise_cov, loose, depth)
+    stc_wlasso, monitor = apply_solver(
+        evoked, forward, noise_cov, loose, depth, model="wlasso")
     print("Value of objectives:")
     print(monitor.objs)
     ###############################################################################
     # View in 2D and 3D ("glass" brain like 3D plot)
     plot_sparse_source_estimates(
-        forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
+        forward['src'], stc_wlasso, bgcolor=(1, 1, 1), opacity=0.1)
