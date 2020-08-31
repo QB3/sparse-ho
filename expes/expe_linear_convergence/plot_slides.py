@@ -1,16 +1,15 @@
 # import numpy as np
+import os
 import pandas
 # import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
 
-
 # save_fig = False
 save_fig = True
-fig_dir = "../../../CD_SUGAR/tex/ICML2020slides/prebuiltimages/"
-fig_dir_svg = "../../../CD_SUGAR/tex/ICML2020slides/images/"
-
+fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
 
 configure_plt()
 
@@ -33,6 +32,8 @@ plt.close('all')
 fig, axarr = plt.subplots(
     2, 4, sharex=False, sharey=False, figsize=[14, 8],)
 
+lines = []
+
 
 for idx, dataset in enumerate(dataset_names):
     df_data = pandas.read_pickle("%s.pkl" % dataset)
@@ -41,7 +42,8 @@ for idx, dataset in enumerate(dataset_names):
     supp_id = df_data["supp_id"].to_numpy()[0]
     #
     axarr.flat[idx].semilogy(diff_beta)
-    axarr.flat[idx].axvline(x=supp_id, c='red', linestyle="--")
+    lines.append(axarr.flat[idx].axvline(
+        x=supp_id, c='red', linestyle="--", label="Support identification"))
 
     axarr.flat[idx+4].semilogy(diff_jac)
     axarr.flat[idx+4].axvline(x=supp_id, c='red', linestyle="--")
@@ -66,3 +68,29 @@ if save_fig:
     fig.savefig(
         fig_dir_svg + "linear_convergence_lasso.svg", bbox_inches="tight")
 fig.show()
+
+
+labels = ["Support identification"]
+
+fig3 = plt.figure(figsize=[18, 4])
+fig3.legend([l for l in lines], labels,
+            ncol=1, loc='upper center', fontsize=fontsize-4)  # , frameon=False)
+fig3.tight_layout()
+if save_fig:
+    fig3.savefig(
+        fig_dir + "linear_convergence_lasso_legend.pdf",
+        bbox_inches="tight")
+    fig3.savefig(
+        fig_dir_svg + "linear_convergence_lasso_legend.svg",
+        bbox_inches="tight")
+fig3.show()
+
+# fig4 = plt.figure(figsize=[18, 4])
+# fig4.legend([l[0] for l in lines], labels,
+# # fig2.legend([l[0] for l in lines],
+#             ncol=3, loc='upper center', fontsize=fontsize-4)  # , frameon=False)
+# fig4.tight_layout()
+# if save_fig:
+#     fig4.savefig(fig_dir + "lasso_pred_legend_2_columns.pdf", bbox_inches="tight")
+#     fig4.savefig(fig_dir_svg + "lasso_pred_legend_2_columns.svg", bbox_inches="tight")
+# fig4.show()
