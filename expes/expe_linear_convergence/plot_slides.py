@@ -28,45 +28,52 @@ dict_title["leu"] = "Leukemia"
 dict_title["real-sim"] = "real-sim"
 
 plt.close('all')
-fig, axarr = plt.subplots(
-    2, 4, sharex=False, sharey=False, figsize=[14, 8],)
 
-lines = []
+model_names = ["lasso", "logreg", "svm"]
 
 
-for idx, dataset in enumerate(dataset_names):
-    df_data = pandas.read_pickle("%s.pkl" % dataset)
-    diff_beta = df_data["diff_beta"].to_numpy()[0]
-    diff_jac = df_data["diff_jac"].to_numpy()[0]
-    supp_id = df_data["supp_id"].to_numpy()[0]
-    #
-    axarr.flat[idx].semilogy(diff_beta)
-    lines.append(axarr.flat[idx].axvline(
-        x=supp_id, c='red', linestyle="--", label="Support identification"))
+for model_name in model_names:
 
-    axarr.flat[idx+4].semilogy(diff_jac)
-    axarr.flat[idx+4].axvline(x=supp_id, c='red', linestyle="--")
+    fig, axarr = plt.subplots(
+        2, 4, sharex=False, sharey=False, figsize=[14, 8],)
 
-    axarr.flat[idx+4].set_xlabel(r"$\#$ epochs", size=fontsize)
+    lines = []
 
-    axarr.flat[idx].set_title("%s" % (
-        dict_title[dataset]), size=fontsize)
-    # xarr.flat[idx].set_title("%s %s" % (
-    #     dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
+    for idx, dataset in enumerate(dataset_names):
+        df_data = pandas.read_pickle("%s_%s.pkl" % (dataset, model_name))
+        diff_beta = df_data["diff_beta"].to_numpy()[0]
+        diff_jac = df_data["diff_jac"].to_numpy()[0]
+        supp_id = df_data["supp_id"].to_numpy()[0]
+        #
+        axarr.flat[idx].semilogy(diff_beta)
+        lines.append(axarr.flat[idx].axvline(
+            x=supp_id, c='red', linestyle="--", label="Support identification"))
 
-axarr.flat[0].set_ylabel(
-    r"$||\beta^{(k)} - \hat \beta||$", fontsize=fontsize)
-axarr.flat[4].set_ylabel(
-    r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$", fontsize=fontsize)
+        axarr.flat[idx+4].semilogy(diff_jac)
+        axarr.flat[idx+4].axvline(x=supp_id, c='red', linestyle="--")
 
-fig.tight_layout()
+        axarr.flat[idx+4].set_xlabel(r"$\#$ epochs", size=fontsize)
 
-if save_fig:
-    fig.savefig(
-        fig_dir + "linear_convergence_lasso.pdf", bbox_inches="tight")
-    fig.savefig(
-        fig_dir_svg + "linear_convergence_lasso.svg", bbox_inches="tight")
-fig.show()
+        axarr.flat[idx].set_title("%s" % (
+            dict_title[dataset]), size=fontsize)
+        # xarr.flat[idx].set_title("%s %s" % (
+        #     dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
+
+    axarr.flat[0].set_ylabel(
+        r"$||\beta^{(k)} - \hat \beta||$", fontsize=fontsize)
+    axarr.flat[4].set_ylabel(
+        r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$", fontsize=fontsize)
+
+    fig.tight_layout()
+
+    if save_fig:
+        fig.savefig(
+            fig_dir + "linear_convergence_%s.pdf" % model_name,
+            bbox_inches="tight")
+        fig.savefig(
+            fig_dir_svg + "linear_convergence_%s.svg" % model_name,
+            bbox_inches="tight")
+    fig.show()
 
 
 labels = ["Support identification"]
