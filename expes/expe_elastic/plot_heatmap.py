@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sparse_ho.utils_plot import configure_plt
 
-# save_fig = True
-save_fig = False
+save_fig = True
+# save_fig = False
 fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
 
@@ -48,46 +48,40 @@ fontsize = 15
 # plt.show(block=False)
 
 
-plt.figure()
 plt.set_cmap(plt.cm.viridis)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, Z.T, levels)
 ax.scatter(
-    X, Y, s=10, c="orange", marker="o")
+    X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)")
 # cp.ax.tick_params(labelsize=2)
 ax.scatter(
     alphas_grad[:, 0]/alpha_max,
     alphas_grad[:, 1]/alpha_max,
-    # np.log10(alphas_grad[:, 0]/alpha_max),
-    # np.log10(alphas_grad[:, 1]/alpha_max),
-    s=100, color=[plt.cm.Reds((i + 1) / len(objs_grad)) for i in np.arange(
-        len(objs_grad))], marker="x")
+    s=100, color=[plt.cm.Reds((i + len(objs_grad) / 5 + 1) / len(objs_grad)) for i in np.arange(
+        len(objs_grad))], marker="x", label="$1$st order")
+# ax.scatter(
+#     alphas_grad[-1, 0]/alpha_max,
+#     alphas_grad[-1, 1]/alpha_max,
+#     s=100, color=[plt.cm.Reds(1.0)], marker="x", label="$1$st order")
 cb = fig.colorbar(cp)
 for t in cb.ax.get_yticklabels():
     t.set_fontsize(fontsize)
 ax.set_xlim(alpha_1.min()/alpha_max, alpha_1.max()/alpha_max)
 ax.set_ylim(alpha_2.min()/alpha_max, alpha_2.max()/alpha_max)
-# plt.axis('equal')
-# plt.xlim(alpha_1.min(), alpha_1.max())
-# plt.ylim(alpha_2.min(), alpha_2.max())
 plt.xscale('log')
 plt.yscale('log')
-# plt.title(r'Real-sim dataset, elastic net: $\min_\beta \frac{1}{2n} ||y-X\beta||^2 + \lambda_1||\beta||_1 + \frac{\lambda_2}{2}||\beta||_2^2$')
-# fig.legend()
+fig.legend(loc=2, ncol=2, fontsize=fontsize, bbox_to_anchor=(0.1653, 1))
 ax.set_xlabel(r'$\lambda_1 / \lambda_\max$', fontsize=fontsize)
 ax.set_ylabel(r'$\lambda_2 / \lambda_\max$', fontsize=fontsize)
 # ax.set_xticklabels(fontsize=fontsize)
 plt.xticks(fontsize=fontsize)
 plt.yticks(fontsize=fontsize)
-
-plt.tight_layout()
+# plt.tight_layout()
 
 if save_fig:
     fig.savefig(
         fig_dir + "held_out_real_sim_enet.pdf", bbox_inches="tight")
     fig.savefig(
         fig_dir_svg + "held_out_real_sim_enet.svg", bbox_inches="tight")
-fig.show()
 
-plt.tight_layout()
 plt.show(block=False)
