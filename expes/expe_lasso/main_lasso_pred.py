@@ -32,7 +32,7 @@ from sparse_ho.ho import grad_search
 # dataset_names = ["rcv1"]
 # dataset_names = ["real-sim"]
 dataset_names = ["20newsgroups"]
-# dataset_names = ["finance"]
+# dataset_names = ["leukemia"]
 # uncomment the following line to launch the experiments on other
 # datasets:
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
@@ -68,8 +68,9 @@ dict_algo["bayesian"] = Forward
 dict_algo["grid_search"] = Forward
 
 #######################################################################
-n_jobs = 1
-# n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
+# n_jobs = 1
+n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
+n_jobs = min(n_jobs, 10)
 #######################################################################
 
 
@@ -83,7 +84,7 @@ def parallel_function(
     # compute alpha_max
     alpha_max = np.abs(X_train.T @ y_train).max() / n_samples
     log_alpha_max = np.log(alpha_max)
-    log_alpha_min = np.log(alpha_max/1000)
+    log_alpha_min = np.log(alpha_max/10000)
     log_alpha0 = np.log(0.1 * alpha_max)
 
     model = Lasso(X_train, y_train)
@@ -128,7 +129,7 @@ def parallel_function(
         monitor.log_alphas = np.array(monitor.log_alphas)
     return (dataset_name, method, tol, n_outer, tolerance_decrease,
             monitor.times, monitor.objs, monitor.objs_test,
-            monitor.log_alphas, norm(y_val), norm(y_test))
+            monitor.log_alphas, norm(y_val), norm(y_test), log_alpha_max)
 
 
 print("enter sequential")
@@ -146,7 +147,7 @@ df = pd.DataFrame(results)
 df.columns = [
     'dataset', 'method', 'tol', 'n_outer', 'tolerance_decrease',
     'times', 'objs', 'objs_test', 'log_alphas', 'norm y_val',
-    'norm y_test']
+    'norm y_test', 'log_alpha_max']
 
 for dataset_name in dataset_names:
     df[df['dataset'] == dataset_name].to_pickle(
