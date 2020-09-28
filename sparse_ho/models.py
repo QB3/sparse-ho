@@ -436,8 +436,8 @@ class wLasso():
             dbeta[j, j] -= alpha[j] * sign_beta[j] / L[j]
             dr[idx_nz] -= np.outer(Xjs, (dbeta[j] - dbeta_old))
 
+    # @njit
     @staticmethod
-    @njit
     def _reduce_alpha(alpha, mask):
         return alpha[mask]
 
