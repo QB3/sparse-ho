@@ -19,7 +19,7 @@ dataset_names = ["rcv1"]
 # dataset_names = ["20news"]
 
 # methods = ["grid_search"]
-methods = ["implicit_forward", "implicit", "forward",
+methods = ["implicit_forward", "forward",
            "grid_search", "random"]
 # "grid_search",
 tolerance_decreases = ["constant"]
@@ -64,7 +64,7 @@ def parallel_function(
     else:
         size_loop = 2
     model = SparseLogreg(
-        X_train, y_train, log_alpha0, log_alpha_max, max_iter=1000, tol=tol)
+        X_train, y_train, max_iter=1000, log_alpha_max=log_alpha_max)
     for i in range(size_loop):
         monitor = Monitor()
 
@@ -101,9 +101,10 @@ def parallel_function(
         elif method == "grid_search":
             criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
-            log_alpha_min = np.log(alpha_min)
+            # log_alpha_min = np.log(alpha_min)
+            log_alphas = np.log(np.geomspace(alpha_max, alpha_min, num=100))
             log_alpha_opt, min_g_func = grid_search(
-                algo, None, None, monitor, max_evals=100, tol=tol, samp="grid",
+                algo, None, None, monitor, tol=tol, samp="grid",
                 t_max=dict_t_max[dataset_name], log_alphas=log_alphas)
             print(log_alpha_opt)
 

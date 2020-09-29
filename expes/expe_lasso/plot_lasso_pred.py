@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -74,14 +74,37 @@ dict_n_feature["rcv1"] = r"($p=19,959$)"
 dict_n_feature["real-sim"] = r"($p=20,958$)"
 dict_n_feature["20newsgroups"] = r"($p=130,107$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
-# dict_n_feature["leukemia"] = r"($plop$)"
+dict_n_feature["leukemia"] = r"($p=7129$)"
+
+dict_xmax = {}
+dict_xmax["logreg", "rcv1"] = 20
+dict_xmax["logreg", "real-sim"] = 30
+dict_xmax["logreg", "leukemia"] = 5
+dict_xmax["logreg", "20newsgroups"] = None
+
+dict_xmax["lasso", "rcv1"] = 5
+dict_xmax["lasso", "real-sim"] = 10
+dict_xmax["lasso", "leukemia"] = 5
+dict_xmax["lasso", "20newsgroups"] = 15
+
+dict_xticks = {}
+dict_xticks["lasso", "rcv1"] = (-6, -4, -2, 0)
+dict_xticks["lasso", "real-sim"] = (-6, -4, -2, 0)
+dict_xticks["lasso", "leukemia"] = (-6, -4, -2, 0)
+dict_xticks["lasso", "20newsgroups"] = (-8, -6, -4, -2, 0)
+
+dict_xticks["logreg", "rcv1"] = (-8, -6, -4, -2, 0)
+dict_xticks["logreg", "real-sim"] = (-8, -6, -4, -2, 0)
+dict_xticks["logreg", "leukemia"] = (-8, -6, -4, -2, 0)
+dict_xticks["logreg", "20newsgroups"] = (-8, -6, -4, -2, 0)
 
 markersize = 8
 
 # dataset_names = ["rcv1"]
 # dataset_names = ["rcv1", "20newsgroups", "finance"]
 # dataset_names = ["rcv1", "real-sim"]
-dataset_names = ["rcv1", "real-sim", "20newsgroups"]
+dataset_names = ["leukemia", "rcv1", "real-sim"]
+# dataset_names = ["rcv1", "real-sim", "20newsgroups"]
 
 
 plt.close('all')
@@ -94,9 +117,12 @@ fig_test, axarr_test = plt.subplots(
 fig_grad, axarr_grad = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
 
+# model_name = "lasso"
+model_name = "logreg"
 
 for idx, dataset in enumerate(dataset_names):
-    df_data = pd.read_pickle("%s.pkl" % dataset)
+    df_data = pd.read_pickle("%s_%s.pkl" % (model_name, dataset))
+    # df_data = pd.read_pickle("%s.pkl" % dataset)
 
     # df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
     df_data = df_data[df_data['tolerance_decrease'] == 'constant']
@@ -106,7 +132,8 @@ for idx, dataset in enumerate(dataset_names):
     objs = df_data['objs']
     objs_tests = df_data['objs_test']
     log_alphas = df_data['log_alphas']
-    log_alpha_max = df_data['log_alpha_max'][0]
+    # log_alpha_max = df_data['log_alpha_max'][0]
+    log_alpha_max = df_data['log_alpha_max'].to_numpy()[0]
     tols = df_data['tolerance_decrease']
     norm_y_vals = df_data['norm y_val']
     norm_val = 0
@@ -123,33 +150,19 @@ for idx, dataset in enumerate(dataset_names):
     plt.figure()
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
-        assert not np.allclose(obj, objs_test)
+        # assert not np.allclose(obj, objs_test)
         marker = dict_markers[method]
         objs_test = [np.min(
             objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
-        axarr_test.flat[idx].semilogy(
+        # axarr_test.flat[idx].semilogy(
+        axarr_test.flat[idx].plot(
             time, objs_test, color=dict_color[method],
             label="%s" % (dict_method[method]),
-            # label="%s, %s" % (dict_method[method], tol),
             marker=marker, markersize=markersize,
             markevery=dict_markevery[dataset])
 
-    if dataset == "rcv1":
-        axarr_test.flat[idx].set_xlim(0, 2)
-        axarr_test.flat[idx].set_xticks((0, 0.5, 1))
-        axarr_test.flat[idx].set_yticks((0.1, 1))
-    elif dataset == "real-sim":
-        axarr_test.flat[idx].set_xlim(0, 10)
-        axarr_test.flat[idx].set_xticks((0, 5, 10))
-        axarr_test.flat[idx].set_yticks((0.1, 1))
-    elif dataset == "20newsgroups":
-        axarr_test.flat[idx].set_xlim(0, 15.5)
-        axarr_test.flat[idx].set_xticks((0, 5, 10, 15))
-        axarr_test.flat[idx].set_yticks((10, 100))
-    elif dataset == "finance":
-        axarr_test.flat[idx].set_xlim(0, 390)
-        axarr_test.flat[idx].set_xticks((0, 100, 200, 300))
-        axarr_test.flat[idx].set_yticks((0.1, 1, 10))
+    axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
+    # axarr_test.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
     axarr_grad.flat[idx].set_xlabel(r"$\lambda - \lambda_\max$", fontsize=fontsize)
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
@@ -170,21 +183,22 @@ for idx, dataset in enumerate(dataset_names):
                 color = [plt.cm.Greens((
                     i+len(obj)/1.1) / len(
                         obj) / 2) for i in np.arange(len(obj))]
-                s = 30
+                s = 100
             # axarr_grad.flat[idx].plot(
             axarr_grad.flat[idx].scatter(
                 np.array(log_alpha) - log_alpha_max, obj, color=color,
                 label="%s" % (dict_method[method]),
                 marker=marker, s=s)
                 # markevery=markevery)
-            axarr_grad.flat[idx].set_xticks((-6, -4, -2, 0))
+            axarr_grad.flat[idx].set_xticks(dict_xticks[model_name, dataset])
     # plot for objective minus optimum on validation set
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            axarr_val.flat[idx].semilogy(
+            # axarr_val.flat[idx].semilogy(
+            axarr_val.flat[idx].plot(
                 time, obj,
                 color=dict_color[method], label="%s" % (dict_method[method]),
                 marker=marker, markersize=markersize,
@@ -194,26 +208,9 @@ for idx, dataset in enumerate(dataset_names):
             #     color=dict_color[method], label="%s" % (dict_method[method]),
             #     marker=marker, markersize=markersize,
             #     markevery=dict_markevery[dataset]))
-    if dataset == "rcv1":
-        axarr_val.flat[idx].set_xlim(0, 2)
-        axarr_val.flat[idx].set_xticks((0, 1, 2))
-        axarr_val.flat[idx].set_yticks((0.1, 1))
-        # axarr_val.flat[idx].set_yticks((0.00001, 0.0001, 0.001, 0.01, 0.1, 1))
-    elif dataset == "20newsgroups":
-        axarr_val.flat[idx].set_xlim(0, 15.5)
-        axarr_val.flat[idx].set_xticks((0, 5, 10, 15))
-        # axarr_val.flat[idx].set_yticks((0.001, 0.01, 0.1, 1, 10, 100))
-    elif dataset == "real-sim":
-        axarr_val.flat[idx].set_xlim(0, 10)
-        axarr_val.flat[idx].set_xticks((0, 5, 10))
-        axarr_val.flat[idx].set_yticks((0.1, 1))
-        # axarr_val.flat[idx].set_yticks((0.001, 0.01, 0.1, 1, 10, 100))
-    elif dataset == "finance":
-        axarr_val.flat[idx].set_xlim(0, 390)
-        axarr_val.flat[idx].set_xticks((0, 100, 200, 300))
-        # axarr_val.flat[idx].set_yticks((0.0001, 0.001, 0.01, 0.1, 1, 10))
+    axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
+    # axarr_val.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
-    # axarr_val.flat[idx].set_title("%s %s" % (
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
@@ -231,17 +228,18 @@ fig_test.tight_layout()
 fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
-        fig_dir + "lasso_val.pdf", bbox_inches="tight")
+        fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
     fig_val.savefig(
-        fig_dir_svg + "lasso_val.svg", bbox_inches="tight")
+        fig_dir_svg + "%s_val.svg" % model_name, bbox_inches="tight")
     fig_test.savefig(
-        fig_dir + "lasso_test.pdf", bbox_inches="tight")
+        fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
     fig_test.savefig(
-        fig_dir_svg + "lasso_test.svg", bbox_inches="tight")
+        fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
     fig_grad.savefig(
-        fig_dir + "lasso_val_grad.pdf", bbox_inches="tight")
+        fig_dir + "%s_val_grad.pdf" % model_name, bbox_inches="tight")
     fig_grad.savefig(
-        fig_dir_svg + "lasso_val_grad.svg", bbox_inches="tight")
+        fig_dir_svg + "%s_lasso_val_grad.svg" % model_name,
+        bbox_inches="tight")
 
 
 fig_val.show()

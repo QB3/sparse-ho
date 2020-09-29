@@ -12,8 +12,8 @@ import pandas as pd
 
 from sparse_ho.datasets.real import get_data
 
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import CV
+from sparse_ho.models import Lasso, SparseLogreg
+from sparse_ho.criterion import CV, Logistic
 from sparse_ho.utils import Monitor
 
 from sparse_ho.forward import Forward
@@ -25,11 +25,17 @@ from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
 
 from sparse_ho.ho import grad_search
 
+model_name = "lasso"
+# model_name = "logreg"
 
-
+dict_t_max = {}
+dict_t_max["rcv1"] = 50
+dict_t_max["real-sim"] = 100
+dict_t_max["leukemia"] = 10
+dict_t_max["20newsgroups"] = 300
 
 #######################################################################
-# dataset_names = ["rcv1"]
+# dataset_names = ["rcv1", "real-sim", "20newsgroups"]
 # dataset_names = ["real-sim"]
 dataset_names = ["20newsgroups"]
 # dataset_names = ["leukemia"]
@@ -70,7 +76,7 @@ dict_algo["grid_search"] = Forward
 #######################################################################
 # n_jobs = 1
 n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
-n_jobs = min(n_jobs, 10)
+n_jobs = min(n_jobs, 1)
 #######################################################################
 
 
@@ -83,11 +89,18 @@ def parallel_function(
     n_samples, _ = X_train.shape
     # compute alpha_max
     alpha_max = np.abs(X_train.T @ y_train).max() / n_samples
+
+    if model_name == "logreg":
+        alpha_max /= 2
+    alpha_min = alpha_max / 10_000
     log_alpha_max = np.log(alpha_max)
-    log_alpha_min = np.log(alpha_max/10000)
+    log_alpha_min = np.log(alpha_min)
     log_alpha0 = np.log(0.1 * alpha_max)
 
-    model = Lasso(X_train, y_train)
+    if model_name == "lasso":
+        model = Lasso(X_train, y_train)
+    elif model_name == "logreg":
+        model = SparseLogreg(X_train, y_train)
 
     try:
         n_outer = dict_n_outers[dataset_name, method]
@@ -95,33 +108,34 @@ def parallel_function(
         n_outer = 20
 
     size_loop = 2
-    # if dataset_name == "rcv1":
-    #     size_loop = 2
-    # else:
-    #     size_loop = 1
 
     for _ in range(size_loop):
-        criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+        if model_name == "lasso":
+            criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+        elif model_name == "logreg":
+            criterion = Logistic(
+                X_val, y_val, model, X_test=X_test, y_test=y_test)
         algo = dict_algo[method](criterion)
         monitor = Monitor()
         if method == 'grid_search':
-            log_alphas = np.log(np.geomspace(
-                alpha_max, alpha_max/1000, num=100))
+            log_alphas = np.log(np.geomspace(alpha_max, alpha_min, num=100))
             grid_search(
                 algo, None, None, monitor, log_alphas=log_alphas,
                 tol=tol)
         elif method == 'random':
             grid_search(
-                algo, log_alpha_max, log_alpha_min, monitor, tol=tol, max_evals=n_alphas)
+                algo, log_alpha_max, log_alpha_min, monitor, tol=tol, max_evals=n_alphas, t_max=dict_t_max[dataset_name])
         elif method in ("bayesian"):
             hyperopt_wrapper(
                 algo, log_alpha_min, log_alpha_max, monitor,
-                max_evals=n_alphas, tol=tol, method='bayesian')
+                max_evals=n_alphas, tol=tol, method='bayesian',
+                t_max=dict_t_max[dataset_name])
         else:
             # do line search to find the optimal lambda
             grad_search(
                 algo, log_alpha0, monitor, n_outer=n_outer, tol=tol,
-                tolerance_decrease=tolerance_decrease)
+                tolerance_decrease=tolerance_decrease,
+                t_max=dict_t_max[dataset_name])
 
         monitor.times = np.array(monitor.times)
         monitor.objs = np.array(monitor.objs)
@@ -129,7 +143,8 @@ def parallel_function(
         monitor.log_alphas = np.array(monitor.log_alphas)
     return (dataset_name, method, tol, n_outer, tolerance_decrease,
             monitor.times, monitor.objs, monitor.objs_test,
-            monitor.log_alphas, norm(y_val), norm(y_test), log_alpha_max)
+            monitor.log_alphas, norm(y_val), norm(y_test), log_alpha_max,
+            model_name)
 
 
 print("enter sequential")
@@ -147,8 +162,8 @@ df = pd.DataFrame(results)
 df.columns = [
     'dataset', 'method', 'tol', 'n_outer', 'tolerance_decrease',
     'times', 'objs', 'objs_test', 'log_alphas', 'norm y_val',
-    'norm y_test', 'log_alpha_max']
+    'norm y_test', 'log_alpha_max', 'model_name']
 
 for dataset_name in dataset_names:
     df[df['dataset'] == dataset_name].to_pickle(
-        "%s.pkl" % dataset_name)
+        "%s_%s.pkl" % (model_name, dataset_name))
