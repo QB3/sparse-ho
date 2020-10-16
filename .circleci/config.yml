@@ -28,11 +28,16 @@ jobs:
                 git fetch upstream master;
               fi
 
-        # Load our data
+        # If all keys are in the same command only one is restored
+        # thx @mathurinm
         - restore_cache:
             keys:
               - data-cache-0
+        - restore_cache:
+            keys:
               - pip-cache
+        - restore_cache:
+            keys:
               - sparse_ho_data
 
         - run:
