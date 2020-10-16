@@ -189,7 +189,6 @@ for idx, dataset in enumerate(dataset_names):
                 np.array(log_alpha) - log_alpha_max, obj, color=color,
                 label="%s" % (dict_method[method]),
                 marker=marker, s=s)
-                # markevery=markevery)
             axarr_grad.flat[idx].set_xticks(dict_xticks[model_name, dataset])
     # plot for objective minus optimum on validation set
     for i, (time, obj, method, tol) in enumerate(
@@ -197,26 +196,15 @@ for idx, dataset in enumerate(dataset_names):
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            # axarr_val.flat[idx].semilogy(
             axarr_val.flat[idx].plot(
                 time, obj,
                 color=dict_color[method], label="%s" % (dict_method[method]),
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
-            # axarr_val.flat[idx].semilogy(
-            #     time, obj - min_objs,
-            #     color=dict_color[method], label="%s" % (dict_method[method]),
-            #     marker=marker, markersize=markersize,
-            #     markevery=dict_markevery[dataset]))
     axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    # axarr_val.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
-
-    # axarr_test.flat[idx].set_title("%s %s" % (
-    #     dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
-    # axarr_val.flat[idx].title.set_text(dict_title[dataset], size=18)
 
 axarr_grad.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
@@ -245,8 +233,6 @@ if save_fig:
 fig_val.show()
 fig_test.show()
 fig_grad.show()
-
-
 
 
 #################################################################
