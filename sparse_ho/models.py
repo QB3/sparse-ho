@@ -485,8 +485,6 @@ class wLasso():
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        """TODO
-        """
         X /= alpha
         self.estimator.set_params(tol=tol, alpha=1)
         self.estimator.fit(X, y)
