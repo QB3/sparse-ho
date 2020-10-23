@@ -19,21 +19,32 @@ enc = OneHotEncoder(sparse=False)
 one_hot_code = enc.fit_transform(y.reshape(-1, 1))
 n_classes = one_hot_code.shape[1]
 
+nC = 500
 # one hot encoding sur
 all_betas = np.zeros((n_features, n_classes))
+dict_clf = {}
+list_mult_C = np.geomspace(1, 100, nC)
 
-mult_C = 5
-for k in range(n_classes):
-    X_train, _, y_train, _ = train_test_split(
-        X, one_hot_code[:, k], random_state=42)
-    C_min = 2 / norm(X_train.T @ y_train, ord=np.inf)
-    clf = LogisticRegression(C=C_min * mult_C, fit_intercept=False)
-    clf.fit(X_train, y_train)
-    coefs = clf.coef_.ravel()
-    all_betas[:, k] = coefs.copy()
+np.random.seed(0)
+all_Cs = np.exp(np.random.uniform(size=(n_classes, nC)) * 5)
 
+mclass_ces = np.zeros(nC)
 
-_, X_test, _, y_test = train_test_split(X, y, random_state=42)
-criterion = LogisticMulticlass()
-mclass_ce = criterion.cross_entropy(all_betas, X_test, y_test)
-print("mce: %0.2f" % mclass_ce)
+# for idx_C, mult_C in enumerate(all_Cs):
+for idx_C in range(nC):
+    for k in range(n_classes):
+        X_train, _, y_train, _ = train_test_split(
+            X, one_hot_code[:, k], random_state=42)
+        C_min = 2 / norm(X_train.T @ y_train, ord=np.inf)
+        clf = dict_clf.get(k, LogisticRegression(
+            C=C_min, fit_intercept=False, warm_start=True))
+        clf.C = C_min * all_Cs[k, idx_C]
+        clf.fit(X_train, y_train)
+        coefs = clf.coef_.ravel()
+        all_betas[:, k] = coefs.copy()
+
+    _, X_test, _, y_test = train_test_split(X, y, random_state=42)
+    criterion = LogisticMulticlass()
+    mclass_ce = criterion.cross_entropy(all_betas, X_test, y_test)
+    print("mce: %0.2f" % mclass_ce)
+    mclass_ces[idx_C] = mclass_ce
