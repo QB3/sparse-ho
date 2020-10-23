@@ -95,7 +95,7 @@ criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
-    algo, np.log(alpha_max / 10), monitor_grad, n_outer=3, tol=tol)
+    algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 
 t_grad_search = time.time() - t0
 
