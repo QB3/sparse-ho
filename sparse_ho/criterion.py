@@ -523,3 +523,38 @@ class CrossVal():
         else:
             grad = None
         return val, grad
+
+
+class LogisticMulticlass():
+    """Multiclass logistic loss.
+    """
+    def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+        """
+        Parameters
+        ----------
+        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
+            Validation data
+        y_val : {ndarray, sparse matrix} of (n_samples)
+            Validation target
+        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
+            Test data
+        y_test : {ndarray, sparse matrix} of (n_samples_test)
+            Test target
+        """
+        self.X_val = X_val
+        self.y_val = y_val
+        self.X_test = X_test
+        self.y_test = y_test
+        self.model = model
+
+        self.mask0 = None
+        self.dense0 = None
+        self.quantity_to_warm_start = None
+        self.val_test = None
+        self.rmse = None
+
+    def value(self, mask, dense):
+        """TODO
+        """
+        return None
