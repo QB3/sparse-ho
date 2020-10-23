@@ -39,7 +39,7 @@ N_FEATURES = {'rcv1_train': 47236,
               'real-sim': 20958}
 
 
-def get_20newsgroup(sparse=True):
+def _get_20newsgroup():
     print("Loading data...")
     newsgroups = fetch_20newsgroups()
     vectorizer = TfidfVectorizer()
@@ -57,92 +57,72 @@ def get_20newsgroup(sparse=True):
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
 
-    if not sparse:
-        X_train = np.array(X_train.tocsc().todense())
-        X_val = np.array(X_val.tocsc().todense())
-        X_test = np.array(X_test.tocsc().todense())
-    else:
-        X_train = X_train.tocsc()
-        X_val = X_val.tocsc()
-        X_test = X_test.tocsc()
-    print("Finished loading data...")
-
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_finance():
+def _get_finance():
     X, y = load_libsvm("finance")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
-    X_train = X_train.tocsc()
-    X_val = X_val.tocsc()
-    X_test = X_test.tocsc()
-
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_rcv1(csr=False):
+def _get_rcv1():
     X, y = load_libsvm("rcv1_train")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
-    if csr:
-        X_train = X_train.tocsr()
-        X_val = X_val.tocsr()
-        X_test = X_test.tocsr()
-    else:
-        X_train = X_train.tocsc()
-        X_val = X_val.tocsc()
-        X_test = X_test.tocsc()
-
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_leukemia(csr=False):
+def _get_leukemia():
     X, y = load_libsvm("leu")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
-
-    if csr:
-        X_train = X_train.tocsr()
-        X_val = X_val.tocsr()
-        X_test = X_test.tocsr()
-    else:
-        X_train = X_train.tocsc()
-        X_val = X_val.tocsc()
-        X_test = X_test.tocsc()
-
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_real_sim(csr=False):
+def _get_real_sim():
     X, y = load_libsvm("real-sim")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
-    if csr:
-        X_train = X_train.tocsr()
-        X_val = X_val.tocsr()
-        X_test = X_test.tocsr()
-    else:
-        X_train = X_train.tocsc()
-        X_val = X_val.tocsc()
-        X_test = X_test.tocsc()
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
-def get_news20(csr=False):
+def _get_news20():
     X, y = load_libsvm("news20")
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5, random_state=42)
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
+def get_data(dataset_name, csr=False):
+    if dataset_name == "finance":
+        out = _get_finance()
+    elif dataset_name == "20newsgroups":
+        out = _get_20newsgroup()
+    elif dataset_name == "rcv1":
+        out = _get_rcv1()
+    elif dataset_name == "leukemia":
+        out = _get_leukemia()
+    elif dataset_name == "real-sim":
+        out = _get_real_sim()
+    elif dataset_name == "20news":
+        out = _get_news20()
+    else:
+        raise ValueError("dataset_name %s do not exist" % dataset_name)
+
+    X_train, X_val, X_test, y_train, y_val, y_test = out
+
     if csr:
         X_train = X_train.tocsr()
         X_val = X_val.tocsr()
@@ -151,24 +131,10 @@ def get_news20(csr=False):
         X_train = X_train.tocsc()
         X_val = X_val.tocsc()
         X_test = X_test.tocsc()
+
+    print("Finished loading data: %s ..." % dataset_name)
+
     return X_train, X_val, X_test, y_train, y_val, y_test
-
-
-def get_data(dataset_name, csr=False):
-    if dataset_name == "finance":
-        return get_finance(csr)
-    elif dataset_name == "20newsgroups":
-        return get_20newsgroup(csr)
-    elif dataset_name == "rcv1":
-        return get_rcv1(csr)
-    elif dataset_name == "leukemia":
-        return get_leukemia(csr)
-    elif dataset_name == "real-sim":
-        return get_real_sim(csr)
-    elif dataset_name == "20news":
-        return get_news20(csr)
-    else:
-        raise ValueError("dataset_name %s do not exist" % dataset_name)
 
 
 def download_libsvm(dataset, destination, replace=False):

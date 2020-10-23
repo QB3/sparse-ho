@@ -4,7 +4,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from expes.utils import configure_plt
 
-save_fig = True
+save_fig = False
+# save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -105,7 +106,7 @@ dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
 
 # dataset_names = ["rcv1", "real-sim"]
-dataset_names = ["rcv1", "real-sim", '20news']
+dataset_names = ["rcv1", "real-sim", '20newsgroups']
 # dataset_names = ["20newsgroups"]
 # dataset_names = ["finance"]
 # dataset_names = ["leukemia"]
@@ -114,15 +115,15 @@ dataset_names = ["rcv1", "real-sim", '20news']
 
 
 plt.close('all')
-fig, axarr = plt.subplots(
-    1, 3, sharex=False, sharey=False, figsize=[14, 4],)
+fig_subopt, axarr_subopt = plt.subplots(
+    1, 3, sharex=False, sharey=False, figsize=[14, 4])
 
-fig2, axarr2 = plt.subplots(
-    1, 3, sharex=False, sharey=False, figsize=[14, 4],)
+fig_obj, axarr_obj = plt.subplots(
+    1, 3, sharex=False, sharey=False, figsize=[14, 4])
 
 
-fig3, axarr3 = plt.subplots(
-    1, 3, sharex=False, sharey=False, figsize=[14, 4],)
+fig_alpha, axarr_alpha = plt.subplots(
+    1, 3, sharex=False, sharey=False, figsize=[14, 4])
 
 
 for idx, dataset in enumerate(dataset_names):
@@ -151,24 +152,32 @@ for idx, dataset in enumerate(dataset_names):
     for i, (time, obj, log_alpha, method, tol) in enumerate(
             zip(times, objs, log_alphas, methods, tols)):
         marker = dict_markers[method]
-        # objs_test = [np.min(objs_test[:k]) for k in np.arange(
-        #     len(objs_test)) + 1]
-        # if method == 'grid_search' or method == "implicit_forward":
-        if method.startswith(('grid_search', "implicit_forward", "random")):
-            # import ipdb; ipdb.set_trace()
-            axarr3.flat[idx].plot(
-                np.array(log_alpha), obj,
-                "bX", color=dict_color[method],
+        if method.startswith(('grid_search', "implicit_forward")):
+            if method == 'implicit_forward':
+                color = [plt.cm.Greens(
+                    (i+len(obj)/1.1) / len(obj) / 2) for i in np.arange(len(obj))]
+                s = 100
+            else:
+                # markevery = dict_markevery[dataset]
+                color = dict_color[method]
+                s = dict_marker_size[method]
+            axarr_alpha.flat[idx].scatter(
+                np.array(log_alpha), obj, color=color,
                 label="%s" % (dict_method[method]),
-                marker=marker, markersize=dict_marker_size[method],
-                markevery=1)
+                marker=marker, s=s)
+            # axarr_alpha.flat[idx].plot(
+            #     np.array(log_alpha), obj,
+            #     "bX", color=dict_color[method],
+            #     label="%s" % (dict_method[method]),
+            #     marker=marker, markersize=dict_marker_size[method],
+            #     markevery=1)
 
     for i, (time, obj, objs_test, method, tol) in enumerate(
             zip(times, objs, objs_tests, methods, tols)):
         marker = dict_markers[method]
         objs_test = [np.min(objs_test[:k]) for k in np.arange(
             len(objs_test)) + 1]
-        axarr2.flat[idx].semilogy(
+        axarr_obj.flat[idx].plot(
             time, objs_test, color=dict_color[method],
             label="%s" % (dict_method[method]),
             marker=marker, markersize=markersize,
@@ -179,70 +188,65 @@ for idx, dataset in enumerate(dataset_names):
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(
-            axarr.flat[idx].semilogy(
+            axarr_subopt.flat[idx].semilogy(
                 time, (obj-min_objs),
-                # time, (obj-min_objs) / norm_val,
                 color=dict_color[method],
                 label="%s" % (dict_method[method]),
-                # label="%s, %s" % (dict_method[method], tol),
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
-        # axarr.flat[i].legend()
 
-    axarr3.flat[idx].set_title("%s %s" % (
+    axarr_alpha.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
-    # axarr.flat[idx].title.set_text(dict_title[dataset], size=18)
-    axarr.flat[0].set_xlim(0, 15)
-    axarr.flat[1].set_xlim(0, 40)
-    axarr.flat[2].set_xlim(0, 210)
+    axarr_subopt.flat[0].set_xlim(0, 15)
+    axarr_subopt.flat[1].set_xlim(0, 40)
+    axarr_subopt.flat[2].set_xlim(0, 210)
 
-    axarr2.flat[0].set_xlim(0, 15)
-    axarr2.flat[1].set_xlim(0, 40)
-    axarr2.flat[2].set_xlim(0, 210)
+    axarr_obj.flat[0].set_xlim(0, 15)
+    axarr_obj.flat[1].set_xlim(0, 40)
+    axarr_obj.flat[2].set_xlim(0, 300)
 
-axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
-# axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
+axarr_subopt.flat[0].set_ylabel("Objective minus optimum", fontsize=fontsize)
 
 
-axarr2.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
-axarr2.flat[0].set_xlabel("Time (s)", fontsize=fontsize)
-axarr2.flat[1].set_xlabel("Time (s)", fontsize=fontsize)
-axarr2.flat[2].set_xlabel("Time (s)", fontsize=fontsize)
+axarr_obj.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
+axarr_obj.flat[0].set_xlabel("Time (s)", fontsize=fontsize)
+axarr_obj.flat[1].set_xlabel("Time (s)", fontsize=fontsize)
+axarr_obj.flat[2].set_xlabel("Time (s)", fontsize=fontsize)
 
-axarr3.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
-axarr3.flat[0].set_xlabel(
+axarr_alpha.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
+axarr_alpha.flat[0].set_xlabel(
     r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
-axarr3.flat[1].set_xlabel(
+axarr_alpha.flat[1].set_xlabel(
     r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
-axarr3.flat[2].set_xlabel(
+axarr_alpha.flat[2].set_xlabel(
     r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
 
-fig.tight_layout()
+fig_subopt.tight_layout()
 if save_fig:
-    fig.savefig(
+    fig_subopt.savefig(
         fig_dir + "pred_log_reg_validation_set.pdf",
         bbox_inches="tight")
-    fig.savefig(
+    fig_subopt.savefig(
         fig_dir_svg + "pred_log_reg_validation_set.svg",
         bbox_inches="tight")
-fig.show()
+fig_subopt.show()
 
-fig2.tight_layout()
+fig_obj.tight_layout()
 if save_fig:
-    fig2.savefig(
+    fig_obj.savefig(
         fig_dir + "pred_log_reg_test_set.pdf",
         bbox_inches="tight")
-    fig2.savefig(
+    fig_obj.savefig(
         fig_dir_svg + "pred_log_reg_test_set.svg",
         bbox_inches="tight")
-fig2.show()
+fig_obj.show()
 
-fig3.tight_layout()
+fig_alpha.tight_layout()
 if save_fig:
-    fig3.savefig(
+    fig_alpha.savefig(
         fig_dir + "pred_vs_alpha_log_reg_validation_set.pdf",
         bbox_inches="tight")
-    fig3.savefig(
+    fig_alpha.savefig(
         fig_dir_svg + "pred_vs_alpha_log_reg_validation_set.svg",
         bbox_inches="tight")
-fig3.show()
+fig_alpha.show()

@@ -8,12 +8,10 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.datasets.real import get_real_sim
-# from sparse_ho.datasets.real import get_rcv1
 # from sparse_ho.datasets.real import get_leukemia
 # from sparse_ho.grid_search import grid_search
 
 X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
 n_samples, n_features = X_train.shape
 

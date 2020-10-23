@@ -24,6 +24,7 @@ def grad_search(
         number of maximum iteration in the outer loop (for the line search)
     tolerance_decrease: string
         tolerance decrease strategy for approximate gradient
+    TODO: convexify and gamma should be remove no? beta_star also?
     convexify: bool
         True if you want to regularize the problem
     gamma: non negative float
