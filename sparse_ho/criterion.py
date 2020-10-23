@@ -3,7 +3,7 @@ import numpy as np
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
 from sklearn.utils import check_random_state
-
+from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
@@ -558,3 +558,13 @@ class LogisticMulticlass():
         """TODO
         """
         return None
+
+    def cross_entropy(beta, X, y):
+        enc = OneHotEncoder(sparse=False)
+        # return a n_samples * n_classes matrix
+        one_hot_code = enc.fit_transform(y.reshape(-1, 1))
+        n_samples, n_features = X.shape
+        exp_Xbeta = np.exp(X @ beta)
+        softmax = (1 / np.sum(exp_Xbeta, axis=1)) * exp_Xbeta
+
+        return -1 / n_samples * np.sum(np.log(softmax) * one_hot_code)
