@@ -528,7 +528,8 @@ class CrossVal():
 class LogisticMulticlass():
     """Multiclass logistic loss.
     """
-    def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+    # def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+    def __init__(self):
         """
         Parameters
         ----------
@@ -542,29 +543,31 @@ class LogisticMulticlass():
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
-        self.X_test = X_test
-        self.y_test = y_test
-        self.model = model
+        # self.X_val = X_val
+        # self.y_val = y_val
+        # self.X_test = X_test
+        # self.y_test = y_test
+        # self.model = model
 
-        self.mask0 = None
-        self.dense0 = None
-        self.quantity_to_warm_start = None
-        self.val_test = None
-        self.rmse = None
+        # self.mask0 = None
+        # self.dense0 = None
+        # self.quantity_to_warm_start = None
+        # self.val_test = None
+        # self.rmse = None
 
     def value(self, mask, dense):
         """TODO
         """
         return None
 
-    def cross_entropy(beta, X, y):
+    def cross_entropy(self, all_beta, X, y):
+        """TODO adapt code for sparse
+        """
         enc = OneHotEncoder(sparse=False)
         # return a n_samples * n_classes matrix
         one_hot_code = enc.fit_transform(y.reshape(-1, 1))
         n_samples, n_features = X.shape
-        exp_Xbeta = np.exp(X @ beta)
-        softmax = (1 / np.sum(exp_Xbeta, axis=1)) * exp_Xbeta
-
+        exp_Xbeta = np.exp(X @ all_beta)
+        softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
+        np.allclose(np.sum(softmax, axis=1), 1)
         return -1 / n_samples * np.sum(np.log(softmax) * one_hot_code)
