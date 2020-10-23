@@ -35,7 +35,6 @@ class Forward():
 
     def get_val_grad(
             self, log_alpha,
-            # mask0=None, dense0=None,
             beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
             backward=False):
@@ -130,10 +129,8 @@ def get_beta_jac_iterdiff(
                 X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
 
         pobj.append(model._get_pobj(r, beta, alphas, y))
-        # print(pobj[-1])
 
         if i > 1:
-            # assert pobj[-1] - pobj[-2] <= 1e-2 * np.abs(pobj[0])
             if verbose:
                 print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
         if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
