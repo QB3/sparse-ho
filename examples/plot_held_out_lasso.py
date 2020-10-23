@@ -31,7 +31,7 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
 
-from sparse_ho.datasets.real import get_data
+from sparse_ho.datasets import get_data
 
 print(__doc__)
 
@@ -62,13 +62,13 @@ tol = 1e-7
 max_iter = 1e5
 
 ##############################################################################
-# Grid-search
-# -----------
+# Grid-search with scikit-learn
+# -----------------------------
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
-print('scikit started')
+print('scikit-learn started')
 
 t0 = time.time()
 model = Lasso(X_train, y_train, estimator=estimator)
@@ -81,12 +81,13 @@ grid_search(
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
-print('scikit finished')
+print('scikit-learn finished')
 
 
 ##############################################################################
-# Grad-search
-# -----------
+# Grad-search with sparse-ho
+# --------------------------
+
 print('sparse-ho started')
 
 t0 = time.time()
@@ -99,10 +100,12 @@ grad_search(
 
 t_grad_search = time.time() - t0
 
+print('sparse-ho finished')
 
 ##############################################################################
 # Plot results
 # ------------
+
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)

@@ -1,3 +1,9 @@
+# Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+#          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#
+# License: BSD (3-clause)
+
+
 from hyperopt import hp
 from hyperopt import fmin, tpe, rand
 from sklearn.utils import check_random_state

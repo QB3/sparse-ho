@@ -1,10 +1,15 @@
+from itertools import product
+
 import numpy as np
 from numpy.linalg import norm
+
 from joblib import Parallel, delayed
+
 import pandas
+
 from bcdsugar.utils import Monitor
+
 from sparse_ho.ho import grad_search
-from itertools import product
 from sparse_ho.criterion import CV
 from sparse_ho.models import ElasticNet
 from sparse_ho.forward import Forward
