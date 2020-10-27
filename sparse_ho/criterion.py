@@ -1,12 +1,16 @@
 from numpy.linalg import norm
 import numpy as np
+import pandas as pd
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
 from sklearn.utils import check_random_state
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.models import SparseLogreg
 
 
 class CV():
@@ -529,7 +533,7 @@ class LogisticMulticlass():
     """Multiclass logistic loss.
     """
     # def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
-    def __init__(self):
+    def __init__(self, X, y, algo, estimator):
         """
         Parameters
         ----------
@@ -543,17 +547,40 @@ class LogisticMulticlass():
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        # self.X_val = X_val
-        # self.y_val = y_val
-        # self.X_test = X_test
-        # self.y_test = y_test
-        # self.model = model
 
-        # self.mask0 = None
-        # self.dense0 = None
-        # self.quantity_to_warm_start = None
-        # self.val_test = None
-        # self.rmse = None
+        self.algo = algo
+
+        enc = OneHotEncoder(sparse=False)  # maybe remove the sparse=False
+        self.one_hot_code = enc.fit_transform(pd.DataFrame(y))
+        self.one_hot_code_test = train_test_split(
+            self.one_hot_code, random_state=42)[1]
+        self.n_classes = self.one_hot_code.shape[1]
+        self.n_features = X.shape[1]
+
+        # TODO use split as for crossval
+        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(
+            X, y, random_state=42)
+
+        # dict with all the one vs all models
+        self.dict_models = {}
+        for k in range(self.n_classes):
+            X_train, X_val, y_train, y_val = train_test_split(
+                X, self.one_hot_code[:, k], random_state=42)
+            model = SparseLogreg(X_train, y_train, estimator=estimator)
+            self.dict_models[k] = model
+
+    # @profile
+    def get_val_grad(self, log_alpha):
+        all_betas = np.zeros((self.n_features, self.n_classes))
+        for k in range(self.n_classes):
+            model = self.dict_models[k]
+            # TODO add warm start
+            mask, dense, jac = self.algo.get_beta_jac(
+                model.X, model.y, log_alpha, model, None, mask0=None,
+                dense0=None, quantity_to_warm_start=None, compute_jac=False)
+            all_betas[mask, k] = dense  # maybe euse np.ix_
+        val = self.cross_entropy(all_betas, self.X_val, self.y_val)
+        return val
 
     def value(self, mask, dense):
         """TODO
@@ -563,11 +590,16 @@ class LogisticMulticlass():
     def cross_entropy(self, all_beta, X, y):
         """TODO adapt code for sparse
         """
-        enc = OneHotEncoder(sparse=False)
-        # return a n_samples * n_classes matrix
-        one_hot_code = enc.fit_transform(y.reshape(-1, 1))
+        # enc = OneHotEncoder(sparse=False)
+        # one_hot_code = enc.fit_transform(y.reshape(-1, 1))
         n_samples, n_features = X.shape
         exp_Xbeta = np.exp(X @ all_beta)
+        # TODO do a softmax stabilisation ?
+        # sometimes I have 0 as a value in the softmax
         softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
         np.allclose(np.sum(softmax, axis=1), 1)
-        return -1 / n_samples * np.sum(np.log(softmax) * one_hot_code)
+        result = - np.sum(
+            np.log(softmax) * self.one_hot_code_test) / n_samples
+        if np.isnan(result):
+            import ipdb; ipdb.set_trace()
+        return result

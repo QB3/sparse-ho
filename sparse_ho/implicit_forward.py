@@ -27,17 +27,29 @@ class ImplicitForward():
         self.n_iter_jac = n_iter_jac
         self.verbose = verbose
 
+    def get_beta_jac(
+            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
+            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            compute_jac=False, backward=False, full_jac_v=False):
+        mask, dense, jac = get_beta_jac_fast_iterdiff(
+            X, y, log_alpha, mask0=mask0, dense0=dense0,
+            jac0=quantity_to_warm_start,
+            # tol_jac=self.tol_jac,
+            tol_jac=tol, tol=tol, niter_jac=self.n_iter_jac, model=model,
+            max_iter=self.max_iter, verbose=self.verbose)
+        return mask, dense, jac
+
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=False, full_jac_v=False):
         mask, dense, jac = get_beta_jac_fast_iterdiff(
-            X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
+            X, y, log_alpha, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             # tol_jac=self.tol_jac,
             tol_jac=tol, tol=tol, niter_jac=self.n_iter_jac, model=model,
             max_iter=self.max_iter, verbose=self.verbose)
-        jac_v = model.get_jac_v(mask, dense, jac, get_v)
+        jac_v = model.get_jac_v(mask, dense, jac)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         return mask, dense, jac_v, jac
@@ -60,7 +72,7 @@ class ImplicitForward():
 
 
 def get_beta_jac_fast_iterdiff(
-        X, y, log_alpha, get_v, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False):
+        X, y, log_alpha, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False):
     n_samples, n_features = X.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
