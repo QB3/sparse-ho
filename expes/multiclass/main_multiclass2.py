@@ -29,6 +29,9 @@ bool_rm = ypd.groupby(0)[0].transform(len) > 1
 ypd = ypd[bool_rm]
 X = X[bool_rm.to_numpy(), :]
 y = y[bool_rm.to_numpy()]
+enc = OneHotEncoder(sparse=True)
+one_hot_code = enc.fit_transform(ypd)
+n_classes = one_hot_code.shape[1]
 
 n_samples, n_features = X.shape
 
@@ -41,11 +44,20 @@ logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 alpha_max = norm(X.T @ y, ord=np.inf) / n_samples
 alpha_max /= 2
 p_alphas = np.geomspace(0.1, 0.001, num=10)
-values = np.zeros_like(p_alphas)
-for i, p_alpha in enumerate(p_alphas):
-    print(i)
-    value = logit_multiclass.get_val_grad(np.log(alpha_max * p_alpha))
-    values[i] = value
 
+n_alphas = 10
+# p_alphas = np.exp(- np.random.uniform(size=(n_classes, n_alphas)) * np.log(1000))
+p_alphas = np.geomspace(0.1, 0.0001, n_alphas)
+p_alphas = np.tile(p_alphas, (n_classes, 1))
+
+values = np.zeros(n_alphas)
+grads = np.zeros((n_classes, n_alphas))
+
+for i in range(n_alphas):
+    print(i)
+    val, grad = logit_multiclass.get_val_grad(
+        np.log(alpha_max * p_alphas[:, i]))
+    values[i] = val
+    grads[:, i] = grad
 
 print(values)

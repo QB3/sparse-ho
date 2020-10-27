@@ -560,40 +560,46 @@ class LogisticMulticlass():
         # TODO use split as for crossval
         self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(
             X, y, random_state=42)
+        self.X_train = self.X_train.tocsc()
+        self.X_val = self.X_val.tocsc()
 
         # dict with all the one vs all models
         self.dict_models = {}
         for k in range(self.n_classes):
             X_train, X_val, y_train, y_val = train_test_split(
                 X, self.one_hot_code[:, k], random_state=42)
+            X_train = X_train.tocsc()
+            X_val = X_val.tocsc()
             model = SparseLogreg(X_train, y_train, estimator=estimator)
             self.dict_models[k] = model
 
-    # @profile
     def get_val_grad(self, log_alpha):
+        # TODO use sparse matrices
         all_betas = np.zeros((self.n_features, self.n_classes))
+        all_jacs = np.zeros((self.n_features, self.n_classes))
         for k in range(self.n_classes):
             model = self.dict_models[k]
             # TODO add warm start
             mask, dense, jac = self.algo.get_beta_jac(
-                model.X, model.y, log_alpha, model, None, mask0=None,
-                dense0=None, quantity_to_warm_start=None, compute_jac=False)
-            all_betas[mask, k] = dense  # maybe euse np.ix_
+                model.X, model.y, log_alpha[k], model, None, mask0=None,
+                dense0=None, quantity_to_warm_start=None, compute_jac=True)
+            all_betas[mask, k] = dense  # maybe use np.ix_
+            all_jacs[mask, k] = jac  # maybe use np.ix_
         val = self.cross_entropy(all_betas, self.X_val, self.y_val)
-        return val
+        grad = self.grad_cross_entropy(
+            all_betas, all_jacs, self.X_val, self.y_val)
+        return val, grad
 
     def value(self, mask, dense):
         """TODO
         """
         return None
 
-    def cross_entropy(self, all_beta, X, y):
+    def cross_entropy(self, all_betas, X, y):
         """TODO adapt code for sparse
         """
-        # enc = OneHotEncoder(sparse=False)
-        # one_hot_code = enc.fit_transform(y.reshape(-1, 1))
         n_samples, n_features = X.shape
-        exp_Xbeta = np.exp(X @ all_beta)
+        exp_Xbeta = np.exp(X @ all_betas)
         # TODO do a softmax stabilisation ?
         # sometimes I have 0 as a value in the softmax
         softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
@@ -603,3 +609,25 @@ class LogisticMulticlass():
         if np.isnan(result):
             import ipdb; ipdb.set_trace()
         return result
+
+    def grad_cross_entropy(self, all_betas, all_jacs, X, y):
+        """TODO adapt code for sparse
+        """
+        n_samples, n_features = X.shape
+        n_classes = self.n_classes
+        exp_Xbeta = np.exp(X @ all_betas)
+        # TODO do a softmax stabilisation?
+        # sometimes I have 0 as a value in the softmax
+        softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
+
+        grad = np.zeros(n_classes)
+        for k in range(n_classes):
+            # import ipdb; ipdb.set_trace()
+            if issparse(X):
+                gradk = - X.T.multiply(((1 - softmax)[:, k] * self.one_hot_code_test[:, k])[np.newaxis, :])
+            else:
+                gradk = ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
+            gradk = gradk.sum(axis=1) / n_samples
+            grad[k] = np.array(gradk).reshape(-1) @ all_jacs[:, k]
+
+        return grad
