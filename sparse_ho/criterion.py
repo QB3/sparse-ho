@@ -573,7 +573,7 @@ class LogisticMulticlass():
             model = SparseLogreg(X_train, y_train, estimator=estimator)
             self.dict_models[k] = model
 
-    def get_val_grad(self, log_alpha):
+    def get_val_grad(self, log_alpha, tol=1e-3):
         # TODO use sparse matrices
         all_betas = np.zeros((self.n_features, self.n_classes))
         all_jacs = np.zeros((self.n_features, self.n_classes))
@@ -594,6 +594,13 @@ class LogisticMulticlass():
         """TODO
         """
         return None
+
+    def proj_param(self, log_alpha):
+        log_alpha_max = self.dict_models[0].compute_alpha_max()
+        # import ipdb; ipdb.set_trace()
+        log_alpha[log_alpha < log_alpha_max - 10] = log_alpha_max - 10
+        log_alpha[log_alpha > log_alpha_max - np.log(0.9)] = log_alpha_max - np.log(0.9)
+        return log_alpha
 
     def cross_entropy(self, all_betas, X, y):
         """TODO adapt code for sparse
@@ -626,8 +633,8 @@ class LogisticMulticlass():
             if issparse(X):
                 gradk = - X.T.multiply(((1 - softmax)[:, k] * self.one_hot_code_test[:, k])[np.newaxis, :])
             else:
-                gradk = ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
-            gradk = gradk.sum(axis=1) / n_samples
+                gradk = - ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
+            gradk = - gradk.sum(axis=1) / n_samples
             grad[k] = np.array(gradk).reshape(-1) @ all_jacs[:, k]
 
         return grad

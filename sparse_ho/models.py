@@ -1076,8 +1076,8 @@ class SparseLogreg():
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= (4 * self.X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < -18:
-            return - 18.0
+        if log_alpha < self.log_alpha_max - 10:
+            return self.log_alpha_max - 10
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:
