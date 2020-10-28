@@ -532,7 +532,6 @@ class CrossVal():
 class LogisticMulticlass():
     """Multiclass logistic loss.
     """
-    # def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
     def __init__(self, X, y, algo, estimator):
         """
         Parameters
@@ -586,8 +585,10 @@ class LogisticMulticlass():
             all_betas[mask, k] = dense  # maybe use np.ix_
             all_jacs[mask, k] = jac  # maybe use np.ix_
         val = self.cross_entropy(all_betas, self.X_val, self.y_val)
-        grad = self.grad_cross_entropy(
-            all_betas, all_jacs, self.X_val, self.y_val)
+        # grad = self.grad_cross_entropy(
+        #     all_betas, all_jacs, self.X_val, self.y_val)
+        grad = 1 / 0
+        # TODO grad = grad_total_loss
         return val, grad
 
     def value(self, mask, dense):
@@ -602,43 +603,12 @@ class LogisticMulticlass():
         log_alpha[log_alpha > log_alpha_max - np.log(0.9)] = log_alpha_max - np.log(0.9)
         return log_alpha
 
-    def cross_entropy(self, all_betas, X, y):
-        """TODO adapt code for sparse
+    def cross_entropy(self, all_betas, X, one_hot_code_test):
+        """TODO call code from utils_cross_entropy.py
         """
-        n_samples, n_features = X.shape
-        exp_Xbeta = np.exp(X @ all_betas)
-        # TODO do a softmax stabilisation ?
-        # sometimes I have 0 as a value in the softmax
-        softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
-        np.allclose(np.sum(softmax, axis=1), 1)
-        result = - np.sum(
-            np.log(softmax) * self.one_hot_code_test) / n_samples
-        if np.isnan(result):
-            import ipdb; ipdb.set_trace()
-        return result
+        return 1 / 0
 
-    def grad_cross_entropy(self, all_betas, all_jacs, X, y):
-        """TODO adapt code for sparse
+    def grad_total_loss(self, all_betas, all_jacs, X, y, one_hot_code_test):
+        """TODO call code from utils_cross_entropy.py
         """
-        n_samples, n_features = X.shape
-        n_classes = self.n_classes
-        exp_Xbeta = np.exp(X @ all_betas)
-        # TODO do a softmax stabilisation?
-        # sometimes I have 0 as a value in the softmax
-        softmax = exp_Xbeta / np.sum(exp_Xbeta, axis=1)[:, np.newaxis]
-
-        grad = np.zeros(n_classes)
-        for k in range(n_classes):
-            # import ipdb; ipdb.set_trace()
-            if issparse(X):
-                weights = - (1 - softmax).sum(axis=1)  # size n_samples
-                weights *= self.one_hot_code_test[:, k]  # size n_samples
-                gradk = - X.T.multiply(weights[np.newaxis, :])
-            else:
-                1 / 0
-            # else:
-            #     gradk = - ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
-            gradk = gradk.sum(axis=1) / n_samples
-            grad[k] = np.array(gradk).reshape(-1) @ all_jacs[:, k]
-
-        return grad
+        return 1 / 0
