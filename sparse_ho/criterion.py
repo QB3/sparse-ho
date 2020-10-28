@@ -631,10 +631,14 @@ class LogisticMulticlass():
         for k in range(n_classes):
             # import ipdb; ipdb.set_trace()
             if issparse(X):
-                gradk = - X.T.multiply(((1 - softmax)[:, k] * self.one_hot_code_test[:, k])[np.newaxis, :])
+                weights = - (1 - softmax).sum(axis=1)  # size n_samples
+                weights *= self.one_hot_code_test[:, k]  # size n_samples
+                gradk = - X.T.multiply(weights[np.newaxis, :])
             else:
-                gradk = - ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
-            gradk = - gradk.sum(axis=1) / n_samples
+                1 / 0
+            # else:
+            #     gradk = - ((1 - softmax)[:, k] * self.one_hot_code_test[:, k]) * X
+            gradk = gradk.sum(axis=1) / n_samples
             grad[k] = np.array(gradk).reshape(-1) @ all_jacs[:, k]
 
         return grad

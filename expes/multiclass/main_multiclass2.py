@@ -5,8 +5,8 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 
 from libsvmdata.libsvm import fetch_libsvm
-# from celer import LogisticRegression
-from sklearn.linear_model import LogisticRegression
+from celer import LogisticRegression
+# from sklearn.linear_model import LogisticRegression
 
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho.implicit_forward import ImplicitForward
@@ -16,10 +16,10 @@ from sparse_ho.utils import Monitor
 
 # load data
 n_samples = 1000
-n_features = 10000
+n_features = 1000
 # X, y = fetch_libsvm('smallNORB')
-# X, y = fetch_libsvm('mnist')
-X, y = fetch_libsvm('sector')
+X, y = fetch_libsvm('mnist')
+# X, y = fetch_libsvm('sector')
 # X, y = fetch_libsvm('rcv1_multiclass')
 np.random.seed(0)
 idx = np.random.choice(X.shape[0], min(n_samples, X.shape[0]), replace=False)
@@ -42,7 +42,9 @@ n_samples, n_features = X.shape
 
 algo = ImplicitForward(None)
 estimator = LogisticRegression(
-    penalty='l1', C=1, fit_intercept=False, warm_start=True, solver='saga')
+    C=1, fit_intercept=False, warm_start=True)
+# estimator = LogisticRegression(
+#     penalty='l1', C=1, fit_intercept=False, warm_start=True, solver='saga')
 logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 
 
@@ -68,6 +70,6 @@ for i in range(n_alphas):
 print(values)
 
 
-log_alpha0 = np.ones(n_classes) * np.log(0.001 * alpha_max)
-monitor = Monitor()
-grad_search(logit_multiclass, log_alpha0, monitor, n_outer=5)
+# log_alpha0 = np.ones(n_classes) * np.log(0.001 * alpha_max)
+# monitor = Monitor()
+# grad_search(logit_multiclass, log_alpha0, monitor, n_outer=5)
