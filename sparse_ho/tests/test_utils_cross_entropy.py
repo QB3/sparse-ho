@@ -25,3 +25,4 @@ if __name__ == '__main__':
         return grad_cross_entropy(x.reshape(X.shape[1], K), X, Y).ravel()
 
     print(check_grad(f, gradf, x0=betas.ravel()))
+    assert np.allclose(check_grad(f, gradf, x0=betas.ravel()), 0, atol=1e-5)
