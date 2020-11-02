@@ -75,13 +75,13 @@ def test_beta_jac():
             X_train, y_train, dict_log_alpha[key], tol=tol,
             model=models[key])
         supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-            X_train, y_train, dict_log_alpha[key], get_v,
+            X_train, y_train, dict_log_alpha[key],
             tol=tol, model=models[key], tol_jac=tol)
         supp3, dense3, jac3 = get_beta_jac_iterdiff(
             X_train_s, y_train, dict_log_alpha[key], tol=tol,
             model=models[key])
         supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, dict_log_alpha[key], get_v,
+            X_train_s, y_train, dict_log_alpha[key],
             tol=tol, model=models[key], tol_jac=tol)
 
         assert np.all(supp1 == supp1sk)
@@ -116,10 +116,10 @@ def test_beta_jac2():
     # maybe we could add a test comparing with sklearn
     for key in models.keys():
         supp, dense, jac = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, dict_log_alpha[key], get_v,
+            X_train_s, y_train, dict_log_alpha[key],
             tol=tol, model=models[key], tol_jac=tol)
         supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-            X_train_s, y_train, dict_log_alpha[key], get_v,
+            X_train_s, y_train, dict_log_alpha[key],
             tol=tol, model=models[key], tol_jac=tol)
         assert np.all(supp == supp_custom)
         assert np.allclose(dense, dense_custom)

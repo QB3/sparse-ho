@@ -67,8 +67,8 @@ def test_beta_jac():
     estimator.fit(X_train, y_train)
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-        X_train, y_train, np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+        X_train, y_train, np.array([log_alpha1, log_alpha2]), tol=tol,
+        model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
     assert np.allclose(dense1, estimator.coef_[estimator.coef_ != 0])
     assert np.all(supp1 == supp2)
     assert np.allclose(dense1, dense2)
@@ -77,10 +77,10 @@ def test_beta_jac():
 def test_beta_jac_custom():
     supp, dense, jac = get_beta_jac_fast_iterdiff(
         X_train, y_train, np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+        tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
         X_train, y_train, np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+        tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
 
     assert np.allclose(dense, dense_custom)
     assert np.allclose(supp, supp_custom)
