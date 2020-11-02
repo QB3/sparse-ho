@@ -9,7 +9,6 @@ from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.models import SparseLogreg
 
 

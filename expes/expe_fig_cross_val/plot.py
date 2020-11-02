@@ -6,7 +6,7 @@ from sparse_ho.utils_plot import configure_plt
 
 configure_plt()
 
-# save_fig = False
+save_fig = False
 save_fig_grid = False
 # save_fig = True
 save_fig_grad = True
@@ -26,7 +26,7 @@ objs_grad = np.load("objs_grad.npy")
 # ax = plt.gca()
 # ax.tick_params(width=10)
 
-# fig = plt.figure()
+fig = plt.figure()
 # plt.semilogx(
 #     p_alphas, objs, color=current_palette[0], linewidth=7.0)
 # plt.semilogx(

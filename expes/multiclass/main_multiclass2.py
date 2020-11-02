@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
 import pandas as pd
 
 from libsvmdata.libsvm import fetch_libsvm
@@ -10,7 +9,8 @@ from celer import LogisticRegression
 
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.ho_dirty import grad_search, grad_search_wolfe
+from sparse_ho.ho_dirty import grad_search
+# , grad_search_wolfe
 from sparse_ho.utils import Monitor
 
 
