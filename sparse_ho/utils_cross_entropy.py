@@ -36,7 +36,7 @@ def grad_cross_entropy(betas, X, Y):
 
     grad = np.empty_like(betas)
     for k in range(n_classes):
-        weights = sm[:, k] * Y.sum(axis=1) - Y[:, k]
+        weights = sm[:, k] - Y[:, k]
         grad[:, k] = (X.T @ weights) / n_samples
 
     return grad
