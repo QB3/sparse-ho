@@ -1,6 +1,48 @@
 
 import numpy as np
 from numpy.linalg import norm
+from scipy.optimize import fmin_l_bfgs_b
+
+
+def lbfgs(
+        criterion, log_alpha0, monitor, n_outer=10, verbose=False,
+        tolerance_decrease='constant', tol=1e-5,
+        beta_star=None, t_max=10000):
+    """
+    Parameters
+    ----------
+    log_alpha0: float
+        log of the regularization coefficient alpha
+    tol : float
+        tolerance for the inner optimization solver
+    monitor: Monitor object
+        used to store the value of the cross-validation function
+    n_outer: int
+        number of maximum iteration in the outer loop (for the line search)
+    tolerance_decrease: string
+        tolerance decrease strategy for approximate gradient
+    TODO: convexify and gamma should be remove no? beta_star also?
+    convexify: bool
+        True if you want to regularize the problem
+    gamma: non negative float
+        convexification coefficient
+    criterion: string
+        criterion to optimize during hyperparameter optimization
+        you may choose between "cv" and "sure"
+    gamma_sure:
+        constant for sure problem
+     sigma,
+        constant for sure problem
+    random_state: int
+    beta_star: np.array, shape (n_features,)
+        True coefficients of the underlying model (if known)
+        used to compute metrics
+    """
+    def _get_val_grad(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol)
+
+    return fmin_l_bfgs_b(
+        _get_val_grad, log_alpha0, fprime=None, maxiter=n_outer)
 
 
 def grad_search(
@@ -157,12 +199,16 @@ def _grad_search(
         seq_tol = tol * np.ones(n_outer)
 
     for i in range(n_outer):
+
         tol = seq_tol[i]
         try:
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
+
+        if verbose >= 1:
+            print("outer function value %f" % g_func)
         try:
             # as in scipy I think we should use callback function, instead of rmse attriburtes, wdyt?
             monitor(g_func, None, lambdak.copy(),
@@ -224,7 +270,7 @@ def _grad_search(
         lambdak = proj_param(lambdak)
         g_func_old = g_func
 
-        if verbose:
+        if verbose > 1:
             print('grad lambda', grad_lambda)
             print('value of lambda_k', lambdak)
         if monitor.times[-1] > t_max:

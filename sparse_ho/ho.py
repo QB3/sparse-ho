@@ -172,6 +172,8 @@ def _grad_search(
             monitor(g_func, algo.criterion.val_test, lambdak,
                     grad_lambda, algo.criterion.rmse)
 
+        if verbose >= 1:
+            print(g_func)
         # TODO this should be removed into the SURE class no?
         if convexify:
             g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
@@ -236,9 +238,10 @@ def _grad_search(
         lambdak = proj_param(lambdak)
         g_func_old = g_func
 
-        if verbose:
-            print('grad lambda', grad_lambda)
+        if verbose > 1:
             print('value of lambda_k', lambdak)
+            print('grad lambda', grad_lambda)
+
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
@@ -260,6 +263,28 @@ def grad_search_wolfe(
 
         monitor(val.copy(), algo.criterion.val_test, log_alphak,
                 grad, algo.criterion.rmse)
+
+        # step_size = 1 / norm(grad)
+        step_size = wolfe(
+            log_alphak, -grad, val, _get_val, _get_val_grad, maxit_ln=maxit_ln)
+        log_alphak -= step_size * grad
+
+
+def grad_search_wolfe_dirty(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=5):
+
+    def _get_val_grad(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol)
+
+    def _get_val(lambdak, tol=tol):
+        return criterion.get_val(lambdak, tol=tol)
+
+    log_alphak = log_alpha0
+    for i in range(n_outer):
+        val, grad = _get_val_grad(log_alphak)
+
+        monitor(val.copy(), None, log_alphak, grad)
 
         # step_size = 1 / norm(grad)
         step_size = wolfe(

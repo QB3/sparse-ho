@@ -1,13 +1,14 @@
 from numpy.linalg import norm
 import numpy as np
+from sklearn.base import clone
 import pandas as pd
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
 from sklearn.utils import check_random_state
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from sparse_ho.utils import sigma, smooth_hinge
-from sparse_ho.utils import derivative_smooth_hinge
+from sparse_ho.utils import sigma, smooth_hinge, derivative_smooth_hinge
+from sparse_ho.utils_cross_entropy import cross_entropy, grad_cross_entropy
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.models import SparseLogreg
 
@@ -550,7 +551,7 @@ class LogisticMulticlass():
 
         enc = OneHotEncoder(sparse=False)  # maybe remove the sparse=False
         self.one_hot_code = enc.fit_transform(pd.DataFrame(y))
-        self.one_hot_code_test = train_test_split(
+        self.one_hot_code_val = train_test_split(
             self.one_hot_code, random_state=42)[1]
         self.n_classes = self.one_hot_code.shape[1]
         self.n_features = X.shape[1]
@@ -568,8 +569,9 @@ class LogisticMulticlass():
                 X, self.one_hot_code[:, k], random_state=42)
             X_train = X_train.tocsc()
             X_val = X_val.tocsc()
-            model = SparseLogreg(X_train, y_train, estimator=estimator)
+            model = SparseLogreg(X_train, y_train, estimator=clone(estimator))
             self.dict_models[k] = model
+        self.dict_warm_start = {}
 
     def get_val_grad(self, log_alpha, tol=1e-3):
         # TODO use sparse matrices
@@ -578,36 +580,43 @@ class LogisticMulticlass():
         for k in range(self.n_classes):
             model = self.dict_models[k]
             # TODO add warm start
+            mask0, dense0, jac0 = self.dict_warm_start.get(
+                k, (None, None, None))
+            mask, dense, jac = self.algo.get_beta_jac(
+                model.X, model.y, log_alpha[k], model, None, mask0=mask0,
+                dense0=dense0, quantity_to_warm_start=jac0, compute_jac=True,
+                tol=tol)
+            self.dict_warm_start[k] = (mask, dense, jac)
+            all_betas[mask, k] = dense  # maybe use np.ix_
+            all_jacs[mask, k] = jac  # maybe use np.ix_
+        val = cross_entropy(all_betas, self.X_val, self.one_hot_code_val)
+        grad = self.grad_total_loss(
+            all_betas, all_jacs, self.X_val, self.one_hot_code_val)
+        # import ipdb; ipdb.set_trace()
+        return val, grad
+
+    def get_val(self, log_alpha, tol=1e-3):
+        # TODO use sparse matrices
+        # TODO add warm start
+        all_betas = np.zeros((self.n_features, self.n_classes))
+        for k in range(self.n_classes):
+            model = self.dict_models[k]
+            # TODO add warm start
             mask, dense, jac = self.algo.get_beta_jac(
                 model.X, model.y, log_alpha[k], model, None, mask0=None,
                 dense0=None, quantity_to_warm_start=None, compute_jac=True)
             all_betas[mask, k] = dense  # maybe use np.ix_
-            all_jacs[mask, k] = jac  # maybe use np.ix_
-        val = self.cross_entropy(all_betas, self.X_val, self.y_val)
-        # grad = self.grad_cross_entropy(
-        #     all_betas, all_jacs, self.X_val, self.y_val)
-        grad = 1 / 0
-        # TODO grad = grad_total_loss
-        return val, grad
-
-    def value(self, mask, dense):
-        """TODO
-        """
-        return None
+        val = cross_entropy(all_betas, self.X_val, self.one_hot_code_val)
+        return val
 
     def proj_param(self, log_alpha):
         log_alpha_max = self.dict_models[0].compute_alpha_max()
         # import ipdb; ipdb.set_trace()
-        log_alpha[log_alpha < log_alpha_max - 10] = log_alpha_max - 10
+        log_alpha[log_alpha < log_alpha_max - 7] = log_alpha_max - 7
         log_alpha[log_alpha > log_alpha_max - np.log(0.9)] = log_alpha_max - np.log(0.9)
         return log_alpha
 
-    def cross_entropy(self, all_betas, X, one_hot_code_test):
-        """TODO call code from utils_cross_entropy.py
-        """
-        return 1 / 0
-
-    def grad_total_loss(self, all_betas, all_jacs, X, y, one_hot_code_test):
-        """TODO call code from utils_cross_entropy.py
-        """
-        return 1 / 0
+    def grad_total_loss(self, all_betas, all_jacs, X, Y):
+        grad_ce = grad_cross_entropy(all_betas, X, Y)
+        grad_total = (grad_ce * all_jacs).sum(axis=0)
+        return grad_total

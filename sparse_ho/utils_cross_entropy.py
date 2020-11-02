@@ -31,12 +31,8 @@ def grad_cross_entropy(betas, X, Y):
     Y: {ndarray, sparse matrix} of (n_samples, n_classes)
     """
     n_samples = X.shape[0]
-    n_classes = Y.shape[1]
     sm = softmax(X @ betas)
-
-    grad = np.empty_like(betas)
-    for k in range(n_classes):
-        weights = sm[:, k] - Y[:, k]
-        grad[:, k] = (X.T @ weights) / n_samples
+    weights = sm - Y
+    grad = (X.T @ weights) / n_samples
 
     return grad
