@@ -1133,7 +1133,7 @@ class SparseLogreg():
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
         self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
-        self.estimator.max_iter = self.max_iter
+        # self.estimator.max_iter = self.max_iter
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]

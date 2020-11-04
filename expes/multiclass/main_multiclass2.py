@@ -16,15 +16,16 @@ from sparse_ho.utils import Monitor
 
 
 # load data
-n_samples = 1000
-n_features = 10000
+n_samples = 1100
+n_features = 1200
 # X, y = fetch_libsvm('smallNORB')
 # X, y = fetch_libsvm('protein')
 # X, y = fetch_libsvm('mnist')
 # y[y != 1] = 2
 # X, y = fetch_libsvm('sector')
 # X, y = fetch_libsvm('news20_multiclass')
-X, y = fetch_libsvm('rcv1_multiclass')
+X, y = fetch_libsvm('aloi')
+# X, y = fetch_libsvm('rcv1_multiclass')
 np.random.seed(0)
 idx = np.random.choice(X.shape[0], min(n_samples, X.shape[0]), replace=False)
 feats = np.random.choice(
@@ -67,33 +68,32 @@ if alpha_max == 0:
 
 n_samples, n_features = X.shape
 
-algo = ImplicitForward(None, n_iter_jac=1000)
+algo = ImplicitForward(None, n_iter_jac=200)
 estimator = LogisticRegression(
-    C=1, fit_intercept=False, warm_start=True, max_iter=50)
+    C=1, fit_intercept=False, warm_start=True, max_iter=50, verbose=False)
     # C=1, fit_intercept=False, warm_start=True, verbose=True)
 # estimator = LogisticRegression(
 #     penalty='l1', C=1, fit_intercept=False, warm_start=True, solver='saga')
 logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 
 
-n_alphas = 10
-p_alphas = np.geomspace(0.1, 0.01, n_alphas)
+n_alphas = 20
+p_alphas = np.geomspace(0.01, 0.0001, n_alphas)
 p_alphas = np.tile(p_alphas, (n_classes, 1))
 
 values = np.zeros(n_alphas)
 grads = np.zeros((n_classes, n_alphas))
 
 for i in range(n_alphas):
-    print(i)
     val, grad = logit_multiclass.get_val_grad(
         np.log(alpha_max * p_alphas[:, i]))
-    print(val)
+    print("%i / %i  ||  %f" % (i, n_alphas, val))
     values[i] = val
     grads[:, i] = grad
 
 print(values)
 
-n_outer = 10
+n_outer = 20
 
 log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 monitor = Monitor()
