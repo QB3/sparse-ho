@@ -14,7 +14,12 @@ for a weighted Lasso using a held-out validation set.
 # License: BSD (3-clause)
 
 import time
+
 import numpy as np
+
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+
 from celer import Lasso
 
 from sparse_ho.models import wLasso
@@ -22,12 +27,7 @@ from sparse_ho.criterion import CV
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-from sklearn.datasets import make_regression
-
-from sklearn.model_selection import train_test_split
-
-
-# from sparse_ho.datasets.real import get_leukemia
+# from sparse_ho.datasets import get_leukemia
 
 print(__doc__)
 
@@ -38,7 +38,7 @@ if dataset == 'leukemia':
     # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
     1 / 0  # TODO
 else:
-    X, y = make_regression(n_samples=1000, n_features=100, noise=1)
+    X, y = make_regression(n_samples=100, n_features=100, noise=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)
@@ -84,7 +84,8 @@ t0 = time.time()
 model = wLasso(X_train, y_train, estimator=estimator)
 
 # here CV means held out
-# the "real" crossval (with folds etc) is very slow (for the moment) for some unknown reasons
+# the "real" crossval (with folds etc) is very slow (for the moment) for some
+# unknown reasons
 
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
