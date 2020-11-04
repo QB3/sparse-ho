@@ -15,7 +15,6 @@ from sparse_ho.datasets.real import get_real_sim
 from sparse_ho.grid_search import grid_search
 # from sparse_ho.ho import grad_search
 X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim(csr=False)
-# X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1(csr=True)
 
 # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
 n_samples, n_features = X_train.shape
