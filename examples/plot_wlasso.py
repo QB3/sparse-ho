@@ -27,7 +27,7 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
 
-from sparse_ho.datasets.real import get_leukemia
+# from sparse_ho.datasets.real import get_leukemia
 
 print(__doc__)
 
@@ -35,7 +35,8 @@ print(__doc__)
 dataset = 'simu'
 
 if dataset == 'leukemia':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
+    # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
+    1 / 0  # TODO
 else:
     X, y = make_regression(n_samples=1000, n_features=100, noise=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
