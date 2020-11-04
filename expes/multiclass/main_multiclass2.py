@@ -10,8 +10,9 @@ from celer import LogisticRegression
 
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.ho_dirty import grad_search, lbfgs
-from sparse_ho.ho import grad_search_wolfe_dirty
+from sparse_ho.ho_dirty import grad_search
+# , lbfgs
+# from sparse_ho.ho import grad_search_wolfe_dirty
 from sparse_ho.utils import Monitor
 
 
@@ -61,7 +62,7 @@ for k in range(n_classes):
     alpha_max = min(alpha_max, norm(
         X.T @ (2 * one_hot_code[:, k] - 1), ord=np.inf) / (2 * n_samples))
     if alpha_max == 0:
-        import ipdb; ipdb.set_trace()
+        1 / 0
 
 if alpha_max == 0:
     1 / 0
@@ -71,7 +72,7 @@ n_samples, n_features = X.shape
 algo = ImplicitForward(None, n_iter_jac=200)
 estimator = LogisticRegression(
     C=1, fit_intercept=False, warm_start=True, max_iter=50, verbose=False)
-    # C=1, fit_intercept=False, warm_start=True, verbose=True)
+# C=1, fit_intercept=False, warm_start=True, verbose=True)
 # estimator = LogisticRegression(
 #     penalty='l1', C=1, fit_intercept=False, warm_start=True, solver='saga')
 logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
