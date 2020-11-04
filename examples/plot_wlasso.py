@@ -31,13 +31,13 @@ from sparse_ho.datasets.real import get_leukemia
 
 print(__doc__)
 
-dataset = 'leukemia'
-# dataset = 'simu'
+# dataset = 'leukemia'
+dataset = 'simu'
 
 if dataset == 'leukemia':
     X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
 else:
-    X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+    X, y = make_regression(n_samples=1000, n_features=100, noise=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
     X_train, X_val, y_train, y_val = train_test_split(
         X_train, y_train, test_size=0.5)
@@ -67,6 +67,7 @@ max_iter = 1e5
 
 # celer is much more faster !
 # https://github.com/mathurinm/celer
+
 estimator = Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
@@ -80,8 +81,10 @@ alpha0 = np.log(alpha_max / 10) * np.ones(n_features)
 
 t0 = time.time()
 model = wLasso(X_train, y_train, estimator=estimator)
+
 # here CV means held out
 # the "real" crossval (with folds etc) is very slow (for the moment) for some unknown reasons
+
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
