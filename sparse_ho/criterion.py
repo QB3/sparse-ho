@@ -515,7 +515,11 @@ class CrossVal():
                 compute_jac=compute_jac, backward=backward,
                 beta_star=beta_star)
             val += vali
-            grad += gradi
+            if gradi is not None:
+                grad += gradi
         val /= self.n_splits
-        grad /= self.n_splits
+        if gradi is not None:
+            grad /= self.n_splits
+        else:
+            grad = None
         return val, grad

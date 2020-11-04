@@ -27,7 +27,7 @@ from sparse_ho.criterion import Logistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.datasets.real import get_rcv1
+from sparse_ho.datasets import get_data
 
 from sklearn.datasets import make_classification
 
@@ -40,7 +40,7 @@ print(__doc__)
 dataset = 'simu'
 
 if dataset == 'rcv1':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data('rcv1')
 else:
     X, y = make_classification(
         n_samples=300, n_features=1000, random_state=42, flip_y=0.02)
