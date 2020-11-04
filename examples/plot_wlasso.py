@@ -1,10 +1,10 @@
 """
-============================
-Lasso with held-out test set
-============================
+=====================================
+Weighted Lasso with held-out test set
+=====================================
 
 This example shows how to perform hyperparameter optimization
-for a Lasso using a held-out validation set.
+for a weighted Lasso using a held-out validation set.
 
 """
 
@@ -81,7 +81,7 @@ alpha0 = np.log(alpha_max / 10) * np.ones(n_features)
 t0 = time.time()
 model = wLasso(X_train, y_train, estimator=estimator)
 # here CV means held out
-# the "real" crossval (with folds etc) is very slow (for the moement) for some unknown reasons
+# the "real" crossval (with folds etc) is very slow (for the moment) for some unknown reasons
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
@@ -89,3 +89,5 @@ grad_search(
     algo, alpha0, monitor_grad, n_outer=10, tol=tol)
 
 t_grad_search = time.time() - t0
+
+print("Time gradient serach:  %f" % t_grad_search)
