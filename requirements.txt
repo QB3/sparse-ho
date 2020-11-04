@@ -6,3 +6,4 @@ seaborn>=0.7
 matplotlib>=2.0.0
 download
 hyperopt
+celer

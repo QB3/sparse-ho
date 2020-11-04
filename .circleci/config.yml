@@ -33,9 +33,11 @@ jobs:
         - restore_cache:
             keys:
               - data-cache-0
+
         - restore_cache:
             keys:
               - pip-cache
+
         - restore_cache:
             keys:
               - sparse_ho_data
@@ -51,7 +53,7 @@ jobs:
               python -m pip install --user --upgrade --progress-bar off pip
               python -m pip install --user --upgrade --progress-bar off -r requirements.txt
               python -m pip install --user --upgrade --progress-bar off -r doc/doc-requirements.txt
-              python -m pip install --user -e .
+              python -m pip install --user --upgrade -e .
 
         - save_cache:
             key: pip-cache
@@ -64,6 +66,7 @@ jobs:
             command: |
                which python
                python -c "import sparse_ho"
+               python -c "from sparse_ho.datasets import get_data"
 
         # Build docs
         - run:
