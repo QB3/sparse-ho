@@ -59,6 +59,7 @@ jobs:
             command: |
                which python
                python -c "import sparse_ho"
+               python -c "from sparse_ho.datasets import get_leukemia"
 
         # Build docs
         - run:
