@@ -32,7 +32,7 @@ jobs:
         - restore_cache:
             keys:
               - data-cache-0
-              - pip-cache
+              # - pip-cache
               - sparse_ho_data
 
         - run:
@@ -48,10 +48,10 @@ jobs:
               python -m pip install --user --upgrade --progress-bar off -r doc/doc-requirements.txt
               python -m pip install --user --upgrade -e .
 
-        - save_cache:
-            key: pip-cache
-            paths:
-              - ~/.cache/pip
+        # - save_cache:
+        #     key: pip-cache
+        #     paths:
+        #       - ~/.cache/pip
 
         # Look at what we have and fail early if there is some library conflict
         - run:
