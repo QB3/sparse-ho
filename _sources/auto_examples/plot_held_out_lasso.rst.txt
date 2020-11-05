@@ -231,8 +231,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 8.16
-    Time to compute CV for sparse-ho: 11.67
+    Time to compute CV for scikit-learn: 8.44
+    Time to compute CV for sparse-ho: 12.99
     Minimum objective grid-search 0.21680
     Minimum objective grad-search 0.21137
 
@@ -242,7 +242,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  20.284 seconds)
+   **Total running time of the script:** ( 0 minutes  21.953 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

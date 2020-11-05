@@ -85,7 +85,7 @@ for a weighted Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:02, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 135kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:17, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 231kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 315kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 436kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 609kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 839kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.14MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.53MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 2.00MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.55MB/s]    file_sizes:  93%|########################3 | 12.8M/13.7M [00:03<00:00, 3.08MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.44MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 135kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:18, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 231kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 314kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 435kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 607kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 837kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.14MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.52MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 1.99MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.54MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 3.14MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.41MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -102,11 +102,11 @@ Grid-search
 .. code-block:: default
 
 
-    # the solver of sklearn is indeed very long on the considered problems!
+    # The sklearn solver is indeed very long on the considered problems!
     # estimator = linear_model.Lasso(
     #     fit_intercept=False, max_iter=1000, warm_start=True)
 
-    # celer is much more faster !
+    # celer is way faster !
     # https://github.com/mathurinm/celer
 
     estimator = Lasso(
@@ -133,8 +133,8 @@ Grad-search
     t0 = time.time()
     model = wLasso(X_train, y_train, estimator=estimator)
 
-    # here CV means held out
-    # the "real" crossval (with folds etc) is very slow (for the moment) for some
+    # Here CV means held out,
+    # the "real" crossval (with folds, etc.) is very slow (for the moment) for some
     # unknown reasons
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
@@ -177,7 +177,7 @@ Grad-search
       sol = celer(
     /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
       sol = celer(
-    Time gradient serach:  6.106674
+    Time gradient serach:  5.849441
 
 
 
@@ -185,7 +185,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.207 seconds)
+   **Total running time of the script:** ( 0 minutes  17.175 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_wlasso.py:
