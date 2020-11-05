@@ -31,11 +31,13 @@ from sparse_ho.datasets import get_data
 
 print(__doc__)
 
-dataset = 'leukemia'
+dataset = 'rcv1'
 # dataset = 'simu'
 
-if dataset == 'leukemia':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data('leukemia')
+if dataset != 'simu':
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+    X_train = X_train[:, :1000]
+    X_test = X_test[:, :1000]
 else:
     X, y = make_regression(n_samples=100, n_features=100, noise=1)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
