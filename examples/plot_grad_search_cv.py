@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import sklearn
 
+from libsvmdata import fetch_libsvm
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
@@ -27,8 +28,6 @@ from sparse_ho.criterion import CV, CrossVal
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-from sparse_ho.datasets.real import load_libsvm
-
 
 print(__doc__)
 
@@ -36,7 +35,7 @@ print(__doc__)
 dataset = 'simu'
 
 if dataset == 'rcv1':
-    X, y = load_libsvm('rcv1_train')
+    X, y = fetch_libsvm('rcv1_train')
 else:
     X, y = make_regression(
         n_samples=500, n_features=1000, noise=40,
