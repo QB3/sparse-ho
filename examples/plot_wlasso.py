@@ -63,11 +63,11 @@ max_iter = 1e5
 # Grid-search
 # -----------
 
-# the solver of sklearn is indeed very long on the considered problems!
+# The sklearn solver is indeed very long on the considered problems!
 # estimator = linear_model.Lasso(
 #     fit_intercept=False, max_iter=1000, warm_start=True)
 
-# celer is much more faster !
+# celer is way faster !
 # https://github.com/mathurinm/celer
 
 estimator = Lasso(
@@ -84,8 +84,8 @@ alpha0 = np.log(alpha_max / 10) * np.ones(n_features)
 t0 = time.time()
 model = wLasso(X_train, y_train, estimator=estimator)
 
-# here CV means held out
-# the "real" crossval (with folds etc) is very slow (for the moment) for some
+# Here CV means held out,
+# the "real" crossval (with folds, etc.) is very slow (for the moment) for some
 # unknown reasons
 
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
