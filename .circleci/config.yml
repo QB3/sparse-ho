@@ -1,10 +1,5 @@
 version: 2
 jobs:
-    deploy-job:
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - SHA256:PH7Uia/Df0GCfx41qPlu+FVWY3BmIEf7miDQhZ1Vdcs
     build_docs:
       docker:
         - image: circleci/python:3.8.1-buster
@@ -30,6 +25,11 @@ jobs:
                 git pull --ff-only upstream "refs/pull/$(cat merge.txt)/merge";
                 git fetch upstream master;
               fi
+      # deploy-job:
+      # steps:
+        - add_ssh_keys:
+            fingerprints:
+              - SHA256:PH7Uia/Df0GCfx41qPlu+FVWY3BmIEf7miDQhZ1Vdcs
 
         # If all keys are in the same command only one is restored
         # thx @mathurinm
