@@ -13,8 +13,8 @@
 Lasso with held-out test set
 ============================
 
-This example shows how to perform hyperparameter optimisation
-for a Lasso using a held-out test set.
+This example shows how to perform hyperparameter optimization
+for a Lasso using a held-out validation set.
 
 
 .. code-block:: default
@@ -29,6 +29,7 @@ for a Lasso using a held-out test set.
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
+    from sklearn import linear_model
 
     from sparse_ho.models import Lasso
     from sparse_ho.criterion import CV
@@ -42,15 +43,15 @@ for a Lasso using a held-out test set.
     from sklearn.model_selection import train_test_split
 
 
-    from sparse_ho.datasets.real import get_rcv1
+    from sparse_ho.datasets import get_data
 
     print(__doc__)
 
-    # dataset = 'rcv1'
-    dataset = 'simu'
+    dataset = 'rcv1'
+    # dataset = 'simu'
 
     if dataset == 'rcv1':
-        X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+        X_train, X_val, X_test, y_train, y_val, y_test = get_data('rcv1_train')
     else:
         X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
@@ -82,25 +83,31 @@ for a Lasso using a held-out test set.
 
  .. code-block:: none
 
+    could import smt.sampling_methods
 
+    Dataset: rcv1_train
+    Finished loading data: rcv1_train ...
     Starting path computation...
 
 
 
 
-Grid-search
------------
+Grid-search with scikit-learn
+-----------------------------
 
 
 .. code-block:: default
 
-    print('scikit started')
+
+    estimator = linear_model.Lasso(
+        fit_intercept=False, max_iter=1000, warm_start=True)
+
+    print('scikit-learn started')
 
     t0 = time.time()
-    model = Lasso(
-        X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+    model = Lasso(X_train, y_train, estimator=estimator)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    algo = Forward(criterion, use_sk=True)
+    algo = Forward(criterion)
     monitor_grid_sk = Monitor()
     grid_search(
         algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -108,7 +115,7 @@ Grid-search
     objs = np.array(monitor_grid_sk.objs)
     t_sk = time.time() - t0
 
-    print('scikit finished')
+    print('scikit-learn finished')
 
 
 
@@ -121,31 +128,40 @@ Grid-search
 
  .. code-block:: none
 
-    scikit started
-    scikit finished
+    scikit-learn started
+    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.024594834782647013, tolerance: 0.0006781
+      model = cd_fast.sparse_enet_coordinate_descent(
+    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.06375966462377392, tolerance: 0.0006781
+      model = cd_fast.sparse_enet_coordinate_descent(
+    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 1.1291046861493612, tolerance: 0.0006781
+      model = cd_fast.sparse_enet_coordinate_descent(
+    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 5.109421629176367, tolerance: 0.0006781
+      model = cd_fast.sparse_enet_coordinate_descent(
+    scikit-learn finished
 
 
 
 
-Grad-search
------------
+Grad-search with sparse-ho
+--------------------------
 
 
 .. code-block:: default
 
+
     print('sparse-ho started')
 
     t0 = time.time()
-    model = Lasso(
-        X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+    model = Lasso(X_train, y_train, estimator=estimator)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    algo = ImplicitForward(criterion, use_sk=True)
+    algo = ImplicitForward(criterion)
     monitor_grad = Monitor()
     grad_search(
         algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 
     t_grad_search = time.time() - t0
 
+    print('sparse-ho finished')
 
 
 
@@ -158,6 +174,7 @@ Grad-search
  .. code-block:: none
 
     sparse-ho started
+    sparse-ho finished
 
 
 
@@ -167,6 +184,7 @@ Plot results
 
 
 .. code-block:: default
+
 
     p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
@@ -213,12 +231,10 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 2.13
-    Time to compute CV for sparse-ho: 0.08
-    Minimum objective grid-search 1736.76656
-    Minimum objective grad-search 1637.82150
-    /home/qbe/sparse-ho/examples/plot_held_out_lasso.py:132: UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.
-      plt.show(block=False)
+    Time to compute CV for scikit-learn: 8.16
+    Time to compute CV for sparse-ho: 11.67
+    Minimum objective grid-search 0.21680
+    Minimum objective grad-search 0.21137
 
 
 
@@ -226,7 +242,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.445 seconds)
+   **Total running time of the script:** ( 0 minutes  20.284 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

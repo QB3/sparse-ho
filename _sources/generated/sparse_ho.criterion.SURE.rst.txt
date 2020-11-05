@@ -1,4 +1,4 @@
-sparse\_ho.criterion.SURE
+﻿sparse\_ho.criterion.SURE
 =========================
 
 .. currentmodule:: sparse_ho.criterion
@@ -15,6 +15,7 @@ sparse\_ho.criterion.SURE
    
       ~SURE.__init__
       ~SURE.compute_rmse
+      ~SURE.get_val
       ~SURE.get_val_grad
       ~SURE.v
       ~SURE.v2

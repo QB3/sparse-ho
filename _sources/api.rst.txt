@@ -91,9 +91,7 @@ Datasets
    :toctree: generated/
 
    get_synt_data
-   get_rcv1
-   get_leukemia
-   get_20newsgroup
+   get_data
 
 
 Utils

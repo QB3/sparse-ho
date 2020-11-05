@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sparse_ho.models.wLasso &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -94,12 +95,12 @@
       
   <div class="section" id="sparse-ho-models-wlasso">
 <h1>sparse_ho.models.wLasso<a class="headerlink" href="#sparse-ho-models-wlasso" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="sparse_ho.models.wLasso">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">wLasso</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">log_alpha</em>, <em class="sig-param">log_alpha_max=None</em>, <em class="sig-param">max_iter=100</em>, <em class="sig-param">tol=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso" title="Permalink to this definition">¶</a></dt>
-<dd><p>Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
-The optimization objective for weighted Lasso is:
-(1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i <a href="#id1"><span class="problematic" id="id2">|wi|</span></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">wLasso</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear Model trained with L1 prior as regularizer (aka the weight Lasso)</p>
+<p>The optimization objective for weighted Lasso is:</p>
+<p>(1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i <a href="#id1"><span class="problematic" id="id2">|wi|</span></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -107,13 +108,16 @@ The optimization objective for weighted Lasso is:
 </dd>
 <dt><strong>y: {ndarray, sparse matrix} of (n_samples)</strong></dt><dd><p>Target</p>
 </dd>
-<dt><strong>TODO: other parameters should be remove</strong></dt><dd></dd>
+<dt><strong>estimator: instance of ``sklearn.base.BaseEstimator``</strong></dt><dd><p>An estimator that follows the scikit-learn API.</p>
+</dd>
+<dt><strong>log_alpha_max: float</strong></dt><dd><p>logarithm of alpha_max if already precomputed</p>
+</dd>
 </dl>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="sparse_ho.models.wLasso.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">log_alpha</em>, <em class="sig-param">log_alpha_max=None</em>, <em class="sig-param">max_iter=100</em>, <em class="sig-param">tol=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -124,7 +128,7 @@ The optimization objective for weighted Lasso is:
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.wLasso.__init__" title="sparse_ho.models.wLasso.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, X, y, log_alpha[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.wLasso.__init__" title="sparse_ho.models.wLasso.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X, y[, max_iter, estimator, …])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
@@ -133,38 +137,35 @@ The optimization objective for weighted Lasso is:
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(self, mask, dense)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(mask, dense, log_alpha)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(self, Xs, ys, sign_beta, dbeta, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, sign_beta, dbeta, r, dr, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(self, mask, dense, jac, v)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(mask, dense, jac, v)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mask_jac_v</span></code>(mask, jac_v)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_primal</span></code>(self, mask, dense)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_primal</span></code>(mask, dense)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_param</span></code>(self, log_alpha)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_param</span></code>(log_alpha)</p></td>
 <td><p>Maybe we could do this in place.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_X</span></code>(self, mask)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_X</span></code>(mask)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_y</span></code>(self, mask)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_y</span></code>(mask)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restrict_full_supp</span></code>(self, mask, dense, v)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restrict_full_supp</span></code>(mask, dense, v)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sign</span></code>(self, x)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sign</span></code>(x, log_alpha)</p></td>
 <td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sk</span></code>(self, X, y, alpha, tol, max_iter)</p></td>
-<td><p>TODO</p></td>
 </tr>
 </tbody>
 </table>
@@ -185,7 +186,7 @@ The optimization objective for weighted Lasso is:
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>

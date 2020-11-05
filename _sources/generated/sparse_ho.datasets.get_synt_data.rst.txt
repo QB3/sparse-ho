@@ -1,4 +1,4 @@
-sparse\_ho.datasets.get\_synt\_data
+﻿sparse\_ho.datasets.get\_synt\_data
 ===================================
 
 .. currentmodule:: sparse_ho.datasets

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sparse_ho.grad_search &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -94,9 +95,9 @@
       
   <div class="section" id="sparse-ho-grad-search">
 <h1>sparse_ho.grad_search<a class="headerlink" href="#sparse-ho-grad-search" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
+<dl class="py function">
 <dt id="sparse_ho.grad_search">
-<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param">algo</em>, <em class="sig-param">log_alpha0</em>, <em class="sig-param">monitor</em>, <em class="sig-param">n_outer=100</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">tolerance_decrease='constant'</em>, <em class="sig-param">tol=1e-05</em>, <em class="sig-param">convexify=False</em>, <em class="sig-param">gamma_convex=False</em>, <em class="sig-param">beta_star=None</em>, <em class="sig-param">t_max=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algo</span></em>, <em class="sig-param"><span class="n">log_alpha0</span></em>, <em class="sig-param"><span class="n">monitor</span></em>, <em class="sig-param"><span class="n">n_outer</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">tolerance_decrease</span><span class="o">=</span><span class="default_value">'constant'</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">beta_star</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">t_max</span><span class="o">=</span><span class="default_value">10000</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>This line-search code is taken from here:
 <a class="reference external" href="https://github.com/fabianp/hoag/blob/master/hoag/hoag.py">https://github.com/fabianp/hoag/blob/master/hoag/hoag.py</a></p>
 <dl class="field-list">
@@ -112,6 +113,7 @@
 </dd>
 <dt><strong>tolerance_decrease: string</strong></dt><dd><p>tolerance decrease strategy for approximate gradient</p>
 </dd>
+<dt><strong>TODO: convexify and gamma should be remove no? beta_star also?</strong></dt><dd></dd>
 <dt><strong>convexify: bool</strong></dt><dd><p>True if you want to regularize the problem</p>
 </dd>
 <dt><strong>gamma: non negative float</strong></dt><dd><p>convexification coefficient</p>
@@ -151,7 +153,7 @@ used to compute metrics</p>
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>

@@ -1,4 +1,4 @@
-sparse\_ho.criterion.CV
+﻿sparse\_ho.criterion.CV
 =======================
 
 .. currentmodule:: sparse_ho.criterion

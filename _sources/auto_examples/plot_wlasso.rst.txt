@@ -1,0 +1,216 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_wlasso.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_wlasso.py:
+
+
+=====================================
+Weighted Lasso with held-out test set
+=====================================
+
+This example shows how to perform hyperparameter optimization
+for a weighted Lasso using a held-out validation set.
+
+
+.. code-block:: default
+
+
+    # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+    #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #
+    # License: BSD (3-clause)
+
+    import time
+
+    import numpy as np
+
+    from sklearn.datasets import make_regression
+    from sklearn.model_selection import train_test_split
+
+    from celer import Lasso
+
+    from sparse_ho.models import wLasso
+    from sparse_ho.criterion import CV
+    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho.utils import Monitor
+    from sparse_ho.ho import grad_search
+    from sparse_ho.datasets import get_data
+
+    print(__doc__)
+
+    dataset = 'rcv1_train'
+    # dataset = 'simu'
+
+    if dataset != 'simu':
+        X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+        X_train = X_train[:, :1000]
+        X_test = X_test[:, :1000]
+    else:
+        X, y = make_regression(n_samples=100, n_features=100, noise=1)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.5)
+
+    n_samples, n_features = X_train.shape
+
+    print("Starting path computation...")
+    n_samples = len(y_train)
+    alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
+    log_alpha0 = np.log(alpha_max / 10)
+
+    n_alphas = 10
+    p_alphas = np.geomspace(1, 0.0001, n_alphas)
+    alphas = alpha_max * p_alphas
+    log_alphas = np.log(alphas)
+
+    tol = 1e-7
+    max_iter = 1e5
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Dataset: rcv1_train
+    Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
+
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:02, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 135kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:17, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 231kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 315kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 436kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 609kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 839kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.14MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.53MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 2.00MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.55MB/s]    file_sizes:  93%|########################3 | 12.8M/13.7M [00:03<00:00, 3.08MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.44MB/s]
+    Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
+    Decompressing...
+    Loading svmlight file...
+    Finished loading data: rcv1_train ...
+    Starting path computation...
+
+
+
+
+Grid-search
+-----------
+
+
+.. code-block:: default
+
+
+    # the solver of sklearn is indeed very long on the considered problems!
+    # estimator = linear_model.Lasso(
+    #     fit_intercept=False, max_iter=1000, warm_start=True)
+
+    # celer is much more faster !
+    # https://github.com/mathurinm/celer
+
+    estimator = Lasso(
+        fit_intercept=False, max_iter=1000, warm_start=True)
+
+
+
+
+
+
+
+
+
+Grad-search
+-----------
+
+
+.. code-block:: default
+
+    print('sparse-ho started')
+
+    alpha0 = np.log(alpha_max / 10) * np.ones(n_features)
+
+    t0 = time.time()
+    model = wLasso(X_train, y_train, estimator=estimator)
+
+    # here CV means held out
+    # the "real" crossval (with folds etc) is very slow (for the moment) for some
+    # unknown reasons
+
+    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    algo = ImplicitForward(criterion)
+    monitor_grad = Monitor()
+    grad_search(
+        algo, alpha0, monitor_grad, n_outer=10, tol=tol)
+
+    t_grad_search = time.time() - t0
+
+    print("Time gradient serach:  %f" % t_grad_search)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    sparse-ho started
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
+      sol = celer(
+    Time gradient serach:  6.106674
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  17.207 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_wlasso.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_wlasso.py <plot_wlasso.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_wlasso.ipynb <plot_wlasso.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

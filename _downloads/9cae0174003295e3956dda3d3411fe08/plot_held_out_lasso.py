@@ -3,8 +3,8 @@
 Lasso with held-out test set
 ============================
 
-This example shows how to perform hyperparameter optimisation
-for a Lasso using a held-out test set.
+This example shows how to perform hyperparameter optimization
+for a Lasso using a held-out validation set.
 
 """
 
@@ -17,6 +17,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CV
@@ -30,15 +31,15 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
 
-from sparse_ho.datasets.real import get_rcv1
+from sparse_ho.datasets import get_data
 
 print(__doc__)
 
-# dataset = 'rcv1'
-dataset = 'simu'
+dataset = 'rcv1'
+# dataset = 'simu'
 
 if dataset == 'rcv1':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data('rcv1_train')
 else:
     X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
@@ -61,15 +62,18 @@ tol = 1e-7
 max_iter = 1e5
 
 ##############################################################################
-# Grid-search
-# -----------
-print('scikit started')
+# Grid-search with scikit-learn
+# -----------------------------
+
+estimator = linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
+
+print('scikit-learn started')
 
 t0 = time.time()
-model = Lasso(
-    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = Forward(criterion, use_sk=True)
+algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(
     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -77,29 +81,31 @@ grid_search(
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
-print('scikit finished')
+print('scikit-learn finished')
 
 
 ##############################################################################
-# Grad-search
-# -----------
+# Grad-search with sparse-ho
+# --------------------------
+
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso(
-    X_train, y_train, np.log(alpha_max / 10), max_iter=max_iter)
+model = Lasso(X_train, y_train, estimator=estimator)
 criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion, use_sk=True)
+algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 
 t_grad_search = time.time() - t0
 
+print('sparse-ho finished')
 
 ##############################################################################
 # Plot results
 # ------------
+
 p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)

@@ -1,4 +1,4 @@
-sparse\_ho.utils.WarmStart
+﻿sparse\_ho.utils.WarmStart
 ==========================
 
 .. currentmodule:: sparse_ho.utils

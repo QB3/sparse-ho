@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sparse_ho.criterion.SURE &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -94,13 +95,20 @@
       
   <div class="section" id="sparse-ho-criterion-sure">
 <h1>sparse_ho.criterion.SURE<a class="headerlink" href="#sparse-ho-criterion-sure" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="sparse_ho.criterion.SURE">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">SURE</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">model</em>, <em class="sig-param">sigma</em>, <em class="sig-param">C=2.0</em>, <em class="sig-param">gamma_sure=0.3</em>, <em class="sig-param">random_state=42</em>, <em class="sig-param">X_test=None</em>, <em class="sig-param">y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SURE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">SURE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">C</span><span class="o">=</span><span class="default_value">2.0</span></em>, <em class="sig-param"><span class="n">gamma_sure</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SURE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stein Unbiased Risk Estimator (SURE).</p>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>TODO</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="sparse_ho.criterion.SURE.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">model</em>, <em class="sig-param">sigma</em>, <em class="sig-param">C=2.0</em>, <em class="sig-param">gamma_sure=0.3</em>, <em class="sig-param">random_state=42</em>, <em class="sig-param">X_test=None</em>, <em class="sig-param">y_test=None</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SURE.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">C</span><span class="o">=</span><span class="default_value">2.0</span></em>, <em class="sig-param"><span class="n">gamma_sure</span><span class="o">=</span><span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SURE.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -108,11 +116,14 @@
 </dd>
 <dt><strong>y</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples)</span></dt><dd><p>Validation target</p>
 </dd>
-<dt><strong>model: object of the class Model (e.g. Lasso or Sparse logistic regression)</strong></dt><dd></dd>
+<dt><strong>model: instance of Model</strong></dt><dd><p>The model (e.g. instance of Lasso or SparseLogreg)</p>
+</dd>
 <dt><strong>sigma: float</strong></dt><dd><p>Noise level</p>
 </dd>
-<dt><strong>random_state: int</strong></dt><dd></dd>
-<dt><strong>X_test, y_test: TODO we should remove these parameters no?</strong></dt><dd></dd>
+<dt><strong>random_state</strong><span class="classifier">int, RandomState instance, default=42</span></dt><dd><p>The seed of the pseudo random number generator.
+Pass an int for reproducible output across multiple function calls.</p>
+</dd>
+<dt><strong>X_test, y_test: TODO we should remove these parameters no? -&gt; YES !</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -125,29 +136,32 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.SURE.__init__" title="sparse_ho.criterion.SURE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, X, y, model, sigma[, C, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.SURE.__init__" title="sparse_ho.criterion.SURE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X, y, model, sigma[, C, …])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rmse</span></code>(self, mask, dense, beta_star)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rmse</span></code>(mask, dense, beta_star)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(self, log_alpha, get_beta_jac_v)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(log_alpha[, tol])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code>(self, mask, dense)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(log_alpha, get_beta_jac_v[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v2</span></code>(self, mask, dense)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code>(mask, dense)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code>(self, mask, dense, mask2, dense2)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v2</span></code>(mask, dense)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_test</span></code>(self, mask, dense)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code>(mask, dense, mask2, dense2)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_test</span></code>(mask, dense)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -169,7 +183,7 @@
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>

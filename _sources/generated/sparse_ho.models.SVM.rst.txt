@@ -1,4 +1,4 @@
-sparse\_ho.models.SVM
+﻿sparse\_ho.models.SVM
 =====================
 
 .. currentmodule:: sparse_ho.models

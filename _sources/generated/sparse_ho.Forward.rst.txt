@@ -1,4 +1,4 @@
-sparse\_ho.Forward
+﻿sparse\_ho.Forward
 ==================
 
 .. currentmodule:: sparse_ho

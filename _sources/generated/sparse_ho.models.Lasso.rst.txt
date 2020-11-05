@@ -1,4 +1,4 @@
-sparse\_ho.models.Lasso
+﻿sparse\_ho.models.Lasso
 =======================
 
 .. currentmodule:: sparse_ho.models
@@ -27,7 +27,6 @@ sparse\_ho.models.Lasso
       ~Lasso.reduce_y
       ~Lasso.restrict_full_supp
       ~Lasso.sign
-      ~Lasso.sk
    
    
 

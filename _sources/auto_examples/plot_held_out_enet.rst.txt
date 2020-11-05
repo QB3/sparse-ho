@@ -1,0 +1,410 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_held_out_enet.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_held_out_enet.py:
+
+
+============================
+Lasso with held-out test set
+============================
+
+This example shows how to perform hyperparameter optimization
+for an elastic-net using a held-out validation set.
+
+
+.. code-block:: default
+
+
+    # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
+    #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #
+    # License: BSD (3-clause)
+
+    import time
+    import numpy as np
+    from sklearn import linear_model
+    from numpy.linalg import norm
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+
+    from sparse_ho.datasets import get_data
+    from sklearn.datasets import make_regression
+    from sklearn.model_selection import train_test_split
+    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho.criterion import CV
+    from sparse_ho.models import ElasticNet
+    from sparse_ho.ho import grad_search
+    from sparse_ho.utils import Monitor
+
+    Axes3D  # hack for matplotlib 3D support
+
+    # dataset = "rcv1"
+    dataset = 'simu'
+    # use_small_part = False
+    use_small_part = True
+
+
+
+
+
+
+
+
+Load some data
+
+
+.. code-block:: default
+
+
+    print("Started to load data")
+
+    if dataset == 'rcv1':
+        X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+    else:
+        rng = np.random.RandomState(42)
+        X, y, beta = make_regression(
+            n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10,
+            random_state=rng,
+        )
+        X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+        beta /= norm(beta)
+        y = X @ beta + rng.randn(X.shape[0])
+        X_train, X_test, y_train, y_test = \
+            train_test_split(X, y, test_size=0.33, random_state=rng)
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train, y_train, test_size=0.5, random_state=rng)
+
+    print("Finished loading data")
+
+    alpha_max = np.max(np.abs(X_train.T @ y_train)) / X_train.shape[0]
+    log_alpha_max = np.log(alpha_max)
+
+    alpha_min = 1e-4 * alpha_max
+
+    n_grid = 10
+    alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
+    log_alphas_1 = np.log(alphas_1)
+    alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
+    log_alphas_2 = np.log(alphas_2)
+
+    results = np.zeros((n_grid, n_grid))
+    tol = 1e-4
+    max_iter = 50000
+
+
+    estimator = linear_model.ElasticNet(
+        fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Started to load data
+    Finished loading data
+
+
+
+
+Grid-search with scikit-learn
+-----------------------------
+
+
+.. code-block:: default
+
+
+    print("Started grid-search")
+    t_grid_search = - time.time()
+    for i in range(n_grid):
+        print("lambda %i / %i" % (i, n_grid))
+        for j in range(n_grid):
+            print("lambda %i / %i" % (j, n_grid))
+            estimator.alpha = (alphas_1[i] + alphas_2[j])
+            estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
+            estimator.fit(X_train, y_train)
+            results[i, j] = np.mean((y_val - X_val @ estimator.coef_) ** 2)
+    t_grid_search += time.time()
+    print("Finished grid-search")
+
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Started grid-search
+    lambda 0 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 1 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 2 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 3 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 4 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 5 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 6 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 7 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 8 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    lambda 9 / 10
+    lambda 0 / 10
+    lambda 1 / 10
+    lambda 2 / 10
+    lambda 3 / 10
+    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:529: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.01635056890434128, tolerance: 0.010802648335507271
+      model = cd_fast.enet_coordinate_descent(
+    lambda 4 / 10
+    lambda 5 / 10
+    lambda 6 / 10
+    lambda 7 / 10
+    lambda 8 / 10
+    lambda 9 / 10
+    Finished grid-search
+
+
+
+
+Grad-search with sparse-ho
+--------------------------
+
+
+.. code-block:: default
+
+    estimator = linear_model.ElasticNet(
+        fit_intercept=False, max_iter=max_iter, warm_start=True)
+    print("Started grad-search")
+    t_grad_search = - time.time()
+    monitor = Monitor()
+    n_outer = 10
+    model = ElasticNet(
+        X_train, y_train, max_iter=max_iter, estimator=estimator)
+    criterion = CV(
+        X_val, y_val, model, X_test=X_test, y_test=y_test)
+    algo = ImplicitForward(
+        criterion, tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
+    _, _, _ = grad_search(
+        algo=algo, verbose=True,
+        log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
+        tol=tol, n_outer=n_outer, monitor=monitor)
+    t_grad_search += time.time()
+    alphas_grad = np.exp(np.array(monitor.log_alphas))
+    alphas_grad /= alpha_max
+
+
+    print("Time grid-search %f" % t_grid_search)
+    print("Time grad-search %f" % t_grad_search)
+    print("Minimum grid search %0.3e" % results.min())
+    print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Started grad-search
+    grad lambda [0.25461191 0.00883922]
+    value of lambda_k [-4.02603104 -2.39605297]
+    grad lambda [-0.05723497 -0.0492543 ]
+    value of lambda_k [-3.35715969 -1.82044697]
+    grad lambda [ 0.0083518  -0.03575358]
+    value of lambda_k [-3.45476226 -1.40261592]
+    grad lambda [-0.00326569 -0.0567686 ]
+    value of lambda_k [-3.41458942 -0.70427787]
+    grad lambda [-0.01145134 -0.02551311]
+    value of lambda_k [-3.26630684 -0.37391035]
+    grad lambda [-0.01176802 -0.01721395]
+    value of lambda_k [-3.10590339 -0.13927638]
+    grad lambda [-0.01739584 -0.01957343]
+    value of lambda_k [-2.85631051 -0.10069454]
+    grad lambda [-0.01334476 -0.02099397]
+    value of lambda_k [-2.65476461 -0.10069454]
+    grad lambda [-0.00824204 -0.01274176]
+    value of lambda_k [-2.52373353 -0.10069454]
+    grad lambda [-0.00351017 -0.01167868]
+    value of lambda_k [-2.4649921  -0.10069454]
+    Time grid-search 9.789968
+    Time grad-search 2.393556
+    Minimum grid search 1.453e+00
+    Minimum grad search 1.448e+00
+
+
+
+
+Plot results
+------------
+
+
+.. code-block:: default
+
+
+    idx = np.where(results == results.min())
+
+    a, b = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(
+        np.log(a), np.log(b), results, rstride=1, cstride=1,
+        cmap='viridis', edgecolor='none', alpha=0.5)
+    ax.scatter3D(
+        np.log(a), np.log(b), results,
+        monitor.objs, c="black", s=20, marker="o")
+    ax.scatter3D(
+        np.log(alphas_grad[:, 0]), np.log(alphas_grad[:, 1]),
+        monitor.objs, c="red", s=200, marker="X")
+    ax.scatter3D(
+        np.log(alphas_2[idx[1]] / alpha_max),
+        np.log(alphas_1[idx[0]] / alpha_max),
+        [results.min()], c="black", s=200, marker="X")
+    ax.set_xlabel("lambda1")
+    ax.set_ylabel("lambda2")
+    ax.set_label("Loss on validation set")
+    fig.show()
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_held_out_enet_001.png
+    :alt: plot held out enet
+    :class: sphx-glr-single-img
+
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  12.292 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_held_out_enet.py <plot_held_out_enet.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_held_out_enet.ipynb <plot_held_out_enet.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

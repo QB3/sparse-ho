@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>sparse_ho.utils.WarmStart &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
@@ -93,13 +94,13 @@
       
   <div class="section" id="sparse-ho-utils-warmstart">
 <h1>sparse_ho.utils.WarmStart<a class="headerlink" href="#sparse-ho-utils-warmstart" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="sparse_ho.utils.WarmStart">
 <em class="property">class </em><code class="sig-prename descclassname">sparse_ho.utils.</code><code class="sig-name descname">WarmStart</code><a class="headerlink" href="#sparse_ho.utils.WarmStart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class used to warm start all algorithms.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="sparse_ho.utils.WarmStart.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.utils.WarmStart.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.utils.WarmStart.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -110,10 +111,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.utils.WarmStart.__init__" title="sparse_ho.utils.WarmStart.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.utils.WarmStart.__init__" title="sparse_ho.utils.WarmStart.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sol_lin_sys</span></code>(self, sol_lin_sys[, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_sol_lin_sys</span></code>(sol_lin_sys[, sol_lin_sys2])</p></td>
 <td><p>For the implicit differentiation the solution of the previous linear system can be used as a warm start for the next conjugate gradient.</p></td>
 </tr>
 </tbody>
@@ -135,7 +136,7 @@
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
     </p>
   </div>
 </footer>

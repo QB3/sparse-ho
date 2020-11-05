@@ -14,6 +14,27 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a weighted Lasso using a held...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_wlasso_thumb.png
+     :alt: Weighted Lasso with held-out test set
+
+     :ref:`sphx_glr_auto_examples_plot_wlasso.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_wlasso
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a Lasso using a full cross-va...">
 
 .. only:: html
@@ -35,7 +56,7 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimisation for a Lasso using a held-out test...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a Lasso using a held-out vali...">
 
 .. only:: html
 
@@ -74,6 +95,27 @@ can be done with the sparse_ho library.
    :hidden:
 
    /auto_examples/plot_sparse_log_reg
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for an elastic-net using a held-o...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_held_out_enet_thumb.png
+     :alt: Lasso with held-out test set
+
+     :ref:`sphx_glr_auto_examples_plot_held_out_enet.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_held_out_enet
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
@@ -88,13 +130,13 @@ can be done with the sparse_ho library.
 
   .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/qbe/sparse-ho/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/qbe/sparse-ho/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

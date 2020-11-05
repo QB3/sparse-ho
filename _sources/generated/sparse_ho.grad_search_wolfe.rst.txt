@@ -1,4 +1,4 @@
-sparse\_ho.grad\_search\_wolfe
+﻿sparse\_ho.grad\_search\_wolfe
 ==============================
 
 .. currentmodule:: sparse_ho
