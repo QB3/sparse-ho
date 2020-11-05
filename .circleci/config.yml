@@ -85,7 +85,7 @@ jobs:
         - run:
             name: deploy
             command: |
-              if 1; then
+              if true; then
                 set -e
                 mkdir -p ~/.ssh
                 echo -e "Host *\nStrictHostKeyChecking no" > ~/.ssh/config
