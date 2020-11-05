@@ -31,7 +31,7 @@ from sparse_ho.datasets import get_data
 
 print(__doc__)
 
-dataset = 'rcv1'
+dataset = 'rcv1_train'
 # dataset = 'simu'
 
 if dataset != 'simu':
