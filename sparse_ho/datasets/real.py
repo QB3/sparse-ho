@@ -1,9 +1,6 @@
 """File to download and load real data from libsvm, using libsvmdata.
 """
 
-import numpy as np
-from scipy import sparse
-
 from libsvmdata import fetch_libsvm
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
