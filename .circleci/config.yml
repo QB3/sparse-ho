@@ -80,6 +80,20 @@ jobs:
             paths:
               - $HOME/sparse_ho_data
 
+        # Deploy docs
+        - run:
+            name: deploy
+            command: |
+              if [[ ${CIRCLE_BRANCH} == "master" ]]; then
+                set -e
+                mkdir -p ~/.ssh
+                echo -e "Host *\nStrictHostKeyChecking no" > ~/.ssh/config
+                chmod og= ~/.ssh/config
+                cd doc;
+                pip install ghp-import;
+                make install
+              fi
+
         # Save the outputs
         - store_artifacts:
             path: doc/_build/html/
