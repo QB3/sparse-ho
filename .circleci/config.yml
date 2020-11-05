@@ -79,13 +79,11 @@ jobs:
             paths:
               - $HOME/sparse_ho_data
 
-        # TODO when it works, before merging PR, replace if 1 with:
-        # if [[ ${CIRCLE_BRANCH} == "master" ]]; then
         # Deploy docs
         - run:
             name: deploy
             command: |
-              if true; then
+              if [[ ${CIRCLE_BRANCH} == "master" ]]; then
                 set -e
                 mkdir -p ~/.ssh
                 echo -e "Host *\nStrictHostKeyChecking no" > ~/.ssh/config
