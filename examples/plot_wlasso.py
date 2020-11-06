@@ -10,7 +10,6 @@ for a weighted Lasso using a held-out validation set.
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
-#          Mathurin Massias
 #          Kenan Sehic
 # License: BSD (3-clause)
 
@@ -19,6 +18,8 @@ import numpy as np
 from celer import Lasso, LassoCV
 
 from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 
 from sparse_ho.models import wLasso
 from sparse_ho.criterion import CV
@@ -26,16 +27,17 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
+##############################################################################
+# Dataset creation
+##############################################################################
+X, y = make_regression(n_samples=500, n_features=600, noise=0, random_state=2)
 
-# from wlasso_hpo import sparse_ho_model, random_search
-
-
-X, y = make_regression(n_samples=500, n_features=600, noise=40, random_state=2)
+# Here we split the dataset (X, y) in 3:
+# the regression coefficients will be determined using X_train, y_train
+# the regularization parameter will be calibrated using X_val, y_val
+# the model is then tested on unseen data X_test, y_test
 X_train_val, X_test, y_train_val, y_test = train_test_split(
     X, y, test_size=0.15)
-
 all_indices = list(range(X_train_val.shape[0]))
 train_indices, val_indices = train_test_split(
     all_indices, test_size=0.5, random_state=42)
@@ -45,12 +47,13 @@ X_val = X_train_val[val_indices, :]
 
 y_train = y_train_val[train_indices]
 y_val = y_train_val[val_indices]
+##############################################################################
 
 
 # max penalty value
 alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
 
-n_alphas = 30
+n_alphas = 30  # number of iter in the line search, ie 30 evals of the gradient
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 
 train_split_cv = [train_indices]
