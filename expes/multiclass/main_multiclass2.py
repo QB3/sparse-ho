@@ -26,6 +26,18 @@ X, y = fetch_libsvm('mnist')
 # X, y = fetch_libsvm('news20_multiclass')
 # X, y = fetch_libsvm('aloi')
 # X, y = fetch_libsvm('rcv1_multiclass')
+bool_123 = np.logical_or(np.logical_or(y == 1, y == 2), y == 3)
+y = y[bool_123]
+X = X[bool_123, :]
+
+bool3 = y == 3
+bool3[:(bool3.shape[0] * 8 // 10)] = False
+
+bool_123 = np.logical_or(np.logical_or(y == 1, y == 2), bool3)
+y = y[bool_123]
+X = X[bool_123, :]
+
+
 np.random.seed(0)
 idx = np.random.choice(X.shape[0], min(n_samples, X.shape[0]), replace=False)
 feats = np.random.choice(
@@ -78,7 +90,7 @@ logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 
 
 n_alphas = 20
-p_alphas = np.geomspace(0.8, 0.001, n_alphas)
+p_alphas = np.geomspace(0.8, 0.0001, n_alphas)
 p_alphas = np.tile(p_alphas, (n_classes, 1))
 
 monitor_grid = Monitor()
@@ -92,19 +104,19 @@ for i in range(n_alphas):
 print("min cross entropy grid-search %f " % np.array(np.min(monitor_grid.objs)))
 print("max accuracy grid-search %f " % np.array(np.max(monitor_grid.acc_vals)))
 
-monitor_adam = Monitor()
-log_alpha0 = np.ones(n_classes) * np.log(0.01 * alpha_max)
+# monitor_adam = Monitor()
+# log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 
-lr = 0.01
-beta_2 = 0.9
-print("###################### ADAM ###################")
-n_outer = 1000
-adam_search(
-    logit_multiclass, log_alpha0, monitor_adam, n_outer=n_outer, verbose=1, epsilon=1e-8, lr=lr, beta_2=beta_2)
+# lr = 0.01
+# beta_2 = 0.999
+# print("###################### ADAM ###################")
+# n_outer = 2000
+# adam_search(
+#     logit_multiclass, log_alpha0, monitor_adam, n_outer=n_outer, verbose=1, epsilon=1e-8, lr=lr, beta_2=beta_2)
 
 
-idx_min = np.argmin(np.array(monitor_adam.objs))
-log_alpha0 = monitor_adam.log_alphas[-1]
+# idx_min = np.argmin(np.array(monitor_adam.objs))
+# log_alpha0 = monitor_adam.log_alphas[-1]
 
 # n_outer = 1_000
 # # log_alpha0 = monitor_adam.log_alphas[-1]
@@ -112,17 +124,18 @@ log_alpha0 = monitor_adam.log_alphas[-1]
 #     logit_multiclass, log_alpha0, monitor_adam, n_outer=n_outer, verbose=1, epsilon=1e-8, lr=lr/10)
 
 
-# print("###################### GRAD SEARCH LS ###################")
+print("###################### GRAD SEARCH LS ###################")
+log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 
-# # n_outer = 20
-# # monitor = Monitor()
-# # # log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 
-# # idx_min = np.argmin(np.array(monitor_grid.objs))
-# # log_alpha0 = monitor_grid.log_alphas[idx_min]
-# # grad_search(
-# #     logit_multiclass, log_alpha0, monitor, n_outer=n_outer, verbose=1, tol=1e-7)
-
+n_outer = 500
+monitor = Monitor()
 
 # idx_min = np.argmin(np.array(monitor_grid.objs))
 # log_alpha0 = monitor_grid.log_alphas[idx_min]
+grad_search(
+    logit_multiclass, log_alpha0, monitor, n_outer=n_outer, verbose=1, tol=1e-7)
+
+
+idx_min = np.argmin(np.array(monitor.objs))
+log_alpha0 = monitor.log_alphas[idx_min]
