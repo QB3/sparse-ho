@@ -83,7 +83,7 @@ def grad_search(
     """
 
     def _get_val_grad(lambdak, tol=tol):
-        return criterion.get_val_grad(lambdak, tol=tol)
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)
 
     def _proj_param(lambdak):
         return criterion.proj_param(lambdak)
@@ -207,6 +207,8 @@ def _grad_search(
             old_tol = seq_tol[0]
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
 
+        print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+              i, n_outer, g_func, monitor.acc_vals[-1]))
         if verbose >= 1:
             print("outer function value %f" % g_func)
         try:
@@ -276,3 +278,86 @@ def _grad_search(
         if monitor.times[-1] > t_max:
             break
     return lambdak, g_func, grad_lambda
+
+
+def adam_search(
+        criterion, log_alpha0, monitor, n_outer=10, verbose=False,
+        tolerance_decrease='constant', tol=1e-5,
+        beta_star=None, t_max=10000, epsilon=1e-3, lr=0.01, beta_2=0.999):
+    """This adam code is taken from here:
+    https://github.com/sagarvegad/Adam-optimizer/blob/master/Adam.py
+
+    Parameters
+    ----------
+    log_alpha0: float
+        log of the regularization coefficient alpha
+    tol : float
+        tolerance for the inner optimization solver
+    monitor: Monitor object
+        used to store the value of the cross-validation function
+    n_outer: int
+        number of maximum iteration in the outer loop (for the line search)
+    tolerance_decrease: string
+        tolerance decrease strategy for approximate gradient
+    gamma: non negative float
+        convexification coefficient
+    criterion: string
+        criterion to optimize during hyperparameter optimization
+        you may choose between "cv" and "sure"
+    gamma_sure:
+        constant for sure problem
+     sigma,
+        constant for sure problem
+    random_state: int
+    beta_star: np.array, shape (n_features,)
+        True coefficients of the underlying model (if known)
+        used to compute metrics
+    """
+
+    def _get_val_grad(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)
+
+    # def _proj_param(lambdak):
+    #     return criterion.proj_param(lambdak)
+
+    return _adam_search(
+        _get_val_grad, log_alpha0, monitor, n_outer=n_outer,
+        verbose=verbose, tolerance_decrease=tolerance_decrease, tol=tol,
+        t_max=t_max, epsilon=epsilon, lr=lr, beta_2=beta_2)
+
+
+def _adam_search(
+        _get_val_grad, log_alpha0, monitor, n_outer=100,
+        verbose=False, tolerance_decrease='constant', tol=1e-5,
+        beta_star=None, t_max=10000, epsilon=1e-3, lr=0.01, beta_2=0.999):
+
+    beta_1 = 0.9
+    beta_2 = 0.999  # initialize the values of the parameters
+    # epsilon = 1e-3
+
+    log_alpha = log_alpha0
+    # log_alpha0 = 0  # initialize the vector
+    m_t = 0
+    v_t = 0
+    t = 0
+
+    for i in range(n_outer):
+        t += 1
+        val, grad = _get_val_grad(log_alpha)
+
+        print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+              i, n_outer, val, monitor.acc_vals[-1]))
+        # updates the moving averages of the gradient
+        m_t = beta_1*m_t + (1-beta_1) * grad
+        # updates the moving averages of the squared gradient
+        v_t = beta_2*v_t + (1-beta_2) * (grad * grad)
+        m_cap = m_t/(1-(beta_1**t))
+        # calculates the bias-corrected estimates
+        v_cap = v_t/(1-(beta_2**t))
+        # calculates the bias-corrected estimates
+        logh_alpha_prev = log_alpha
+        # updates the parameters
+        log_alpha = log_alpha - (lr*m_cap) / (np.sqrt(v_cap)+epsilon)
+        # checks if it is converged or not
+        if np.allclose(log_alpha, logh_alpha_prev):
+            break
