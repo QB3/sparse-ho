@@ -14,6 +14,8 @@ In particular we compare the weighted Lasso to LassoCV on a toy example
 # License: BSD (3-clause)
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
 from celer import Lasso, LassoCV
 from sklearn.datasets import make_regression
@@ -29,7 +31,7 @@ from sparse_ho.ho import grad_search
 ##############################################################################
 # Dataset creation
 ##############################################################################
-X, y = make_regression(n_samples=500, n_features=600, noise=0, random_state=2)
+X, y = make_regression(n_samples=600, n_features=600, noise=60, random_state=2)
 
 # Here we split the dataset (X, y) in 3:
 # the regression coefficients will be determined using X_train, y_train
@@ -53,7 +55,7 @@ alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 print("========== Celer's LassoCV started ===============")
 model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
-    cv=5).fit(X_train_val, y_train_val)
+    cv=2).fit(X_train_val, y_train_val)
 
 # measure mse on test
 mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
@@ -91,3 +93,24 @@ mse_sho_test = mean_squared_error(y_test, X_test @ coef_)
 
 print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
 print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
+
+
+# fig = plt.figure()
+# ax = fig.add_axes([0, 0, 1, 1])
+# legend = ['wLasso val', 'wLasso test', 'Lasso CV']
+# mses = [mse_sho_val, mse_sho_test, mse_cv]
+# ax.bar(legend, mses)
+# ax.legend(labels=legend)
+# plt.show(block=False)
+
+labels = ['wLasso val', 'wLasso test', 'Lasso CV']
+
+df = pd.DataFrame(
+    np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),
+    columns=labels)
+# df.index = labels
+df.plot.bar(rot=0)
+plt.xlabel("Estimator")
+plt.ylabel("Mean square error")
+plt.tight_layout()
+plt.show()
