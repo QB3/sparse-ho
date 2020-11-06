@@ -181,9 +181,11 @@ class Monitor():
         self.log_alphas = []
         self.grads = []
         self.rmse = []
+        self.acc_vals = []
 
     def __call__(
-            self, obj, obj_test=None, log_alpha=None, grad=None, rmse=None):
+            self, obj, obj_test=None, log_alpha=None, grad=None, rmse=None,
+            acc_val=None):
         self.objs.append(obj)
         self.objs_test.append(obj_test)
         try:
@@ -193,6 +195,7 @@ class Monitor():
         self.times.append(time.time() - self.t0)
         self.grads.append(grad)
         self.rmse.append(rmse)
+        self.acc_vals.append(acc_val)
 
 
 class WarmStart():

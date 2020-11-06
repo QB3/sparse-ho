@@ -10,22 +10,21 @@ from celer import LogisticRegression
 
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.ho_dirty import grad_search
+from sparse_ho.ho_dirty import grad_search, adam_search
 # , lbfgs
 # from sparse_ho.ho import grad_search_wolfe_dirty
 from sparse_ho.utils import Monitor
 
 
 # load data
-n_samples = 1100
-n_features = 1200
+n_samples = 1_100
+n_features = 3_200
 # X, y = fetch_libsvm('smallNORB')
-# X, y = fetch_libsvm('protein')
-# X, y = fetch_libsvm('mnist')
+X, y = fetch_libsvm('mnist')
 # y[y != 1] = 2
 # X, y = fetch_libsvm('sector')
 # X, y = fetch_libsvm('news20_multiclass')
-X, y = fetch_libsvm('aloi')
+# X, y = fetch_libsvm('aloi')
 # X, y = fetch_libsvm('rcv1_multiclass')
 np.random.seed(0)
 idx = np.random.choice(X.shape[0], min(n_samples, X.shape[0]), replace=False)
@@ -79,24 +78,51 @@ logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 
 
 n_alphas = 20
-p_alphas = np.geomspace(0.01, 0.0001, n_alphas)
+p_alphas = np.geomspace(0.8, 0.001, n_alphas)
 p_alphas = np.tile(p_alphas, (n_classes, 1))
 
-values = np.zeros(n_alphas)
-grads = np.zeros((n_classes, n_alphas))
+monitor_grid = Monitor()
 
 for i in range(n_alphas):
     val, grad = logit_multiclass.get_val_grad(
-        np.log(alpha_max * p_alphas[:, i]))
-    print("%i / %i  ||  %f" % (i, n_alphas, val))
-    values[i] = val
-    grads[:, i] = grad
+        np.log(alpha_max * p_alphas[:, i]), monitor_grid)
+    print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+        i, n_alphas, val, monitor_grid.acc_vals[-1]))
 
-print(values)
+print("min cross entropy grid-search %f " % np.array(np.min(monitor_grid.objs)))
+print("max accuracy grid-search %f " % np.array(np.max(monitor_grid.acc_vals)))
 
-n_outer = 20
+monitor_adam = Monitor()
+log_alpha0 = np.ones(n_classes) * np.log(0.01 * alpha_max)
 
-log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
-monitor = Monitor()
-grad_search(
-    logit_multiclass, log_alpha0, monitor, n_outer=n_outer, verbose=1, tol=1e-7)
+lr = 0.01
+beta_2 = 0.9
+print("###################### ADAM ###################")
+n_outer = 1000
+adam_search(
+    logit_multiclass, log_alpha0, monitor_adam, n_outer=n_outer, verbose=1, epsilon=1e-8, lr=lr, beta_2=beta_2)
+
+
+idx_min = np.argmin(np.array(monitor_adam.objs))
+log_alpha0 = monitor_adam.log_alphas[-1]
+
+# n_outer = 1_000
+# # log_alpha0 = monitor_adam.log_alphas[-1]
+# adam_search(
+#     logit_multiclass, log_alpha0, monitor_adam, n_outer=n_outer, verbose=1, epsilon=1e-8, lr=lr/10)
+
+
+# print("###################### GRAD SEARCH LS ###################")
+
+# # n_outer = 20
+# # monitor = Monitor()
+# # # log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
+
+# # idx_min = np.argmin(np.array(monitor_grid.objs))
+# # log_alpha0 = monitor_grid.log_alphas[idx_min]
+# # grad_search(
+# #     logit_multiclass, log_alpha0, monitor, n_outer=n_outer, verbose=1, tol=1e-7)
+
+
+# idx_min = np.argmin(np.array(monitor_grid.objs))
+# log_alpha0 = monitor_grid.log_alphas[idx_min]

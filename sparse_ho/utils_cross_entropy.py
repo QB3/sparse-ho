@@ -24,6 +24,14 @@ def cross_entropy(betas, X, Y):
     return result
 
 
+def accuracy(betas, X, Y):
+    scores = X @ betas
+    idx_max = np.argmax(scores, axis=1)
+    idx_true = np.argmax(Y, axis=1)  # TODO to improve
+    acc = (idx_max == idx_true).mean()
+    return acc
+
+
 def grad_cross_entropy(betas, X, Y):
     """Compute gradient of cross-entropy wrt betas
     betas: array of size (n_features, n_classes)
