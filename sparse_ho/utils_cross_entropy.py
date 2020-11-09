@@ -44,3 +44,17 @@ def grad_cross_entropy(betas, X, Y):
     grad = (X.T @ weights) / n_samples
 
     return grad
+
+
+def grad_cross_entropyk(betas, X, Y, k):
+    """Compute gradient of cross-entropy wrt betas
+    betas: array of size (n_features, n_classes)
+    X: {ndarray, sparse matrix} of (n_samples, n_features)
+    Y: {ndarray, sparse matrix} of (n_samples, n_classes)
+    """
+    n_samples = X.shape[0]
+    sm = softmax(X @ betas)
+    weights = sm[:, k] - Y[:, k]
+    gradk = (X.T @ weights) / n_samples
+
+    return gradk

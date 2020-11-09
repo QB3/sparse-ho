@@ -361,3 +361,97 @@ def _adam_search(
         # checks if it is converged or not
         if np.allclose(log_alpha, logh_alpha_prev):
             break
+
+
+def grad_search_backtrack_dirty(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=10):
+
+    def _get_val_grad(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)
+
+    def _get_val(lambdak, tol=tol):
+        return criterion.get_val(lambdak, tol=tol)
+
+    log_alphak = log_alpha0
+    for i in range(n_outer):
+        val, grad = _get_val_grad(log_alphak)
+
+        monitor(val.copy(), None, log_alphak, grad)
+
+        # step_size = 1 / norm(grad)
+        step_size = backtracking_ls(
+            val, grad, _get_val, log_alphak, c=0.5, rho=0.5, maxit_ln=maxit_ln)
+        log_alphak -= step_size * grad
+
+        print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+            i, n_outer, val, monitor.acc_vals[-1]))
+
+
+def grad_search_backtracking_cd_dirty(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=5):
+
+    log_alpha = log_alpha0
+    for i in range(n_outer):
+        for k in range(log_alpha0.shape[0]):
+
+            def _get_val(log_alphak, tol=tol):
+                return criterion.get_val(log_alphanew, tol=tol)
+
+            def _get_val_gradk(log_alphak, tol=tol):
+                val, grad = criterion.get_val_grad(
+                    log_alphanew, tol=tol, monitor=monitor)
+                return val, grad[k]
+
+            val, gradk = _get_val_gradk(log_alpha[k])
+
+            step_size = backtracking_ls(
+                val, gradk, _get_val, log_alpha[k], maxit_ln=maxit_ln)
+
+            log_alpha[k] -= step_size * gradk
+
+            print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+                i, n_outer, val, monitor.acc_vals[-1]))
+
+
+def grad_search_backtracking_cd_dirty2(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=5):
+
+    log_alpha = log_alpha0
+
+    def _get_val(log_alphak, tol=tol):
+        return criterion.get_valk(log_alphak, k, tol=tol)
+
+    def _get_val_gradk(log_alpha, k, tol=tol):
+        val, gradk = criterion.get_val_gradk(
+            log_alpha, monitor=monitor, k=k, tol=tol)
+        return val, gradk
+
+    for i in range(n_outer):
+        for k in range(log_alpha0.shape[0]):
+
+            val, gradk = _get_val_gradk(log_alpha, k)
+
+            step_size = backtracking_ls(
+                val, gradk, _get_val, log_alpha[k], maxit_ln=maxit_ln)
+
+            log_alpha[k] -= step_size * gradk
+
+            print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+                i, n_outer, val, monitor.acc_vals[-1]))
+
+
+def backtracking_ls(val, grad, _get_val, x, c=0.00001, rho=0.5, maxit_ln=50):
+    alpha_ls = 1 / norm(grad)
+
+    for i in range(maxit_ln):
+        if _get_val(x - alpha_ls * grad) <= val - c * alpha_ls * norm(grad) ** 2:
+            return alpha_ls
+        else:
+            alpha_ls = alpha_ls * rho
+
+    print("WARNING no step found")
+    return 0
+    # return alpha_ls

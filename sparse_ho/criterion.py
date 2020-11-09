@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils import sigma, smooth_hinge, derivative_smooth_hinge
 from sparse_ho.utils_cross_entropy import (
-    cross_entropy, grad_cross_entropy, accuracy)
+    cross_entropy, grad_cross_entropy, grad_cross_entropyk, accuracy)
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.models import SparseLogreg
 
@@ -573,6 +573,8 @@ class LogisticMulticlass():
             model = SparseLogreg(X_train, y_train, estimator=clone(estimator))
             self.dict_models[k] = model
         self.dict_warm_start = {}
+        self.all_betas = np.zeros((self.n_features, self.n_classes))
+        self.init_beta = False
 
     def get_val_grad(self, log_alpha, monitor, tol=1e-3):
         # TODO use sparse matrices
@@ -594,7 +596,48 @@ class LogisticMulticlass():
         grad = self.grad_total_loss(
             all_betas, all_jacs, self.X_val, self.one_hot_code_val)
         monitor(val, log_alpha=log_alpha.copy(), grad=grad.copy(), acc_val=acc)
+        self.all_betas = all_betas
+        self.init_beta = True
         return val, grad
+
+    def get_val_gradk(self, log_alpha, monitor, k, tol=1e-3):
+        if not self.init_beta:
+            self.get_val_grad(log_alpha, monitor, tol=tol)
+            self.init_beta = True
+        # TODO use sparse matrices
+        # all_betas = np.zeros((self.n_features, self.n_classes))
+        # all_jacs = np.zeros((self.n_features, self.n_classes))
+        model = self.dict_models[k]
+        mask0, dense0, jac0 = self.dict_warm_start.get(
+            k, (None, None, None))
+        mask, dense, jac = self.algo.get_beta_jac(
+            model.X, model.y, log_alpha[k], model, None, mask0=mask0,
+            dense0=dense0, quantity_to_warm_start=jac0, compute_jac=True,
+            tol=tol)
+        self.dict_warm_start[k] = (mask, dense, jac)
+        self.all_betas[mask, k] = dense  # maybe use np.ix_
+        jack = np.zeros(self.n_features)
+        jack[mask] = dense  # maybe use np.ix_
+        acc = accuracy(self.all_betas, self.X_val, self.one_hot_code_val)
+        val = cross_entropy(self.all_betas, self.X_val, self.one_hot_code_val)
+        gradk = self.grad_k_loss(
+            self.all_betas, jack, self.X_val, self.one_hot_code_val, k)
+        monitor(val, log_alpha=log_alpha.copy(), grad=gradk, acc_val=acc)
+        return val, gradk
+
+    def get_valk(self, log_alphak, k, tol=1e-3):
+        # TODO use sparse matrices
+        # TODO add warm start
+        # all_betas = np.zeros((self.n_features, self.n_classes))
+        # for k in range(self.n_classes):
+        model = self.dict_models[k]
+        # TODO add warm start
+        mask, dense, jac = self.algo.get_beta_jac(
+            model.X, model.y, log_alphak, model, None, mask0=None,
+            dense0=None, quantity_to_warm_start=None, compute_jac=True)
+        self.all_betas[mask, k] = dense  # maybe use np.ix_
+        val = cross_entropy(self.all_betas, self.X_val, self.one_hot_code_val)
+        return val
 
     def get_val(self, log_alpha, tol=1e-3):
         # TODO use sparse matrices
@@ -621,3 +664,8 @@ class LogisticMulticlass():
         grad_ce = grad_cross_entropy(all_betas, X, Y)
         grad_total = (grad_ce * all_jacs).sum(axis=0)
         return grad_total
+
+    def grad_k_loss(self, all_betas, jack, X, Y, k):
+        grad_ce = grad_cross_entropyk(all_betas, X, Y, k)
+        grad_k = grad_ce @ jack
+        return grad_k

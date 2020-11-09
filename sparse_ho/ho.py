@@ -275,7 +275,7 @@ def grad_search_wolfe_dirty(
         maxit_ln=5):
 
     def _get_val_grad(lambdak, tol=tol):
-        return criterion.get_val_grad(lambdak, tol=tol)
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)
 
     def _get_val(lambdak, tol=tol):
         return criterion.get_val(lambdak, tol=tol)
@@ -292,11 +292,43 @@ def grad_search_wolfe_dirty(
         log_alphak -= step_size * grad
 
 
+def grad_search_wolfe_cd_dirty(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        maxit_ln=5):
+
+    log_alpha = log_alpha0
+    for i in range(n_outer):
+        for k in range(log_alpha0.shape[0]):
+
+            def _get_val(log_alphak, tol=tol):
+                log_alphanew = log_alpha.copy()
+                log_alphanew[k] = log_alphak
+                return criterion.get_val(log_alphanew, tol=tol)
+
+            def _get_val_gradk(log_alphak, tol=tol):
+                log_alphanew = log_alpha.copy()
+                log_alphanew[k] = log_alphak
+                val, grad = criterion.get_val_grad(
+                    log_alphanew, tol=tol, monitor=monitor)
+                return val, grad[k]
+
+            val, gradk = _get_val_gradk(log_alpha[k])
+
+            step_size = wolfe(
+                log_alpha[k], -gradk, val, _get_val, _get_val_gradk, maxit_ln=maxit_ln)
+
+            log_alpha[k] -= step_size * gradk
+
+            print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+                i, n_outer, val, monitor.acc_vals[-1]))
+
+
 def wolfe(x_k, p_k, val, fun, fun_grad, maxit_ln=5):
 
     alpha_low = 0
     alpha_high = 1000
-    alpha = 1 / (10 * norm(p_k))
+    alpha = 1 / norm(p_k)
+    # alpha = 1 / (10 * norm(p_k))
     # alpha = 1 / (10 * norm(p_k))
     c1 = 0.1
     c2 = 0.7

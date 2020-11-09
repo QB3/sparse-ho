@@ -195,7 +195,8 @@ class Monitor():
         self.times.append(time.time() - self.t0)
         self.grads.append(grad)
         self.rmse.append(rmse)
-        self.acc_vals.append(acc_val)
+        if acc_val is not None:
+            self.acc_vals.append(acc_val)
 
 
 class WarmStart():
