@@ -10,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils import sigma, smooth_hinge, derivative_smooth_hinge
 from sparse_ho.utils_cross_entropy import (
     cross_entropy, grad_cross_entropy, grad_cross_entropyk, accuracy)
+from sparse_ho.utils_datasets import get_splits
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.models import SparseLogreg
 
@@ -550,27 +551,33 @@ class LogisticMulticlass():
 
         self.algo = algo
 
+        idx_train, idx_val, idx_test = get_splits(X, y)
+
         enc = OneHotEncoder(sparse=False)  # maybe remove the sparse=False
+        # split data set in test validation and train
         self.one_hot_code = enc.fit_transform(pd.DataFrame(y))
-        self.one_hot_code_val = train_test_split(
-            self.one_hot_code, random_state=42)[1]
+        self.one_hot_code_train = self.one_hot_code[idx_train, :]
+        self.one_hot_code_val = self.one_hot_code[idx_val, :]
+        self.one_hot_code_test = self.one_hot_code[idx_test, :]
+
         self.n_classes = self.one_hot_code.shape[1]
         self.n_features = X.shape[1]
 
-        # TODO use split as for crossval
-        self.X_train, self.X_val, self.y_train, self.y_val = train_test_split(
-            X, y, random_state=42)
-        self.X_train = self.X_train.tocsc()
-        self.X_val = self.X_val.tocsc()
+        # TODO use better splitting methods
+        self.X_train = X[idx_train, :]
+        self.X_val = X[idx_val, :]
+        self.X_test = X[idx_test, :]
+
+        # self.X_train = self.X_train.tocsc()
+        # self.X_val = self.X_val.tocsc()
+        # self.X_test = self.X_test.tocsc()
 
         # dict with all the one vs all models
         self.dict_models = {}
         for k in range(self.n_classes):
-            X_train, X_val, y_train, y_val = train_test_split(
-                X, self.one_hot_code[:, k], random_state=42)
-            X_train = X_train.tocsc()
-            X_val = X_val.tocsc()
-            model = SparseLogreg(X_train, y_train, estimator=clone(estimator))
+            model = SparseLogreg(
+                X[idx_train, :], self.one_hot_code_train[:, k],
+                estimator=clone(estimator))
             self.dict_models[k] = model
         self.dict_warm_start = {}
         self.all_betas = np.zeros((self.n_features, self.n_classes))
@@ -591,11 +598,14 @@ class LogisticMulticlass():
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
             all_jacs[mask, k] = jac  # maybe use np.ix_
-        acc = accuracy(all_betas, self.X_val, self.one_hot_code_val)
+        acc_val = accuracy(all_betas, self.X_val, self.one_hot_code_val)
+        acc_test = accuracy(all_betas, self.X_test, self.one_hot_code_test)
         val = cross_entropy(all_betas, self.X_val, self.one_hot_code_val)
         grad = self.grad_total_loss(
             all_betas, all_jacs, self.X_val, self.one_hot_code_val)
-        monitor(val, log_alpha=log_alpha.copy(), grad=grad.copy(), acc_val=acc)
+        monitor(
+            val, log_alpha=log_alpha.copy(), grad=grad.copy(), acc_val=acc_val,
+            acc_test=acc_test)
         self.all_betas = all_betas
         self.init_beta = True
         return val, grad
@@ -618,11 +628,14 @@ class LogisticMulticlass():
         self.all_betas[mask, k] = dense  # maybe use np.ix_
         jack = np.zeros(self.n_features)
         jack[mask] = dense  # maybe use np.ix_
-        acc = accuracy(self.all_betas, self.X_val, self.one_hot_code_val)
+        acc_val = accuracy(self.all_betas, self.X_val, self.one_hot_code_val)
+        acc_test = accuracy(self.all_betas, self.X_test, self.one_hot_code_test)
         val = cross_entropy(self.all_betas, self.X_val, self.one_hot_code_val)
         gradk = self.grad_k_loss(
             self.all_betas, jack, self.X_val, self.one_hot_code_val, k)
-        monitor(val, log_alpha=log_alpha.copy(), grad=gradk, acc_val=acc)
+        monitor(
+            val, log_alpha=log_alpha.copy(), grad=gradk, acc_val=acc_val,
+            acc_test=acc_test)
         return val, gradk
 
     def get_valk(self, log_alphak, k, tol=1e-3):
@@ -646,11 +659,37 @@ class LogisticMulticlass():
         for k in range(self.n_classes):
             model = self.dict_models[k]
             # TODO add warm start
+            mask0, dense0, jac0 = self.dict_warm_start.get(
+                k, (None, None, None))
             mask, dense, jac = self.algo.get_beta_jac(
                 model.X, model.y, log_alpha[k], model, None, mask0=None,
                 dense0=None, quantity_to_warm_start=None, compute_jac=True)
+            self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
         val = cross_entropy(all_betas, self.X_val, self.one_hot_code_val)
+        return val
+
+    def get_val_monitor(self, log_alpha, monitor, tol=1e-3):
+        # TODO use sparse matrices
+        # TODO add warm start
+        all_betas = np.zeros((self.n_features, self.n_classes))
+        for k in range(self.n_classes):
+            model = self.dict_models[k]
+            # TODO add warm start
+            mask0, dense0, jac0 = self.dict_warm_start.get(
+                k, (None, None, None))
+            mask, dense, jac = self.algo.get_beta_jac(
+                model.X, model.y, log_alpha[k], model, None, mask0=None,
+                dense0=None, quantity_to_warm_start=None, compute_jac=True)
+            self.dict_warm_start[k] = (mask, dense, jac)
+            all_betas[mask, k] = dense  # maybe use np.ix_
+        self.all_betas = all_betas
+        val = cross_entropy(self.all_betas, self.X_val, self.one_hot_code_val)
+        acc_val = accuracy(self.all_betas, self.X_val, self.one_hot_code_val)
+        acc_test = accuracy(self.all_betas, self.X_test, self.one_hot_code_test)
+        monitor(
+            val, log_alpha=log_alpha.copy(), grad=None, acc_val=acc_val,
+            acc_test=acc_test)
         return val
 
     def proj_param(self, log_alpha):

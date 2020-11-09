@@ -207,16 +207,11 @@ def _grad_search(
             old_tol = seq_tol[0]
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
 
-        print("%i / %i  || crosss entropy %f  || accuracy %f" % (
-              i, n_outer, g_func, monitor.acc_vals[-1]))
-        if verbose >= 1:
-            print("outer function value %f" % g_func)
-        try:
-            # as in scipy I think we should use callback function, instead of rmse attriburtes, wdyt?
-            monitor(g_func, None, lambdak.copy(),
-                    grad_lambda)
-        except Exception:
-            monitor(g_func, None, lambdak, grad_lambda)
+        print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f " % (
+              i, n_outer, g_func, monitor.acc_vals[-1], monitor.acc_tests[-1]))
+
+        if monitor.times[-1] > t_max:
+            return
 
         old_grads.append(norm(grad_lambda))
         if np.isnan(old_grads[-1]):
@@ -275,8 +270,7 @@ def _grad_search(
         if verbose > 1:
             print('grad lambda', grad_lambda)
             print('value of lambda_k', lambdak)
-        if monitor.times[-1] > t_max:
-            break
+
     return lambdak, g_func, grad_lambda
 
 
@@ -417,7 +411,7 @@ def grad_search_backtracking_cd_dirty(
 
 def grad_search_backtracking_cd_dirty2(
         criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
-        maxit_ln=5):
+        maxit_ln=5, t_max=np.infty):
 
     log_alpha = log_alpha0
 
@@ -439,12 +433,16 @@ def grad_search_backtracking_cd_dirty2(
 
             log_alpha[k] -= step_size * gradk
 
-            print("%i / %i  || crosss entropy %f  || accuracy %f" % (
-                i, n_outer, val, monitor.acc_vals[-1]))
+            print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f" % (
+                i, n_outer, val, monitor.acc_vals[-1], monitor.acc_tests[-1]))
+
+            if monitor.times[-1] > t_max:
+                return
 
 
 def backtracking_ls(val, grad, _get_val, x, c=0.00001, rho=0.5, maxit_ln=50):
     alpha_ls = 1 / norm(grad)
+    print("init stepsize %f " % alpha_ls)
 
     for i in range(maxit_ln):
         if _get_val(x - alpha_ls * grad) <= val - c * alpha_ls * norm(grad) ** 2:

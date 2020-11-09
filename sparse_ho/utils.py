@@ -182,10 +182,11 @@ class Monitor():
         self.grads = []
         self.rmse = []
         self.acc_vals = []
+        self.acc_tests = []
 
     def __call__(
             self, obj, obj_test=None, log_alpha=None, grad=None, rmse=None,
-            acc_val=None):
+            acc_val=None, acc_test=None):
         self.objs.append(obj)
         self.objs_test.append(obj_test)
         try:
@@ -197,6 +198,8 @@ class Monitor():
         self.rmse.append(rmse)
         if acc_val is not None:
             self.acc_vals.append(acc_val)
+        if acc_test is not None:
+            self.acc_tests.append(acc_test)
 
 
 class WarmStart():
