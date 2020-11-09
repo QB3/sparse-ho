@@ -25,6 +25,7 @@ class Lasso():
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
+
     def __init__(
             self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
@@ -282,6 +283,7 @@ class wLasso():
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
+
     def __init__(
             self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
@@ -488,6 +490,8 @@ class wLasso():
         X /= alpha
         self.estimator.set_params(tol=tol, alpha=1)
         self.estimator.fit(X, y)
+        # set proper coefficients for estimator, to predict and use warm start
+        self.estimator.coef_ /= alpha
         mask = self.estimator.coef_ != 0
         dense = (self.estimator.coef_ / alpha)[mask]
         return mask, dense, None
@@ -529,6 +533,7 @@ class SVM():
         Target
     TODO: other parameters should be remove
     """
+
     def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
         self.logC = logC
         self.max_iter = max_iter
@@ -569,7 +574,6 @@ class SVM():
     @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, C, L, compute_jac=True):
-
         """
             beta : dual variable of the svm
             r : primal used for cheap updates
@@ -865,6 +869,7 @@ class SparseLogreg():
         Target
     TODO: other parameters should be remove
     """
+
     def __init__(
             self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
         self.X = X
@@ -1157,6 +1162,7 @@ class SVR():
         Target
     TODO: other parameters should be remove
     """
+
     def __init__(self, X, y, logC, log_epsilon, max_iter=100, tol=1e-3):
         self.hyperparam = np.array([logC, log_epsilon])
         self.max_iter = max_iter
@@ -1198,7 +1204,6 @@ class SVR():
     # @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, hyperparam, L, compute_jac=True):
-
         """
             beta : dual variable of the svm
             r : primal used for cheap updates
