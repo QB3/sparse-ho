@@ -53,7 +53,8 @@ dict_markers['random'] = '*'
 dict_markers['lhs'] = 'H'
 
 dict_title = {}
-dict_title["rcv1"] = "rcv1"
+dict_title["mnist"] = "mnist"
+dict_title["rcv1_train"] = "rcv1"
 dict_title["20news"] = "20news"
 dict_title["finance"] = "finance"
 dict_title["kdda_train"] = "kdda"
@@ -104,6 +105,9 @@ fig_acc_test, axarr_acc_test = plt.subplots(
 fig_ce, axarr_ce = plt.subplots(
     1, len(dataset_names) + 1, sharex=False, sharey=False, figsize=[14, 4])
 
+all_figs = [fig_acc_val, fig_acc_test, fig_ce]
+all_axarr = [axarr_acc_val, axarr_acc_test, axarr_ce]
+
 
 for idx, dataset_name in enumerate(dataset_names):
     plt.figure()
@@ -114,9 +118,14 @@ for idx, dataset_name in enumerate(dataset_names):
         method = df_data['method'].to_numpy()[0]
         times = df_data['times'].to_numpy()[0]
         objs = df_data['objs'].to_numpy()[0]
+        objs = [
+            np.min(objs[:k]) for k in np.arange(len(objs)) + 1]
         log_alphas = df_data['log_alphas'].to_numpy()[0]
         acc_vals = df_data['acc_vals'].to_numpy()[0]
+        acc_vals = [np.max(acc_vals[:k]) for k in np.arange(len(acc_vals)) + 1]
         acc_tests = df_data['acc_tests'].to_numpy()[0]
+        acc_tests = [
+            np.max(acc_tests[:k]) for k in np.arange(len(acc_tests)) + 1]
 
         axarr_acc_val.flat[idx].plot(
             times, acc_vals, label=dict_method[method],
@@ -130,9 +139,13 @@ for idx, dataset_name in enumerate(dataset_names):
             times, objs, label=dict_method[method], color=dict_color[method],
             marker=dict_markers[method])
 
-fig_acc_val.legend()
-fig_acc_test.legend()
-fig_ce.legend()
+    for axarr in all_axarr:
+        axarr.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
+        axarr.flat[idx].set_title(dict_title[dataset_name])
+
+for fig in all_figs:
+    fig.tight_layout()
+    fig.legend()
 
 
 axarr_acc_val.flat[0].set_ylabel("Accuracy validation set", fontsize=fontsize)

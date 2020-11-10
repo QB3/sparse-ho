@@ -17,10 +17,10 @@ from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
 dataset_names = ["aloi"]
 # dataset_names = ["mnist"]
 
-# methods = ["random"]
+methods = ["random"]
 # methods = ["random", "bayesian"]
 # methods = ["implicit_forward_cdls"]
-methods = ["implicit_forward"]
+# methods = ["implicit_forward"]
 # methods = ["implicit_forward_cdls", "implicit_forward"]
 # methods = ["implicit_forward_cdls", "implicit_forward", "random", "bayesian"]
 
@@ -81,10 +81,11 @@ def parallel_function(
             logit_multiclass, log_alpha0, monitor, n_outer=n_outer, tol=tol,
             maxit_ln=10, t_max=t_max)
     elif method.startswith(('random', 'bayesian')):
+        max_evals = dict_max_eval[dataset_name]
         log_alpha_min = np.log(alpha_max) - 7
         hyperopt_wrapper(
             logit_multiclass, log_alpha_min, log_alpha_max, monitor,
-            max_evals=50, tol=tol, t_max=t_max, method=method,
+            max_evals=max_evals, tol=tol, t_max=t_max, method=method,
             size_space=n_classes)
 
     monitor.times = np.array(monitor.times).copy()
