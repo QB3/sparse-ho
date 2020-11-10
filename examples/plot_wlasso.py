@@ -70,7 +70,8 @@ alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
 
 ##############################################################################
 #  weighted Lasso: Sparse-ho: 1 param per feature
-lasso_sho = Lasso(fit_intercept=False, max_iter=30, warm_start=True)
+lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
+
 model_sho = wLasso(X_train, y_train, estimator=lasso_sho)
 criterion_sho = CV(X_val, y_val, model_sho, X_test=X_test, y_test=y_test)
 algo_sho = ImplicitForward(criterion_sho)
@@ -79,16 +80,16 @@ grad_search(
     algo_sho, alpha0, monitor, n_outer=20, tol=1e-6)
 
 
-alphas = np.exp(monitor.log_alphas[-1])
-lasso_sho.fit(X_train / alphas, y_train)
-coef_ = lasso_sho.coef_ / alphas
+# alphas = np.exp(monitor.log_alphas[-1])
+# lasso_sho.fit(X_train, y_train)
+# coef_ = lasso_sho.coef_ / alphas
 
 
 # mse on validation set
-mse_sho_val = mean_squared_error(y_val, X_val @ coef_)
+mse_sho_val = mean_squared_error(y_val, lasso_sho.predict(X_val))
 
 # mse on test set, ie unseen data
-mse_sho_test = mean_squared_error(y_test, X_test @ coef_)
+mse_sho_test = mean_squared_error(y_test, lasso_sho.predict(X_test))
 
 
 print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
