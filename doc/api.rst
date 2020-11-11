@@ -25,7 +25,7 @@ Models
    :toctree: generated/
 
    Lasso
-   wLasso
+   WeightedLasso
    SVM
 
 
