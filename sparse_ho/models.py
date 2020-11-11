@@ -498,7 +498,7 @@ class WeightedLasso():
         # set proper coefficients for estimator, to predict and use warm start
         self.estimator.coef_ /= alpha
         mask = self.estimator.coef_ != 0
-        dense = (self.estimator.coef_)[mask]
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):

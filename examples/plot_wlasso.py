@@ -43,13 +43,15 @@ X = rng.multivariate_normal(
 # Create true regression coefficients of 5 non-zero values
 w_true = np.zeros(n_features)
 size_supp = 5
-idx = rng.choice(
-    X.shape[0], size_supp, replace=False)
+idx = rng.choice(X.shape[0], size_supp, replace=False)
 w_true[idx] = (-1) ** np.arange(size_supp)
 noise = rng.randn(n_samples)
 y = X @ w_true
 y += noise / norm(noise) * 0.5 * norm(y)
+##############################################################################
 
+
+##############################################################################
 # Here we split the dataset (X, y) in 3:
 # the regression coefficients will be determined using X_train, y_train
 # the regularization parameter will be calibrated using X_val, y_val
@@ -61,10 +63,12 @@ X_train, X_val, y_train, y_val = train_test_split(
 ##############################################################################
 
 
+##############################################################################
 # Max penalty value
 alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
-n_alphas = 30  # number of iter in the line search, ie 30 evals of the gradient
+n_alphas = 30
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
+##############################################################################
 
 
 ##############################################################################
@@ -72,7 +76,7 @@ alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 print("========== Celer's LassoCV started ===============")
 model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
-    cv=2).fit(X_train_val, y_train_val)
+    cv=2, n_jobs=2).fit(X_train_val, y_train_val)
 
 # Measure mse on test
 mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
@@ -84,19 +88,17 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 # Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
 alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
-
-##############################################################################
 # Weighted Lasso: Sparse-ho: 1 param per feature
 lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
-
 model_sho = WeightedLasso(X_train, y_train, estimator=lasso_sho)
 criterion_sho = CV(X_val, y_val, model_sho, X_test=X_test, y_test=y_test)
 algo_sho = ImplicitForward(criterion_sho)
 monitor = Monitor()
 grad_search(
     algo_sho, alpha0, monitor, n_outer=20, tol=1e-6)
+##############################################################################
 
-
+##############################################################################
 # MSE on validation set
 mse_sho_val = mean_squared_error(y_val, lasso_sho.predict(X_val))
 
@@ -118,3 +120,4 @@ plt.xlabel("Estimator")
 plt.ylabel("Mean square error")
 plt.tight_layout()
 plt.show()
+##############################################################################
