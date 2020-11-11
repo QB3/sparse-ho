@@ -485,7 +485,7 @@ class wLasso():
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        # TODO uncomment this code when the new version of ceelr is released
+        # TODO uncomment this code when the new version of celer is released
         # self.estimator.set_params(tol=tol)
         # self.estimator.weights = alpha
         # self.estimator.fit(X, y)
