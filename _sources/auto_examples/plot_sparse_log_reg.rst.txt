@@ -143,7 +143,7 @@ Grid-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     scikit finished
-    Time to compute CV for scikit-learn: 1.30
+    Time to compute CV for scikit-learn: 1.49
 
 
 
@@ -234,7 +234,7 @@ Grad-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     sparse-ho finished
-    Time to compute CV for sparse-ho: 2.36
+    Time to compute CV for sparse-ho: 3.15
 
 
 
@@ -242,7 +242,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.079 seconds)
+   **Total running time of the script:** ( 0 minutes  5.242 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

@@ -14,27 +14,6 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a weighted Lasso using a held...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_wlasso_thumb.png
-     :alt: Weighted Lasso with held-out test set
-
-     :ref:`sphx_glr_auto_examples_plot_wlasso.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_wlasso
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a Lasso using a full cross-va...">
 
 .. only:: html
@@ -53,6 +32,27 @@ can be done with the sparse_ho library.
    :hidden:
 
    /auto_examples/plot_grad_search_cv
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a weighted Lasso using a held...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_wlasso_thumb.png
+     :alt: Weighted Lasso with held-out test set
+
+     :ref:`sphx_glr_auto_examples_plot_wlasso.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_wlasso
 
 .. raw:: html
 

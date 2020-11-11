@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparse_ho.models.wLasso &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.models.WeightedLasso &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -93,11 +93,11 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="sparse-ho-models-wlasso">
-<h1>sparse_ho.models.wLasso<a class="headerlink" href="#sparse-ho-models-wlasso" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sparse-ho-models-weightedlasso">
+<h1>sparse_ho.models.WeightedLasso<a class="headerlink" href="#sparse-ho-models-weightedlasso" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="sparse_ho.models.wLasso">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">wLasso</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.models.WeightedLasso">
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">WeightedLasso</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.WeightedLasso" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear Model trained with L1 prior as regularizer (aka the weight Lasso)</p>
 <p>The optimization objective for weighted Lasso is:</p>
 <p>(1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i <a href="#id1"><span class="problematic" id="id2">|wi|</span></a></p>
@@ -116,8 +116,8 @@
 </dd>
 </dl>
 <dl class="py method">
-<dt id="sparse_ho.models.wLasso.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.wLasso.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.models.WeightedLasso.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.WeightedLasso.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -128,7 +128,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.wLasso.__init__" title="sparse_ho.models.wLasso.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X, y[, max_iter, estimator, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.WeightedLasso.__init__" title="sparse_ho.models.WeightedLasso.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X, y[, max_iter, estimator, …])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>

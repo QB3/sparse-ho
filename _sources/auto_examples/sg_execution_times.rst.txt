@@ -5,16 +5,16 @@
 
 Computation times
 =================
-**01:09.940** total execution time for **auto_examples** files:
+**01:11.053** total execution time for **auto_examples** files:
 
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``) | 00:22.807 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``) | 00:33.130 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_wlasso.py` (``plot_wlasso.py``)                 | 00:18.659 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_held_out_enet.py` (``plot_held_out_enet.py``)   | 00:14.264 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_held_out_enet.py` (``plot_held_out_enet.py``)   | 00:13.203 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py` (``plot_grad_search_cv.py``) | 00:11.839 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_grad_search_cv.py` (``plot_grad_search_cv.py``) | 00:11.192 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_wlasso.py` (``plot_wlasso.py``)                 | 00:06.578 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``) | 00:04.079 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``) | 00:05.242 | 0.0 MB |
 +-----------------------------------------------------------------------------------+-----------+--------+

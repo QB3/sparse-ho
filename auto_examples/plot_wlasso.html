@@ -98,157 +98,427 @@
 <div class="sphx-glr-example-title section" id="weighted-lasso-with-held-out-test-set">
 <span id="sphx-glr-auto-examples-plot-wlasso-py"></span><h1>Weighted Lasso with held-out test set<a class="headerlink" href="#weighted-lasso-with-held-out-test-set" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to perform hyperparameter optimization
-for a weighted Lasso using a held-out validation set.</p>
+for a weighted Lasso using a held-out validation set.
+In particular we compare the weighted Lasso to LassoCV on a toy example</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Quentin Bertrand &lt;quentin.bertrand@inria.fr&gt;</span>
 <span class="c1">#          Quentin Klopfenstein &lt;quentin.klopfenstein@u-bourgogne.fr&gt;</span>
-<span class="c1">#</span>
+<span class="c1">#          Kenan Sehic</span>
 <span class="c1"># License: BSD (3-clause)</span>
 
-<span class="kn">import</span> <span class="nn">time</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.linalg.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-np-function"><span class="n">norm</span></a>
 
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_regression</span>
+<span class="kn">from</span> <span class="nn">celer</span> <span class="kn">import</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">LassoCV</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.linalg.html#scipy.linalg.toeplitz" title="scipy.linalg.toeplitz" class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-scipy-optimize-function"><span class="n">toeplitz</span></a>
 
-<span class="kn">from</span> <span class="nn">celer</span> <span class="kn">import</span> <span class="n">Lasso</span>
-
-<span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">wLasso</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">WeightedLasso</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.criterion</span> <span class="kn">import</span> <span class="n">CV</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.implicit_forward</span> <span class="kn">import</span> <span class="n">ImplicitForward</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.ho</span> <span class="kn">import</span> <span class="n">grad_search</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.datasets</span> <span class="kn">import</span> <span class="n">get_data</span>
+</pre></div>
+</div>
+<p>Dataset creation</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">600</span>
+<span class="n">n_features</span> <span class="o">=</span> <span class="mi">600</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.random.html#numpy.random.RandomState" title="numpy.random.RandomState" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-np-class"><span class="n">rng</span></a> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.random.html#numpy.random.RandomState" title="numpy.random.RandomState" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-np-class"><span class="n">rng</span></a><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">n_features</span><span class="p">),</span>
+    <span class="n">cov</span><span class="o">=</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.linalg.html#scipy.linalg.toeplitz" title="scipy.linalg.toeplitz" class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-scipy-optimize-function"><span class="n">toeplitz</span></a><span class="p">(</span><span class="mf">0.5</span> <span class="o">**</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="n">n_features</span><span class="p">)))</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;rcv1_train&#39;</span>
-<span class="c1"># dataset = &#39;simu&#39;</span>
+<span class="c1"># Create true regression coefficients of 5 non-zero values</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">w_true</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
+<span class="n">size_supp</span> <span class="o">=</span> <span class="mi">5</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.random.html#numpy.random.RandomState" title="numpy.random.RandomState" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-np-class"><span class="n">rng</span></a><span class="o">.</span><span class="n">choice</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size_supp</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">w_true</span></a><span class="p">[</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx</span></a><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="n">size_supp</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">noise</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.random.html#numpy.random.RandomState" title="numpy.random.RandomState" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-np-class"><span class="n">rng</span></a><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a> <span class="o">@</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">w_true</span></a>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">+=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">noise</span></a> <span class="o">/</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.linalg.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-np-function"><span class="n">norm</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">noise</span></a><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.linalg.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-np-function"><span class="n">norm</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here we split the dataset (X, y) in 3:
+the regression coefficients will be determined using X_train, y_train
+the regularization parameter will be calibrated using X_val, y_val
+the model is then tested on unseen data X_test, y_test</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train_val</span></a><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Max penalty value</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">)))</span> <span class="o">/</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">30</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Vanilla LassoCV</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========== Celer&#39;s LassoCV started ===============&quot;</span><span class="p">)</span>
+<span class="n">model_cv</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">cv</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train_val</span></a><span class="p">)</span>
 
-<span class="k">if</span> <span class="n">dataset</span> <span class="o">!=</span> <span class="s1">&#39;simu&#39;</span><span class="p">:</span>
-    <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">get_data</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-    <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">[:,</span> <span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-    <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">[:,</span> <span class="p">:</span><span class="mi">1000</span><span class="p">]</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">)</span>
-    <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-        <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-
-<span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix.shape" title="scipy.sparse.csc_matrix.shape" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-attribute"><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span></a>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting path computation...&quot;</span><span class="p">)</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">)</span>
-<span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix.dot" title="scipy.sparse.csr_matrix.dot" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-method"><span class="n">X_train</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">)))</span> <span class="o">/</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.csc_matrix.html#scipy.sparse.csc_matrix.shape" title="scipy.sparse.csc_matrix.shape" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-attribute"><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
-
-<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">10</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">log_alphas</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">)</span>
-
-<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-7</span>
-<span class="n">max_iter</span> <span class="o">=</span> <span class="mf">1e5</span>
+<span class="c1"># Measure mse on test</span>
+<span class="n">mse_cv</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="p">,</span> <span class="n">model_cv</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_test</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Vanilla LassoCV: Mean-squared error on test data </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mse_cv</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset: rcv1_train
-Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
-
-
-file_sizes:   0%|                                   | 0.00/13.7M [00:00&lt;?, ?B/s]
-file_sizes:   0%|                           | 24.6k/13.7M [00:00&lt;02:09, 106kB/s]
-file_sizes:   0%|                           | 49.2k/13.7M [00:00&lt;02:08, 106kB/s]
-file_sizes:   1%|2                           | 106k/13.7M [00:00&lt;01:46, 128kB/s]
-file_sizes:   2%|4                           | 221k/13.7M [00:00&lt;01:21, 165kB/s]
-file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;01:00, 220kB/s]
-file_sizes:   7%|#8                          | 909k/13.7M [00:01&lt;00:42, 300kB/s]
-file_sizes:  13%|###5                       | 1.83M/13.7M [00:01&lt;00:28, 415kB/s]
-file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01&lt;00:17, 580kB/s]
-file_sizes:  38%|##########2                | 5.23M/13.7M [00:02&lt;00:10, 799kB/s]
-file_sizes:  50%|############8             | 6.81M/13.7M [00:02&lt;00:06, 1.09MB/s]
-file_sizes:  61%|###############8          | 8.38M/13.7M [00:02&lt;00:03, 1.45MB/s]
-file_sizes:  72%|##################8       | 9.95M/13.7M [00:02&lt;00:01, 1.90MB/s]
-file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03&lt;00:00, 2.43MB/s]
-file_sizes:  95%|########################8 | 13.1M/13.7M [00:03&lt;00:00, 3.01MB/s]
-file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.22MB/s]
-Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
-Decompressing...
-Loading svmlight file...
-Finished loading data: rcv1_train ...
-Starting path computation...
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>========== Celer&#39;s LassoCV started ===============
+Vanilla LassoCV: Mean-squared error on test data 1.256642
 </pre></div>
 </div>
-<div class="section" id="grid-search">
-<h2>Grid-search<a class="headerlink" href="#grid-search" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># The sklearn solver is indeed very long on the considered problems!</span>
-<span class="c1"># estimator = linear_model.Lasso(</span>
-<span class="c1">#     fit_intercept=False, max_iter=1000, warm_start=True)</span>
-
-<span class="c1"># celer is way faster !</span>
-<span class="c1"># https://github.com/mathurinm/celer</span>
-
-<span class="n">estimator</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span>
-    <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="grad-search">
-<h2>Grad-search<a class="headerlink" href="#grad-search" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sparse-ho started&#39;</span><span class="p">)</span>
-
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ones" title="numpy.ones" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
-
-<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">wLasso</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
-
-<span class="c1"># Here CV means held out,</span>
-<span class="c1"># the &quot;real&quot; crossval (with folds, etc.) is very slow (for the moment) for some</span>
-<span class="c1"># unknown reasons</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">CV</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="p">)</span>
-<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
-<span class="n">monitor_grad</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
+<p>Weighted Lasso with sparse-ho.
+We use the vanilla lassoCV coefficients as a starting point</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">model_cv</span><span class="o">.</span><span class="n">alpha_</span><span class="p">)</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ones" title="numpy.ones" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># Weighted Lasso: Sparse-ho: 1 param per feature</span>
+<span class="n">lasso_sho</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">model_sho</span> <span class="o">=</span> <span class="n">WeightedLasso</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_train</span></a><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">lasso_sho</span><span class="p">)</span>
+<span class="n">criterion_sho</span> <span class="o">=</span> <span class="n">CV</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">model_sho</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_test</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_test</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="p">)</span>
+<span class="n">algo_sho</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">criterion_sho</span><span class="p">)</span>
+<span class="n">monitor</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
 <span class="n">grad_search</span><span class="p">(</span>
-    <span class="n">algo</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a><span class="p">,</span> <span class="n">monitor_grad</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-
-<span class="n">t_grad_search</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time gradient serach:  </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">t_grad_search</span><span class="p">)</span>
+    <span class="n">algo_sho</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a><span class="p">,</span> <span class="n">monitor</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho started
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-!!step size rejected!! 22.166604103094933 0.9999999999998118
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-!!step size rejected!! 6.183602442144726 0.9999999999999796
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-/home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-  sol = celer(
-Time gradient serach:  7.458755
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(array([ -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -0.2024833 ,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+         0.11151323,   0.11151323,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,   0.11151323, -12.        ,  -0.82289153,
+        -0.71665707,  -1.97421325,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,   0.11151323,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,   0.11151323,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,   0.11151323,  -7.83045733,
+        -2.03227289,  -5.32315778,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -4.5863289 ,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,   0.11151323,  -2.03227289,  -2.03227289,
+        -4.71451565,  -1.14555602,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,   0.11151323,   0.11151323,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -1.95763425,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -4.976862  ,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.13012012,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,   0.11151323,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -0.59957442,
+        -2.03227289, -11.87749458,  -6.29341596,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -0.4592734 ,   0.11151323,
+         0.11151323,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289, -12.        ,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289, -11.9998313 ,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -0.65926919,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.92149366,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -0.73111824,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,   0.11151323,  -2.03227289,
+        -2.03227289,  -2.03227289,  -3.64883903,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,   0.11151323,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.01581535,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -1.37007351,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -6.37207281,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -0.2290245 ,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -0.35288573,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,   0.11151323,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+         0.11151323,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289,  -2.03227289,  -2.03227289,  -2.03227289,
+        -2.03227289, -12.        ,  -2.03227289,  -2.03227289]), 1.0765322243843984, array([ 0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  1.39593166e-06,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00, -2.23906621e-05,
+        0.00000000e+00, -6.75960016e-05,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+       -1.28800761e-03,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+       -8.72431477e-04,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+       -1.65983931e-03,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00, -2.41344522e-03,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00, -8.61046241e-08, -4.86676602e-05,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00, -3.53207833e-02,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  1.36110837e-06,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00, -3.23768542e-07,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00, -1.00543423e-03,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  4.12498730e-03,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        3.25106724e-04,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
+        0.00000000e+00,  9.30144806e-08,  0.00000000e+00,  0.00000000e+00]))
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  18.659 seconds)</p>
+<p>MSE on validation set</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mse_sho_val</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_val</span></a><span class="p">,</span> <span class="n">lasso_sho</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_val</span></a><span class="p">))</span>
+
+<span class="c1"># MSE on test set, ie unseen data</span>
+<span class="n">mse_sho_test</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y_test</span></a><span class="p">,</span> <span class="n">lasso_sho</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X_test</span></a><span class="p">))</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparse-ho: Mean-squared error on validation data </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mse_sho_val</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sparse-ho: Mean-squared error on test (unseen) data </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mse_sho_test</span><span class="p">)</span>
+
+
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wLasso val&#39;</span><span class="p">,</span> <span class="s1">&#39;wLasso test&#39;</span><span class="p">,</span> <span class="s1">&#39;Lasso CV&#39;</span><span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">mse_sho_val</span><span class="p">,</span> <span class="n">mse_sho_test</span><span class="p">,</span> <span class="n">mse_cv</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">rot</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Estimator&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Mean square error&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="plot wlasso" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_wlasso_001.png" />
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Sparse-ho: Mean-squared error on validation data 1.076532
+Sparse-ho: Mean-squared error on test (unseen) data 1.142013
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.578 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-wlasso-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/14a579547aea3e35eebf613173d8c3c2/plot_wlasso.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_wlasso.py</span></code></a></p>
@@ -258,7 +528,6 @@ Time gradient serach:  7.458755
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
 </div>
 
 
