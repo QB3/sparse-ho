@@ -70,7 +70,7 @@ alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 
 
 ##############################################################################
-# vanilla LassoCV
+# Vanilla LassoCV
 print("========== Celer's LassoCV started ===============")
 model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
