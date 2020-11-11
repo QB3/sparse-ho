@@ -99,7 +99,7 @@ grad_search(
     algo_sho, alpha0, monitor, n_outer=20, tol=1e-6)
 
 
-# mse on validation set
+# MSE on validation set
 mse_sho_val = mean_squared_error(y_val, lasso_sho.predict(X_val))
 
 # mse on test set, ie unseen data
