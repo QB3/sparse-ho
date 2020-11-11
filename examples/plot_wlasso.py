@@ -24,7 +24,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.utils import check_random_state
 from scipy.linalg import toeplitz
 
-from sparse_ho.models import wLasso
+from sparse_ho.models import WeightedLasso
 from sparse_ho.criterion import CV
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
@@ -89,7 +89,7 @@ alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
 # Weighted Lasso: Sparse-ho: 1 param per feature
 lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
 
-model_sho = wLasso(X_train, y_train, estimator=lasso_sho)
+model_sho = WeightedLasso(X_train, y_train, estimator=lasso_sho)
 criterion_sho = CV(X_val, y_val, model_sho, X_test=X_test, y_test=y_test)
 algo_sho = ImplicitForward(criterion_sho)
 monitor = Monitor()

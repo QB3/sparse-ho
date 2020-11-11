@@ -264,7 +264,7 @@ class Lasso():
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
 
-class wLasso():
+class WeightedLasso():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
 
     The optimization objective for weighted Lasso is:

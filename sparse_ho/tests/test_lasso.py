@@ -5,7 +5,7 @@ from sklearn import linear_model
 
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.models import Lasso, wLasso
+from sparse_ho.models import Lasso, WeightedLasso
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.implicit import get_beta_jac_t_v_implicit
 
@@ -55,7 +55,7 @@ dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = {}
 models["lasso"] = Lasso(X_train, y_train, estimator=None)
-models["wlasso"] = wLasso(X_train, y_train, estimator=None)
+models["wlasso"] = WeightedLasso(X_train, y_train, estimator=None)
 
 
 def get_v(mask, dense):
@@ -107,7 +107,7 @@ estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = {}
 models_custom["lasso"] = Lasso(X_train, y_train, estimator=estimator)
-models_custom["wlasso"] = wLasso(X_train, y_train, estimator=estimator)
+models_custom["wlasso"] = WeightedLasso(X_train, y_train, estimator=estimator)
 
 
 def test_beta_jac2():
