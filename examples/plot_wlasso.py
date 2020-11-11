@@ -18,13 +18,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from numpy.linalg import norm
 
-from celer import Lasso, LassoCV
+from celer import LassoCV
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.utils import check_random_state
 from scipy.linalg import toeplitz
 
-from sparse_ho.models import WeightedLasso
+from sparse_ho.models import WeightedLassoGradSearch
 from sparse_ho.criterion import CV
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
@@ -88,22 +88,19 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 # Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
 alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
-# Weighted Lasso: Sparse-ho: 1 param per feature
-lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
-model_sho = WeightedLasso(X_train, y_train, estimator=lasso_sho)
-criterion_sho = CV(X_val, y_val, model_sho, X_test=X_test, y_test=y_test)
-algo_sho = ImplicitForward(criterion_sho)
-monitor = Monitor()
-grad_search(
-    algo_sho, alpha0, monitor, n_outer=20, tol=1e-6)
+criterion = CV(X_val, y_val)
+algo = ImplicitForward(criterion_sho)
+
+model_sho = WeightedLassoGradSearch(criterion, algo, alpha0)
+model_sho.fit(X_trainval, y_trainval, callback=test_loss)
 ##############################################################################
 
 ##############################################################################
 # MSE on validation set
-mse_sho_val = mean_squared_error(y_val, lasso_sho.predict(X_val))
+mse_sho_val = mean_squared_error(y_val, model_sho.predict(X_val))
 
 # MSE on test set, ie unseen data
-mse_sho_test = mean_squared_error(y_test, lasso_sho.predict(X_test))
+mse_sho_test = mean_squared_error(y_test, model_sho.predict(X_test))
 
 
 print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
