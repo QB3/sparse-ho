@@ -1,14 +1,18 @@
 import numpy as np
 from numpy.linalg import norm
 from numba import njit
-from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
-from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
-from sparse_ho.utils import sigma
+from celer import Lasso
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse, csc_matrix
 
+from sparse_ho.utils import sigma
+from sparse_ho.utils import (ST, init_dbeta0_new, init_dbeta0_new_p,
+                             prox_elasticnet)
+from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
 
-class Lasso():
+
+# TODO name improvable
+class LassoGradSearch():
     """Linear Model trained with L1 prior as regularizer (aka the Lasso)
     The optimization objective for Lasso is:
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
@@ -27,12 +31,15 @@ class Lasso():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, X, y, max_iter=1000, log_alpha_max=None,
+            estimator_kwargs=None):
+        if estimator_kwargs is None:
+            estimator_kwargs = dict()
         self.X = X
         self.y = y
         self.max_iter = max_iter
-        self.estimator = estimator
         self.log_alpha_max = log_alpha_max
+        self._estimator = Lasso(warm_start=True, **estimator_kwargs)
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -222,13 +229,20 @@ class Lasso():
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        if self.estimator is None:
-            raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(tol=tol, alpha=alpha)
-        self.estimator.fit(X, y)
-        mask = self.estimator.coef_ != 0
-        dense = self.estimator.coef_[mask]
+        self._estimator.set_params(tol=tol, alpha=alpha)
+        self._estimator.fit(X, y)
+        mask = self._estimator.coef_ != 0
+        dense = self._estimator.coef_[mask]
         return mask, dense, None
+
+    def predict(self, X):
+        return self._estimator.predict(X)
+
+    def fit(self, X, y):
+        # split X_train X_val
+        monitor = Monitor()
+        grad_search()
+        pass  # TODO
 
     def reduce_X(self, mask):
         return self.X[:, mask]
@@ -265,7 +279,7 @@ class Lasso():
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
 
-class WeightedLasso():
+class WeightedLassoGradSearch():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
 
     The optimization objective for weighted Lasso is:
@@ -278,19 +292,25 @@ class WeightedLasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    estimator: instance of ``sklearn.base.BaseEstimator``
-        An estimator that follows the scikit-learn API.
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.X = X
-        self.y = y
+            self, criterion, algo, max_iter=1000, log_alpha_max=None):
+        self.criterion = criterion
+        self.algo = algo
         self.max_iter = max_iter
-        self.estimator = estimator
+        self._estimator = Lasso(warm_start=True)
         self.log_alpha_max = log_alpha_max
+
+    def fit(X, y):
+        monitor = Monitor()
+        grad_search(self.algo, monitor, self.alpha0, n_outer=20, tol=1e-6)
+        self.monitor = monitor
+
+    def predict(X):
+        return self._estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
