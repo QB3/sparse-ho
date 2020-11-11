@@ -61,7 +61,7 @@ X_train, X_val, y_train, y_val = train_test_split(
 ##############################################################################
 
 
-# max penalty value
+# Max penalty value
 alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
 n_alphas = 30  # number of iter in the line search, ie 30 evals of the gradient
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
@@ -74,19 +74,19 @@ model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
     cv=2).fit(X_train_val, y_train_val)
 
-# measure mse on test
+# Measure mse on test
 mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
 print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 ##############################################################################
 
 
 ##############################################################################
-# Weighted Lasso with sparse-ho
+# Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
 alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
 
 ##############################################################################
-#  weighted Lasso: Sparse-ho: 1 param per feature
+# Weighted Lasso: Sparse-ho: 1 param per feature
 lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
 
 model_sho = wLasso(X_train, y_train, estimator=lasso_sho)
