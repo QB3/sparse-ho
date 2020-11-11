@@ -265,7 +265,7 @@ class Lasso():
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
 
-class wLasso():
+class WeightedLasso():
     """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
 
     The optimization objective for weighted Lasso is:
@@ -487,13 +487,20 @@ class wLasso():
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
+        # TODO uncomment this code when the new version of celer is released
+        # self.estimator.set_params(tol=tol)
+        # self.estimator.weights = alpha
+        # self.estimator.fit(X, y)
+        # mask = self.estimator.coef_ != 0
+        # dense = (self.estimator.coef_)[mask]
+        # return mask, dense, None
         X /= alpha
         self.estimator.set_params(tol=tol, alpha=1)
         self.estimator.fit(X, y)
         # set proper coefficients for estimator, to predict and use warm start
         self.estimator.coef_ /= alpha
         mask = self.estimator.coef_ != 0
-        dense = (self.estimator.coef_ / alpha)[mask]
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def reduce_X(self, mask):

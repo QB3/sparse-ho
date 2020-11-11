@@ -5,95 +5,119 @@ Weighted Lasso with held-out test set
 
 This example shows how to perform hyperparameter optimization
 for a weighted Lasso using a held-out validation set.
-
+In particular we compare the weighted Lasso to LassoCV on a toy example
 """
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
-#
+#          Kenan Sehic
 # License: BSD (3-clause)
 
-import time
-
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from numpy.linalg import norm
 
-from sklearn.datasets import make_regression
+from celer import Lasso, LassoCV
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.utils import check_random_state
+from scipy.linalg import toeplitz
 
-from celer import Lasso
-
-from sparse_ho.models import wLasso
+from sparse_ho.models import WeightedLasso
 from sparse_ho.criterion import CV
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-from sparse_ho.datasets import get_data
 
-print(__doc__)
+##############################################################################
+# Dataset creation
+n_samples = 600
+n_features = 600
+rng = check_random_state(0)
+X = rng.multivariate_normal(
+    size=n_samples, mean=np.zeros(n_features),
+    cov=toeplitz(0.5 ** np.arange(n_features)))
 
-dataset = 'rcv1_train'
-# dataset = 'simu'
 
-if dataset != 'simu':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
-    X_train = X_train[:, :1000]
-    X_test = X_test[:, :1000]
-else:
-    X, y = make_regression(n_samples=100, n_features=100, noise=1)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.5)
+# Create true regression coefficients of 5 non-zero values
+w_true = np.zeros(n_features)
+size_supp = 5
+idx = rng.choice(X.shape[0], size_supp, replace=False)
+w_true[idx] = (-1) ** np.arange(size_supp)
+noise = rng.randn(n_samples)
+y = X @ w_true
+y += noise / norm(noise) * 0.5 * norm(y)
+##############################################################################
 
-n_samples, n_features = X_train.shape
 
-print("Starting path computation...")
-n_samples = len(y_train)
+##############################################################################
+# Here we split the dataset (X, y) in 3:
+# the regression coefficients will be determined using X_train, y_train
+# the regularization parameter will be calibrated using X_val, y_val
+# the model is then tested on unseen data X_test, y_test
+X_train_val, X_test, y_train_val, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=2)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train_val, y_train_val, test_size=0.5, random_state=2)
+##############################################################################
+
+
+##############################################################################
+# Max penalty value
 alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
-log_alpha0 = np.log(alpha_max / 10)
-
-n_alphas = 10
-p_alphas = np.geomspace(1, 0.0001, n_alphas)
-alphas = alpha_max * p_alphas
-log_alphas = np.log(alphas)
-
-tol = 1e-7
-max_iter = 1e5
-
+n_alphas = 30
+alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 ##############################################################################
-# Grid-search
-# -----------
-
-# The sklearn solver is indeed very long on the considered problems!
-# estimator = linear_model.Lasso(
-#     fit_intercept=False, max_iter=1000, warm_start=True)
-
-# celer is way faster !
-# https://github.com/mathurinm/celer
-
-estimator = Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
 
 
 ##############################################################################
-# Grad-search
-# -----------
-print('sparse-ho started')
+# Vanilla LassoCV
+print("========== Celer's LassoCV started ===============")
+model_cv = LassoCV(
+    verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
+    cv=2, n_jobs=2).fit(X_train_val, y_train_val)
 
-alpha0 = np.log(alpha_max / 10) * np.ones(n_features)
+# Measure mse on test
+mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
+print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
+##############################################################################
 
-t0 = time.time()
-model = wLasso(X_train, y_train, estimator=estimator)
 
-# Here CV means held out,
-# the "real" crossval (with folds, etc.) is very slow (for the moment) for some
-# unknown reasons
-
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion)
-monitor_grad = Monitor()
+##############################################################################
+# Weighted Lasso with sparse-ho.
+# We use the vanilla lassoCV coefficients as a starting point
+alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
+# Weighted Lasso: Sparse-ho: 1 param per feature
+lasso_sho = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
+model_sho = WeightedLasso(X_train, y_train, estimator=lasso_sho)
+criterion_sho = CV(X_val, y_val, model_sho, X_test=X_test, y_test=y_test)
+algo_sho = ImplicitForward(criterion_sho)
+monitor = Monitor()
 grad_search(
-    algo, alpha0, monitor_grad, n_outer=10, tol=tol)
+    algo_sho, alpha0, monitor, n_outer=20, tol=1e-6)
+##############################################################################
 
-t_grad_search = time.time() - t0
+##############################################################################
+# MSE on validation set
+mse_sho_val = mean_squared_error(y_val, lasso_sho.predict(X_val))
 
-print("Time gradient serach:  %f" % t_grad_search)
+# MSE on test set, ie unseen data
+mse_sho_test = mean_squared_error(y_test, lasso_sho.predict(X_test))
+
+
+print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
+print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
+
+
+labels = ['wLasso val', 'wLasso test', 'Lasso CV']
+
+df = pd.DataFrame(
+    np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),
+    columns=labels)
+df.plot.bar(rot=0)
+plt.xlabel("Estimator")
+plt.ylabel("Mean square error")
+plt.tight_layout()
+plt.show()
+##############################################################################
