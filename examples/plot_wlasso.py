@@ -32,8 +32,6 @@ from sparse_ho.ho import grad_search
 
 ##############################################################################
 # Dataset creation
-##############################################################################
-# X, y = make_regression(n_samples=600, n_features=600, noise=60, random_state=2)
 n_samples = 600
 n_features = 600
 rng = check_random_state(0)
