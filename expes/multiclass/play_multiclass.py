@@ -31,24 +31,20 @@ n_features = 1_000
 # X, y = fetch_libsvm('smallNORB')
 X, y = fetch_libsvm('mnist')
 
+# clean data and subsample
 X, y = clean_dataset(X, y, n_samples, n_features)
 n_samples, n_features = X.shape
 
 algo = ImplicitForward(None, n_iter_jac=1000)
 estimator = LogisticRegression(
     C=1, fit_intercept=False, warm_start=True, max_iter=200, verbose=False)
-# C=1, fit_intercept=False, warm_start=True, verbose=True)
-# estimator = LogisticRegression(
-#     penalty='l1', C=1, fit_intercept=False, warm_start=True, solver='saga')
 logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
 
+
 alpha_max, n_classes = get_alpha_max(X, y)
-
-monitor = Monitor()
-tol = 1e-8
-method = 'random'
-
 log_alpha_max = np.log(alpha_max)
+tol = 1e-8
+
 
 n_alphas = 10
 p_alphas = np.geomspace(1, 0.001, n_alphas)
@@ -65,9 +61,6 @@ for i in range(n_alphas):
 print("min cross entropy grid-search %f " % np.array(np.min(monitor_grid.objs)))
 print("max accuracy grid-search %f " % np.array(np.max(monitor_grid.acc_vals)))
 
-tol = 1e-8
-
-# # 1 / 0
 
 # print("###################### ADAM ###################")
 # monitor_adam = Monitor()
@@ -113,7 +106,7 @@ tol = 1e-8
 # print("###################### GRAD SEARCH backtrack ###################")
 
 # n_outer = 4
-# monitor = Monitor()
+monitor = Monitor()
 
 # idx_min = np.argmin(np.array(monitor_grid.objs))
 # log_alpha0 = monitor_grid.log_alphas[idx_min]
@@ -123,25 +116,3 @@ log_alpha0 = np.ones(n_classes) * np.log(0.01 * alpha_max)
 grad_search_backtracking_cd_dirty2(
     logit_multiclass, log_alpha0, monitor, n_outer=n_outer, tol=tol,
     maxit_ln=20)
-
-# brent_cd(
-#     logit_multiclass, log_alpha0, monitor, n_outer=n_outer, tol=tol)
-
-# idx_min = np.argmin(np.array(monitor.objs))
-# log_alpha0 = monitor.log_alphas[idx_min]
-1 / 0
-
-
-
-# print("###################### GRAD SEARCH backtracking LS ###################")
-# n_outer = 10
-# monitor = Monitor()
-# log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
-
-# # idx_min = np.argmin(np.array(monitor_grid.objs))
-# # log_alpha0 = monitor_grid.log_alphas[idx_min]
-# grad_search_backtrack_dirty(
-#     logit_multiclass, log_alpha0, monitor, n_outer=n_outer, tol=1e-7)
-
-# idx_min = np.argmin(np.array(monitor.objs))
-# log_alpha0 = monitor.log_alphas[idx_min]
