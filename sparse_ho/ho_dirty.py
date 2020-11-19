@@ -1,7 +1,7 @@
 
 import numpy as np
 from numpy.linalg import norm
-from scipy.optimize import fmin_l_bfgs_b
+from scipy.optimize import fmin_l_bfgs_b, line_search, brent
 
 
 def lbfgs(
@@ -339,8 +339,13 @@ def _adam_search(
         t += 1
         val, grad = _get_val_grad(log_alpha)
 
-        print("%i / %i  || crosss entropy %f  || accuracy %f" % (
-              i, n_outer, val, monitor.acc_vals[-1]))
+        print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f" % (
+            i, n_outer, val, monitor.acc_vals[-1], monitor.acc_tests[-1]))
+
+        if (i > 1) and (monitor.objs[-1] > monitor.objs[-2]):
+            break
+        # print("%i / %i  || crosss entropy %f  || accuracy %f" % (
+        #       i, n_outer, val, monitor.acc_vals[-1]))
         # updates the moving averages of the gradient
         m_t = beta_1*m_t + (1-beta_1) * grad
         # updates the moving averages of the squared gradient
@@ -453,3 +458,115 @@ def backtracking_ls(val, grad, _get_val, x, c=0.00001, rho=0.5, maxit_ln=50):
     print("WARNING no step found")
     return 0
     # return alpha_ls
+
+
+def grad_search_scipy(
+        criterion, log_alpha0, monitor, n_outer=10, verbose=False,
+        tolerance_decrease='constant', tol=1e-5,
+        beta_star=None, t_max=10000):
+    """This line-search code is taken from here:
+    https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
+
+    Parameters
+    ----------
+    log_alpha0: float
+        log of the regularization coefficient alpha
+    tol : float
+        tolerance for the inner optimization solver
+    monitor: Monitor object
+        used to store the value of the cross-validation function
+    n_outer: int
+        number of maximum iteration in the outer loop (for the line search)
+    tolerance_decrease: string
+        tolerance decrease strategy for approximate gradient
+    gamma: non negative float
+        convexification coefficient
+    criterion: string
+        criterion to optimize during hyperparameter optimization
+        you may choose between "cv" and "sure"
+    gamma_sure:
+        constant for sure problem
+     sigma,
+        constant for sure problem
+    random_state: int
+    beta_star: np.array, shape (n_features,)
+        True coefficients of the underlying model (if known)
+        used to compute metrics
+    """
+
+    def _get_val(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)[0]
+
+    def _get_grad(lambdak, tol=tol):
+        return criterion.get_val_grad(lambdak, tol=tol, monitor=monitor)[1]
+
+    def _proj_param(lambdak):
+        return criterion.proj_param(lambdak)
+
+    log_alpha = log_alpha0.copy()
+    for i in range(n_outer):
+        grad = _get_grad(log_alpha)
+        print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f " % (i, n_outer, monitor.objs[-1], monitor.acc_vals[-1], monitor.acc_tests[-1]))
+
+        step_size = line_search(
+            _get_val, _get_grad, log_alpha0, -grad)[0]
+        if step_size is None:
+            break
+        else:
+            log_alpha -= step_size * grad
+
+
+def brent_cd(
+        criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
+        t_max=np.infty):
+
+    log_alpha = log_alpha0.copy()
+
+    criterion.get_val_grad(log_alpha, monitor)
+
+    for i in range(n_outer):
+        for k in range(log_alpha0.shape[0]):
+
+            def _get_valk(log_alphak, tol=tol):
+                log_alpha_new = log_alpha.copy()
+                log_alpha_new[k] = log_alphak
+                val, gradk = criterion.get_val_gradk(
+                    log_alpha_new, monitor=monitor, k=k, tol=tol)
+                # val = criterion.get_val(log_alpha_new, tol=tol)
+                return val
+
+                # return criterion.get_valk(log_alphak, k, tol=tol)
+
+            def _get_gradk(log_alphak, tol=tol):
+                log_alpha_new = log_alpha.copy()
+                log_alpha_new[k] = log_alphak
+                val, gradk = criterion.get_val_gradk(
+                    log_alpha_new, monitor=monitor, k=k, tol=tol)
+                return gradk
+
+            def _get_val_gradk(log_alpha, tol=tol):
+                val, gradk = criterion.get_val_gradk(
+                    log_alpha, monitor=monitor, k=k, tol=tol)
+                return val, gradk
+
+            results = brent(_get_valk, maxiter=50, full_output=True)
+            # results = brent(_get_valk, brack=(log_alpha_max - 8, log_alpha_max/2), maxiter=50, full_output=True)
+            # step_size = line_search(
+            #     _get_val, _get_gradk, log_alpha[k], -gradk)[0]
+
+            log_alpha[k] = results[0]
+
+            val = criterion.get_val(log_alpha, tol=tol)
+            # log_alpha[k] = results[0].copy()
+            # print(step_size)
+            # if step_size is not None:
+            #     log_alpha[k] -= step_size * gradk
+
+            # val = _get_val(log_alpha)
+            # print("%i /" % i)
+            print("%i / %i  || crosss entropy %f" % (i, n_outer, val))
+            # print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f" % (
+            #     i, n_outer, results[1], monitor.acc_vals[-1], monitor.acc_tests[-1]))
+
+            if monitor.times[-1] > t_max:
+                return

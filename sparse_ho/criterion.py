@@ -667,6 +667,11 @@ class LogisticMulticlass():
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
         val = cross_entropy(all_betas, self.X_val, self.one_hot_code_val)
+        # acc_val = accuracy(all_betas, self.X_val, self.one_hot_code_val)
+        # acc_test = accuracy(all_betas, self.X_test, self.one_hot_code_test)
+        # monitor(
+        #     val, log_alpha=log_alpha.copy(), grad=None, acc_val=acc_val,
+        #     acc_test=acc_test)
         return val
 
     def get_val_monitor(self, log_alpha, monitor, tol=1e-3):
