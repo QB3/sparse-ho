@@ -170,9 +170,9 @@ def _grad_search(
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
         try:
             monitor(g_func, criterion.val_test, lambdak.copy(),
-                    grad_lambda, algo.criterion.rmse)
+                    grad_lambda, criterion.rmse)
         except Exception:
-            monitor(g_func, algo.criterion.val_test, lambdak,
+            monitor(g_func, criterion.val_test, lambdak,
                     grad_lambda, criterion.rmse)
 
         # TODO this should be removed into the SURE class no?
