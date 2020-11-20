@@ -31,7 +31,8 @@ class LassoGradSearch():
     """
 
     def __init__(
-            self, algo, criterion, estimator, X, y, max_iter=1000, log_alpha_max=None):
+            self, algo, criterion, estimator, X, y, max_iter=1000,
+            log_alpha_max=None, tol=1e-4):
         # MM TODO don't have X and y as attributes, no ?
         self.X = X
         self.y = y
@@ -40,6 +41,7 @@ class LassoGradSearch():
         self.estimator = estimator
         self.criterion = criterion
         self.algo = algo
+        self.tol = tol
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -242,7 +244,12 @@ class LassoGradSearch():
     def fit(self, X, y):
         monitor = Monitor()
         # TODO MM is monitor instanciated here or passed in init?
-        grad_search(self.algo, self.criterion, n_outer=10, tol=self.tol)
+        # TODO fix log_alpha0 (who sets it?)
+        self.proj_param(10)  # set alpha_max. This breaks sklearn API.
+        grad_search(self.algo, self.criterion, self.log_alpha_max + np.log(0.9),
+                    monitor, n_outer=10, tol=self.tol)
+        self.monitor_ = monitor
+        return self
 
     def reduce_X(self, mask):
         return self.X[:, mask]

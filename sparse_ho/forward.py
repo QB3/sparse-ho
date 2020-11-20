@@ -3,17 +3,15 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the forward algorithm.
 
     Parameters
     ----------
-    criterion: criterion object
-        HeldOut, CrossVal or SURE
-        verbose: bool
+    verbose: bool
     """
 
-    def __init__(self, criterion, verbose=False):
-        self.criterion = criterion
+    def __init__(self, verbose=False):
         self.verbose = verbose
 
     def get_beta_jac_v(
@@ -23,7 +21,7 @@ class Forward():
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=self.criterion.model.max_iter, tol=tol,
+            max_iter=model.max_iter, tol=tol,  # TODO MM param max_iter?
             compute_jac=compute_jac, backward=backward, verbose=self.verbose)
 
         if jac is not None:

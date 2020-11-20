@@ -252,6 +252,7 @@ def grad_search_wolfe(
 
 
 def wolfe(x_k, p_k, val, fun, fun_grad, maxit_ln=5):
+    # TODO MM pass criterion here to fun_grad ?
 
     alpha_low = 0
     alpha_high = 1000
