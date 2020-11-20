@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, criterion, log_alpha0, monitor, n_outer=100, verbose=False,
+        algo, criterion, model, log_alpha0, monitor, n_outer=100, verbose=False,
         tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """This line-search code is taken from here:
@@ -16,6 +16,7 @@ def grad_search(
     ----------
     algo: TODO
     criterion: TODO
+    model: TODO
     log_alpha0: float
         log of the regularization coefficient alpha
     tol : float
@@ -46,10 +47,11 @@ def grad_search(
 
     def _get_val_grad(log_alpha, tol=tol):
         return criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol,
+            beta_star=beta_star)
 
     def _proj_param(log_alpha):
-        return criterion.model.proj_param(log_alpha)
+        return model.proj_param(log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor, algo,
@@ -245,14 +247,15 @@ def _grad_search(
 
 
 def grad_search_wolfe(
-        algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None,
-        tol=1e-3, maxit_ln=5):
+        algo, criterion, model, log_alpha0, monitor, n_outer=10,
+        warm_start=None, tol=1e-3, maxit_ln=5):
 
     def _get_val_grad(log_alpha, tol=tol):
-        return criterion.get_val_grad(log_alpha, algo.get_beta_jac_v, tol=tol)
+        return criterion.get_val_grad(model, log_alpha, algo.get_beta_jac_v,
+                                      tol=tol)
 
-    def _get_val(lambdak, tol=tol):
-        return criterion.get_val(lambdak, tol=tol)
+    def _get_val(log_alpha, tol=tol):
+        return criterion.get_val(model, log_alpha, tol=tol)
 
     log_alphak = log_alpha0
     for i in range(n_outer):
