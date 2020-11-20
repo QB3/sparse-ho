@@ -42,16 +42,19 @@ def grad_search(
         used to compute metrics
     """
 
-    def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(lambdak, tol=tol, beta_star=beta_star)
+    def _get_val_grad(criterion, lambdak, tol=tol):
+        return algo.get_val_grad(
+            criterion, lambdak, tol=tol, beta_star=beta_star)
 
     def _proj_param(lambdak):
         return criterion.model.proj_param(lambdak)
 
     return _grad_search(
-        _get_val_grad, _proj_param, log_alpha0, monitor, algo, n_outer=n_outer,
-        verbose=verbose, tolerance_decrease=tolerance_decrease, tol=tol,
+        _get_val_grad, _proj_param, log_alpha0, monitor, algo, criterion,
+        n_outer=n_outer, verbose=verbose,
+        tolerance_decrease=tolerance_decrease, tol=tol,
         t_max=t_max)
+    # TODO MM tolerance_decrease > tol_decrease ?
 
 
 def _grad_search(
@@ -148,7 +151,7 @@ def _grad_search(
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
-        g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
+        g_func, grad_lambda = _get_val_grad(criterion, lambdak, tol=tol)
         try:
             monitor(g_func, criterion.val_test, lambdak.copy(),
                     grad_lambda, criterion.rmse)
@@ -205,10 +208,7 @@ def _grad_search(
                 lambdak = old_lambdak
             print('!!step size rejected!!', g_func, g_func_old)
             g_func, grad_lambda = _get_val_grad(
-                lambdak, tol=tol)
-            # g_func, grad_lambda = algo.get_val_grad(lambdak, tol=tol,
-            #
-            #                                         beta_star=beta_star)
+                criterion, lambdak, tol=tol)
             if convexify:
                 g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
                 grad_lambda += gamma_convex * np.exp(lambdak)
@@ -229,18 +229,18 @@ def _grad_search(
 
 
 def grad_search_wolfe(
-        algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
-        maxit_ln=5):
+        algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None,
+        tol=1e-3, maxit_ln=5):
 
-    def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(lambdak, tol=tol)
+    def _get_val_grad(criterion, lambdak, tol=tol):
+        return algo.get_val_grad(criterion, lambdak, tol=tol)
 
     def _get_val(lambdak, tol=tol):
         return criterion.get_val(lambdak, tol=tol)
 
     log_alphak = log_alpha0
     for i in range(n_outer):
-        val, grad = _get_val_grad(log_alphak)
+        val, grad = _get_val_grad(criterion, log_alphak)
 
         monitor(val.copy(), criterion.val_test, log_alphak,
                 grad, criterion.rmse)

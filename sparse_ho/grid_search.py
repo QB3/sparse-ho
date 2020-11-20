@@ -59,6 +59,7 @@ def grid_search(
             log_alpha = log_alphas[i]
         if samp == "lhs":
             log_alpha = log_alpha[0]
+        # TODO MM here which crierion to pass ? pass criterion to grid_search?
         g_func, grad_lambda = algo.get_val_grad(
             log_alpha, tol=tol, beta_star=beta_star, compute_jac=False)
 

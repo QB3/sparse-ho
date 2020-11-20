@@ -122,17 +122,19 @@ def test_beta_jac_custom_solver(model, model_custom):
 @pytest.mark.parametrize('model', models)
 def test_val_grad(model):
     criterion = Logistic(X_val, y_val, model)
-    algo = Forward(criterion)
-    val_fwd, grad_fwd = algo.get_val_grad(log_alpha, tol=tol)
+    algo = Forward()
+    val_fwd, grad_fwd = algo.get_val_grad(
+        criterion, log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(log_alpha, tol=tol)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
+        criterion, log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = Implicit(criterion)
+    algo = Implicit()
     val_imp, grad_imp = algo.get_val_grad(
-        log_alpha, tol=tol)
+        criterion, log_alpha, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd, atol=1e-4)
     assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
@@ -146,12 +148,13 @@ def test_val_grad(model):
 @pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
 def test_val_grad_custom(model, model_custom):
     criterion = Logistic(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    val, grad = algo.get_val_grad(log_alpha, tol=tol)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    val, grad = algo.get_val_grad(criterion, log_alpha, tol=tol)
 
     criterion = Logistic(X_val, y_val, model_custom)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    val_custom, grad_custom = algo.get_val_grad(log_alpha, tol=tol)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    val_custom, grad_custom = algo.get_val_grad(
+        criterion, log_alpha, tol=tol)
 
     assert np.allclose(val, val_custom)
     assert np.allclose(grad, grad_custom)
@@ -165,14 +168,14 @@ def test_grad_search(model, crit):
 
     criterion = Logistic(X_val, y_val, model)
     monitor1 = Monitor()
-    algo = Forward(criterion)
-    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
+    algo = Forward()
+    grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
     monitor2 = Monitor()
-    algo = Implicit(criterion)
-    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
+    algo = Implicit()
+    grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
                 tol=tol)
 
     criterion = Logistic(X_val, y_val, model)

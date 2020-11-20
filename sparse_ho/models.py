@@ -5,13 +5,13 @@ from celer import Lasso
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse, csc_matrix
 
-from sparse_ho.utils import sigma
-from sparse_ho.utils import (ST, init_dbeta0_new, init_dbeta0_new_p,
-                             prox_elasticnet)
-from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
+from sparse_ho.ho import grad_search
+from sparse_ho.utils import Monitor
+from sparse_ho.utils import (sigma, ST, init_dbeta0_new, init_dbeta0_new_p,
+                             prox_elasticnet, proj_box_svm, ind_box, compute_grad_proj)
 
 
-# TODO name improvable
+# TODO MM name improvable
 class LassoGradSearch():
     """Linear Model trained with L1 prior as regularizer (aka the Lasso)
     The optimization objective for Lasso is:
@@ -31,15 +31,15 @@ class LassoGradSearch():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, log_alpha_max=None,
-            estimator_kwargs=None):
-        if estimator_kwargs is None:
-            estimator_kwargs = dict()
+            self, algo, criterion, estimator, X, y, max_iter=1000, log_alpha_max=None):
+        # MM TODO don't have X and y as attributes, no ?
         self.X = X
         self.y = y
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
-        self._estimator = Lasso(warm_start=True, **estimator_kwargs)
+        self.estimator = estimator
+        self.criterion = criterion
+        self.algo = algo
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -206,9 +206,11 @@ class LassoGradSearch():
     # @staticmethod
     def _get_jac_t_v(self, jac, mask, dense, alphas, v):
         n_samples = self.X.shape[0]
+        # TODO MM@QBE can this use X as a param and not as self.X ?
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
+        # TODO MM@QBE can this use X as a param and not as self.X ?
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= self.X.shape[0]
@@ -222,27 +224,25 @@ class LassoGradSearch():
 
     @staticmethod
     def get_L(X, is_sparse=False):
-        # print(is_sparse)
         if is_sparse:
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        self._estimator.set_params(tol=tol, alpha=alpha)
-        self._estimator.fit(X, y)
-        mask = self._estimator.coef_ != 0
-        dense = self._estimator.coef_[mask]
+        self.estimator.set_params(tol=tol, alpha=alpha)
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
     def predict(self, X):
-        return self._estimator.predict(X)
+        return self.estimator.predict(X)
 
     def fit(self, X, y):
-        # split X_train X_val
         monitor = Monitor()
-        grad_search()
-        pass  # TODO
+        # TODO MM is monitor instanciated here or passed in init?
+        grad_search(self.algo, self.criterion, n_outer=10, tol=self.tol)
 
     def reduce_X(self, mask):
         return self.X[:, mask]

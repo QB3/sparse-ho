@@ -13,6 +13,7 @@ class Backward():
     criterion: criterion object
         HeldOut, CrossVal or SURE
     """
+
     def __init__(self, criterion):
         self.criterion = criterion
 
@@ -35,10 +36,10 @@ class Backward():
         return mask, dense, jac_v, jac_v
 
     def get_val_grad(
-            self, log_alpha, max_iter=1000, tol=1e-3, compute_jac=False,
+            self, criterion, log_alpha, max_iter=1000, tol=1e-3, compute_jac=False,
             backward=True, beta_star=None):
 
-        return self.criterion.get_val_grad(
+        return criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward, beta_star=beta_star)
 

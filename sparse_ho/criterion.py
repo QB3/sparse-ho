@@ -87,8 +87,8 @@ class CV():
         return self.value(mask, dense)
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, backward=False, beta_star=None):
+            self, log_alpha, get_beta_jac_v, max_iter=10000,
+            tol=1e-5, compute_jac=True, backward=False, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
@@ -111,6 +111,7 @@ class CV():
 class Logistic():
     """Logistic loss.
     """
+
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -200,6 +201,7 @@ class SmoothedHinge():
     ----------
     TODO
     """
+
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -302,6 +304,7 @@ class SURE():
     ----------
     TODO
     """
+
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
                  X_test=None, y_test=None):
@@ -349,7 +352,7 @@ class SURE():
 
     def v2(self, mask, dense):
         return ((2 * self.sigma ** 2 *
-                self.X_val[:, mask].T @ self.delta / self.epsilon))
+                 self.X_val[:, mask].T @ self.delta / self.epsilon))
 
     def value(self, mask, dense, mask2, dense2):
         dof = ((self.X_val[:, mask2] @ dense2 -
@@ -441,6 +444,7 @@ class CrossVal():
     rmse : None
         XXX
     """
+
     def __init__(self, X, y, Model, cv=None, max_iter=1000, estimator=None):
         """
         Parameters

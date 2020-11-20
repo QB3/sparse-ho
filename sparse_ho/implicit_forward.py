@@ -8,20 +8,19 @@ class ImplicitForward():
 
     Parameters
     ----------
-    criterion: criterion object
-        HeldOut, CrossVal or SURE
-        max_iter: int
-            maximum number of iteration for the inner solver
-        tol_jac: float
-            tolerance for the Jacobian computation
-        n_iter_jac: int
-            maximum number of iteration for the Jacobian computation
-        verbose: bool
+    HeldOut, CrossVal or SURE
+    max_iter: int
+        maximum number of iteration for the inner solver
+    tol_jac: float
+        tolerance for the Jacobian computation
+    n_iter_jac: int
+        maximum number of iteration for the Jacobian computation
+    verbose: bool
     """
+
     def __init__(
-            self, criterion, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
+            self, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
             verbose=False):
-        self.criterion = criterion
         self.max_iter = max_iter
         self.tol_jac = tol_jac
         self.n_iter_jac = n_iter_jac
@@ -43,10 +42,10 @@ class ImplicitForward():
         return mask, dense, jac_v, jac
 
     def get_val_grad(
-            self, log_alpha, mask0=None, dense0=None, beta_star=None,
+            self, criterion, log_alpha, mask0=None, dense0=None, beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
             backward=False):
-        return self.criterion.get_val_grad(
+        return criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
 

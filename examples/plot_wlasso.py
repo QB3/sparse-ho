@@ -89,9 +89,9 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 # We use the vanilla lassoCV coefficients as a starting point
 alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
 criterion = CV(X_val, y_val)
-algo = ImplicitForward(criterion_sho)
+algo = ImplicitForward()
 
-model_sho = WeightedLassoGradSearch(criterion, algo, alpha0)
+model_sho = WeightedLassoGradSearch(criterion, algo, estimator, alpha0)
 model_sho.fit(X_trainval, y_trainval, callback=test_loss)
 ##############################################################################
 
