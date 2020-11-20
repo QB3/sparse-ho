@@ -153,7 +153,7 @@ def test_val_grad_custom(model, model_custom):
         log_alpha, algo.get_beta_jac_v, tol=tol)
 
     criterion = Logistic(X_val, y_val, model_custom)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
     val_custom, grad_custom = criterion.get_val_grad(
         log_alpha, algo.get_beta_jac_v, tol=tol)
 
