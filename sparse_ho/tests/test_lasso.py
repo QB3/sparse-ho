@@ -178,8 +178,7 @@ def test_val_grad():
         # model = Lasso(log_alpha)
         criterion = SURE(X_train, y_train, model, sigma_star)
         algo = Forward(criterion)
-        val_fwd, grad_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+        val_fwd, grad_fwd = algo.get_val_grad(log_alpha, tol=tol)
 
         criterion = SURE(X_train, y_train, model, sigma_star)
         algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
@@ -192,7 +191,7 @@ def test_val_grad():
         #     log_alpha, tol=tol)
 
         criterion = SURE(X_train, y_train, model, sigma_star)
-        algo = Backward(criterion)
+        algo = Backward()
         val_bwd, grad_bwd = algo.get_val_grad(
             log_alpha, tol=tol)
 

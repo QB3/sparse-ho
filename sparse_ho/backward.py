@@ -24,7 +24,7 @@ class Backward():
         mask, dense, list_sign = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=None, max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward)
+            compute_jac=compute_jac, backward=True)
         v = np.zeros(X.shape[1])
         v[mask] = get_v(mask, dense)
         jac_v = get_only_jac_backward(
