@@ -132,32 +132,28 @@ def test_val_grad():
     # compute the gradients
     # check that the gradient returned by all methods are the same
     for key in models.keys():
-        # model = Lasso(log_alpha)
         log_alpha = dict_log_alpha[key]
         model = models[key]
-        # model = Lasso(log_alpha)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = CV(X_val, y_val)
         algo = Forward()
         val_fwd, grad_fwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = CV(X_val, y_val)
         algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
         val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = CV(X_val, y_val)
         algo = Implicit()
         val_imp, grad_imp = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        # import ipdb; ipdb.set_trace()
-
-        criterion = CV(X_val, y_val, model)
+        criterion = CV(X_val, y_val)
         algo = Backward()
         val_bwd, grad_bwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
         assert np.allclose(val_fwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_imp_fwd)
@@ -172,29 +168,27 @@ def test_val_grad():
         assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
 
     for key in models.keys():
-        # model = Lasso(log_alpha)
         log_alpha = dict_log_alpha[key]
         model = models[key]
-        # model = Lasso(log_alpha)
-        criterion = SURE(X_train, y_train, model, sigma_star)
+        criterion = SURE(X_train, y_train, sigma_star)
         algo = Forward()
         val_fwd, grad_fwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SURE(X_train, y_train, model, sigma_star)
+        criterion = SURE(X_train, y_train, sigma_star)
         algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
         val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SURE(X_train, y_train, model, sigma_star)
+        criterion = SURE(X_train, y_train, sigma_star)
         algo = Implicit(criterion)
         val_imp, grad_imp = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SURE(X_train, y_train, model, sigma_star)
+        criterion = SURE(X_train, y_train, sigma_star)
         algo = Backward()
         val_bwd, grad_bwd = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
         assert np.allclose(val_fwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_imp_fwd)
