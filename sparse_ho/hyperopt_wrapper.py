@@ -10,16 +10,16 @@ from sklearn.utils import check_random_state
 
 
 def hyperopt_wrapper(
-        algo, log_alpha_min, log_alpha_max, monitor, max_evals=50,
+        algo, criterion, log_alpha_min, log_alpha_max, monitor, max_evals=50,
         tol=1e-5, beta_star=None, random_state=42, t_max=1000,
         method='bayesian'):
 
     def objective(log_alpha):
-        val_func, _ = algo.get_val_grad(
-            log_alpha, tol=tol, beta_star=beta_star, compute_jac=False)
+        val_func, _ = criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star, compute_jac=False)
         monitor(
-            val_func, algo.criterion.val_test, log_alpha, None,
-            algo.criterion.rmse)
+            val_func, criterion.val_test, log_alpha, None,
+            criterion.rmse)
         return val_func
 
     space = hp.uniform(

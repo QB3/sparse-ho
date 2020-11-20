@@ -56,16 +56,16 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(X_train, y_train, estimator=estimator)
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    algo = Forward(criterion)
+    algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-    algo = Forward(criterion)
+    algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
@@ -78,17 +78,17 @@ def test_grid_search():
     criterion = SURE(
         X_train, y_train, model, sigma=sigma_star, X_test=X_test,
         y_test=y_test)
-    algo = Forward(criterion)
+    algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = SURE(X_train, y_train, model, sigma=sigma_star,
                      X_test=X_test, y_test=y_test)
-    algo = Forward(criterion)
+    algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[

@@ -7,23 +7,21 @@ class Forward():
 
     Parameters
     ----------
-    criterion: criterion object
-        HeldOut, CrossVal or SURE
-        verbose: bool
+    verbose: bool
     """
-    def __init__(self, criterion, verbose=False):
-        self.criterion = criterion
+
+    def __init__(self, verbose=False):
         self.verbose = verbose
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            compute_jac=True, backward=False, full_jac_v=False):
+            compute_jac=True, full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=self.criterion.model.max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward, verbose=self.verbose)
+            max_iter=100, tol=tol,  # TODO replace 100 by better value
+            compute_jac=compute_jac, verbose=self.verbose)
 
         if jac is not None:
             jac_v = model.get_jac_v(mask, dense, jac, v)
@@ -33,19 +31,10 @@ class Forward():
             jac_v = None
         return mask, dense, jac_v, jac
 
-    def get_val_grad(
-            self, log_alpha,
-            beta_star=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-            backward=False):
-        return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward)
-
 
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
-        max_iter=1000, tol=1e-3, compute_jac=True, backward=False,
+        max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
         save_iterates=False, verbose=False):
     """
     Parameters
@@ -74,7 +63,7 @@ def get_beta_jac_iterdiff(
         coefficients
     model: string
         model used, "lasso", "wlasso", or "mcp"
-    backward: bool
+    return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way
     """
@@ -111,7 +100,7 @@ def get_beta_jac_iterdiff(
     # pobj.append(pobj0)
     ############################################
     # store the iterates if needed
-    if backward:
+    if return_all:
         list_beta = []
     if save_iterates:
         list_beta = []
@@ -135,7 +124,7 @@ def get_beta_jac_iterdiff(
                 print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
         if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
             break
-        if backward:
+        if return_all:
             list_beta.append(beta.copy())
         if save_iterates:
             list_beta.append(beta.copy())
@@ -151,7 +140,7 @@ def get_beta_jac_iterdiff(
 
     if save_iterates:
         return np.array(list_beta), np.array(list_jac)
-    if backward:
+    if return_all:
         return mask, dense, list_beta
     else:
         if compute_jac:

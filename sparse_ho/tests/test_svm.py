@@ -95,19 +95,19 @@ def test_val_grad(model):
     # check that the gradient returned by all methods are the same
 
     criterion = Logistic(X_val, y_val, model)
-    algo = Forward(criterion)
-    val_fwd, grad_fwd = algo.get_val_grad(
-        log_C, tol=tol)
+    algo = Forward()
+    val_fwd, grad_fwd = criterion.get_val_grad(
+        log_C, algo.get_beta_jac_v, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=100)
-    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
-        log_C, tol=tol)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
+    val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
+        log_C, algo.get_beta_jac_v, tol=tol)
 
     criterion = Logistic(X_val, y_val, model)
-    algo = Implicit(criterion)
-    val_imp, grad_imp = algo.get_val_grad(
-        log_C, tol=tol)
+    algo = Implicit()
+    val_imp, grad_imp = criterion.get_val_grad(
+        log_C, algo.get_beta_jac_v, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
@@ -123,8 +123,8 @@ def test_grad_search(model):
     n_outer = 3
     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
-    algo = Forward(criterion)
-    grad_search(algo, np.log(1e-3), monitor1, n_outer=n_outer,
+    algo = Forward()
+    grad_search(algo, criterion, np.log(1e-3), monitor1, n_outer=n_outer,
                 tol=1e-13)
 
     # criterion = SURE(
@@ -132,8 +132,8 @@ def test_grad_search(model):
     #     y_test=y_test)
     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor2 = Monitor()
-    algo = Implicit(criterion)
-    grad_search(algo, np.log(1e-3), monitor2, n_outer=n_outer,
+    algo = Implicit()
+    grad_search(algo, criterion, np.log(1e-3), monitor2, n_outer=n_outer,
                 tol=1e-13)
 
     # criterion = SURE(
@@ -141,8 +141,8 @@ def test_grad_search(model):
     #     y_test=y_test)
     criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-6, n_iter_jac=100)
-    grad_search(algo, np.log(1e-3), monitor3, n_outer=n_outer,
+    algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
+    grad_search(algo, criterion, np.log(1e-3), monitor3, n_outer=n_outer,
                 tol=1e-13)
 
     assert np.allclose(

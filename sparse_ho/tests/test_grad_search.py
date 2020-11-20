@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 import pytest
-import sklearn
+from sklearn import linear_model
 
 from sparse_ho.utils import Monitor
 
@@ -58,7 +58,7 @@ models = [
     Lasso(X_train, y_train, max_iter=max_iter, estimator=None),
 ]
 
-estimator = sklearn.linear_model.Lasso(
+estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = [
     Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator),
@@ -79,20 +79,20 @@ def test_grad_search(model, crit):
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
-    algo = Forward(criterion)
-    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
+    algo = Forward()
+    grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
-    algo = Implicit(criterion)
-    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
+    algo = Implicit()
+    grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    grad_search(algo, criterion, log_alpha, monitor3, n_outer=n_outer,
                 tol=1e-16)
 
     assert np.allclose(
