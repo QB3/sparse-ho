@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import csc_matrix
-import sklearn
+from sklearn import linear_model
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso
@@ -46,7 +46,7 @@ max_iter = 1000
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(0.0001 * alpha_max)
 
-estimator = sklearn.linear_model.Lasso(
+estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 
 
@@ -58,14 +58,14 @@ def test_grid_search():
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
@@ -76,19 +76,19 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(X_train, y_train, estimator=estimator)
     criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
+        X_train, y_train, sigma=sigma_star, X_test=X_test,
         y_test=y_test)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
-    criterion = SURE(X_train, y_train, model, sigma=sigma_star,
+    criterion = SURE(X_train, y_train, sigma=sigma_star,
                      X_test=X_test, y_test=y_test)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
