@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, log_alpha0, monitor, n_outer=100, verbose=False,
+        algo, criterion, log_alpha0, monitor, n_outer=100, verbose=False,
         tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """This line-search code is taken from here:
@@ -14,6 +14,8 @@ def grad_search(
 
     Parameters
     ----------
+    algo: TODO
+    criterion: TODO
     log_alpha0: float
         log of the regularization coefficient alpha
     tol : float
@@ -43,20 +45,21 @@ def grad_search(
     """
 
     def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(lambdak, tol=tol, beta_star=beta_star)
+        return algo.get_val_grad(criterion, lambdak, tol=tol,
+                                 beta_star=beta_star)
 
     def _proj_param(lambdak):
-        return algo.criterion.model.proj_param(lambdak)
+        return criterion.model.proj_param(lambdak)
 
     return _grad_search(
-        _get_val_grad, _proj_param, log_alpha0, monitor, algo, n_outer=n_outer,
-        verbose=verbose, tolerance_decrease=tolerance_decrease, tol=tol,
-        t_max=t_max)
+        _get_val_grad, _proj_param, log_alpha0, monitor, algo,
+        criterion, n_outer=n_outer, verbose=verbose,
+        tolerance_decrease=tolerance_decrease, tol=tol, t_max=t_max)
 
 
 def _grad_search(
-        _get_val_grad, proj_param, log_alpha0, monitor, algo, n_outer=100,
-        verbose=False, tolerance_decrease='constant', tol=1e-5,
+        _get_val_grad, proj_param, log_alpha0, monitor, algo, criterion,
+        n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
         convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
     """
     This line-search code is taken from here:
@@ -166,11 +169,11 @@ def _grad_search(
             old_tol = seq_tol[0]
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
         try:
-            monitor(g_func, algo.criterion.val_test, lambdak.copy(),
+            monitor(g_func, criterion.val_test, lambdak.copy(),
                     grad_lambda, algo.criterion.rmse)
         except Exception:
             monitor(g_func, algo.criterion.val_test, lambdak,
-                    grad_lambda, algo.criterion.rmse)
+                    grad_lambda, criterion.rmse)
 
         # TODO this should be removed into the SURE class no?
         if convexify:
@@ -200,7 +203,6 @@ def _grad_search(
 
         incr = norm(step_size * grad_lambda)
         C = 0.25
-        # C = 0.25 / algo.criterion.model.X.shape[0]
         factor_L_lambda = 1.0
         if g_func <= g_func_old + C * tol + \
                 old_tol * (C + factor_L_lambda) * incr - factor_L_lambda * \
@@ -222,9 +224,7 @@ def _grad_search(
             print('!!step size rejected!!', g_func, g_func_old)
             g_func, grad_lambda = _get_val_grad(
                 lambdak, tol=tol)
-            # g_func, grad_lambda = algo.get_val_grad(lambdak, tol=tol,
-            #
-            #                                         beta_star=beta_star)
+
             if convexify:
                 g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
                 grad_lambda += gamma_convex * np.exp(lambdak)
@@ -245,21 +245,21 @@ def _grad_search(
 
 
 def grad_search_wolfe(
-        algo, log_alpha0, monitor, n_outer=10, warm_start=None, tol=1e-3,
-        maxit_ln=5):
+        algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None,
+        tol=1e-3, maxit_ln=5):
 
     def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(lambdak, tol=tol)
+        return algo.get_val_grad(criterion, lambdak, tol=tol)
 
     def _get_val(lambdak, tol=tol):
-        return algo.criterion.get_val(lambdak, tol=tol)
+        return criterion.get_val(lambdak, tol=tol)
 
     log_alphak = log_alpha0
     for i in range(n_outer):
         val, grad = _get_val_grad(log_alphak)
 
-        monitor(val.copy(), algo.criterion.val_test, log_alphak,
-                grad, algo.criterion.rmse)
+        monitor(val.copy(), criterion.val_test, log_alphak,
+                grad, criterion.rmse)
 
         # step_size = 1 / norm(grad)
         step_size = wolfe(

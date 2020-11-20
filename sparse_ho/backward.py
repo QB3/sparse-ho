@@ -6,18 +6,19 @@ from sparse_ho.forward import get_beta_jac_iterdiff
 
 
 class Backward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the bacward differentiation.
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the backward differentiation.
 
     Parameters
     ----------
-    criterion: criterion object
-        HeldOut, CrossVal or SURE
+    verbose: bool
     """
-    def __init__(self, criterion):
-        self.criterion = criterion
+
+    def __init__(self, verbose=False):
+        self.verbose = verbose
 
     def get_beta_jac_v(
-            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
+            self, X, y, criterion, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=True, full_jac_v=False):
         mask, dense, list_sign = get_beta_jac_iterdiff(
@@ -34,13 +35,13 @@ class Backward():
             jac_v = model.get_mask_jac_v(mask, jac_v)
         return mask, dense, jac_v, jac_v
 
-    def get_val_grad(
-            self, log_alpha, max_iter=1000, tol=1e-3, compute_jac=False,
-            backward=True, beta_star=None):
+    # def get_val_grad(
+    #         self, criterion, log_alpha, max_iter=1000, tol=1e-3, compute_jac=False,
+    #         backward=True, beta_star=None):
 
-        return self.criterion.get_val_grad(
-            log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, backward=backward, beta_star=beta_star)
+    #     return criterion.get_val_grad(
+    #         log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
+    #         compute_jac=compute_jac, backward=backward, beta_star=beta_star)
 
 
 def get_only_jac_backward(X, alpha, list_beta, v, model, jac_v0=None):

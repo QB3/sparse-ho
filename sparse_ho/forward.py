@@ -7,22 +7,20 @@ class Forward():
 
     Parameters
     ----------
-    criterion: criterion object
-        HeldOut, CrossVal or SURE
-        verbose: bool
+    verbose: bool
     """
-    def __init__(self, criterion, verbose=False):
-        self.criterion = criterion
+
+    def __init__(self, verbose=False):
         self.verbose = verbose
 
     def get_beta_jac_v(
-            self, X, y, log_alpha, model, v, mask0=None, dense0=None,
+            self, X, y, criterion, log_alpha, model, v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=True, backward=False, full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=self.criterion.model.max_iter, tol=tol,
+            max_iter=criterion.model.max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward, verbose=self.verbose)
 
         if jac is not None:
@@ -34,11 +32,11 @@ class Forward():
         return mask, dense, jac_v, jac
 
     def get_val_grad(
-            self, log_alpha,
+            self, criterion, log_alpha,
             beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
             backward=False):
-        return self.criterion.get_val_grad(
+        return criterion.get_val_grad(
             log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
             compute_jac=compute_jac, backward=backward)
 
