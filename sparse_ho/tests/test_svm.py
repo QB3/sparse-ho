@@ -94,20 +94,20 @@ def test_val_grad(model):
     # compute the gradients
     # check that the gradient returned by all methods are the same
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
-        log_C, algo.get_beta_jac_v, tol=tol)
+        model, log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-        log_C, algo.get_beta_jac_v, tol=tol)
+        model, log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = Logistic(X_val, y_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
-        log_C, algo.get_beta_jac_v, tol=tol)
+        model, log_C, algo.get_beta_jac_v, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
@@ -117,33 +117,24 @@ def test_val_grad(model):
 
 @pytest.mark.parametrize('model', models)
 def test_grad_search(model):
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
     n_outer = 3
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = SmoothedHinge(X_val, y_val, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(algo, criterion, np.log(1e-3), monitor1, n_outer=n_outer,
-                tol=1e-13)
+    grad_search(algo, criterion, model, np.log(1e-3), monitor1,
+                n_outer=n_outer, tol=1e-13)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = SmoothedHinge(X_val, y_val, X_test=None, y_test=None)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, np.log(1e-3), monitor2, n_outer=n_outer,
-                tol=1e-13)
+    grad_search(algo, criterion, model, np.log(1e-3), monitor2,
+                n_outer=n_outer, tol=1e-13)
 
-    # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = SmoothedHinge(X_val, y_val, X_test=None, y_test=None)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
-    grad_search(algo, criterion, np.log(1e-3), monitor3, n_outer=n_outer,
-                tol=1e-13)
+    grad_search(algo, criterion, model, np.log(1e-3), monitor3,
+                n_outer=n_outer, tol=1e-13)
 
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))

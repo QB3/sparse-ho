@@ -71,28 +71,29 @@ def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     if crit == 'cv':
         n_outer = 2
-        criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+        criterion = CV(X_val, y_val, X_test=X_test, y_test=y_test)
     else:
         n_outer = 2
-        criterion = SURE(X_train, y_train, model, sigma=sigma_star,
+        criterion = SURE(X_train, y_train, sigma=sigma_star,
                          X_test=X_test, y_test=y_test)
+    # TODO MM@QBE if else scheme surprising
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = CV(X_val, y_val, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
+    grad_search(algo, criterion, model, log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = CV(X_val, y_val, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
+    grad_search(algo, criterion, model, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = CV(X_val, y_val, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(algo, criterion, log_alpha, monitor3, n_outer=n_outer,
+    grad_search(algo, criterion, model, log_alpha, monitor3, n_outer=n_outer,
                 tol=1e-16)
 
     assert np.allclose(

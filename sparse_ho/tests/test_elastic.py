@@ -92,25 +92,28 @@ def test_val_grad():
     # Not all methods computes the full Jacobian, but all
     # compute the gradients
     # check that the gradient returned by all methods are the same
-    criterion = CV(X_val, y_val, model)
+    criterion = CV(X_val, y_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
+        model, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = CV(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
+        model, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = CV(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd_custom, grad_imp_fwd_custom = criterion.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
+        model, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        tol=tol)
 
-    criterion = CV(X_val, y_val, model)
+    criterion = CV(X_val, y_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
-        np.array([log_alpha1, log_alpha2]),
+        model, np.array([log_alpha1, log_alpha2]),
         algo.get_beta_jac_v, tol=tol)
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
@@ -125,26 +128,26 @@ def test_val_grad():
 def test_grad_search():
 
     n_outer = 3
-    criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = CV(X_val, y_val, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(
-        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor1, n_outer=n_outer,
-        tol=1e-16)
+        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor1,
+        n_outer=n_outer, tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = CV(X_val, y_val, X_test=None, y_test=None)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(
-        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor2, n_outer=n_outer,
-        tol=1e-16)
+        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor2,
+        n_outer=n_outer, tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = CV(X_val, y_val, X_test=None, y_test=None)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=1000)
     grad_search(
-        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor3, n_outer=n_outer,
-        tol=1e-16)
+        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor3,
+        n_outer=n_outer, tol=1e-16)
     [np.linalg.norm(grad) for grad in monitor1.grads]
     [np.exp(alpha) for alpha in monitor1.log_alphas]
 
