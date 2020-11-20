@@ -66,8 +66,7 @@ models_custom = [
 
 
 @pytest.mark.parametrize('model', models)
-# @pytest.mark.parametrize('crit', ['cv', 'sure'])
-@pytest.mark.parametrize('crit', ['cv'])
+@pytest.mark.parametrize('crit', ['cv', 'sure'])
 def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     if crit == 'cv':

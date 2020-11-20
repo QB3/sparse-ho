@@ -88,13 +88,12 @@ class CV():
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, backward=False, beta_star=None):
+            compute_jac=True, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            backward=backward, full_jac_v=True)
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac, full_jac_v=True)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
@@ -174,13 +173,13 @@ class Logistic():
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, backward=False, beta_star=None):
+            compute_jac=True, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            backward=backward, full_jac_v=True)
+            full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
@@ -267,13 +266,13 @@ class SmoothedHinge():
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, backward=False, beta_star=None):
+            compute_jac=True, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            backward=backward, full_jac_v=True)
+            ull_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
@@ -395,21 +394,20 @@ class SURE():
     def get_val_grad(
             self, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-            backward=False):
+            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True):
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
             self.model.X, self.model.y, log_alpha, self.model, self.v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            backward=backward, full_jac_v=True)
+            full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
             self.model.X, self.model.y + self.epsilon * self.delta,
             log_alpha, self.model, self.v2, mask0=self.mask02,
             dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            backward=backward, full_jac_v=True)
+            full_jac_v=True)
         val = self.value(mask, dense, mask2, dense2)
         self.value_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)
@@ -506,14 +504,13 @@ class CrossVal():
 
     def get_val_grad(
             self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, backward=False, beta_star=None):
+            compute_jac=True, beta_star=None):
         val = 0
         grad = 0
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
                 log_alpha, get_beta_jac_v, max_iter=max_iter, tol=tol,
-                compute_jac=compute_jac, backward=backward,
-                beta_star=beta_star)
+                compute_jac=compute_jac, beta_star=beta_star)
             val += vali
             if gradi is not None:
                 grad += gradi
