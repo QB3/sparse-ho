@@ -280,7 +280,7 @@ class LassoGradSearch():
 
 
 class WeightedLassoGradSearch():
-    """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+    """Linear Model trained with weighted L1 regularizer (aka the weighted Lasso)
 
     The optimization objective for weighted Lasso is:
 
@@ -288,10 +288,10 @@ class WeightedLassoGradSearch():
 
     Parameters
     ----------
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
+    X: {ndarray, sparse matrix}, shape (n_samples, n_features)
+        Design matrix.
+    y: {ndarray, sparse matrix}, shape (n_samples,)
+        Target vector.
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
@@ -300,17 +300,18 @@ class WeightedLassoGradSearch():
             self, criterion, algo, max_iter=1000, log_alpha_max=None):
         self.criterion = criterion
         self.algo = algo
+        self.estimator = estimator
         self.max_iter = max_iter
-        self._estimator = Lasso(warm_start=True)
         self.log_alpha_max = log_alpha_max
 
-    def fit(X, y):
+    def fit(self, X, y):
         monitor = Monitor()
         grad_search(self.algo, monitor, self.alpha0, n_outer=20, tol=1e-6)
         self.monitor = monitor
+        return self
 
-    def predict(X):
-        return self._estimator.predict(X)
+    def predict(self, X):
+        return self.estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -507,6 +508,7 @@ class WeightedLassoGradSearch():
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
+        # TODO MM@QBE alpha should be alphas, right ?
         # TODO uncomment this code when the new version of celer is released
         # self.estimator.set_params(tol=tol)
         # self.estimator.weights = alpha
