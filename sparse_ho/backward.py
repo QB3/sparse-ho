@@ -18,7 +18,7 @@ class Backward():
         self.verbose = verbose
 
     def get_beta_jac_v(
-            self, X, y, criterion, log_alpha, model, get_v, mask0=None, dense0=None,
+            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             compute_jac=False, backward=True, full_jac_v=False):
         mask, dense, list_sign = get_beta_jac_iterdiff(
