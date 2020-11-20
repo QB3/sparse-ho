@@ -272,7 +272,7 @@ class SmoothedHinge():
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            ull_jac_v=True)
+            full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
