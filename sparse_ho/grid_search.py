@@ -66,8 +66,8 @@ def grid_search(
             min_g_func = g_func
             log_alpha_opt = log_alpha
 
-        monitor(g_func, algo.criterion.val_test, log_alpha, None,
-                algo.criterion.rmse)
+        monitor(g_func, criterion.val_test, log_alpha, None,
+                .criterion.rmse)
         if monitor.times[-1] > t_max:
             break
     return log_alpha_opt, min_g_func

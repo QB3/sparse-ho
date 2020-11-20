@@ -137,24 +137,24 @@ def test_val_grad():
         model = models[key]
         # model = Lasso(log_alpha)
         criterion = CV(X_val, y_val, model)
-        algo = Forward(criterion)
-        val_fwd, grad_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+        algo = Forward()
+        val_fwd, grad_fwd = criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol)
 
         criterion = CV(X_val, y_val, model)
-        algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-        val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+        algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+        val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol)
 
         criterion = CV(X_val, y_val, model)
-        algo = Implicit(criterion)
-        val_imp, grad_imp = algo.get_val_grad(
-            log_alpha, tol=tol)
+        algo = Implicit()
+        val_imp, grad_imp = criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol)
 
         criterion = CV(X_val, y_val, model)
         algo = Backward(criterion)
-        val_bwd, grad_bwd = algo.get_val_grad(
-            log_alpha, tol=tol)
+        val_bwd, grad_bwd = criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol)
 
         assert np.allclose(val_fwd, val_imp_fwd)
         assert np.allclose(grad_fwd, grad_imp_fwd)

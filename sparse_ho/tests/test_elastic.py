@@ -93,25 +93,25 @@ def test_val_grad():
     # compute the gradients
     # check that the gradient returned by all methods are the same
     criterion = CV(X_val, y_val, model)
-    algo = Forward(criterion)
-    val_fwd, grad_fwd = algo.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), tol=tol)
+    algo = Forward()
+    val_fwd, grad_fwd = criterion.get_val_grad(
+        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
 
     criterion = CV(X_val, y_val, model)
-    algo = ImplicitForward(criterion, tol_jac=1e-16, n_iter_jac=5000)
-    val_imp_fwd, grad_imp_fwd = algo.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), tol=tol)
+    algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
+    val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
+        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
 
     criterion = CV(X_val, y_val, model)
-    algo = ImplicitForward(
-        criterion, tol_jac=1e-16, n_iter_jac=5000)
-    val_imp_fwd_custom, grad_imp_fwd_custom = algo.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), tol=tol)
+    algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
+    val_imp_fwd_custom, grad_imp_fwd_custom = criterion.get_val_grad(
+        np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v, tol=tol)
 
     criterion = CV(X_val, y_val, model)
-    algo = Implicit(criterion)
-    val_imp, grad_imp = algo.get_val_grad(
-        np.array([log_alpha1, log_alpha2]), tol=tol)
+    algo = Implicit()
+    val_imp, grad_imp = criterion.get_val_grad(
+        np.array([log_alpha1, log_alpha2]),
+        algo.get_beta_jac_v, tol=tol)
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
     assert np.allclose(val_imp_fwd, val_imp)
