@@ -6,7 +6,7 @@ from bcdsugar.utils import Monitor
 from sparse_ho.ho import grad_search
 from itertools import product
 from sparse_ho.criterion import SmoothedHinge
-from sparse_ho.models import SVM
+from sparse_ho.models import SVMGradSearch
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit

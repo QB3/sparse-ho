@@ -6,7 +6,7 @@ from sparse_ho.criterion import Logistic
 from sparse_ho.forward import Forward
 from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.models import SVM
+from sparse_ho.models import SVMGradSearch
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from scipy.sparse import csr_matrix
@@ -40,10 +40,8 @@ log_C = np.log(C)
 tol = 1e-16
 
 models = [
-    SVM(
-        X_train, y_train, log_C, max_iter=10000, tol=tol),
-    SVM(
-        X_train_s, y_train, log_C, max_iter=10000, tol=tol)
+    SVMGradSearch(X_train, y_train, log_C, max_iter=10000, tol=tol),
+    SVMGradSearch(X_train_s, y_train, log_C, max_iter=10000, tol=tol)
 ]
 
 

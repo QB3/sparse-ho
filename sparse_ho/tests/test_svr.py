@@ -1,6 +1,6 @@
 import numpy as np
 # from sklearn.svm import LinearSVR
-from sparse_ho.models import SVR
+from sparse_ho.models import SVRGradSearch
 # from sparse_ho.forward import get_beta_jac_iterdiff
 from sklearn.datasets import make_regression
 n_samples = 100
@@ -17,7 +17,8 @@ X_train, y_train, beta_star = make_regression(
     shuffle=False, random_state=10, n_samples=n_samples, n_features=n_features,
     n_informative=n_features, n_targets=1, coef=True)
 
-model = SVR(X_train, y_train, log_C, log_epsilon, max_iter=10000, tol=tol)
+model = SVRGradSearch(X_train, y_train, log_C, log_epsilon, max_iter=10000,
+                      tol=tol)
 
 
 # def test_beta_jac(model):

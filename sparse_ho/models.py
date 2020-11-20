@@ -297,7 +297,7 @@ class WeightedLassoGradSearch():
     """
 
     def __init__(
-            self, criterion, algo, max_iter=1000, log_alpha_max=None):
+            self, criterion, algo, estimator, max_iter=1000, log_alpha_max=None):
         self.criterion = criterion
         self.algo = algo
         self.estimator = estimator
@@ -549,7 +549,7 @@ class WeightedLassoGradSearch():
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
 
-class SVM():
+class SVMGradSearch():
     """Support vector machines.
     The optimization objective for the SVM is:
     TODO
@@ -563,12 +563,24 @@ class SVM():
     TODO: other parameters should be remove
     """
 
-    def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
+    def __init__(self, criterion, algo, estimator, X, y, logC, max_iter=100,
+                 tol=1e-3):
+        self.algo = algo
+        self.criterion = criterion
+        self.estimator = estimator
+
         self.logC = logC
         self.max_iter = max_iter
         self.tol = tol
         self.X = X
         self.y = y
+
+    def fit(self, X, y):
+        # TODO MM@QBE grad_search
+        return self
+
+    def predict(self, X):
+        return self.estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -884,7 +896,7 @@ class SVM():
             norm(res))
 
 
-class SparseLogreg():
+class SparseLogregGradSearch():
     """Sparse Logistic Regression classifier.
     The objective function is:
 
@@ -900,12 +912,22 @@ class SparseLogreg():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, criterion, algo, estimator, X, y, max_iter=1000,
+            log_alpha_max=None):
+        self.algo = algo
+        self.criterion = criterion
+        self.estimator = estimator
         self.X = X
         self.y = y
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
-        self.estimator = estimator
+
+    def fit(self, X, y):
+        # TODO MM@QBE grad_search
+        return self
+
+    def predict(self, X):
+        return self.estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -1174,7 +1196,7 @@ class SparseLogreg():
         return mask[0], dense, None
 
 
-class SVR():
+class SVRGradSearch():
     """
     Should we remove the SVR?
 
@@ -1542,14 +1564,23 @@ class SVR():
             norm(res))
 
 
-class ElasticNet():
+class ElasticNetGradSearch():
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, criterion, algo, estimator, X, y, max_iter=1000,
+            log_alpha_max=None):
         self.X = X
         self.y = y
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
+        self.cirterion = criterion
+        self.algo = algo
+
+    def fit(self, X, y):
+        return self  # TODO MM@QBE
+
+    def predict(self, X):
+        return self.estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):

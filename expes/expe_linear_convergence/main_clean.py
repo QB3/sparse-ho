@@ -9,7 +9,7 @@ import blitzl1
 # from celer import LogisticRegression
 from scipy.sparse.linalg import cg
 from scipy.sparse import csc_matrix
-from sparse_ho.models import Lasso, SparseLogreg
+from sparse_ho.models import LassoGradSearch, SparseLogregGradSearch
 # , SparseLogreg
 # import matplotlib.pyplot as plt
 

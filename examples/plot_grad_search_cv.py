@@ -23,7 +23,7 @@ from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
 
-from sparse_ho.models import Lasso
+from sparse_ho.models import LassoGradSearch
 from sparse_ho.criterion import CV, CrossVal
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
@@ -79,8 +79,7 @@ estimator = sklearn.linear_model.Lasso(
 print('sparse-ho started')
 
 t0 = time.time()
-Model = Lasso
-Criterion = CV
+Model = LassoGradSearch
 log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
 criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)

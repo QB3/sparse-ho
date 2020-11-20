@@ -4,7 +4,7 @@ from sklearn import datasets
 from sklearn.linear_model import LogisticRegression
 from scipy.sparse import csc_matrix
 
-from sparse_ho.models import SparseLogreg
+from sparse_ho.models import SparseLogregGradSearch
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.forward import Forward
@@ -40,9 +40,9 @@ log_alpha = np.log(alpha)
 tol = 1e-16
 
 models = [
-    SparseLogreg(
+    SparseLogregGradSearch(
         X_train, y_train, max_iter=10000, estimator=None),
-    SparseLogreg(
+    SparseLogregGradSearch(
         X_train_s, y_train, max_iter=10000, estimator=None)
 ]
 
@@ -51,9 +51,9 @@ estimator = LogisticRegression(
     solver="saga")
 
 models_custom = [
-    SparseLogreg(
+    SparseLogregGradSearch(
         X_train, y_train, max_iter=10000, estimator=estimator),
-    SparseLogreg(
+    SparseLogregGradSearch(
         X_train_s, y_train, max_iter=10000, estimator=estimator)
 ]
 
@@ -180,7 +180,7 @@ def test_grad_search(model, crit):
 
     criterion = Logistic(X_val, y_val, model)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
+    algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
                 tol=tol)
 

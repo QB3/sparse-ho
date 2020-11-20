@@ -4,7 +4,7 @@ import sklearn
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LassoCV
 
-from sparse_ho.models import Lasso
+from sparse_ho.models import LassoGradSearch
 from sparse_ho.criterion import CrossVal
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
@@ -56,7 +56,7 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
-    Lasso(X_train, y_train, dict_log_alpha["lasso"])
+    LassoGradSearch(X_train, y_train, dict_log_alpha["lasso"])
 ]
 
 

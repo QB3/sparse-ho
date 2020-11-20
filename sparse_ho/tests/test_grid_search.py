@@ -3,7 +3,7 @@ from scipy.sparse import csc_matrix
 import sklearn
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.models import Lasso
+from sparse_ho.models import LassoGradSearch
 from sparse_ho.forward import Forward
 from sparse_ho.criterion import CV, SURE
 from sparse_ho.grid_search import grid_search

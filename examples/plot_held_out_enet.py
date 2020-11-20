@@ -25,7 +25,7 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import CV
-from sparse_ho.models import ElasticNet
+from sparse_ho.models import ElasticNetGradSearch
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 
@@ -105,7 +105,7 @@ print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
 n_outer = 10
-model = ElasticNet(
+model = ElasticNetGradSearch(
     X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = CV(
     X_val, y_val, model, X_test=X_test, y_test=y_test)

@@ -6,7 +6,7 @@ import sklearn
 from sparse_ho.utils import Monitor
 
 from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.models import Lasso
+from sparse_ho.models import LassoGradSearch
 
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
@@ -21,6 +21,7 @@ n_active = 5
 SNR = 3
 rho = 0.5
 
+# TODO MM there should be a better way to do this
 X_train, y_train, beta_star, noise, sigma_star = get_synt_data(
     dictionary_type="Toeplitz", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
@@ -54,23 +55,16 @@ dict_log_alpha0["lasso"] = log_alpha
 tab = np.linspace(1, 1000, n_features)
 dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
 
-models = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=None),
-]
-
 estimator = sklearn.linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
-models_custom = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator),
-]
 
 
-@pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('crit', ['cv', 'sure'])
-def test_grad_search(model, crit):
+def test_grad_search(crit):
     """check that the paths are the same in the line search"""
     if crit == 'cv':
         n_outer = 2
+        # MM todo criterion depending on model make our life complicated
         criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     else:
         n_outer = 2
@@ -79,20 +73,22 @@ def test_grad_search(model, crit):
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
-    algo = Forward(criterion)
-    grad_search(algo, log_alpha, monitor1, n_outer=n_outer,
+    algo = Forward()
+    model = LassoGradSearch(X_train, y_train, max_iter=max_iter)
+    model.fit(X_train, y_train)
+    grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
-    algo = Implicit(criterion)
-    grad_search(algo, log_alpha, monitor2, n_outer=n_outer,
+    algo = Implicit()
+    grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(algo, log_alpha, monitor3, n_outer=n_outer,
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    grad_search(algo, criterion, log_alpha, monitor3, n_outer=n_outer,
                 tol=1e-16)
 
     assert np.allclose(
@@ -108,9 +104,4 @@ def test_grad_search(model, crit):
 
 
 if __name__ == '__main__':
-    models = [
-        Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator)]
-    crits = ['cv']
-    for model in models:
-        for crit in crits:
-            test_grad_search(model, crit)
+    test_grad_search('cv')

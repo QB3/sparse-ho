@@ -5,7 +5,7 @@ from sklearn import linear_model
 
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.models import Lasso, WeightedLasso
+from sparse_ho.models import LassoGradSearch, WeightedLassoGradSearch
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.implicit import get_beta_jac_t_v_implicit
 
@@ -54,8 +54,8 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = {}
-models["lasso"] = Lasso(X_train, y_train, estimator=None)
-models["wlasso"] = WeightedLasso(X_train, y_train, estimator=None)
+models["lasso"] = LassoGradSearch(X_train, y_train, estimator=None)
+models["wlasso"] = WeightedLassoGradSearch(X_train, y_train, estimator=None)
 
 
 def get_v(mask, dense):
@@ -106,8 +106,8 @@ def test_beta_jac():
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = {}
-models_custom["lasso"] = Lasso(X_train, y_train, estimator=estimator)
-models_custom["wlasso"] = WeightedLasso(X_train, y_train, estimator=estimator)
+models_custom["lasso"] = LassoGradSearch(X_train, y_train, estimator=estimator)
+models_custom["wlasso"] = WeightedLassoGradSearch(X_train, y_train, estimator=estimator)
 
 
 def test_beta_jac2():
