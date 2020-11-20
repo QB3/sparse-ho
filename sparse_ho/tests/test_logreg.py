@@ -203,13 +203,13 @@ def test_grad_search_custom(model, model_custom, crit):
 
     criterion = Logistic(X_val, y_val, model)
     monitor = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, log_alpha, monitor, n_outer=n_outer, tol=tol)
+    algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, criterion, log_alpha, monitor, n_outer=n_outer, tol=tol)
 
     criterion = Logistic(X_val, y_val, model_custom)
     monitor_custom = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, log_alpha, monitor_custom, n_outer=n_outer, tol=tol)
+    algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
+    grad_search(algo, criterion, log_alpha, monitor_custom, n_outer=n_outer, tol=tol)
 
     assert np.allclose(
         np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas))
