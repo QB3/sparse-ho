@@ -249,7 +249,7 @@ def grad_search_wolfe(
         tol=1e-3, maxit_ln=5):
 
     def _get_val_grad(log_alpha, tol=tol):
-        return criterion.get_val_grad(log_alpha, alpha.get_beta_jac_v, tol=tol)
+        return criterion.get_val_grad(log_alpha, algo.get_beta_jac_v, tol=tol)
 
     def _get_val(lambdak, tol=tol):
         return criterion.get_val(lambdak, tol=tol)
