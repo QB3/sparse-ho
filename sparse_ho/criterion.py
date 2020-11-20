@@ -460,6 +460,7 @@ class CrossVal():
         self.X = X
         self.y = y
         self.dict_crits = {}
+        self.dict_models = {}
         self.val_test = None
         self.rmse = None
         self.estimator = estimator
@@ -478,32 +479,33 @@ class CrossVal():
                 X_val = X_val.tocsc()
 
             # TODO get rid of this
-            model = Model(
+            self.models[i] = Model(
                 X_train, y_train, max_iter=max_iter, estimator=estimator)
 
             criterion = CV(
-                X_val, y_val, model, X_test=X_val, y_test=y_val)
+                X_val, y_val, X_test=X_val, y_test=y_val)
 
             self.dict_crits[i] = criterion
         self.n_splits = cv.n_splits
-        self.model = self.dict_crits[0].model
 
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, log_alpha, tol=1e-3):
         val = 0
         for i in range(self.n_splits):
-            vali = self.dict_crits[i].get_val(log_alpha, tol=tol)
+            vali = self.dict_crits[i].get_val(self.models[i], log_alpha,
+                                              tol=tol)
             val += vali
         val /= self.n_splits
         return val
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
         val = 0
         grad = 0
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
-                log_alpha, get_beta_jac_v, max_iter=max_iter, tol=tol,
+                self.models[i], log_alpha, get_beta_jac_v, max_iter=max_iter,
+                tol=tol,
                 compute_jac=compute_jac, beta_star=beta_star)
             val += vali
             if gradi is not None:
