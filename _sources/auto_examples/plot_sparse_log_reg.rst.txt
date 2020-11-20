@@ -98,10 +98,10 @@ Grid-search
         penalty='l1', fit_intercept=False, solver='saga', max_iter=max_iter)
     model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
     criterion = Logistic(X_val, y_val, model)
-    algo_grid = Forward(criterion)
+    algo_grid = Forward()
     monitor_grid = Monitor()
     grid_search(
-        algo_grid, log_alpha_min, log_alpha_max, monitor_grid,
+        algo_grid, criterion, log_alpha_min, log_alpha_max, monitor_grid,
         log_alphas=log_alphas, tol=tol)
     objs = np.array(monitor_grid.objs)
 
@@ -143,7 +143,7 @@ Grid-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     scikit finished
-    Time to compute CV for scikit-learn: 1.49
+    Time to compute CV for scikit-learn: 1.57
 
 
 
@@ -163,8 +163,9 @@ Grad-search
     model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
     criterion = Logistic(X_val, y_val, model)
     monitor_grad = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=tol, n_iter_jac=100)
-    grad_search(algo, np.log(0.1 * alpha_max), monitor_grad, n_outer=10, tol=tol)
+    algo = ImplicitForward(tol_jac=tol, n_iter_jac=100)
+    grad_search(algo, criterion, np.log(0.1 * alpha_max), monitor_grad,
+                n_outer=10, tol=tol)
     objs_grad = np.array(monitor_grad.objs)
 
     t_grad_search = time.time() - t0
@@ -234,7 +235,7 @@ Grad-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     sparse-ho finished
-    Time to compute CV for sparse-ho: 3.15
+    Time to compute CV for sparse-ho: 2.51
 
 
 
@@ -242,7 +243,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.242 seconds)
+   **Total running time of the script:** ( 0 minutes  4.547 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

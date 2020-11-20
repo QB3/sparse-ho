@@ -97,30 +97,25 @@
 <h1>sparse_ho.ImplicitForward<a class="headerlink" href="#sparse-ho-implicitforward" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.ImplicitForward">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">ImplicitForward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">tol_jac</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">n_iter_jac</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.</p>
-<dl class="field-list">
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">ImplicitForward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tol_jac</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">n_iter_jac</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with
+respect to the hyperparameter using the implicit forward algorithm.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>criterion: criterion object</strong></dt><dd><p>HeldOut, CrossVal or SURE
-max_iter: int</p>
-<blockquote>
-<div><p>maximum number of iteration for the inner solver</p>
-</div></blockquote>
-<dl class="simple">
-<dt>tol_jac: float</dt><dd><p>tolerance for the Jacobian computation</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>max_iter: int</strong></dt><dd><p>maximum number of iteration for the inner solver</p>
 </dd>
-<dt>n_iter_jac: int</dt><dd><p>maximum number of iteration for the Jacobian computation</p>
+<dt><strong>tol_jac: float</strong></dt><dd><p>tolerance for the Jacobian computation</p>
 </dd>
-</dl>
-<p>verbose: bool</p>
+<dt><strong>n_iter_jac: int</strong></dt><dd><p>maximum number of iteration for the Jacobian computation</p>
 </dd>
+<dt><strong>verbose: bool</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.ImplicitForward.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">tol_jac</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">n_iter_jac</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tol_jac</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">n_iter_jac</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -131,16 +126,10 @@ max_iter: int</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.ImplicitForward.__init__" title="sparse_ho.ImplicitForward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(criterion[, tol_jac, max_iter, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.ImplicitForward.__init__" title="sparse_ho.ImplicitForward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([tol_jac, max_iter, n_iter_jac, …])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_beta_jac_v</span></code>(X, y, log_alpha, model, get_v)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(log_alpha[, mask0, dense0, …])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(log_alpha[, mask0, dense0, …])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -162,7 +151,7 @@ max_iter: int</p>
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
     </p>
   </div>
 </footer>

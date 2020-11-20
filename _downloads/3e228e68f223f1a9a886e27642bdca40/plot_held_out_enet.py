@@ -109,10 +109,9 @@ model = ElasticNet(
     X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = CV(
     X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(
-    criterion, tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
+algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
 _, _, _ = grad_search(
-    algo=algo, verbose=True,
+    algo, criterion, verbose=True,
     log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
     tol=tol, n_outer=n_outer, monitor=monitor)
 t_grad_search += time.time()

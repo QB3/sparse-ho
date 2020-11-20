@@ -76,7 +76,7 @@ criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(
-    algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
+    algo, criterion, None, None, monitor_grid_sk, log_alphas=log_alphas,
     tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
@@ -96,7 +96,7 @@ criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
-    algo, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
+    algo, criterion, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
 
 t_grad_search = time.time() - t0
 

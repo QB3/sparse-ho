@@ -147,14 +147,14 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>(criterion[, tol_jac, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>(criterion[, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([verbose])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>(criterion)</p></td>
-<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the bacward differentiation.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([verbose])</p></td>
+<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the backward differentiation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -167,10 +167,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, log_alpha0, monitor[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, criterion, log_alpha0, monitor)</p></td>
 <td><p>This line-search code is taken from here: <a class="reference external" href="https://github.com/fabianp/hoag/blob/master/hoag/hoag.py">https://github.com/fabianp/hoag/blob/master/hoag/hoag.py</a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search_wolfe.html#sparse_ho.grad_search_wolfe" title="sparse_ho.grad_search_wolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search_wolfe</span></code></a>(algo, log_alpha0, monitor)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search_wolfe.html#sparse_ho.grad_search_wolfe" title="sparse_ho.grad_search_wolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search_wolfe</span></code></a>(algo, criterion, …[, …])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -227,7 +227,7 @@
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
     </p>
   </div>
 </footer>

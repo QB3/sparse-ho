@@ -15,7 +15,6 @@
    
       ~Forward.__init__
       ~Forward.get_beta_jac_v
-      ~Forward.get_val_grad
    
    
 

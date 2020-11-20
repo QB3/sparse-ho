@@ -169,7 +169,7 @@ for a Lasso using a full cross-validation score.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>scikit started
 [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    9.1s finished
+..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    8.0s finished
 scikit finished
 </pre></div>
 </div>
@@ -187,9 +187,9 @@ scikit finished
 <span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">monitor_grad</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">CrossVal</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
-<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">criterion</span><span class="p">)</span>
+<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">()</span>
 <span class="n">grad_search</span><span class="p">(</span>
-    <span class="n">algo</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="n">monitor_grad</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+    <span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="n">monitor_grad</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
 
 <span class="n">t_grad_search</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
 
@@ -239,13 +239,13 @@ sparse-ho finished
 </div>
 <img alt="plot grad search cv" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_grad_search_cv_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time to compute CV for scikit-learn: 9.11
-Time to compute CV for sparse-ho: 1.99
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time to compute CV for scikit-learn: 8.04
+Time to compute CV for sparse-ho: 1.77
 Minimum objective grid-search 1938.13556
 Minimum objective grad-search 1932.51526
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.839 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.461 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-grad-search-cv-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/63181d815e1d8c3490d642d68c95f73f/plot_grad_search_cv.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_grad_search_cv.py</span></code></a></p>
@@ -271,7 +271,7 @@ Minimum objective grad-search 1932.51526
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
     </p>
   </div>
 </footer>

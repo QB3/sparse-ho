@@ -15,8 +15,6 @@
    
       ~ImplicitForward.__init__
       ~ImplicitForward.get_beta_jac_v
-      ~ImplicitForward.get_val
-      ~ImplicitForward.get_val_grad
    
    
 
