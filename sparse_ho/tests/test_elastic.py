@@ -127,23 +127,23 @@ def test_grad_search():
     n_outer = 3
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
-    algo = Forward(criterion)
+    algo = Forward()
     grad_search(
-        algo, np.array([log_alpha1, log_alpha2]), monitor1, n_outer=n_outer,
+        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor1, n_outer=n_outer,
         tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor2 = Monitor()
-    algo = Implicit(criterion)
+    algo = Implicit()
     grad_search(
-        algo, np.array([log_alpha1, log_alpha2]), monitor2, n_outer=n_outer,
+        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor2, n_outer=n_outer,
         tol=1e-16)
 
     criterion = CV(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
-    algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=1000)
+    algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=1000)
     grad_search(
-        algo, np.array([log_alpha1, log_alpha2]), monitor3, n_outer=n_outer,
+        algo, criterion, np.array([log_alpha1, log_alpha2]), monitor3, n_outer=n_outer,
         tol=1e-16)
     [np.linalg.norm(grad) for grad in monitor1.grads]
     [np.exp(alpha) for alpha in monitor1.log_alphas]
