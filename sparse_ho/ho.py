@@ -44,12 +44,12 @@ def grad_search(
         used to compute metrics
     """
 
-    def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(criterion, lambdak, tol=tol,
-                                 beta_star=beta_star)
+    def _get_val_grad(log_alpha, tol=tol):
+        return criterion.get_val_grad(
+            log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star)
 
-    def _proj_param(lambdak):
-        return criterion.model.proj_param(lambdak)
+    def _proj_param(log_alpha):
+        return criterion.model.proj_param(log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor, algo,
@@ -248,8 +248,8 @@ def grad_search_wolfe(
         algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None,
         tol=1e-3, maxit_ln=5):
 
-    def _get_val_grad(lambdak, tol=tol):
-        return algo.get_val_grad(criterion, lambdak, tol=tol)
+    def _get_val_grad(log_alpha, tol=tol):
+        return criterion.get_val_grad(log_alpha, alpha.get_beta_jac_v, tol=tol)
 
     def _get_val(lambdak, tol=tol):
         return criterion.get_val(lambdak, tol=tol)
