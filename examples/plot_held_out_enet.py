@@ -47,8 +47,7 @@ else:
     rng = np.random.RandomState(42)
     X, y, beta = make_regression(
         n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10,
-        random_state=rng,
-    )
+        random_state=rng)
     X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
     beta /= norm(beta)
     y = X @ beta + rng.randn(X.shape[0])
@@ -108,10 +107,10 @@ n_outer = 10
 model = ElasticNet(
     X_train, y_train, max_iter=max_iter, estimator=estimator)
 criterion = CV(
-    X_val, y_val, model, X_test=X_test, y_test=y_test)
+    X_val, y_val, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
-_, _, _ = grad_search(
-    algo, criterion, verbose=True,
+grad_search(
+    algo, criterion, model, verbose=True,
     log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
     tol=tol, n_outer=n_outer, monitor=monitor)
 t_grad_search += time.time()
