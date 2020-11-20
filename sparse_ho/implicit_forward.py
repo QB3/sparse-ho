@@ -41,22 +41,6 @@ class ImplicitForward():
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         return mask, dense, jac_v, jac
 
-    # def get_val_grad(
-    #         self, criterion, log_alpha, mask0=None, dense0=None, beta_star=None,
-    #         jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-    #         backward=False):
-    #     return criterion.get_val_grad(
-    #         log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
-    #         compute_jac=compute_jac, backward=backward)
-
-    # def get_val(
-    #         self, criterion, log_alpha, mask0=None, dense0=None, beta_star=None,
-    #         jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-    #         backward=False):
-    #     return criterion.get_val(
-    #         log_alpha, self.get_beta_jac_v, max_iter=max_iter, tol=tol,
-    #         compute_jac=compute_jac, backward=backward)
-
 
 def get_beta_jac_fast_iterdiff(
         X, y, log_alpha, get_v, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False):

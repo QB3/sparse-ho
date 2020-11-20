@@ -32,7 +32,6 @@ class Forward():
         return mask, dense, jac_v, jac
 
 
-
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
