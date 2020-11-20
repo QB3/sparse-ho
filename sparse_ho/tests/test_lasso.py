@@ -136,6 +136,7 @@ def test_val_grad():
         log_alpha = dict_log_alpha[key]
         model = models[key]
         # model = Lasso(log_alpha)
+
         criterion = CV(X_val, y_val, model)
         algo = Forward()
         val_fwd, grad_fwd = criterion.get_val_grad(
@@ -151,8 +152,10 @@ def test_val_grad():
         val_imp, grad_imp = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)
 
+        # import ipdb; ipdb.set_trace()
+
         criterion = CV(X_val, y_val, model)
-        algo = Backward(criterion)
+        algo = Backward()
         val_bwd, grad_bwd = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)
 
@@ -206,4 +209,4 @@ def test_val_grad():
 if __name__ == '__main__':
     test_beta_jac()
     test_val_grad()
-    # test_beta_jac2()
+    test_beta_jac2()
