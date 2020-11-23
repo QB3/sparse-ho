@@ -43,9 +43,9 @@ Criterion
 .. autosummary::
    :toctree: generated/
 
-   CV
-   SURE
-   Logistic
+   HeldOutMSE
+   SmoothedSURE
+   HeldOutLogistic
 
 
 Algorithms

@@ -4,7 +4,7 @@ from sparse_ho.models import ElasticNet
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.forward import Forward
 from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
@@ -89,25 +89,25 @@ def test_val_grad():
     # Not all methods computes the full Jacobian, but all
     # compute the gradients
     # check that the gradient returned by all methods are the same
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
         model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
         tol=tol)
 
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
         tol=tol)
 
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd_custom, grad_imp_fwd_custom = criterion.get_val_grad(
         model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
         tol=tol)
 
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
         model, X, y, np.array([log_alpha1, log_alpha2]),
@@ -125,21 +125,21 @@ def test_val_grad():
 def test_grad_search():
 
     n_outer = 3
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(
         algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor1,
         n_outer=n_outer, tol=1e-16)
 
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(
         algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor2,
         n_outer=n_outer, tol=1e-16)
 
-    criterion = CV(idx_train, idx_val)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=1000)
     grad_search(

@@ -20,7 +20,7 @@ import seaborn as sns
 from sklearn import linear_model
 
 from sparse_ho.models import Lasso
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
@@ -72,7 +72,7 @@ print('scikit-learn started')
 
 t0 = time.time()
 model = Lasso(X_train, y_train, estimator=estimator)
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(
@@ -92,7 +92,7 @@ print('sparse-ho started')
 
 t0 = time.time()
 model = Lasso(X_train, y_train, estimator=estimator)
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(

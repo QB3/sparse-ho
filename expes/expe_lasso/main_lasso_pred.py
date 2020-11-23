@@ -13,7 +13,7 @@ import pandas as pd
 from sparse_ho.datasets.real import get_data
 
 from sparse_ho.models import Lasso, SparseLogreg
-from sparse_ho.criterion import CV, Logistic
+from sparse_ho.criterion import HeldOutMSE, HeldOutLogistic
 from sparse_ho.utils import Monitor
 
 from sparse_ho.forward import Forward
@@ -111,9 +111,10 @@ def parallel_function(
 
     for _ in range(size_loop):
         if model_name == "lasso":
-            criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test,
+                                   y_test=y_test)
         elif model_name == "logreg":
-            criterion = Logistic(
+            criterion = HeldOutLogistic(
                 X_val, y_val, model, X_test=X_test, y_test=y_test)
         algo = dict_algo[method](criterion)
         monitor = Monitor()
