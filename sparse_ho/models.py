@@ -155,7 +155,8 @@ class Lasso():
     def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
-    def _init_g_backward(self, jac_v0):
+    @staticmethod
+    def _init_g_backward(jac_v0, n_features):
         if jac_v0 is None:
             return 0.0
         else:
@@ -283,9 +284,7 @@ class WeightedLasso():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.X = X
-        self.y = y
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
@@ -402,9 +401,10 @@ class WeightedLasso():
     def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
-    def _init_g_backward(self, jac_v0):
+    @staticmethod
+    def _init_g_backward(jac_v0, n_features):
         if jac_v0 is None:
-            return np.zeros(self.X.shape[1])
+            return np.zeros(n_features)
         else:
             return jac_v0
 
@@ -479,8 +479,9 @@ class WeightedLasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def get_hessian(self, mask, dense, log_alpha):
-        hessian = self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X, y, mask, dense, log_alpha):
+        hessian = X[:, mask].T @ X[:, mask]
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
@@ -500,11 +501,13 @@ class WeightedLasso():
         dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
@@ -518,8 +521,7 @@ class WeightedLasso():
     def restrict_full_supp(self, mask, dense, v):
         return v
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 

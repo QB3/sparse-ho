@@ -29,18 +29,6 @@ X_s = csc_matrix(X)
 
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
-# X_test, y_test, beta_star, noise, sigma = get_synt_data(
-#     dictionary_type="Toeplitz", n_samples=n_samples,
-#     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-#     SNR=SNR, seed=1)
-# X_test_s = csc_matrix(X_test)
-
-# X_val, y_val, beta_star, noise, sigma = get_synt_data(
-#     dictionary_type="Toeplitz", n_samples=n_samples,
-#     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-#     SNR=SNR, seed=2)
-# X_test_s = csc_matrix(X_test)
-
 
 alpha_max = (X[idx_train, :].T @ y[idx_train]).max() / n_samples
 p_alpha = 0.9
@@ -57,7 +45,7 @@ dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = {}
 models["lasso"] = Lasso(estimator=None)
-# models["wlasso"] = WeightedLasso(X_train, y_train, estimator=None)
+models["wlasso"] = WeightedLasso(estimator=None)
 
 
 def get_v(mask, dense):
@@ -90,15 +78,15 @@ def test_beta_jac():
         assert np.all(supp1 == supp2)
         assert np.allclose(dense1, dense1sk)
         assert np.allclose(dense1, dense2)
-        assert np.allclose(jac1, jac2)
+        assert np.allclose(jac1, jac2, atol=1e-6)
 
         assert np.all(supp2 == supp3)
         assert np.allclose(dense2, dense3)
-        assert np.allclose(jac2, jac3)
+        assert np.allclose(jac2, jac3, atol=1e-6)
 
         assert np.all(supp3 == supp4)
         assert np.allclose(dense3, dense4)
-        assert np.allclose(jac3, jac4)
+        assert np.allclose(jac3, jac4, atol=1e-6)
 
         get_beta_jac_t_v_implicit(
             X[idx_train, :], y[idx_train], dict_log_alpha[key], get_v,
@@ -109,7 +97,7 @@ estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = {}
 models_custom["lasso"] = Lasso(estimator=estimator)
-# models_custom["wlasso"] = WeightedLasso(X_train, y_train, estimator=estimator)
+models_custom["wlasso"] = WeightedLasso(estimator=estimator)
 
 
 def test_beta_jac2():
