@@ -8,7 +8,7 @@ except Exception:
 
 
 def grid_search(
-        algo, criterion, model, log_alpha_min, log_alpha_max, monitor, max_evals=50,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor, max_evals=50,
         tol=1e-5, nb_hyperparam=1,
         beta_star=None, random_state=42, samp="grid", log_alphas=None,
         t_max=1000, reverse=True):
@@ -60,7 +60,7 @@ def grid_search(
         if samp == "lhs":
             log_alpha = log_alpha[0]
         g_func, grad_lambda = criterion.get_val_grad(
-            model, log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star, compute_jac=False)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star, compute_jac=False)
 
         if g_func < min_g_func:
             min_g_func = g_func

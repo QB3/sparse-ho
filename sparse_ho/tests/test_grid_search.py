@@ -15,26 +15,16 @@ n_active = 5
 SNR = 3
 rho = 0.5
 
-X_train, y_train, beta_star, noise, sigma_star = get_synt_data(
+X, y, beta_star, noise, sigma_star = get_synt_data(
     dictionary_type="Toeplitz", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
     SNR=SNR, seed=0)
-X_train_s = csc_matrix(X_train)
+X_s = csc_matrix(X)
 
-X_test, y_test, beta_star, noise, sigma = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=1)
-X_test_s = csc_matrix(X_test)
+idx_train = np.arange(0, 50)
+idx_val = np.arange(50, 100)
 
-X_val, y_val, beta_star, noise, sigma = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=2)
-X_test_s = csc_matrix(X_test)
-
-
-alpha_max = (X_train.T @ y_train).max() / n_samples
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / n_samples
 p_alpha = 0.7
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
@@ -54,18 +44,18 @@ def test_grid_search():
     max_evals = 5
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, estimator=estimator)
-    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    model = Lasso(estimator=estimator)
+    criterion = HeldOutMSE(idx_train, idx_train)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
-    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
@@ -74,19 +64,19 @@ def test_grid_search():
         np.argmin(monitor_grid.objs)] == log_alpha_opt_grid)
 
     monitor_grid = Monitor()
-    model = Lasso(X_train, y_train, estimator=estimator)
+    model = Lasso(estimator=estimator)
 
-    criterion = SmoothedSURE(X_train, y_train, sigma=sigma_star)
+    criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
-    criterion = SmoothedSURE(X_train, y_train, sigma=sigma_star)
+    criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y,log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
