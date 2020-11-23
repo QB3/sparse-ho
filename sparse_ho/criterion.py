@@ -21,8 +21,7 @@ class HeldOutMSE():
     # and test splits.
 
     def __init__(
-            self, idx_train, idx_val, X_test=None,
-            y_test=None,):
+            self, idx_train, idx_val, X_test=None, y_test=None,):
         """
         Parameters
         ----------
