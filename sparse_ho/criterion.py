@@ -193,7 +193,7 @@ class HeldOutLogistic():
         return val, grad
 
 
-class SmoothedHinge():
+class HeldOutSmoothedHinge():
     """Smooth Hinge loss.
 
     Attributes

@@ -5,7 +5,7 @@ import pandas
 from bcdsugar.utils import Monitor
 from sparse_ho.ho import grad_search
 from itertools import product
-from sparse_ho.criterion import SmoothedHinge
+from sparse_ho.criterion import HeldOutSmoothedHinge
 from sparse_ho.models import SVM
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
@@ -58,7 +58,7 @@ def parallel_function(
         monitor = Monitor()
 
         if method == "implicit_forward":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = ImplicitForward(criterion, tol_jac=1e-3, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
@@ -68,7 +68,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -78,7 +78,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Implicit(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -88,7 +88,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(
@@ -97,7 +97,7 @@ def parallel_function(
             print(log_alpha_opt)
 
         elif method == "random":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(
@@ -106,7 +106,7 @@ def parallel_function(
             print(log_alpha_opt)
 
         elif method == "lhs":
-            criterion = SmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(1e-2)
             log_alpha_opt, min_g_func = grid_search(

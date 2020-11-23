@@ -12,7 +12,7 @@ from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from scipy.sparse import csr_matrix
 from scipy.sparse import issparse
 from sparse_ho.ho import grad_search
-from sparse_ho.criterion import SmoothedHinge
+from sparse_ho.criterion import HeldOutSmoothedHinge
 from sparse_ho.utils import Monitor
 n_samples = 100
 n_features = 300
@@ -121,7 +121,7 @@ def test_grad_search(model):
     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
     #     y_test=y_test)
     n_outer = 3
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(algo, criterion, np.log(1e-3), monitor1, n_outer=n_outer,
@@ -130,7 +130,7 @@ def test_grad_search(model):
     # criterion = SURE(
     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
     #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(algo, criterion, np.log(1e-3), monitor2, n_outer=n_outer,
@@ -139,7 +139,7 @@ def test_grad_search(model):
     # criterion = SURE(
     #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
     #     y_test=y_test)
-    criterion = SmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
     grad_search(algo, criterion, np.log(1e-3), monitor3, n_outer=n_outer,
