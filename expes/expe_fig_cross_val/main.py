@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import linear_model
 
 from sparse_ho.models import Lasso
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 # from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
@@ -29,7 +29,7 @@ tol = 1e-7
 
 # grid search
 # model = Lasso(X_train, y_train, np.log(alpha_max/10))
-# criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+# criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
 # algo = Forward(criterion)
 # monitor_grid_sk = Monitor()
 # grid_search(
@@ -44,7 +44,7 @@ tol = 1e-7
 estimator = linear_model.Lasso(
     fit_intercept=False, warm_start=True)
 model = Lasso(X_train, y_train, np.log(alpha_max/10), estimator=estimator)
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(

@@ -10,7 +10,7 @@ from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
-from sparse_ho.criterion import Logistic
+from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 
@@ -121,17 +121,17 @@ def test_beta_jac_custom_solver(model, model_custom):
 
 @pytest.mark.parametrize('model', models)
 def test_val_grad(model):
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
         model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
         model, log_alpha, algo.get_beta_jac_v, tol=tol)
@@ -147,12 +147,12 @@ def test_val_grad(model):
 
 @pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
 def test_val_grad_custom(model, model_custom):
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
     val, grad = criterion.get_val_grad(
         model, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
     val_custom, grad_custom = criterion.get_val_grad(
         model_custom, log_alpha, algo.get_beta_jac_v, tol=tol)
@@ -167,19 +167,19 @@ def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     n_outer = 2
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(algo, criterion, model, log_alpha, monitor1, n_outer=n_outer,
                 tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(algo, criterion, model, log_alpha, monitor2, n_outer=n_outer,
                 tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, criterion, model, log_alpha, monitor3, n_outer=n_outer,
@@ -201,13 +201,13 @@ def test_grad_search_custom(model, model_custom, crit):
     """check that the paths are the same in the line search"""
     n_outer = 5
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     monitor = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, criterion, model, log_alpha, monitor, n_outer=n_outer,
                 tol=tol)
 
-    criterion = Logistic(X_val, y_val)
+    criterion = HeldOutLogistic(X_val, y_val)
     monitor_custom = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
     grad_search(algo, criterion, model_custom, log_alpha, monitor_custom,

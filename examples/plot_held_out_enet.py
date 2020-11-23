@@ -24,7 +24,7 @@ from sparse_ho.datasets import get_data
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
@@ -106,7 +106,7 @@ monitor = Monitor()
 n_outer = 10
 model = ElasticNet(
     X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = CV(
+criterion = HeldOutMSE(
     X_val, y_val, X_test=X_test, y_test=y_test)
 algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
 grad_search(

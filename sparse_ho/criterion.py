@@ -9,8 +9,8 @@ from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
-class CV():
-    """Held out loss for quadratic datafit (we should change the name CV here).
+class HeldOutMSE():
+    """Held out loss for quadratic datafit.
 
     Attributes
     ----------
@@ -102,8 +102,8 @@ class CV():
         return val, grad
 
 
-class Logistic():
-    """Logistic loss.
+class HeldOutLogistic():
+    """Logistic loss on held out data
     """
 
     def __init__(self, X_val, y_val, X_test=None, y_test=None):
@@ -186,7 +186,7 @@ class Logistic():
         return val, grad
 
 
-class SmoothedHinge():
+class HeldOutSmoothedHinge():
     """Smooth Hinge loss.
 
     Attributes
@@ -286,16 +286,24 @@ class SmoothedHinge():
         return val
 
 
-class SURE():
-    """Stein Unbiased Risk Estimator (SURE).
+class SmoothedSURE():
+    """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
+
+    Implements the iterative Finite-Difference Monte-Carlo approximation of the
+    SURE. By default, the approximation is ruled by a power law heuristic [1].
 
     Attributes
     ----------
     TODO
+
+    References
+    ----------
+    .. [1] C.-A. Deledalle, Stein Unbiased GrAdient estimator of the Risk (SUGAR)
+    for multiple parameter selection. SIAM J. Imaging Sci., 7(4), 2448-2487.
     """
 
-    def __init__(self, X, y, sigma, C=2.0, gamma_sure=0.3, random_state=42,
-                 X_test=None, y_test=None):
+    def __init__(self, X, y, sigma, finite_difference_step=None,
+                 random_state=42):
         """
         Parameters
         ----------
@@ -305,17 +313,21 @@ class SURE():
             Validation target
         sigma: float
             Noise level
+        finite_difference_step: float, optional
+            Finite difference step used in the approximation of the SURE.
+            By default, use a power law heuristic.
         random_state : int, RandomState instance, default=42
             The seed of the pseudo random number generator.
             Pass an int for reproducible output across multiple function calls.
-        X_test, y_test: TODO we should remove these parameters no? -> YES !
         """
         self.X_val = X
         self.y_val = y
         self.sigma = sigma
-        self.C = C
-        self.gamma_sure = gamma_sure
-        self.epsilon = C * sigma / (X.shape[0]) ** gamma_sure
+        if finite_difference_step:
+            self.epsilon = finite_difference_step
+        else:
+            # Use Deledalle et al. 2014 heuristic
+            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
         rng = check_random_state(random_state)
         self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
 
@@ -478,7 +490,7 @@ class CrossVal():
             self.models[i] = Model(
                 X_train, y_train, max_iter=max_iter, estimator=estimator)
 
-            criterion = CV(
+            criterion = HeldOutMSE(
                 X_val, y_val, X_test=X_val, y_test=y_val)
 
             self.dict_crits[i] = criterion
