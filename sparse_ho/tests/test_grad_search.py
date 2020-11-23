@@ -11,7 +11,7 @@ from sparse_ho.models import Lasso
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
-from sparse_ho.criterion import HeldOutMSE, SURE
+from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 from sparse_ho.ho import grad_search
 
 
@@ -75,8 +75,7 @@ def test_grad_search(model, crit):
                                y_test=y_test)
     else:
         n_outer = 2
-        criterion = SURE(X_train, y_train, model, sigma=sigma_star,
-                         X_test=X_test, y_test=y_test)
+        criterion = SmoothedSURE(X_train, y_train, model, sigma=sigma_star)
 
     criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
