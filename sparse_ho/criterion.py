@@ -166,10 +166,10 @@ class HeldOutLogistic():
         return self.value(mask, dense)
 
     def get_val_grad(
-            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            model.X, model.y, log_alpha, model, self.get_v,
+            X, y, log_alpha, model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
