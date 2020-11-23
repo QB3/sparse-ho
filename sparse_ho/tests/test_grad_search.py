@@ -55,13 +55,13 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=None),
+    Lasso(max_iter=max_iter, estimator=None),
 ]
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator),
+    Lasso(max_iter=max_iter, estimator=estimator),
 ]
 
 
