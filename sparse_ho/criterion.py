@@ -305,8 +305,7 @@ class SURE():
     """
 
     def __init__(self, X, y, model, sigma, C=2.0,
-                 gamma_sure=0.3, random_state=42,
-                 X_test=None, y_test=None):
+                 gamma_sure=0.3, random_state=42):
         """
         Parameters
         ----------
@@ -321,7 +320,6 @@ class SURE():
         random_state : int, RandomState instance, default=42
             The seed of the pseudo random number generator.
             Pass an int for reproducible output across multiple function calls.
-        X_test, y_test: TODO we should remove these parameters no? -> YES !
         """
         self.X_val = X
         self.y_val = y

@@ -75,8 +75,7 @@ def test_grad_search(model, crit):
                                y_test=y_test)
     else:
         n_outer = 2
-        criterion = SURE(X_train, y_train, model, sigma=sigma_star,
-                         X_test=X_test, y_test=y_test)
+        criterion = SURE(X_train, y_train, model, sigma=sigma_star)
 
     criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()

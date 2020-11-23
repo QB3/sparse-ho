@@ -76,16 +76,14 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(X_train, y_train, estimator=estimator)
     criterion = SURE(
-        X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-        y_test=y_test)
+        X_train, y_train, model, sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
         algo, criterion, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
-    criterion = SURE(X_train, y_train, model, sigma=sigma_star,
-                     X_test=X_test, y_test=y_test)
+    criterion = SURE(X_train, y_train, model, sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
         algo, criterion, log_alpha_min, log_alpha_max, monitor_random,

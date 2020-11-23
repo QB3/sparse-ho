@@ -118,8 +118,7 @@ def test_val_grad(model):
 @pytest.mark.parametrize('model', models)
 def test_grad_search(model):
     # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
+    #     X_train, y_train, model, sigma=sigma_star)
     n_outer = 3
     criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor1 = Monitor()
@@ -128,8 +127,7 @@ def test_grad_search(model):
                 tol=1e-13)
 
     # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
+    #     X_train, y_train, model, sigma=sigma_star)
     criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor2 = Monitor()
     algo = Implicit()
@@ -137,8 +135,7 @@ def test_grad_search(model):
                 tol=1e-13)
 
     # criterion = SURE(
-    #     X_train, y_train, model, sigma=sigma_star, X_test=X_test,
-    #     y_test=y_test)
+    #     X_train, y_train, model, sigma=sigma_star)
     criterion = HeldOutSmoothedHinge(X_val, y_val, model, X_test=None, y_test=None)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
