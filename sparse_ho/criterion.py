@@ -296,12 +296,20 @@ class HeldOutSmoothedHinge():
         return val
 
 
-class SURE():
-    """Stein Unbiased Risk Estimator (SURE).
+class SmoothedSURE():
+    """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
+
+    Implements the iterative Finite-Difference Monte-Carlo approximation of the
+    SURE. By default, the approximation is ruled by a power law heuristic [1].
 
     Attributes
     ----------
     TODO
+
+    References
+    ----------
+    .. [1] C.-A. Deledalle, Stein Unbiased GrAdient estimator of the Risk (SUGAR)
+    for multiple parameter selection. SIAM J. Imaging Sci., 7(4), 2448-2487.
     """
 
     def __init__(self, X, y, model, sigma, finite_difference_step=None,
