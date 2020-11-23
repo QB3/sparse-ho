@@ -318,6 +318,7 @@ class SmoothedSURE():
         """
         self.sigma = sigma
         self.random_state = random_state
+        self.finite_difference_step = finite_difference_step
         self.init_delta_epsilon = False
 
         self.mask0 = None
@@ -331,31 +332,20 @@ class SmoothedSURE():
         self.val_test = None
         self.rmse = None
 
-    def v(self, mask, dense):
-        return (2 * self.X_val[:, mask].T @ (
-                self.X_val[:, mask] @ dense - self.y_val -
-                self.delta * self.sigma ** 2 / self.epsilon))
-
-    def v2(self, mask, dense):
-        return ((2 * self.sigma ** 2 *
-                 self.X_val[:, mask].T @ self.delta / self.epsilon))
-
-    def value(self, mask, dense, mask2, dense2):
-        dof = ((self.X_val[:, mask2] @ dense2 -
-                self.X_val[:, mask] @ dense) @ self.delta)
+    def value(self, X, y, mask, dense, mask2, dense2):
+        dof = ((X[:, mask2] @ dense2 -
+                X[:, mask] @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
-        val = norm(self.y_val - self.X_val[:, mask] @ dense) ** 2
-        val -= self.X_val.shape[0] * self.sigma ** 2
+        val = norm(y    - X[:, mask] @ dense) ** 2
+        val -= X.shape[0] * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
 
         return val
 
-    def value_test(self, mask, dense):
-        # self.val_test = None
+    def value_test(self, X, y, mask, dense):
         val = (
-            norm(self.y_val - self.X_val[:, mask] @ dense) ** 2 /
-            self.X_val.shape[0])
+            norm(y - X[:, mask] @ dense) ** 2 / X.shape[0])
         self.val_test = val
         return val
 
@@ -380,12 +370,12 @@ class SmoothedSURE():
 
         return val
 
-    def init_delta_epsilon(self, X):
+    def _init_delta_epsilon(self, X):
         if self.finite_difference_step:
             self.epsilon = self.finite_difference_step
         else:
             # Use Deledalle et al. 2014 heuristic
-            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
+            self.epsilon = 2.0 * self.sigma / (X.shape[0]) ** 0.3
         rng = check_random_state(self.random_state)
         self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
         self.init_delta_epsilon = True
@@ -395,23 +385,32 @@ class SmoothedSURE():
             mask0=None, dense0=None, beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True):
         if not self.init_delta_epsilon:
-            self.init_delta_epsilon(X)
+            self._init_delta_epsilon(X)
+
+        def v(mask, dense):
+            return (2 * X[:, mask].T @ (
+                    X[:, mask] @ dense - y -
+                    self.delta * self.sigma ** 2 / self.epsilon))
+
+        def v2(mask, dense):
+            return ((2 * self.sigma ** 2 *
+                    X[:, mask].T @ self.delta / self.epsilon))
 
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
-            X, y, log_alpha, model, self.v,
+            X, y, log_alpha, model, v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
             X, y + self.epsilon * self.delta,
-            log_alpha, model, self.v2, mask0=self.mask02,
+            log_alpha, model, v2, mask0=self.mask02,
             dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
-        val = self.value(mask, dense, mask2, dense2)
-        self.value_test(mask, dense)
+        val = self.value(X, y, mask, dense, mask2, dense2)
+        self.value_test(X, y, mask, dense)
         self.compute_rmse(mask, dense, beta_star)
         self.mask0 = mask
         self.dense0 = dense
