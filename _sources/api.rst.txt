@@ -44,7 +44,7 @@ Criterion
    :toctree: generated/
 
    HeldOutMSE
-   SURE
+   SmoothedSURE
    HeldOutLogistic
 
 
