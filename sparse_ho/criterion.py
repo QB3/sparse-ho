@@ -304,8 +304,8 @@ class SURE():
     TODO
     """
 
-    def __init__(self, X, y, model, sigma, C=2.0,
-                 gamma_sure=0.3, random_state=42):
+    def __init__(self, X, y, model, sigma, finite_difference_step=None,
+                 random_state=42):
         """
         Parameters
         ----------
@@ -317,6 +317,9 @@ class SURE():
             The model (e.g. instance of Lasso or SparseLogreg)
         sigma: float
             Noise level
+        finite_difference_step: float, optional
+            Finite difference step used in the approximation of the SURE.
+            By default, use a power law heuristic.
         random_state : int, RandomState instance, default=42
             The seed of the pseudo random number generator.
             Pass an int for reproducible output across multiple function calls.
@@ -325,9 +328,11 @@ class SURE():
         self.y_val = y
         self.model = model
         self.sigma = sigma
-        self.C = C
-        self.gamma_sure = gamma_sure
-        self.epsilon = C * sigma / (X.shape[0]) ** gamma_sure
+        if finite_difference_step:
+            self.epsilon = finite_difference_step
+        else:
+            # Use Deledalle et al. 2014 heuristic
+            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
         rng = check_random_state(random_state)
         self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
 
