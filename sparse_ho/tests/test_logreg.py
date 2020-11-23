@@ -27,8 +27,7 @@ y[y == 0.0] = -1.0
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
-alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train]))
-alpha_max /= (2 * n_samples)
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / (2 * n_samples)
 alpha = 0.3 * alpha_max
 log_alpha = np.log(alpha)
 tol = 1e-16

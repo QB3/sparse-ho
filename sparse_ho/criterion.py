@@ -99,6 +99,7 @@ class HeldOutMSE():
         # TODO put the following in a callback function
         self.get_mse_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)
+
         return val, grad
 
 
@@ -302,15 +303,11 @@ class SmoothedSURE():
     for multiple parameter selection. SIAM J. Imaging Sci., 7(4), 2448-2487.
     """
 
-    def __init__(self, X, y, sigma, finite_difference_step=None,
+    def __init__(self, sigma, finite_difference_step=None,
                  random_state=42):
         """
         Parameters
         ----------
-        X_ : {ndarray, sparse matrix} of (n_samples, n_features)
-            Validation data
-        y : {ndarray, sparse matrix} of (n_samples)
-            Validation target
         sigma: float
             Noise level
         finite_difference_step: float, optional
@@ -320,16 +317,9 @@ class SmoothedSURE():
             The seed of the pseudo random number generator.
             Pass an int for reproducible output across multiple function calls.
         """
-        self.X_val = X
-        self.y_val = y
         self.sigma = sigma
-        if finite_difference_step:
-            self.epsilon = finite_difference_step
-        else:
-            # Use Deledalle et al. 2014 heuristic
-            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
-        rng = check_random_state(random_state)
-        self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
+        self.random_state = random_state
+        self.init_delta_epsilon = False
 
         self.mask0 = None
         self.dense0 = None
@@ -391,10 +381,23 @@ class SmoothedSURE():
 
         return val
 
+    def init_delta_epsilon(self, X):
+        if self.finite_difference_step:
+            self.epsilon = self.finite_difference_step
+        else:
+            # Use Deledalle et al. 2014 heuristic
+            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
+        rng = check_random_state(self.random_state)
+        self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
+        self.init_delta_epsilon = True
+
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True):
+        if not self.init_delta_epsilon:
+            self.init_delta_epsilon(X)
+
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
             X, y, log_alpha, model, self.v,
             mask0=self.mask0, dense0=self.dense0,

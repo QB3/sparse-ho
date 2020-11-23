@@ -22,7 +22,6 @@ class Forward():
             jac0=quantity_to_warm_start,
             max_iter=100, tol=tol,  # TODO replace 100 by better value
             compute_jac=compute_jac, verbose=self.verbose)
-
         if jac is not None:
             jac_v = model.get_jac_v(mask, dense, jac, v)
             if full_jac_v:
