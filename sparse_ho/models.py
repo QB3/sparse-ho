@@ -1521,9 +1521,7 @@ class SVR():
 
 class ElasticNet():
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.X = X
-        self.y = y
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
@@ -1713,8 +1711,8 @@ class ElasticNet():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
+    @staticmethod
+    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
         return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
     def proj_param(self, log_alpha):
@@ -1751,11 +1749,13 @@ class ElasticNet():
         dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return x
@@ -1766,9 +1766,10 @@ class ElasticNet():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense, log_alpha):
-        n_samples = self.X.shape[0]
-        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        n_samples = X_train.shape[0]
+        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
@@ -1781,8 +1782,7 @@ class ElasticNet():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, r, dr, alpha):
         res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * np.sign(beta) @ dbeta[:, 0]
         res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
         return(
