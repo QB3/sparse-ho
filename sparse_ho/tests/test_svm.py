@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from sklearn import datasets
 from sklearn.svm import LinearSVC
-from sparse_ho.criterion import Logistic
+from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.forward import Forward
 from sparse_ho.implicit import Implicit
 from sparse_ho.implicit_forward import ImplicitForward
@@ -94,17 +94,17 @@ def test_val_grad(model):
     # compute the gradients
     # check that the gradient returned by all methods are the same
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = HeldOutLogistic(X_val, y_val, model)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
         log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = HeldOutLogistic(X_val, y_val, model)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = Logistic(X_val, y_val, model)
+    criterion = HeldOutLogistic(X_val, y_val, model)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
         log_C, algo.get_beta_jac_v, tol=tol)

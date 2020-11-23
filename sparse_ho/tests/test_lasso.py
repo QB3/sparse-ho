@@ -13,7 +13,7 @@ from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
 from sparse_ho.backward import Backward
-from sparse_ho.criterion import CV, SURE
+from sparse_ho.criterion import HeldOutMSE, SURE
 
 n_samples = 100
 n_features = 100
@@ -137,24 +137,24 @@ def test_val_grad():
         model = models[key]
         # model = Lasso(log_alpha)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = HeldOutMSE(X_val, y_val, model)
         algo = Forward()
         val_fwd, grad_fwd = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = HeldOutMSE(X_val, y_val, model)
         algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
         val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = CV(X_val, y_val, model)
+        criterion = HeldOutMSE(X_val, y_val, model)
         algo = Implicit()
         val_imp, grad_imp = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)
 
         # import ipdb; ipdb.set_trace()
 
-        criterion = CV(X_val, y_val, model)
+        criterion = HeldOutMSE(X_val, y_val, model)
         algo = Backward()
         val_bwd, grad_bwd = criterion.get_val_grad(
             log_alpha, algo.get_beta_jac_v, tol=tol)

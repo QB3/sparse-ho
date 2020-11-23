@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # from scipy.sparse.linalg import norm
 
 from sparse_ho.models import SparseLogreg
-from sparse_ho.criterion import Logistic
+from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.forward import Forward
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.real import get_real_sim
@@ -31,7 +31,7 @@ tol = 1e-5
 
 # grid search
 model = SparseLogreg(X_train, y_train, log_alphas[0], max_iter=1000)
-criterion = Logistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
+criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion)
 monitor_grid_sk = Monitor()
 grid_search(

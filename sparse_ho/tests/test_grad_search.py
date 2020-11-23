@@ -11,7 +11,7 @@ from sparse_ho.models import Lasso
 from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.implicit import Implicit
-from sparse_ho.criterion import CV, SURE
+from sparse_ho.criterion import HeldOutMSE, SURE
 from sparse_ho.ho import grad_search
 
 
@@ -71,25 +71,26 @@ def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     if crit == 'cv':
         n_outer = 2
-        criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+        criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test,
+                               y_test=y_test)
     else:
         n_outer = 2
         criterion = SURE(X_train, y_train, model, sigma=sigma_star,
                          X_test=X_test, y_test=y_test)
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
     grad_search(algo, criterion, log_alpha, monitor3, n_outer=n_outer,

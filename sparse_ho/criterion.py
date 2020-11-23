@@ -9,8 +9,8 @@ from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
-class CV():
-    """Held out loss for quadratic datafit (we should change the name CV here).
+class HeldOutMSE():
+    """Held out loss for quadratic datafit.
 
     Attributes
     ----------
@@ -107,9 +107,10 @@ class CV():
         return val, grad
 
 
-class Logistic():
-    """Logistic loss.
+class HeldOutLogistic():
+    """Logistic loss on held out data
     """
+
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -199,6 +200,7 @@ class SmoothedHinge():
     ----------
     TODO
     """
+
     def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
         """
         Parameters
@@ -301,6 +303,7 @@ class SURE():
     ----------
     TODO
     """
+
     def __init__(self, X, y, model, sigma, C=2.0,
                  gamma_sure=0.3, random_state=42,
                  X_test=None, y_test=None):
@@ -348,7 +351,7 @@ class SURE():
 
     def v2(self, mask, dense):
         return ((2 * self.sigma ** 2 *
-                self.X_val[:, mask].T @ self.delta / self.epsilon))
+                 self.X_val[:, mask].T @ self.delta / self.epsilon))
 
     def value(self, mask, dense, mask2, dense2):
         dof = ((self.X_val[:, mask2] @ dense2 -
@@ -439,6 +442,7 @@ class CrossVal():
     rmse : None
         XXX
     """
+
     def __init__(self, X, y, Model, cv=None, max_iter=1000, estimator=None):
         """
         Parameters
@@ -487,7 +491,7 @@ class CrossVal():
             model = Model(
                 X_train, y_train, max_iter=max_iter, estimator=estimator)
 
-            criterion = CV(
+            criterion = HeldOutMSE(
                 X_val, y_val, model, X_test=X_val, y_test=y_val)
 
             self.dict_crits[i] = criterion

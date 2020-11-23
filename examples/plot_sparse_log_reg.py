@@ -23,7 +23,7 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from sklearn.linear_model import LogisticRegression
-from sparse_ho.criterion import Logistic
+from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
@@ -75,7 +75,7 @@ t0 = time.time()
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, solver='saga', max_iter=max_iter)
 model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = Logistic(X_val, y_val, model)
+criterion = HeldOutLogistic(X_val, y_val, model)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
@@ -99,7 +99,7 @@ t0 = time.time()
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, solver='saga')
 model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = Logistic(X_val, y_val, model)
+criterion = HeldOutLogistic(X_val, y_val, model)
 monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=100)
 grad_search(algo, criterion, np.log(0.1 * alpha_max), monitor_grad,
