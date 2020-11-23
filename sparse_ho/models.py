@@ -266,11 +266,13 @@ class Lasso():
 
 
 class WeightedLasso():
-    """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+    r"""Linear Model trained with weighted L1 regularizer (aka weighted Lasso)
 
     The optimization objective for weighted Lasso is:
 
-    (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |wi|
+    ..math::
+
+        ||y - Xw||^2_2 / (2 * n_samples) + \sum_i^{n_features} \alpha_i |wi|
 
     Parameters
     ----------
