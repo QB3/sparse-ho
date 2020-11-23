@@ -1,0 +1,28 @@
+﻿sparse\_ho.criterion.HeldOutLogistic
+====================================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: HeldOutLogistic
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HeldOutLogistic.__init__
+      ~HeldOutLogistic.compute_rmse
+      ~HeldOutLogistic.get_v
+      ~HeldOutLogistic.get_val
+      ~HeldOutLogistic.get_val_grad
+      ~HeldOutLogistic.value
+      ~HeldOutLogistic.value_test
+   
+   
+
+   
+   
+   

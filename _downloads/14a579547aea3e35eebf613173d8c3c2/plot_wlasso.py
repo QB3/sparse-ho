@@ -25,7 +25,7 @@ from sklearn.utils import check_random_state
 from scipy.linalg import toeplitz
 
 from sparse_ho.models import WeightedLasso
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
@@ -91,7 +91,7 @@ alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
 # Weighted Lasso: Sparse-ho: 1 param per feature
 estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
 model = WeightedLasso(X_train, y_train, estimator=estimator)
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = ImplicitForward()
 monitor = Monitor()
 grad_search(
@@ -110,7 +110,7 @@ print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
 print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
 
 
-labels = ['wLasso val', 'wLasso test', 'Lasso CV']
+labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV']
 
 df = pd.DataFrame(
     np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),

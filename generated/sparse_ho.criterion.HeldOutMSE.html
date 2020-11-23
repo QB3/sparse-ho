@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparse_ho.criterion.CV &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.criterion.HeldOutMSE &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -93,12 +93,12 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="sparse-ho-criterion-cv">
-<h1>sparse_ho.criterion.CV<a class="headerlink" href="#sparse-ho-criterion-cv" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sparse-ho-criterion-heldoutmse">
+<h1>sparse_ho.criterion.HeldOutMSE<a class="headerlink" href="#sparse-ho-criterion-heldoutmse" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="sparse_ho.criterion.CV">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">CV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.CV" title="Permalink to this definition">¶</a></dt>
-<dd><p>Held out loss for quadratic datafit (we should change the name CV here).</p>
+<dt id="sparse_ho.criterion.HeldOutMSE">
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">HeldOutMSE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Held out loss for quadratic datafit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
 <dd class="field-odd"><dl class="simple">
@@ -107,8 +107,8 @@
 </dd>
 </dl>
 <dl class="py method">
-<dt id="sparse_ho.criterion.CV.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.CV.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.criterion.HeldOutMSE.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -137,7 +137,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.CV.__init__" title="sparse_ho.criterion.CV.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X_val, y_val, model[, convexify, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="sparse_ho.criterion.HeldOutMSE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X_val, y_val, model[, convexify, …])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>

@@ -37,7 +37,7 @@ for a Lasso using a full cross-validation score.
     from sklearn.model_selection import KFold
 
     from sparse_ho.models import Lasso
-    from sparse_ho.criterion import CV, CrossVal
+    from sparse_ho.criterion import HeldOutMSE, CrossVal
     from sparse_ho.implicit_forward import ImplicitForward
     from sparse_ho.utils import Monitor
     from sparse_ho.ho import grad_search
@@ -113,7 +113,7 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    8.0s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    8.5s finished
     scikit finished
 
 
@@ -133,7 +133,7 @@ Now do the hyperparameter optimization with implicit differentiation
 
     t0 = time.time()
     Model = Lasso
-    Criterion = CV
+    Criterion = HeldOutMSE
     log_alpha0 = np.log(alpha_max / 10)
     monitor_grad = Monitor()
     criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)
@@ -212,8 +212,8 @@ Plot results
 
  .. code-block:: none
 
-    Time to compute CV for scikit-learn: 8.04
-    Time to compute CV for sparse-ho: 1.77
+    Time to compute CV for scikit-learn: 8.54
+    Time to compute CV for sparse-ho: 1.70
     Minimum objective grid-search 1938.13556
     Minimum objective grad-search 1932.51526
 
@@ -223,7 +223,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.461 seconds)
+   **Total running time of the script:** ( 0 minutes  10.871 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_grad_search_cv.py:

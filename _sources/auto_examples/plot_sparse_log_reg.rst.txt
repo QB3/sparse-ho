@@ -35,7 +35,7 @@ for sparse logistic regression using a held-out test set.
     from sparse_ho.utils import Monitor
     from sparse_ho.models import SparseLogreg
     from sklearn.linear_model import LogisticRegression
-    from sparse_ho.criterion import Logistic
+    from sparse_ho.criterion import HeldOutLogistic
     from sparse_ho.implicit_forward import ImplicitForward
     from sparse_ho.forward import Forward
     from sparse_ho.grid_search import grid_search
@@ -97,7 +97,7 @@ Grid-search
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, solver='saga', max_iter=max_iter)
     model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-    criterion = Logistic(X_val, y_val, model)
+    criterion = HeldOutLogistic(X_val, y_val, model)
     algo_grid = Forward()
     monitor_grid = Monitor()
     grid_search(
@@ -143,7 +143,7 @@ Grid-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     scikit finished
-    Time to compute CV for scikit-learn: 1.57
+    Time to compute CV for scikit-learn: 1.31
 
 
 
@@ -161,7 +161,7 @@ Grad-search
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, solver='saga')
     model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-    criterion = Logistic(X_val, y_val, model)
+    criterion = HeldOutLogistic(X_val, y_val, model)
     monitor_grad = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=100)
     grad_search(algo, criterion, np.log(0.1 * alpha_max), monitor_grad,
@@ -235,7 +235,7 @@ Grad-search
     /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_sag.py:329: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn("The max_iter was reached which means "
     sparse-ho finished
-    Time to compute CV for sparse-ho: 2.51
+    Time to compute CV for sparse-ho: 2.22
 
 
 
@@ -243,7 +243,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.547 seconds)
+   **Total running time of the script:** ( 0 minutes  3.942 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

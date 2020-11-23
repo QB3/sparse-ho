@@ -38,7 +38,7 @@ In particular we compare the weighted Lasso to LassoCV on a toy example
     from scipy.linalg import toeplitz
 
     from sparse_ho.models import WeightedLasso
-    from sparse_ho.criterion import CV
+    from sparse_ho.criterion import HeldOutMSE
     from sparse_ho.implicit_forward import ImplicitForward
     from sparse_ho.utils import Monitor
     from sparse_ho.ho import grad_search
@@ -151,7 +151,7 @@ We use the vanilla lassoCV coefficients as a starting point
     # Weighted Lasso: Sparse-ho: 1 param per feature
     estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
     model = WeightedLasso(X_train, y_train, estimator=estimator)
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = ImplicitForward()
     monitor = Monitor()
     grad_search(
@@ -484,7 +484,7 @@ MSE on validation set
     print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
 
 
-    labels = ['wLasso val', 'wLasso test', 'Lasso CV']
+    labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV']
 
     df = pd.DataFrame(
         np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),
@@ -517,7 +517,7 @@ MSE on validation set
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.910 seconds)
+   **Total running time of the script:** ( 0 minutes  6.340 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_wlasso.py:

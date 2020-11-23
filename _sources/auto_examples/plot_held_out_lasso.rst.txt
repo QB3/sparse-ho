@@ -32,7 +32,7 @@ for a Lasso using a held-out validation set.
     from sklearn import linear_model
 
     from sparse_ho.models import Lasso
-    from sparse_ho.criterion import CV
+    from sparse_ho.criterion import HeldOutMSE
     from sparse_ho.forward import Forward
     from sparse_ho.implicit_forward import ImplicitForward
     from sparse_ho.utils import Monitor
@@ -88,7 +88,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:01, 113kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:01, 113kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:40, 136kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:17, 175kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 233kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 318kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 439kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 613kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 845kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.15MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.54MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 2.01MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.56MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 3.18MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.46MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 111kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 134kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:18, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 230kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 314kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 435kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 607kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 837kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.14MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.52MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 1.99MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.54MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 3.15MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.42MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -112,7 +112,7 @@ Grid-search with scikit-learn
 
     t0 = time.time()
     model = Lasso(X_train, y_train, estimator=estimator)
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = Forward(criterion)
     monitor_grid_sk = Monitor()
     grid_search(
@@ -159,7 +159,7 @@ Grad-search with sparse-ho
 
     t0 = time.time()
     model = Lasso(X_train, y_train, estimator=estimator)
-    criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
     algo = ImplicitForward(criterion)
     monitor_grad = Monitor()
     grad_search(
@@ -237,8 +237,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 8.86
-    Time to compute CV for sparse-ho: 13.78
+    Time to compute CV for scikit-learn: 8.38
+    Time to compute CV for sparse-ho: 12.30
     Minimum objective grid-search 0.21680
     Minimum objective grad-search 0.21137
 
@@ -248,7 +248,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  33.678 seconds)
+   **Total running time of the script:** ( 0 minutes  31.549 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

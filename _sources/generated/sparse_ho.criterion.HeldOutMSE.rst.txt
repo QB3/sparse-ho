@@ -1,0 +1,28 @@
+﻿sparse\_ho.criterion.HeldOutMSE
+===============================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: HeldOutMSE
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HeldOutMSE.__init__
+      ~HeldOutMSE.compute_rmse
+      ~HeldOutMSE.get_v
+      ~HeldOutMSE.get_val
+      ~HeldOutMSE.get_val_grad
+      ~HeldOutMSE.value
+      ~HeldOutMSE.value_test
+   
+   
+
+   
+   
+   

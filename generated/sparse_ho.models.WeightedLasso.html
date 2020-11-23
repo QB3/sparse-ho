@@ -98,9 +98,12 @@
 <dl class="py class">
 <dt id="sparse_ho.models.WeightedLasso">
 <em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">WeightedLasso</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">log_alpha_max</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.WeightedLasso" title="Permalink to this definition">¶</a></dt>
-<dd><p>Linear Model trained with L1 prior as regularizer (aka the weight Lasso)</p>
+<dd><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso)</p>
 <p>The optimization objective for weighted Lasso is:</p>
-<p>(1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i <a href="#id1"><span class="problematic" id="id2">|wi|</span></a></p>
+<p>..math:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">||</span><span class="n">y</span> <span class="o">-</span> <span class="n">Xw</span><span class="o">||^</span><span class="mi">2_2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n_samples</span><span class="p">)</span> <span class="o">+</span> \<span class="n">sum_i</span><span class="o">^</span><span class="p">{</span><span class="n">n_features</span><span class="p">}</span> \<span class="n">alpha_i</span> <span class="o">|</span><span class="n">wi</span><span class="o">|</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
