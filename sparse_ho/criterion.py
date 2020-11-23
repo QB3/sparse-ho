@@ -20,30 +20,22 @@ class CV():
     # cv as [(train, test)] ie directly the indices of the train
     # and test splits.
 
-    def __init__(self, X_val, y_val, convexify=False,
-                 gamma_convex=1e-2, X_test=None, y_test=None):
+    def __init__(
+            self, idx_train, idx_val, X_test=None,
+            y_test=None,):
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of shape (n_samples,)
             Validation target
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
-        convexify: bool
-            this param should be remove from here XXX
-        gamma_convex: bool
-            this param should be removed from here XXX
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
         self.X_test = X_test
         self.y_test = y_test
-        self.convexify = convexify
-        self.gamma_convex = gamma_convex
+        self.idx_train = idx_train
+        self.idx_val = idx_val
 
         self.mask0 = None
         self.dense0 = None
@@ -51,17 +43,18 @@ class CV():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        return 2 * (self.X_val[:, mask].T @ (
-            self.X_val[:, mask] @ dense - self.y_val)) / self.X_val.shape[0]
-
-    def value(self, mask, dense):
+    def get_mse_val(self, X, y, mask, dense):
+        """Compute the MSE on the validation set.
+        """
         val = (
-            norm(self.y_val - self.X_val[:, mask] @ dense) ** 2 /
-            self.X_val.shape[0])
+            norm(y[self.idx_val] - X[np.ix_(self.idx_val, mask)] @ dense) ** 2 /
+            len(self.idx_val))
         return val
 
-    def value_test(self, mask, dense):
+    def get_mse_test(self, mask, dense):
+        """Compute the MSE on the validation set.
+        TODO
+        """
         if self.X_test is not None and self.y_test is not None:
             self.val_test = (
                 norm(self.y_test - self.X_test[:, mask] @ dense) ** 2 /
@@ -81,28 +74,31 @@ class CV():
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             model.X, model.y, log_alpha, model, tol=tol, compute_jac=False)
-        self.value_test(mask, dense)
-        return self.value(mask, dense)
+        self.get_mse_test(mask, dense)
+        return self.get_mse_val(mask, dense)
 
     def get_val_grad(
-            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        def get_v(mask, dense):
+            return 2 * (
+                X[np.ix_(self.idx_val, mask)].T @ (
+                    X[np.ix_(self.idx_val, mask)] @ dense - y[self.idx_val])) / len(self.idx_val)
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            model.X, model.y, log_alpha, model, self.get_v,
-            mask0=self.mask0, dense0=self.dense0,
+            X[self.idx_train, :], y[self.idx_train], log_alpha, model,
+            get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac, full_jac_v=True)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
+        val = self.get_mse_val(X, y, mask, dense)
+        # TODO put the following in a callback function
+        self.get_mse_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)
-        if self.convexify:
-            val += self.gamma_convex + np.sum(np.exp(log_alpha) ** 2)
-            if grad is not None:
-                grad += 2 * self.gamma_convex * np.exp(log_alpha)
         return val, grad
 
 
@@ -384,17 +380,17 @@ class SURE():
         return val
 
     def get_val_grad(
-            self, model, log_alpha, get_beta_jac_v,
+            self, model, X, y, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True):
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
-            model.X, model.y, log_alpha, model, self.v,
+            X, y, log_alpha, model, self.v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
-            model.X, model.y + self.epsilon * self.delta,
+            X, y + self.epsilon * self.delta,
             log_alpha, model, self.v2, mask0=self.mask02,
             dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,

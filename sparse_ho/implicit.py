@@ -44,7 +44,7 @@ def get_beta_jac_t_v_implicit(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
 
-    mat_to_inv = model.get_hessian(mask, dense, log_alpha)
+    mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
 
     maskp, densep = model.get_primal(mask, dense)
@@ -75,15 +75,16 @@ def get_beta_jac_t_v_implicit(
         print("Matrix to invert was badly conditioned")
         size_mat = mat_to_inv.shape[0]
         if is_sparse:
-            reg_amount = 1e-7 * norm(model.reduce_X(mask).todense(), ord=2) ** 2
+            reg_amount = 1e-7 * norm(model.reduce_X(X_train, mask).todense(), ord=2) ** 2
             mat_to_inv += reg_amount * identity(size_mat)
         else:
-            reg_amount = 1e-7 * norm(model.reduce_X(mask), ord=2) ** 2
+            reg_amount = 1e-7 * norm(model.reduce_X(X_train, mask), ord=2) ** 2
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
             - model.restrict_full_supp(mask, dense, v), x0=sol0, atol=1e-3)
         sol_lin_sys = sol[0]
-    jac_t_v = model._get_jac_t_v(sol_lin_sys, mask, dense, alphas, v.copy())
+    jac_t_v = model._get_jac_t_v(
+        sol_lin_sys, mask, dense, alphas, v.copy(), n_samples)
 
     return mask, dense, jac_t_v, sol[0]

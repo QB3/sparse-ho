@@ -56,13 +56,13 @@ def get_beta_jac_fast_iterdiff(
     v = None
     _, r = model._init_beta_r(X, y, mask, dense)
     jac = get_only_jac(
-        model.reduce_X(mask), model.reduce_y(mask), r, reduce_alpha, model.sign(dense, log_alpha), v,
+        model.reduce_X(X, mask), model.reduce_y(y, mask), r, n_samples, reduce_alpha, model.sign(dense, log_alpha), v,
         dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose)
     return mask, dense, jac
 
 
 def get_only_jac(
-        Xs, y, r, alpha, sign_beta, v, dbeta=None, niter_jac=100, tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False):
+        Xs, y, r, n_samples, alpha, sign_beta, v, dbeta=None, niter_jac=100, tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False):
     n_samples, n_features = Xs.shape
 
     is_sparse = issparse(Xs)
@@ -72,12 +72,6 @@ def get_only_jac(
 
     if dbeta is None:
         model._init_dbeta(n_features)
-        # if model == "lasso":
-        #     dbeta = np.zeros(n_features)
-        # if model == "mcp":
-        #     dbeta = np.zeros((n_features, 2))
-        # elif model == "wlasso":
-        #     dbeta = np.zeros((n_features, n_features))
     else:
         dbeta = dbeta.copy()
     dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
@@ -93,20 +87,9 @@ def get_only_jac(
                 Xs, y, r, dbeta, dr, L, alpha, sign_beta)
 
         objs.append(
-            model.get_jac_obj(Xs, y, sign_beta, dbeta, r, dr, alpha))
-        # m1 = norm(- v.T @ Xs.T @ dr + sign_beta * n_samples * alpha)
-        # m2 = tol_jac * np.sqrt(n_features) * n_samples * alpha * norm(v)
-        # crit = m1 <= m2
-        # print("m1 %.2f", m1)
-        # print("m2 %.2f", m2)
-        # print("m1 = %f" % norm(v @ (dbeta - dbeta_old)))
-        # print("tol_crit %f" % tol_crit)
-        # if norm(v @ (dbeta - dbeta_old)) < tol_crit:
-        # if norm((dbeta - dbeta_old)) < tol_jac * norm(dbeta):
-        # crit =
-        # print('jac obj', objs[-1])
+            model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, r, dr, alpha))
+
         if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
             break
-        # dbeta_old = dbeta.copy()
-        # dr_old = dr.copy()
+
     return dbeta

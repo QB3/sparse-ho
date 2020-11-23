@@ -27,9 +27,7 @@ class Lasso():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.X = X
-        self.y = y
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
@@ -196,9 +194,8 @@ class Lasso():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
@@ -230,11 +227,13 @@ class Lasso():
         dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
@@ -245,8 +244,9 @@ class Lasso():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense, log_alpha):
-        hessian = self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        hessian = X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
@@ -259,10 +259,8 @@ class Lasso():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
-        return(
-            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
+        return norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta)
 
 
 class WeightedLasso():
@@ -453,9 +451,8 @@ class WeightedLasso():
     def get_mask_jac_v(mask, jac_v):
         return jac_v[mask]
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
         jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
