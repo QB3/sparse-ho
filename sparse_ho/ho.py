@@ -139,9 +139,6 @@ def _grad_search(
             g_func, grad_lambda = _get_val_grad(
                 lambdak, tol=tol)
 
-            if convexify:
-                g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
-                grad_lambda += gamma_convex * np.exp(lambdak)
             tol *= 0.5
         else:
             old_lambdak = lambdak.copy()

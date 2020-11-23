@@ -106,7 +106,7 @@ class HeldOutLogistic():
     """Logistic loss on held out data
     """
 
-    def __init__(self, X_val, y_val, X_test=None, y_test=None):
+    def __init__(self, idx_train, idx_val, X_test=None, y_test=None):
         """
         Parameters
         ----------
@@ -119,8 +119,8 @@ class HeldOutLogistic():
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
+        self.idx_train = idx_train
+        self.idx_val = idx_val
         self.X_test = X_test
         self.y_test = y_test
 
@@ -130,17 +130,15 @@ class HeldOutLogistic():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        temp = sigma(self.y_val * (self.X_val[:, mask] @ dense))
-        v = self.X_val[:, mask].T @ (self.y_val * (temp - 1))
-        v /= self.X_val.shape[0]
-        return v
-
-    def value(self, mask, dense):
-        val = np.sum(
-            np.log(1 + np.exp(-self.y_val * (self.X_val[:, mask] @ dense))))
-        val /= self.X_val.shape[0]
-        return val
+    @staticmethod
+    def value_outer_crit(X, y, mask, dense):
+        if X is not None and y is not None:
+            val = np.sum(
+                np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
+            val /= X.shape[0]
+            return val
+        else:
+            return None
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
@@ -168,9 +166,16 @@ class HeldOutLogistic():
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        def get_v(mask, dense):
+            temp = sigma(y * (X[:, mask] @ dense))
+            v = X[:, mask].T @ (y * (temp - 1))
+            v /= X.shape[0]
+            return v
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X, y, log_alpha, model, self.get_v,
-            mask0=self.mask0, dense0=self.dense0,
+            X[self.idx_train, :], y[self.idx_train], log_alpha, model,
+            get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
@@ -179,8 +184,8 @@ class HeldOutLogistic():
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
+        val = self.value_outer_crit(
+            X[self.idx_val, :], y[self.idx_val], mask, dense)
         self.compute_rmse(mask, dense, beta_star)
 
         return val, grad
