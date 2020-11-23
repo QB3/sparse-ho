@@ -151,7 +151,7 @@ def test_val_grad_custom(model, model_custom):
 
 
 @pytest.mark.parametrize('model', models)
-@pytest.mark.parametrize('crit', ['cv'])
+@pytest.mark.parametrize('crit', ['held_out'])
 def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     n_outer = 2
@@ -188,7 +188,7 @@ def test_grad_search(model, crit):
 
 
 @pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
-@pytest.mark.parametrize('crit', ['cv'])
+@pytest.mark.parametrize('crit', ['held_out'])
 def test_grad_search_custom(model, model_custom, crit):
     """check that the paths are the same in the line search"""
     n_outer = 5
@@ -196,14 +196,16 @@ def test_grad_search_custom(model, model_custom, crit):
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, criterion, model, log_alpha, monitor, n_outer=n_outer,
-                tol=tol)
+    grad_search(
+        algo, criterion, model, X, y, log_alpha, monitor, n_outer=n_outer,
+        tol=tol)
 
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor_custom = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
-    grad_search(algo, criterion, model_custom, log_alpha, monitor_custom,
-                n_outer=n_outer, tol=tol)
+    grad_search(
+        algo, criterion, model_custom, X, y, log_alpha, monitor_custom,
+        n_outer=n_outer, tol=tol)
 
     assert np.allclose(
         np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas))
@@ -219,8 +221,10 @@ if __name__ == '__main__':
 
     for model, model_custom in zip(models, models_custom):
         test_val_grad_custom(model, model_custom)
+        for crit in ['held_out']:
+            test_grad_search_custom(model, model_custom, crit)
 
     for model in models:
         test_beta_jac(model)
-        test_grad_search(model, 'cv')
+        test_grad_search(model, 'held_out')
         test_val_grad(model)
