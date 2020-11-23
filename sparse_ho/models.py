@@ -862,9 +862,7 @@ class SparseLogreg():
     """
 
     def __init__(
-            self, X, y, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.X = X
-        self.y = y
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
@@ -1062,9 +1060,8 @@ class SparseLogreg():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
@@ -1083,11 +1080,13 @@ class SparseLogreg():
     def get_L(X, is_sparse=False):
         return 0.0
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
@@ -1098,15 +1097,16 @@ class SparseLogreg():
     def get_jac_v(self, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense, log_alpha):
-        a = self.y * (self.X[:, mask] @ dense)
+    @staticmethod
+    def get_hessian(X, y, mask, dense, log_alpha):
+        a = y * (X[:, mask] @ dense)
         temp = sigma(a) * (1 - sigma(a))
-        is_sparse = issparse(self.X)
+        is_sparse = issparse(X)
         if is_sparse:
             hessian = csc_matrix(
-                self.X[:, mask].T.multiply(temp)) @ self.X[:, mask]
+                X[:, mask].T.multiply(temp)) @ X[:, mask]
         else:
-            hessian = (self.X[:, mask].T * temp) @ self.X[:, mask]
+            hessian = (X[:, mask].T * temp) @ X[:, mask]
         return hessian
 
     def restrict_full_supp(self, mask, dense, v):
@@ -1119,8 +1119,7 @@ class SparseLogreg():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
@@ -1407,7 +1406,7 @@ class SVR():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense, log_alpha):
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
         full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
