@@ -13,7 +13,6 @@ from sparse_ho.utils import Monitor
 from scipy.sparse import csc_matrix
 
 
-
 n_samples = 100
 n_features = 100
 n_active = 5
@@ -129,22 +128,22 @@ def test_grad_search():
     monitor1 = Monitor()
     algo = Forward()
     grad_search(
-        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor1,
-        n_outer=n_outer, tol=1e-16)
+        algo, criterion, model, X, y, np.array([log_alpha1, log_alpha2]),
+        monitor1, n_outer=n_outer, tol=1e-16)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(
-        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor2,
-        n_outer=n_outer, tol=1e-16)
+        algo, criterion, model, X, y, np.array([log_alpha1, log_alpha2]),
+        monitor2, n_outer=n_outer, tol=1e-16)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=1000)
     grad_search(
-        algo, criterion, model, np.array([log_alpha1, log_alpha2]), monitor3,
-        n_outer=n_outer, tol=1e-16)
+        algo, criterion, model, X, y, np.array([log_alpha1, log_alpha2]),
+        monitor3, n_outer=n_outer, tol=1e-16)
     [np.linalg.norm(grad) for grad in monitor1.grads]
     [np.exp(alpha) for alpha in monitor1.log_alphas]
 

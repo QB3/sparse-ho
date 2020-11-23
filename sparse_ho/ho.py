@@ -6,7 +6,7 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, criterion, model, log_alpha0, monitor, n_outer=100, verbose=False,
+        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100, verbose=False,
         tolerance_decrease='constant', tol=1e-5, t_max=10000):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
@@ -37,10 +37,12 @@ def grad_search(
 
     def _get_val_grad(log_alpha, tol=tol):
         return criterion.get_val_grad(
-            model, log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
+    # TODO fix this proj param pb
     def _proj_param(log_alpha):
-        return model.proj_param(log_alpha)
+        return log_alpha
+        # return model.proj_param(log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor,
@@ -91,11 +93,6 @@ def _grad_search(
         except Exception:
             monitor(g_func, criterion.val_test, lambdak,
                     grad_lambda, criterion.rmse)
-
-        # TODO this should be removed into the SURE class no?
-        if convexify:
-            g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
-            grad_lambda += gamma_convex * np.exp(lambdak)
 
         old_grads.append(norm(grad_lambda))
         if np.isnan(old_grads[-1]):
