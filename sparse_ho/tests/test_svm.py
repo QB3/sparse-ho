@@ -40,10 +40,8 @@ log_C = np.log(C)
 tol = 1e-16
 
 models = [
-    SVM(
-        X_train, y_train, log_C, max_iter=10000, tol=tol),
-    SVM(
-        X_train_s, y_train, log_C, max_iter=10000, tol=tol)
+    SVM(log_C, max_iter=10000, tol=tol),
+    SVM(log_C, max_iter=10000, tol=tol)
 ]
 
 
@@ -94,17 +92,17 @@ def test_val_grad(model):
     # compute the gradients
     # check that the gradient returned by all methods are the same
 
-    criterion = HeldOutLogistic(X_val, y_val)
+    criterion = HeldOutLogistic(idx_train, idx_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
         model, log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = HeldOutLogistic(X_val, y_val)
+    criterion = HeldOutLogistic(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         model, log_C, algo.get_beta_jac_v, tol=tol)
 
-    criterion = HeldOutLogistic(X_val, y_val)
+    criterion = HeldOutLogistic(idx_train, idx_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
         model, log_C, algo.get_beta_jac_v, tol=tol)
@@ -123,7 +121,7 @@ def test_grad_search(model):
     criterion = HeldOutSmoothedHinge(X_val, y_val, X_test=None, y_test=None)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(algo, criterion, model, np.log(1e-3), monitor1,
+    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor1,
                 n_outer=n_outer, tol=1e-13)
 
     # criterion = SmoothedSURE(
@@ -131,7 +129,7 @@ def test_grad_search(model):
     criterion = HeldOutSmoothedHinge(X_val, y_val, X_test=None, y_test=None)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, model, np.log(1e-3), monitor2,
+    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor2,
                 n_outer=n_outer, tol=1e-13)
 
     # criterion = SmoothedSURE(
