@@ -968,7 +968,7 @@ class SparseLogreg():
         return grad
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y):
+    def _get_pobj(r, X, beta, alphas, y):
         n_samples = r.shape[0]
         return (
             np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
@@ -1063,7 +1063,7 @@ class SparseLogreg():
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_param(self, log_alpha):
@@ -1093,10 +1093,10 @@ class SparseLogreg():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_primal(self, mask, dense):
+    def get_primal(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
     @staticmethod
@@ -1111,7 +1111,7 @@ class SparseLogreg():
             hessian = (X[:, mask].T * temp) @ X[:, mask]
         return hessian
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
     def compute_alpha_max(self):
