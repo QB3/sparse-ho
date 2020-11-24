@@ -298,6 +298,10 @@ class HeldOutSmoothedHinge():
         self.value_test(mask, dense)
         return val
 
+    def proj_param(self, model, X, y, log_alpha):
+        return model.proj_param(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
+
 
 class SmoothedSURE():
     """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
