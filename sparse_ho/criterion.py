@@ -93,7 +93,7 @@ class HeldOutMSE():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_primal(mask, dense)
+        mask, dense = model.get_primal(X, y, mask, dense)
         val = self.get_mse_val(X, y, mask, dense)
         # TODO put the following in a callback function
         self.get_mse_test(mask, dense)
