@@ -1602,7 +1602,7 @@ class ElasticNet():
         return norm(y) ** 2 / (2 * n_samples)
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y=None):
+    def _get_pobj(r, X, beta, alphas, y=None):
         n_samples = r.shape[0]
         pobj = norm(r) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
         pobj += 0.5 * alphas[1] * norm(beta) ** 2
@@ -1698,7 +1698,7 @@ class ElasticNet():
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(jac, mask, dense, alphas, v, n_samples):
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
     def proj_param(self, log_alpha):
@@ -1746,10 +1746,10 @@ class ElasticNet():
     def sign(self, x, log_alpha):
         return x
 
-    def get_primal(self, mask, dense):
+    def get_primal(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
     @staticmethod
@@ -1758,7 +1758,7 @@ class ElasticNet():
         hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
     def compute_alpha_max(self):
