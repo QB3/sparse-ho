@@ -316,8 +316,6 @@ class SmoothedSURE():
         val = norm(y - X[:, mask] @ dense) ** 2
         val -= X.shape[0] * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
-        val = norm(self.y_val - self.X_val[:, mask] @ dense) ** 2
-        val -= self.X_val.shape[0] * self.sigma ** 2
         return val
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
