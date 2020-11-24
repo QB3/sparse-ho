@@ -27,7 +27,8 @@ y[y == 0.0] = -1.0
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
-alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / (2 * n_samples)
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / (
+    2 * len(idx_train))
 alpha = 0.3 * alpha_max
 log_alpha = np.log(alpha)
 tol = 1e-16
@@ -50,6 +51,11 @@ models_custom = [
 def get_v(mask, dense):
     return 2 * (X[np.ix_(idx_val, mask)].T @ (
         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
+
+
+def get_v_s(mask, dense):
+    return 2 * (X_s[np.ix_(idx_val, mask)].T @ (
+        X_s[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
 
 
 @pytest.mark.parametrize('model', models)
@@ -75,7 +81,7 @@ def test_beta_jac(model):
 
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
         X_s[idx_train, :], y[idx_train], log_alpha,
-        get_v, tol=tol, model=model, tol_jac=1e-12)
+        get_v_s, tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)
     assert np.allclose(dense1, dense_sk, atol=1e-4)

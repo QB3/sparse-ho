@@ -23,8 +23,6 @@ X, y = datasets.make_classification(
     n_samples=n_samples,
     n_features=n_features, n_informative=50,
     random_state=11, flip_y=0.1, n_redundant=0)
-X_s = csr_matrix(X)
-
 
 y[y == 0.0] = -1.0
 idx_train = np.arange(0, 50)
@@ -35,10 +33,7 @@ C = 0.01
 log_C = np.log(C)
 tol = 1e-16
 
-models = [
-    SVM(log_C, max_iter=10000, tol=tol),
-    SVM(log_C, max_iter=10000, tol=tol)
-]
+models = [SVM(log_C, max_iter=10000, tol=tol)]
 
 
 def get_v(mask, dense):
