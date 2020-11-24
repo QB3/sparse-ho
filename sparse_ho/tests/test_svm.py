@@ -31,7 +31,7 @@ idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
 
-C = 0.001
+C = 0.01
 log_C = np.log(C)
 tol = 1e-16
 
@@ -52,22 +52,23 @@ def test_beta_jac(model):
         X[idx_train, :], y[idx_train], log_C, tol=tol,
         model=model, compute_jac=True, max_iter=10000)
 
-    beta = np.zeros(n_samples)
+    beta = np.zeros(len(idx_train))
     beta[supp1] = dense1
     full_supp = np.logical_and(beta > 0, beta < C)
     # full_supp = np.logical_or(beta <= 0, beta >= C)
 
     Q = (y[idx_train, np.newaxis] * X[idx_train, :])  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
-    v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
+    v = (np.eye(len(idx_train), len(idx_train)) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
     jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
     assert np.allclose(jac_dense, jac1[dense1 < C])
 
     if issparse(X):
-        primal = np.sum(X_train_s[supp1, :].T.multiply(y_train[supp1] * dense1), axis=1)
+        primal = np.sum(
+            X_s[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1), axis=1)
         primal = primal.T
     else:
-        primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
+        primal = np.sum(y[idx_train][supp1] * dense1 * X[idx_train, :][supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
     clf.fit(X[idx_train, :], y[idx_train])
@@ -94,7 +95,7 @@ def test_val_grad(model):
         model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
     criterion = HeldOutLogistic(idx_train, idx_val)
-    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=1000)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
@@ -111,8 +112,6 @@ def test_val_grad(model):
 
 @pytest.mark.parametrize('model', models)
 def test_grad_search(model):
-    # criterion = SmoothedSURE(
-    #     X_train, y_train, model, sigma=sigma_star)
     n_outer = 3
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor1 = Monitor()
@@ -120,20 +119,16 @@ def test_grad_search(model):
     grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor1,
                 n_outer=n_outer, tol=1e-13)
 
-    # criterion = SmoothedSURE(
-    #     X_train, y_train, model, sigma=sigma_star)
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor2,
                 n_outer=n_outer, tol=1e-13)
 
-    # criterion = SmoothedSURE(
-    #     X_train, y_train, model, sigma=sigma_star)
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
-    grad_search(algo, criterion, model, np.log(1e-3), monitor3,
+    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor3,
                 n_outer=n_outer, tol=1e-13)
 
     assert np.allclose(
@@ -146,7 +141,6 @@ def test_grad_search(model):
     #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
-    # import ipdb; ipdb.set_trace()
 
 
 if __name__ == '__main__':

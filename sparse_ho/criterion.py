@@ -184,7 +184,8 @@ class HeldOutLogistic():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_primal(mask, dense)
+        mask, dense = model.get_primal(
+            X[self.idx_train, :], y[self.idx_train], mask, dense)
         val = self.value_outer_crit(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
         self.compute_rmse(mask, dense, beta_star)
@@ -219,25 +220,12 @@ class HeldOutSmoothedHinge():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
-        deriv = derivative_smooth_hinge(Xbeta_y)
-        if issparse(self.X_val):
-            v = self.X_val[:, mask].T.multiply(deriv * self.y_val)
-            v = np.array(np.sum(v, axis=1))
-            v = np.squeeze(v)
+    def value(self, X_val, y_val, mask, dense):
+        if issparse(X_val):
+            Xbeta_y = (X_val[:, mask].T).multiply(y_val).T @ dense
         else:
-            v = (deriv * self.y_val)[:, np.newaxis] * self.X_val[:, mask]
-            v = np.sum(v, axis=0)
-        v /= self.X_val.shape[0]
-        return v
-
-    def value(self, mask, dense):
-        if issparse(self.X_val):
-            Xbeta_y = (self.X_val[:, mask].T).multiply(self.y_val).T @ dense
-        else:
-            Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
-        return np.sum(smooth_hinge(Xbeta_y)) / self.X_val.shape[0]
+            Xbeta_y = y_val * (X_val[:, mask] @ dense)
+        return np.sum(smooth_hinge(Xbeta_y)) / X_val.shape[0]
 
     def value_test(self, mask, dense):
         if self.X_test is not None and self.y_test is not None:
@@ -260,8 +248,21 @@ class HeldOutSmoothedHinge():
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+        def get_v(mask, dense):
+            Xbeta_y = y[self.idx_val] * (
+                X[np.ix_(self.idx_val, mask)] @ dense)
+            deriv = derivative_smooth_hinge(Xbeta_y)
+            if issparse(X):
+                v = X[np.ix_(self.idx_val, mask)].T.multiply(deriv * y[self.idx_val])
+                v = np.array(np.sum(v, axis=1))
+                v = np.squeeze(v)
+            else:
+                v = (deriv * y[self.idx_val])[:, np.newaxis] * X[np.ix_(self.idx_val, mask)]
+                v = np.sum(v, axis=0)
+            v /= len(self.idx_val)
+            return v
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, self.get_v,
+            X[self.idx_train], y[self.idx_train], log_alpha, model, get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
@@ -270,10 +271,11 @@ class HeldOutSmoothedHinge():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
+        mask, dense = model.get_primal(
+            X[self.idx_train, :], y[self.idx_train], mask, dense)
+        val = self.value(X[self.idx_val], y[self.idx_val], mask, dense)
+        # self.value_test(mask, dense)
+        # self.compute_rmse(mask, dense, beta_star)
 
         return val, grad
 

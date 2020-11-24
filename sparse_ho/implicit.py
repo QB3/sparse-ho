@@ -47,7 +47,7 @@ def get_beta_jac_t_v_implicit(
     mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
 
-    maskp, densep = model.get_primal(mask, dense)
+    maskp, densep = model.get_primal(X_train, y_train, mask, dense)
     v = get_v(maskp, densep)
 
     # TODO: to clean
@@ -64,7 +64,8 @@ def get_beta_jac_t_v_implicit(
         sol0 = np.zeros(size_mat)
     try:
         sol = cg(
-            mat_to_inv, - model.restrict_full_supp(mask, dense, v),
+            mat_to_inv, - model.restrict_full_supp(
+                X_train, y_train, mask, dense, v),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -82,9 +83,10 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - model.restrict_full_supp(mask, dense, v), x0=sol0, atol=1e-3)
+            - model.restrict_full_supp(
+                X_train, y_train, mask, dense, v, log_alpha), x0=sol0, atol=1e-3)
         sol_lin_sys = sol[0]
     jac_t_v = model._get_jac_t_v(
-        sol_lin_sys, mask, dense, alphas, v.copy(), n_samples)
+        X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(), n_samples)
 
     return mask, dense, jac_t_v, sol[0]

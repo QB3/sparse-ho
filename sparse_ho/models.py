@@ -647,8 +647,7 @@ class SVM():
         return obj_prim
 
     @staticmethod
-    def _get_pobj(X, r, beta, C, y):
-        # r = y.copy()
+    def _get_pobj(r, X, beta, C, y):
         C = C[0]
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
@@ -737,6 +736,7 @@ class SVM():
         sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
+    @staticmethod
     def get_jac_v(X, y, mask, dense, jac, v):
         n_samples, n_features = X.shape
         if issparse(X):
@@ -751,6 +751,7 @@ class SVM():
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
+    @staticmethod
     def get_primal(X, y, mask, dense):
         if issparse(X):
             primal = np.sum(X[mask, :].T.multiply(y[mask] * dense), axis=1)
@@ -771,7 +772,7 @@ class SVM():
         beta[mask] = dense
         full_supp = np.logical_and(
             np.logical_not(np.isclose(beta, 0)),
-            np.logical_not(np.isclose(beta, np.exp(self.logC))))
+            np.logical_not(np.isclose(beta, np.exp(log_alpha))))
 
         if issparse(X_train):
             mat = X_train[full_supp, :].multiply(y_train[full_supp, np.newaxis])
@@ -780,10 +781,11 @@ class SVM():
         Q = mat @ mat.T
         return Q
 
-    @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, C, v):
+    # @staticmethod
+    def _get_jac_t_v(self, X, y, jac, mask, dense, C, v, n_samples):
+        # TODO do you think we can improve svm computations?
+        # in particular remove the dependency in X and y?
         C = C[0]
-        n_samples = X.shape[0]
         beta = np.zeros(n_samples)
         beta[mask] = dense
         maskC = np.isclose(beta, C)
@@ -794,14 +796,14 @@ class SVM():
         if full_supp.sum() != 0:
             full_jac[full_supp] = jac
         full_jac[maskC] = C
-        maskp, densep = self.get_primal(mask, dense)
+        maskp, densep = self.get_primal(X, y, mask, dense)
         # primal dual relation
         jac_primal = (y[mask] * full_jac[mask]) @ X[mask, :]
         return jac_primal[maskp] @ v
 
     @staticmethod
-    def restrict_full_supp(X, y, mask, dense, v):
-        C = np.exp(self.logC)
+    def restrict_full_supp(X, y, mask, dense, v, log_alpha):
+        C = np.exp(log_alpha)
         n_samples = X.shape[0]
         beta = np.zeros(n_samples)
         beta[mask] = dense
@@ -829,7 +831,7 @@ class SVM():
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, C):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
         if issparse(Xs):

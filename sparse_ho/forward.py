@@ -23,7 +23,7 @@ class Forward():
             max_iter=100, tol=tol,  # TODO replace 100 by better value
             compute_jac=compute_jac, verbose=self.verbose)
         if jac is not None:
-            jac_v = model.get_jac_v(mask, dense, jac, v)
+            jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
             if full_jac_v:
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:
@@ -116,7 +116,7 @@ def get_beta_jac_iterdiff(
             model._update_beta_jac_bcd(
                 X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
 
-        pobj.append(model._get_pobj(r, beta, alphas, y))
+        pobj.append(model._get_pobj(r, X, beta, alphas, y))
 
         if i > 1:
             if verbose:
