@@ -24,7 +24,6 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from celer import LogisticRegression
-# from sklearn.linear_model import LogisticRegression
 from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
@@ -35,12 +34,12 @@ from sklearn.datasets import make_classification
 
 print(__doc__)
 
-# dataset = 'rcv1_train'
-dataset = 'simu'
+dataset = 'rcv1_train'
+# dataset = 'simu'
 
 if dataset != 'simu':
     X, y = fetch_libsvm(dataset)
-    X = X[:, :100]
+    X = X[:, :50]
 else:
     X, y = make_classification(
         n_samples=100, n_features=1_000, random_state=42, flip_y=0.02)
@@ -75,7 +74,7 @@ print('scikit started')
 t0 = time.time()
 
 estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, max_iter=max_iter)
+    penalty='l1', solver='saga', fit_intercept=False, max_iter=max_iter)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
@@ -102,9 +101,9 @@ estimator = LogisticRegression(
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grad = Monitor()
-algo = ImplicitForward(tol_jac=tol, n_iter_jac=100)
+algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max), monitor_grad,
-            n_outer=20, tol=tol)
+            n_outer=5, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 
 t_grad_search = time.time() - t0
