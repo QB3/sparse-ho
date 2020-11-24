@@ -18,7 +18,7 @@ n_samples = 100
 n_features = 100
 X, y = datasets.make_classification(
     n_samples=n_samples,
-    n_features=n_features, n_informative=50,
+    n_features=n_features, n_informative=10,
     random_state=110, flip_y=0.1, n_redundant=0)
 X_s = csc_matrix(X)
 

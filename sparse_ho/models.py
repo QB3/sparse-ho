@@ -199,10 +199,10 @@ class Lasso():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
         if log_alpha < self.log_alpha_max - 12:
             return self.log_alpha_max - 12
@@ -824,7 +824,7 @@ class SVM():
         else:
             return - w
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
@@ -1482,7 +1482,7 @@ class SVR():
         #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
         # return - res
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
@@ -1702,10 +1702,10 @@ class ElasticNet():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
         if log_alpha[0] < self.log_alpha_max - 7:
             log_alpha[0] = self.log_alpha_max - 7
