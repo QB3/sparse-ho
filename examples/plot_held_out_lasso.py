@@ -40,9 +40,7 @@ if dataset == 'rcv1':
     X, y = fetch_libsvm('rcv1_train')
 else:
     X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-    # X_train, X_val, y_train, y_val = train_test_split(
-    #     X_train, y_train, test_size=0.5)
+
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
