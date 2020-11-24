@@ -42,7 +42,7 @@ class HeldOutMSE():
         self.val_test = None
         self.rmse = None
 
-    def get_mse_val(self, X, y, mask, dense):
+    def value_outer_crit(self, X, y, mask, dense):
         """Compute the MSE on the validation set.
         """
         val = (
@@ -74,7 +74,7 @@ class HeldOutMSE():
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
         self.get_mse_test(mask, dense)
-        return self.get_mse_val(mask, dense)
+        return self.value_outer_crit(mask, dense)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -94,7 +94,7 @@ class HeldOutMSE():
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(X, y, mask, dense)
-        val = self.get_mse_val(X, y, mask, dense)
+        val = self.value_outer_crit(X, y, mask, dense)
         # TODO put the following in a callback function
         self.get_mse_test(mask, dense)
         self.compute_rmse(mask, dense, beta_star)
@@ -166,7 +166,7 @@ class HeldOutLogistic():
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
-        return self.value(mask, dense)
+        return self.value_outer_crit(mask, dense)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -228,7 +228,7 @@ class HeldOutSmoothedHinge():
         self.val_test = None
         self.rmse = None
 
-    def value(self, X_val, y_val, mask, dense):
+    def value_outer_crit(self, X_val, y_val, mask, dense):
         if issparse(X_val):
             Xbeta_y = (X_val[:, mask].T).multiply(y_val).T @ dense
         else:
@@ -281,7 +281,7 @@ class HeldOutSmoothedHinge():
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.value(X[self.idx_val], y[self.idx_val], mask, dense)
+        val = self.value_outer_crit(X[self.idx_val], y[self.idx_val], mask, dense)
         # self.value_test(mask, dense)
         # self.compute_rmse(mask, dense, beta_star)
 
@@ -293,7 +293,7 @@ class HeldOutSmoothedHinge():
             model.X, model.y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
         mask, dense = model.get_primal(mask, dense)
-        val = self.value(mask, dense)
+        val = self.value_outer_crit(mask, dense)
         self.value_test(mask, dense)
         return val
 
@@ -348,11 +348,11 @@ class SmoothedSURE():
         self.val_test = None
         self.rmse = None
 
-    def value(self, X, y, mask, dense, mask2, dense2):
+    def value_outer_crit(self, X, y, mask, dense, mask2, dense2):
         dof = ((X[:, mask2] @ dense2 -
                 X[:, mask] @ dense) @ self.delta)
         dof /= self.epsilon
-        # compute the value of the sure
+        # compute the value_outer_crit of the sure
         val = norm(y - X[:, mask] @ dense) ** 2
         val -= X.shape[0] * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
@@ -382,7 +382,7 @@ class SmoothedSURE():
             X[self.idx_train], y[self.idx_train] + self.epsilon * self.delta,
             log_alpha, model, tol=tol, compute_jac=False)
 
-        val = self.value(mask, dense, mask2, dense2)
+        val = self.value_outer_crit(mask, dense, mask2, dense2)
 
         return val
 
@@ -425,7 +425,7 @@ class SmoothedSURE():
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
-        val = self.value(X, y, mask, dense, mask2, dense2)
+        val = self.value_outer_crit(X, y, mask, dense, mask2, dense2)
         self.value_test(X, y, mask, dense)
         self.compute_rmse(mask, dense, beta_star)
         self.mask0 = mask
