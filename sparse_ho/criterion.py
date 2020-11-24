@@ -69,10 +69,10 @@ class HeldOutMSE():
         else:
             self.rmse = None
 
-    def get_val(self, model, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            model.X, model.y, log_alpha, model, tol=tol, compute_jac=False)
+            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
         self.get_mse_test(mask, dense)
         return self.get_mse_val(mask, dense)
 
@@ -158,8 +158,9 @@ class HeldOutLogistic():
 
     def get_val(self, model, log_alpha, tol=1e-3):
         # TODO add warm start
+        # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
-            model.X, model.y, log_alpha, model, tol=tol, compute_jac=False)
+            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
         self.value_test(mask, dense)
         return self.value(mask, dense)
 
@@ -199,21 +200,16 @@ class HeldOutSmoothedHinge():
     TODO
     """
 
-    def __init__(self, X_val, y_val, X_test=None, y_test=None):
+    def __init__(self, idx_train, idx_val, X_test=None, y_test=None):
         """
         Parameters
-        ----------
-        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of shape (n_samples)
-            Validation target
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of shape (n_samples_test,)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
+        self.idx_train = idx_train
+        self.idx_val = idx_val
         self.X_test = X_test
         self.y_test = y_test
 
@@ -262,10 +258,10 @@ class HeldOutSmoothedHinge():
             self.rmse = None
 
     def get_val_grad(
-            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            model.X, model.y, log_alpha, model, self.get_v,
+            X[self.idx_train], y[self.idx_train], log_alpha, model, self.get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
@@ -282,6 +278,7 @@ class HeldOutSmoothedHinge():
         return val, grad
 
     def get_val(self, model, log_alpha, tol=1e-3):
+        # TODO X y also ?
         mask, dense, _ = get_beta_jac_iterdiff(
             model.X, model.y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
@@ -342,7 +339,7 @@ class SmoothedSURE():
                 X[:, mask] @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
-        val = norm(y    - X[:, mask] @ dense) ** 2
+        val = norm(y - X[:, mask] @ dense) ** 2
         val -= X.shape[0] * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
 
@@ -362,13 +359,13 @@ class SmoothedSURE():
         else:
             self.rmse = None
 
-    def get_val(self, model, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            model.X, model.y, log_alpha, model,
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
-            model.X, model.y + self.epsilon * self.delta,
+            X[self.idx_train], y[self.idx_train] + self.epsilon * self.delta,
             log_alpha, model, tol=tol, compute_jac=False)
 
         val = self.value(mask, dense, mask2, dense2)
@@ -399,7 +396,7 @@ class SmoothedSURE():
 
         def v2(mask, dense):
             return ((2 * self.sigma ** 2 *
-                    X[:, mask].T @ self.delta / self.epsilon))
+                     X[:, mask].T @ self.delta / self.epsilon))
 
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
             X, y, log_alpha, model, v,

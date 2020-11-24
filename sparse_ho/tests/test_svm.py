@@ -49,7 +49,7 @@ def get_v(mask, dense):
 @pytest.mark.parametrize('model', models)
 def test_beta_jac(model):
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
-        X[idx_train, :], y_train, log_C, tol=tol,
+        X[idx_train, :], y[idx_train], log_C, tol=tol,
         model=model, compute_jac=True, max_iter=10000)
 
     beta = np.zeros(n_samples)
@@ -57,7 +57,7 @@ def test_beta_jac(model):
     full_supp = np.logical_and(beta > 0, beta < C)
     # full_supp = np.logical_or(beta <= 0, beta >= C)
 
-    Q = (y_train[:, np.newaxis] * X[idx_train, :])  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
+    Q = (y[idx_train, np.newaxis] * X[idx_train, :])  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
     v = (np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
     jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
@@ -70,9 +70,9 @@ def test_beta_jac(model):
         primal = np.sum(y_train[supp1] * dense1 * X_train[supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
-    clf.fit(X[idx_train, :], y_train)
+    clf.fit(X[idx_train, :], y[idx_train])
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y_train, log_C,
+        X[idx_train, :], y[idx_train], log_C,
         get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
     assert np.allclose(primal, clf.coef_)
 
@@ -91,17 +91,17 @@ def test_val_grad(model):
     criterion = HeldOutLogistic(idx_train, idx_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
-        model, log_C, algo.get_beta_jac_v, tol=tol)
+        model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
     criterion = HeldOutLogistic(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=100)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-        model, log_C, algo.get_beta_jac_v, tol=tol)
+        model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
     criterion = HeldOutLogistic(idx_train, idx_val)
     algo = Implicit()
     val_imp, grad_imp = criterion.get_val_grad(
-        model, log_C, algo.get_beta_jac_v, tol=tol)
+        model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
@@ -114,8 +114,7 @@ def test_grad_search(model):
     # criterion = SmoothedSURE(
     #     X_train, y_train, model, sigma=sigma_star)
     n_outer = 3
-    criterion = HeldOutSmoothedHinge(X[idx_val, :], y[idx_val],
-                                     X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
     grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor1,
@@ -123,8 +122,7 @@ def test_grad_search(model):
 
     # criterion = SmoothedSURE(
     #     X_train, y_train, model, sigma=sigma_star)
-    criterion = HeldOutSmoothedHinge(X[idx_val, :], y[idx_val],
-                                     X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
     grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor2,
@@ -132,8 +130,7 @@ def test_grad_search(model):
 
     # criterion = SmoothedSURE(
     #     X_train, y_train, model, sigma=sigma_star)
-    criterion = HeldOutSmoothedHinge(X[idx_val, :], y[idx_val],
-                                     X_test=None, y_test=None)
+    criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
     grad_search(algo, criterion, model, np.log(1e-3), monitor3,
