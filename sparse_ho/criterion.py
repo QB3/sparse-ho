@@ -50,7 +50,7 @@ class HeldOutMSE():
         """
         if X is None or y is None:
             return None
-        return norm(y - X[:, mask] @ dense) ** 2 / len(self.idx_val)
+        return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
@@ -76,7 +76,6 @@ class HeldOutMSE():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        # # g
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
         val = self.value_outer_crit(
@@ -212,7 +211,7 @@ class HeldOutSmoothedHinge():
             Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
         else:
             Xbeta_y = y * (X[:, mask] @ dense)
-        return np.sum(smooth_hinge(Xbeta_y)) / X.shape[0]
+        return np.sum(smooth_hinge(Xbeta_y)) / len(y)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -313,11 +312,12 @@ class SmoothedSURE():
         dof = ((X[:, mask2] @ dense2 -
                 X[:, mask] @ dense) @ self.delta)
         dof /= self.epsilon
-        # compute the value_outer_crit of the sure
+        # compute the value of the sure
         val = norm(y - X[:, mask] @ dense) ** 2
         val -= X.shape[0] * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
-
+        val = norm(self.y_val - self.X_val[:, mask] @ dense) ** 2
+        val -= self.X_val.shape[0] * self.sigma ** 2
         return val
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):

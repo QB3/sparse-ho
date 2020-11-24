@@ -34,18 +34,14 @@ log_alpha = np.log(alpha)
 tol = 1e-16
 
 models = [
-    SparseLogreg(max_iter=10000, estimator=None),
-    SparseLogreg(max_iter=10000, estimator=None)
-]
+    SparseLogreg(max_iter=10000, estimator=None)]
 
 estimator = LogisticRegression(
     penalty="l1", tol=1e-12, fit_intercept=False, max_iter=100000,
     solver="saga")
 
 models_custom = [
-    SparseLogreg(max_iter=10000, estimator=estimator),
-    SparseLogreg(max_iter=10000, estimator=estimator)
-]
+    SparseLogreg(max_iter=10000, estimator=estimator)]
 
 
 def get_v(mask, dense):
@@ -99,7 +95,7 @@ def test_beta_jac(model):
     assert np.allclose(jac3, jac4, atol=1e-4)
 
 
-@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+@pytest.mark.parametrize('model,model_custom', [(models[0], models_custom[0])])
 def test_beta_jac_custom_solver(model, model_custom):
     supp, dense, jac = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_alpha,
@@ -140,7 +136,7 @@ def test_val_grad(model):
     assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
 
 
-@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+@pytest.mark.parametrize('model,model_custom', [(models[0], models_custom[0])])
 def test_val_grad_custom(model, model_custom):
     criterion = HeldOutLogistic(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
@@ -193,7 +189,7 @@ def test_grad_search(model, crit):
         np.array(monitor1.times), np.array(monitor3.times))
 
 
-@pytest.mark.parametrize(('model', 'model_custom'), (models, models_custom))
+@pytest.mark.parametrize('model,model_custom', [(models[0], models_custom[0])])
 @pytest.mark.parametrize('crit', ['held_out'])
 def test_grad_search_custom(model, model_custom, crit):
     """check that the paths are the same in the line search"""

@@ -74,7 +74,7 @@ print('scikit started')
 t0 = time.time()
 
 estimator = LogisticRegression(
-    penalty='l1', solver='saga', fit_intercept=False, max_iter=max_iter)
+    penalty='l1', fit_intercept=False, max_iter=max_iter)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
