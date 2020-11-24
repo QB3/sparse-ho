@@ -9,7 +9,6 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.models import SVM
 from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
-from scipy.sparse import csr_matrix
 from scipy.sparse import issparse
 from sparse_ho.ho import grad_search
 from sparse_ho.criterion import HeldOutSmoothedHinge
@@ -60,7 +59,7 @@ def test_beta_jac(model):
 
     if issparse(X):
         primal = np.sum(
-            X_s[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1), axis=1)
+            X[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1), axis=1)
         primal = primal.T
     else:
         primal = np.sum(y[idx_train][supp1] * dense1 * X[idx_train, :][supp1, :].T, axis=1)
