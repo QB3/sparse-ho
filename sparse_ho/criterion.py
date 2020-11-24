@@ -25,7 +25,10 @@ class HeldOutMSE():
         """
         Parameters
         ----------
-            Validation target
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of (n_samples_test)
@@ -45,29 +48,9 @@ class HeldOutMSE():
     def value_outer_crit(self, X, y, mask, dense):
         """Compute the MSE on the validation set.
         """
-        val = (
-            norm(y[self.idx_val] - X[np.ix_(self.idx_val, mask)] @ dense) ** 2 /
-            len(self.idx_val))
-        return val
-
-    def get_mse_test(self, mask, dense):
-        """Compute the MSE on the validation set.
-        TODO
-        """
-        if self.X_test is not None and self.y_test is not None:
-            self.val_test = (
-                norm(self.y_test - self.X_test[:, mask] @ dense) ** 2 /
-                self.X_test.shape[0])
-        else:
-            self.val_test = None
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
+        if X is None or y is None:
+            return None
+        return norm(y - X[:, mask] @ dense) ** 2 / len(self.idx_val)
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
@@ -93,12 +76,14 @@ class HeldOutMSE():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_primal(X, y, mask, dense)
-        val = self.value_outer_crit(X, y, mask, dense)
+        # # g
+        mask, dense = model.get_primal(
+            X[self.idx_train, :], y[self.idx_train], mask, dense)
+        val = self.value_outer_crit(
+            X[self.idx_val, :], y[self.idx_val], mask, dense)
         # TODO put the following in a callback function
-        self.get_mse_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
-
+        self.mse_test = self.value_outer_crit(
+            self.X_test, self.y_test, mask, dense)
         return val, grad
 
     def proj_param(self, model, X, y, log_alpha):
@@ -114,10 +99,10 @@ class HeldOutLogistic():
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of (n_samples)
-            Validation target
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of (n_samples_test)
@@ -136,37 +121,23 @@ class HeldOutLogistic():
 
     @staticmethod
     def value_outer_crit(X, y, mask, dense):
-        if X is not None and y is not None:
+        if X is None or y is None:
+            return None
+        else:
             val = np.sum(
                 np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
             val /= X.shape[0]
             return val
-        else:
-            return None
-
-    def value_test(self, mask, dense):
-        if self.X_test is not None and self.y_test is not None:
-            self.val_test = np.sum(
-                np.log(1 + np.exp(-self.y_test * (self.X_test[:, mask] @ dense))))
-            self.val_test /= self.X_test.shape[0]
-        else:
-            self.val_test = None
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
-        self.value_test(mask, dense)
-        return self.value_outer_crit(mask, dense)
+        self.val_test = self.value_outer_crit(
+            self.X_test, self.y_test, mask, dense)
+        return self.value_outer_crit(
+            X[self.idx_val, :], y[self.idx_val], mask, dense)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -192,8 +163,8 @@ class HeldOutLogistic():
             X[self.idx_train, :], y[self.idx_train], mask, dense)
         val = self.value_outer_crit(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
-
+        self.val_test = self.value_outer_crit(
+            self.X_test, self.y_test, mask, dense)
         return val, grad
 
     def proj_param(self, model, X, y, log_alpha):
@@ -211,7 +182,12 @@ class HeldOutSmoothedHinge():
 
     def __init__(self, idx_train, idx_val, X_test=None, y_test=None):
         """
-        Parameters
+        Parameters:
+        ----------
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of shape (n_samples_test,)
@@ -228,30 +204,15 @@ class HeldOutSmoothedHinge():
         self.val_test = None
         self.rmse = None
 
-    def value_outer_crit(self, X_val, y_val, mask, dense):
-        if issparse(X_val):
-            Xbeta_y = (X_val[:, mask].T).multiply(y_val).T @ dense
-        else:
-            Xbeta_y = y_val * (X_val[:, mask] @ dense)
-        return np.sum(smooth_hinge(Xbeta_y)) / X_val.shape[0]
+    def value_outer_crit(self, X, y, mask, dense):
+        if X is None or y is None:
+            return None
 
-    def value_test(self, mask, dense):
-        if self.X_test is not None and self.y_test is not None:
-            if issparse(self.X_test):
-                Xbeta_y = (self.X_test[:, mask].T).multiply(self.y_test).T @ dense
-            else:
-                Xbeta_y = self.y_test * (self.X_test[:, mask] @ dense)
-            self.val_test = np.sum(smooth_hinge(Xbeta_y)) / self.X_test.shape[0]
+        if issparse(X):
+            Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
         else:
-            self.val_test = None
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
+            Xbeta_y = y * (X[:, mask] @ dense)
+        return np.sum(smooth_hinge(Xbeta_y)) / X.shape[0]
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -281,20 +242,20 @@ class HeldOutSmoothedHinge():
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.value_outer_crit(X[self.idx_val], y[self.idx_val], mask, dense)
-        # self.value_test(mask, dense)
-        # self.compute_rmse(mask, dense, beta_star)
+        val = self.value_outer_crit(
+            X[self.idx_val], y[self.idx_val], mask, dense)
+        self.val_test = self.value_outer_crit(
+            self.X_test, self.y_test, mask, dense)
 
         return val, grad
 
-    def get_val(self, model, log_alpha, tol=1e-3):
-        # TODO X y also ?
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         mask, dense, _ = get_beta_jac_iterdiff(
-            model.X, model.y, log_alpha, model,  # TODO max_iter
+            X, y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
         mask, dense = model.get_primal(mask, dense)
-        val = self.value_outer_crit(mask, dense)
-        self.value_test(mask, dense)
+        val = self.value_outer_crit(
+            X[self.idx_val], y[self.idx_val], mask, dense)
         return val
 
     def proj_param(self, model, X, y, log_alpha):
@@ -359,20 +320,6 @@ class SmoothedSURE():
 
         return val
 
-    def value_test(self, X, y, mask, dense):
-        val = (
-            norm(y - X[:, mask] @ dense) ** 2 / X.shape[0])
-        self.val_test = val
-        return val
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
-
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
@@ -426,8 +373,6 @@ class SmoothedSURE():
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
         val = self.value_outer_crit(X, y, mask, dense, mask2, dense2)
-        self.value_test(X, y, mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
