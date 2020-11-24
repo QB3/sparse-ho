@@ -32,7 +32,7 @@ from sparse_ho.ho import grad_search
 
 ##############################################################################
 # Dataset creation
-n_samples = 600
+n_samples = 900
 n_features = 600
 rng = check_random_state(0)
 X = rng.multivariate_normal(
@@ -43,29 +43,27 @@ X = rng.multivariate_normal(
 # Create true regression coefficients of 5 non-zero values
 w_true = np.zeros(n_features)
 size_supp = 5
-idx = rng.choice(X.shape[0], size_supp, replace=False)
+idx = rng.choice(X.shape[1], size_supp, replace=False)
 w_true[idx] = (-1) ** np.arange(size_supp)
 noise = rng.randn(n_samples)
 y = X @ w_true
 y += noise / norm(noise) * 0.5 * norm(y)
 ##############################################################################
 
+X, X_test, y, y_test = train_test_split(X, y, test_size=0.333)
 
-##############################################################################
-# Here we split the dataset (X, y) in 3:
-# the regression coefficients will be determined using X_train, y_train
-# the regularization parameter will be calibrated using X_val, y_val
-# the model is then tested on unseen data X_test, y_test
-X_train_val, X_test, y_train_val, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=2)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_val, y_train_val, test_size=0.5, random_state=2)
+n_samples = X.shape[0]
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
+
+
+
 ##############################################################################
 
 
 ##############################################################################
 # Max penalty value
-alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 n_alphas = 30
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 ##############################################################################
@@ -76,7 +74,7 @@ alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 print("========== Celer's LassoCV started ===============")
 model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
-    cv=2, n_jobs=2).fit(X_train_val, y_train_val)
+    cv=2, n_jobs=2).fit(X, y)
 
 # Measure mse on test
 mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
@@ -87,20 +85,20 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 ##############################################################################
 # Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
-log_alpha0 = np.log(model_cv.alpha_) * np.ones(X_train.shape[1])
+log_alpha0 = np.log(model_cv.alpha_) * np.ones(n_features)
 # Weighted Lasso: Sparse-ho: 1 param per feature
 estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
-model = WeightedLasso(X_train, y_train, estimator=estimator)
-criterion = HeldOutMSE(X_val, y_val, X_test=X_test, y_test=y_test)
+model = WeightedLasso(estimator=estimator)
+criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
 monitor = Monitor()
 grad_search(
-    algo, criterion, model, log_alpha0, monitor, n_outer=20, tol=1e-6)
+    algo, criterion, model, X, y, log_alpha0, monitor, n_outer=20, tol=1e-6)
 ##############################################################################
 
 ##############################################################################
 # MSE on validation set
-mse_sho_val = mean_squared_error(y_val, estimator.predict(X_val))
+mse_sho_val = mean_squared_error(y[idx_val], estimator.predict(X[idx_val, :]))
 
 # MSE on test set, ie unseen data
 mse_sho_test = mean_squared_error(y_test, estimator.predict(X_test))

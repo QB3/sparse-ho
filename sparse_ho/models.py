@@ -460,12 +460,12 @@ class WeightedLasso():
         jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         """Maybe we could do this in place.
         """
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
         proj_log_alpha = log_alpha.copy()
         proj_log_alpha[proj_log_alpha < -12] = -12
@@ -1066,13 +1066,13 @@ class SparseLogreg():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, log_alpha):
+    def proj_param(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= (4 * self.X.shape[0])
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= (4 * X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < -18:
-            return - 18.0
+        if log_alpha < self.log_alpha_max - 8:
+            return self.log_alpha_max - 8
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:
@@ -1114,12 +1114,11 @@ class SparseLogreg():
     def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
-    def compute_alpha_max(self):
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= (4 * self.X.shape[0])
-            self.log_alpha_max = np.log(alpha_max)
-        return self.log_alpha_max
+    def compute_alpha_max(self, X, y):
+        alpha_max = np.max(np.abs(X.T @ y))
+        alpha_max /= (4 * X.shape[0])
+        log_alpha_max = np.log(alpha_max)
+        return log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
         return(

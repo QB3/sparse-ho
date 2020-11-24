@@ -1,3 +1,4 @@
+from logging import log
 from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
@@ -101,6 +102,10 @@ class HeldOutMSE():
 
         return val, grad
 
+    def proj_param(self, model, X, y, log_alpha):
+        return model.proj_param(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
+
 
 class HeldOutLogistic():
     """Logistic loss on held out data
@@ -191,6 +196,10 @@ class HeldOutLogistic():
         self.compute_rmse(mask, dense, beta_star)
 
         return val, grad
+
+    def proj_param(self, model, X, y, log_alpha):
+        return model.proj_param(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
 class HeldOutSmoothedHinge():

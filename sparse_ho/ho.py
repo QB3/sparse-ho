@@ -41,8 +41,8 @@ def grad_search(
 
     # TODO fix this proj param pb
     def _proj_param(log_alpha):
-        return log_alpha
-        # return model.proj_param(log_alpha)
+        # return log_alpha
+        return criterion.proj_param(model, X, y, log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor,
