@@ -76,7 +76,7 @@ def test_grid_search():
     criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y,log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[

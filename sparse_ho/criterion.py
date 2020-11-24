@@ -161,7 +161,7 @@ class HeldOutLogistic():
         else:
             self.rmse = None
 
-    def get_val(self, model, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(

@@ -1407,11 +1407,13 @@ class SVR():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+    def get_hessian(self, X_train, y_train, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
-        Q = self.X[full_supp, :] @ self.X[full_supp, :].T
+        full_supp = np.logical_and(
+            np.logical_not(np.isclose(beta, 0)),
+            np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
+        Q = X_train[full_supp, :] @ X_train[full_supp, :].T
         return Q
 
     def _get_jac_t_v(self, jac, mask, dense, C, v):
