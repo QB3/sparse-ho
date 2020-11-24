@@ -1,4 +1,3 @@
-from logging import log
 from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse

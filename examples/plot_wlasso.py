@@ -49,17 +49,12 @@ noise = rng.randn(n_samples)
 y = X @ w_true
 y += noise / norm(noise) * 0.5 * norm(y)
 ##############################################################################
-
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333)
 
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
-
-
-
 ##############################################################################
-
 
 ##############################################################################
 # Max penalty value
@@ -67,7 +62,6 @@ alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 n_alphas = 30
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 ##############################################################################
-
 
 ##############################################################################
 # Vanilla LassoCV
