@@ -239,7 +239,7 @@ class Lasso():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_beta_primal(self, X, y, mask, dense):
+    def  get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -516,7 +516,7 @@ class WeightedLasso():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_beta_primal(self, X, y, mask, dense):
+    def  get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -754,7 +754,7 @@ class SVM():
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
     @staticmethod
-    def get_beta_primal(X, y, mask, dense):
+    def  get_beta(X, y, mask, dense):
         if issparse(X):
             primal = np.sum(X[mask, :].T.multiply(y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
@@ -798,7 +798,7 @@ class SVM():
         if full_supp.sum() != 0:
             full_jac[full_supp] = jac
         full_jac[maskC] = C
-        maskp, densep = self.get_beta_primal(X, y, mask, dense)
+        maskp, densep = self. get_beta(X, y, mask, dense)
         # primal dual relation
         jac_primal = (y[mask] * full_jac[mask]) @ X[mask, :]
         return jac_primal[maskp] @ v
@@ -1095,7 +1095,7 @@ class SparseLogreg():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_beta_primal(self, X, y, mask, dense):
+    def  get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -1396,7 +1396,7 @@ class SVR():
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
-    def get_beta_primal(self, mask, dense):
+    def  get_beta(self, mask, dense):
         if issparse(self.X):
             primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
@@ -1750,7 +1750,7 @@ class ElasticNet():
     def sign(self, x, log_alpha):
         return x
 
-    def get_beta_primal(self, X, y, mask, dense):
+    def  get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
