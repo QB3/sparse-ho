@@ -63,13 +63,15 @@ class HeldOutMSE():
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
 
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
+
         def get_v(mask, dense):
-            return 2 * (
-                X[np.ix_(self.idx_val, mask)].T @ (
-                    X[np.ix_(self.idx_val, mask)] @ dense - y[self.idx_val])) / len(self.idx_val)
+            X_val_m = X_val[:, mask]
+            return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
 
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X[self.idx_train, :], y[self.idx_train], log_alpha, model,
+            X_train, y_train, log_alpha, model,
             get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac, full_jac_v=True)
@@ -77,9 +79,8 @@ class HeldOutMSE():
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
-            X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.get_val_outer(
-            X[self.idx_val, :], y[self.idx_val], mask, dense)
+            X_train, y_train, mask, dense)
+        val = self.get_val_outer(X_val, y_val, mask, dense)
         # TODO put the following in a callback function
         self.mse_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
@@ -142,16 +143,17 @@ class HeldOutLogistic():
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
 
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
         def get_v(mask, dense):
-            X_m = X[:, mask]
-            temp = sigma(y * (X_m @ dense))
-            v = X_m.T @ (y * (temp - 1))
-            v /= len(y)
+            X_val_m = X_val[:, mask]
+            temp = sigma(y_val * (X_val_m @ dense))
+            v = X_val_m.T @ (y_val * (temp - 1))
+            v /= len(y_val)
             return v
 
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X[self.idx_train, :], y[self.idx_train], log_alpha, model,
-            get_v, mask0=self.mask0, dense0=self.dense0,
+            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
@@ -160,9 +162,9 @@ class HeldOutLogistic():
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
-            X[self.idx_train, :], y[self.idx_train], mask, dense)
+            X_train, y_train, mask, dense)
         val = self.get_val_outer(
-            X[self.idx_val, :], y[self.idx_val], mask, dense)
+            X_val, y_val, mask, dense)
         self.val_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
         return val, grad
@@ -217,21 +219,26 @@ class HeldOutSmoothedHinge():
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
+
         def get_v(mask, dense):
-            Xbeta_y = y[self.idx_val] * (
-                X[np.ix_(self.idx_val, mask)] @ dense)
+            X_val_m = X_val[:, mask]
+            Xbeta_y = y_val * (X_val_m @ dense)
             deriv = derivative_smooth_hinge(Xbeta_y)
             if issparse(X):
-                v = X[np.ix_(self.idx_val, mask)].T.multiply(deriv * y[self.idx_val])
+                v = X_val_m.T.multiply(deriv * y_val)
                 v = np.array(np.sum(v, axis=1))
                 v = np.squeeze(v)
             else:
-                v = (deriv * y[self.idx_val])[:, np.newaxis] * X[np.ix_(self.idx_val, mask)]
+                v = (deriv * y_val)[:, np.newaxis] * X_val_m
                 v = np.sum(v, axis=0)
             v /= len(self.idx_val)
             return v
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, get_v,
+            X_train, y_train, log_alpha, model, get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
@@ -241,9 +248,8 @@ class HeldOutSmoothedHinge():
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
-            X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.get_val_outer(
-            X[self.idx_val], y[self.idx_val], mask, dense)
+            X_train, y_train, mask, dense)
+        val = self.get_val_outer(X_val, y_val, mask, dense)
         self.val_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
 

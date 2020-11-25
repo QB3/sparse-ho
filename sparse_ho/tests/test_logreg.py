@@ -209,12 +209,13 @@ def test_grad_search_custom(model, model_custom, crit):
         algo, criterion, model_custom, X, y, log_alpha, monitor_custom,
         n_outer=n_outer, tol=tol)
 
-    assert np.allclose(
-        np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas))
-    assert np.allclose(
+    np.testing.assert_allclose(
+        np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas),
+        atol=1e-3)
+    np.testing.assert_allclose(
         np.array(monitor.grads), np.array(monitor_custom.grads), atol=1e-4)
-    assert np.allclose(
-        np.array(monitor.objs), np.array(monitor_custom.objs))
+    np.testing.assert_allclose(
+        np.array(monitor.objs), np.array(monitor_custom.objs), atol=1e-5)
     assert not np.allclose(
         np.array(monitor.times), np.array(monitor_custom.times))
 
