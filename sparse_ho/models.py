@@ -247,7 +247,8 @@ class Lasso():
 
     @staticmethod
     def get_hessian(X_train, y_train, mask, dense, log_alpha):
-        hessian = X_train[:, mask].T @ X_train[:, mask]
+        X_m = X_train[:, mask]
+        hessian = X_m.T @ X_m
         return hessian
 
     def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
@@ -483,7 +484,8 @@ class WeightedLasso():
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
-        hessian = X[:, mask].T @ X[:, mask]
+        X_m = X[:, mask]
+        hessian = X_m.T @ X_m
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
@@ -1101,14 +1103,15 @@ class SparseLogreg():
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
-        a = y * (X[:, mask] @ dense)
+        X_m = X[:, mask]
+        a = y * (X_m @ dense)
         temp = sigma(a) * (1 - sigma(a))
         is_sparse = issparse(X)
         if is_sparse:
             hessian = csc_matrix(
-                X[:, mask].T.multiply(temp)) @ X[:, mask]
+                X_m.T.multiply(temp)) @ X_m
         else:
-            hessian = (X[:, mask].T * temp) @ X[:, mask]
+            hessian = (X_m.T * temp) @ X_m
         return hessian
 
     def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
