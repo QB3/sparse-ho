@@ -45,7 +45,7 @@ class HeldOutMSE():
         self.val_test = None
         self.rmse = None
 
-    def value_outer_crit(self, X, y, mask, dense):
+    def get_val_outer(self, X, y, mask, dense):
         """Compute the MSE on the validation set.
         """
         if X is None or y is None:
@@ -57,7 +57,7 @@ class HeldOutMSE():
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
         self.get_mse_test(mask, dense)
-        return self.value_outer_crit(mask, dense)
+        return self.get_val_outer(mask, dense)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
@@ -78,10 +78,10 @@ class HeldOutMSE():
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.value_outer_crit(
+        val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
         # TODO put the following in a callback function
-        self.mse_test = self.value_outer_crit(
+        self.mse_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
         return val, grad
 
@@ -119,7 +119,7 @@ class HeldOutLogistic():
         self.rmse = None
 
     @staticmethod
-    def value_outer_crit(X, y, mask, dense):
+    def get_val_outer(X, y, mask, dense):
         if X is None or y is None:
             return None
         else:
@@ -133,9 +133,9 @@ class HeldOutLogistic():
         # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
-        self.val_test = self.value_outer_crit(
+        self.val_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
-        return self.value_outer_crit(
+        return self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
 
     def get_val_grad(
@@ -161,9 +161,9 @@ class HeldOutLogistic():
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.value_outer_crit(
+        val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
-        self.val_test = self.value_outer_crit(
+        self.val_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
         return val, grad
 
@@ -204,7 +204,7 @@ class HeldOutSmoothedHinge():
         self.val_test = None
         self.rmse = None
 
-    def value_outer_crit(self, X, y, mask, dense):
+    def get_val_outer(self, X, y, mask, dense):
         if X is None or y is None:
             return None
 
@@ -242,9 +242,9 @@ class HeldOutSmoothedHinge():
         self.quantity_to_warm_start = quantity_to_warm_start
         mask, dense = model.get_primal(
             X[self.idx_train, :], y[self.idx_train], mask, dense)
-        val = self.value_outer_crit(
+        val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
-        self.val_test = self.value_outer_crit(
+        self.val_test = self.get_val_outer(
             self.X_test, self.y_test, mask, dense)
 
         return val, grad
@@ -254,7 +254,7 @@ class HeldOutSmoothedHinge():
             X, y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
         mask, dense = model.get_primal(mask, dense)
-        val = self.value_outer_crit(
+        val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
 
@@ -309,7 +309,7 @@ class SmoothedSURE():
         self.val_test = None
         self.rmse = None
 
-    def value_outer_crit(self, X, y, mask, dense, mask2, dense2):
+    def get_val_outer(self, X, y, mask, dense, mask2, dense2):
         X_m = X[:, mask]  # avoid multiple calls to X[:, mask]
         dof = ((X[:, mask2] @ dense2 -
                 X_m @ dense) @ self.delta)
@@ -329,7 +329,7 @@ class SmoothedSURE():
             X[self.idx_train], y[self.idx_train] + self.epsilon * self.delta,
             log_alpha, model, tol=tol, compute_jac=False)
 
-        val = self.value_outer_crit(mask, dense, mask2, dense2)
+        val = self.get_val_outer(mask, dense, mask2, dense2)
 
         return val
 
@@ -373,7 +373,7 @@ class SmoothedSURE():
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
-        val = self.value_outer_crit(X, y, mask, dense, mask2, dense2)
+        val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
