@@ -239,7 +239,7 @@ class Lasso():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def  get_beta(self, X, y, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -516,7 +516,7 @@ class WeightedLasso():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def  get_beta(self, X, y, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -754,7 +754,7 @@ class SVM():
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
     @staticmethod
-    def  get_beta(X, y, mask, dense):
+    def get_beta(X, y, mask, dense):
         if issparse(X):
             primal = np.sum(X[mask, :].T.multiply(y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
@@ -1095,7 +1095,7 @@ class SparseLogreg():
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def  get_beta(self, X, y, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -1396,7 +1396,7 @@ class SVR():
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
-    def  get_beta(self, mask, dense):
+    def get_beta(self, mask, dense):
         if issparse(self.X):
             primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
@@ -1750,7 +1750,7 @@ class ElasticNet():
     def sign(self, x, log_alpha):
         return x
 
-    def  get_beta(self, X, y, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -1775,5 +1775,4 @@ class ElasticNet():
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, r, dr, alpha):
         res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * np.sign(beta) @ dbeta[:, 0]
         res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
-        return(
-            norm(res2) + norm(res1))
+        return(norm(res2) + norm(res1))
