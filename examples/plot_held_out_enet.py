@@ -16,13 +16,12 @@ for an elastic-net using a held-out validation set.
 import time
 import numpy as np
 from sklearn import linear_model
-from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-from sparse_ho.datasets import get_data
+from libsvmdata.datasets import fetch_libsvm
+
 from sklearn.datasets import make_regression
-from sklearn.model_selection import train_test_split
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.models import ElasticNet
@@ -30,6 +29,7 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 
 Axes3D  # hack for matplotlib 3D support
+# TODO improve example and remove this 3D graph
 
 # dataset = "rcv1"
 dataset = 'simu'
@@ -40,26 +40,23 @@ use_small_part = True
 # Load some data
 
 print("Started to load data")
+dataset = 'rcv1'
+# dataset = 'simu'
 
 if dataset == 'rcv1':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+    X, y = fetch_libsvm('rcv1_train')
 else:
-    rng = np.random.RandomState(42)
-    X, y, beta = make_regression(
-        n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10,
-        random_state=rng,
-    )
-    X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
-    beta /= norm(beta)
-    y = X @ beta + rng.randn(X.shape[0])
-    X_train, X_test, y_train, y_test = \
-        train_test_split(X, y, test_size=0.33, random_state=rng)
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.5, random_state=rng)
+    X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
 
 print("Finished loading data")
 
-alpha_max = np.max(np.abs(X_train.T @ y_train)) / X_train.shape[0]
+n_samples = X.shape[0]
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
+
+print("Starting path computation...")
+n_samples = len(y[idx_train])
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 log_alpha_max = np.log(alpha_max)
 
 alpha_min = 1e-4 * alpha_max
@@ -73,7 +70,6 @@ log_alphas_2 = np.log(alphas_2)
 results = np.zeros((n_grid, n_grid))
 tol = 1e-4
 max_iter = 50000
-
 
 estimator = linear_model.ElasticNet(
     fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
@@ -90,8 +86,8 @@ for i in range(n_grid):
         print("lambda %i / %i" % (j, n_grid))
         estimator.alpha = (alphas_1[i] + alphas_2[j])
         estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
-        estimator.fit(X_train, y_train)
-        results[i, j] = np.mean((y_val - X_val @ estimator.coef_) ** 2)
+        estimator.fit(X[idx_train, :], y[idx_train])
+        results[i, j] = np.mean((y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
 t_grid_search += time.time()
 print("Finished grid-search")
 
@@ -105,13 +101,11 @@ print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
 n_outer = 10
-model = ElasticNet(
-    X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = HeldOutMSE(
-    X_val, y_val, model, X_test=X_test, y_test=y_test)
+model = ElasticNet(max_iter=max_iter, estimator=estimator)
+criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
-_, _, _ = grad_search(
-    algo, criterion, verbose=True,
+grad_search(
+    algo, criterion, model, X, y, verbose=True,
     log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
     tol=tol, n_outer=n_outer, monitor=monitor)
 t_grad_search += time.time()

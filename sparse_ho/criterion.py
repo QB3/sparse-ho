@@ -20,32 +20,24 @@ class HeldOutMSE():
     # cv as [(train, test)] ie directly the indices of the train
     # and test splits.
 
-    def __init__(self, X_val, y_val, model, convexify=False,
-                 gamma_convex=1e-2, X_test=None, y_test=None):
+    def __init__(
+            self, idx_train, idx_val, X_test=None, y_test=None,):
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of shape (n_samples,)
-            Validation target
-        model: object of the class Model (e.g. Lasso or SparseLogreg)
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
-        convexify: bool
-            this param should be remove from here XXX
-        gamma_convex: bool
-            this param should be removed from here XXX
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
         self.X_test = X_test
         self.y_test = y_test
-        self.model = model
-        self.convexify = convexify
-        self.gamma_convex = gamma_convex
+        self.idx_train = idx_train
+        self.idx_val = idx_val
 
         self.mask0 = None
         self.dense0 = None
@@ -53,83 +45,72 @@ class HeldOutMSE():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        return 2 * (self.X_val[:, mask].T @ (
-            self.X_val[:, mask] @ dense - self.y_val)) / self.X_val.shape[0]
+    def get_val_outer(self, X, y, mask, dense):
+        """Compute the MSE on the validation set.
+        """
+        if X is None or y is None:
+            return None
+        return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
-    def value(self, mask, dense):
-        val = (
-            norm(self.y_val - self.X_val[:, mask] @ dense) ** 2 /
-            self.X_val.shape[0])
-        return val
-
-    def value_test(self, mask, dense):
-        if self.X_test is not None and self.y_test is not None:
-            self.val_test = (
-                norm(self.y_test - self.X_test[:, mask] @ dense) ** 2 /
-                self.X_test.shape[0])
-        else:
-            self.val_test = None
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
-
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
-        self.value_test(mask, dense)
-        return self.value(mask, dense)
+            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
+        return self.get_val_outer(mask, dense)
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
+
+        def get_v(mask, dense):
+            X_val_m = X_val[:, mask]
+            return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            self.model.X, self.model.y, log_alpha, self.model, self.get_v,
-            mask0=self.mask0, dense0=self.dense0,
+            X_train, y_train, log_alpha, model,
+            get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac, full_jac_v=True)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = self.model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
-        if self.convexify:
-            val += self.gamma_convex + np.sum(np.exp(log_alpha) ** 2)
-            grad += 2 * self.gamma_convex * np.exp(log_alpha)
+        mask, dense = model.get_beta(
+            X_train, y_train, mask, dense)
+        val = self.get_val_outer(X_val, y_val, mask, dense)
+        # TODO put the following in a callback function
+        self.mse_test = self.get_val_outer(
+            self.X_test, self.y_test, mask, dense)
         return val, grad
+
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
 class HeldOutLogistic():
     """Logistic loss on held out data
     """
 
-    def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+    def __init__(self, idx_train, idx_val, X_test=None, y_test=None):
         """
         Parameters
         ----------
-        X_val : {ndarray, sparse matrix} of (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of (n_samples)
-            Validation target
-        model: object of the class Model (e.g. Lasso or Sparse logistic regression)
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of (n_samples_test)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
+        self.idx_train = idx_train
+        self.idx_val = idx_val
         self.X_test = X_test
         self.y_test = y_test
-        self.model = model
 
         self.mask0 = None
         self.dense0 = None
@@ -137,47 +118,42 @@ class HeldOutLogistic():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        temp = sigma(self.y_val * (self.X_val[:, mask] @ dense))
-        v = self.X_val[:, mask].T @ (self.y_val * (temp - 1))
-        v /= self.X_val.shape[0]
-        return v
-
-    def value(self, mask, dense):
-        val = np.sum(
-            np.log(1 + np.exp(-self.y_val * (self.X_val[:, mask] @ dense))))
-        val /= self.X_val.shape[0]
-        return val
-
-    def value_test(self, mask, dense):
-        if self.X_test is not None and self.y_test is not None:
-            self.val_test = np.sum(
-                np.log(1 + np.exp(-self.y_test * (self.X_test[:, mask] @ dense))))
-            self.val_test /= self.X_test.shape[0]
+    @staticmethod
+    def get_val_outer(X, y, mask, dense):
+        if X is None or y is None:
+            return None
         else:
-            self.val_test = None
+            val = np.sum(
+                np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
+            val /= X.shape[0]
+            return val
 
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
-
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
+        # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model, tol=tol, compute_jac=False)
-        self.value_test(mask, dense)
-        return self.value(mask, dense)
+            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
+        self.val_test = self.get_val_outer(
+            self.X_test, self.y_test, mask, dense)
+        return self.get_val_outer(
+            X[self.idx_val, :], y[self.idx_val], mask, dense)
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
+
+        def get_v(mask, dense):
+            X_val_m = X_val[:, mask]
+            temp = sigma(y_val * (X_val_m @ dense))
+            v = X_val_m.T @ (y_val * (temp - 1))
+            v /= len(y_val)
+            return v
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            self.model.X, self.model.y, log_alpha, self.model, self.get_v,
-            mask0=self.mask0, dense0=self.dense0,
+            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
@@ -185,12 +161,17 @@ class HeldOutLogistic():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = self.model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
-
+        mask, dense = model.get_beta(
+            X_train, y_train, mask, dense)
+        val = self.get_val_outer(
+            X_val, y_val, mask, dense)
+        self.val_test = self.get_val_outer(
+            self.X_test, self.y_test, mask, dense)
         return val, grad
+
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
 class HeldOutSmoothedHinge():
@@ -201,26 +182,23 @@ class HeldOutSmoothedHinge():
     TODO
     """
 
-    def __init__(self, X_val, y_val, model, X_test=None, y_test=None):
+    def __init__(self, idx_train, idx_val, X_test=None, y_test=None):
         """
-        Parameters
+        Parameters:
         ----------
-        X_val : {ndarray, sparse matrix} of shape (n_samples, n_features)
-            Validation data
-        y_val : {ndarray, sparse matrix} of shape (n_samples)
-            Validation target
-        model: instance of Model
-            Object of the class Model (e.g. Lasso or Sparse logistic regression)
+        idx_train: np.array
+            indices of the training set
+        idx_test: np.array
+            indices of the testing set
         X_test : {ndarray, sparse matrix} of shape (n_samples_test, n_features)
             Test data
         y_test : {ndarray, sparse matrix} of shape (n_samples_test,)
             Test target
         """
-        self.X_val = X_val
-        self.y_val = y_val
+        self.idx_train = idx_train
+        self.idx_val = idx_val
         self.X_test = X_test
         self.y_test = y_test
-        self.model = model
 
         self.mask0 = None
         self.dense0 = None
@@ -228,49 +206,39 @@ class HeldOutSmoothedHinge():
         self.val_test = None
         self.rmse = None
 
-    def get_v(self, mask, dense):
-        Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
-        deriv = derivative_smooth_hinge(Xbeta_y)
-        if issparse(self.X_val):
-            v = self.X_val[:, mask].T.multiply(deriv * self.y_val)
-            v = np.array(np.sum(v, axis=1))
-            v = np.squeeze(v)
-        else:
-            v = (deriv * self.y_val)[:, np.newaxis] * self.X_val[:, mask]
-            v = np.sum(v, axis=0)
-        v /= self.X_val.shape[0]
-        return v
+    def get_val_outer(self, X, y, mask, dense):
+        if X is None or y is None:
+            return None
 
-    def value(self, mask, dense):
-        if issparse(self.X_val):
-            Xbeta_y = (self.X_val[:, mask].T).multiply(self.y_val).T @ dense
+        if issparse(X):
+            Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
         else:
-            Xbeta_y = self.y_val * (self.X_val[:, mask] @ dense)
-        return np.sum(smooth_hinge(Xbeta_y)) / self.X_val.shape[0]
-
-    def value_test(self, mask, dense):
-        if self.X_test is not None and self.y_test is not None:
-            if issparse(self.X_test):
-                Xbeta_y = (self.X_test[:, mask].T).multiply(self.y_test).T @ dense
-            else:
-                Xbeta_y = self.y_test * (self.X_test[:, mask] @ dense)
-            self.val_test = np.sum(smooth_hinge(Xbeta_y)) / self.X_test.shape[0]
-        else:
-            self.val_test = None
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
+            Xbeta_y = y * (X[:, mask] @ dense)
+        return np.sum(smooth_hinge(Xbeta_y)) / len(y)
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
+
+        X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
+        y_train, y_val = y[self.idx_train], y[self.idx_val]
+
+        def get_v(mask, dense):
+            X_val_m = X_val[:, mask]
+            Xbeta_y = y_val * (X_val_m @ dense)
+            deriv = derivative_smooth_hinge(Xbeta_y)
+            if issparse(X):
+                v = X_val_m.T.multiply(deriv * y_val)
+                v = np.array(np.sum(v, axis=1))
+                v = np.squeeze(v)
+            else:
+                v = (deriv * y_val)[:, np.newaxis] * X_val_m
+                v = np.sum(v, axis=0)
+            v /= len(self.idx_val)
+            return v
+
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            self.model.X, self.model.y, log_alpha, self.model, self.get_v,
+            X_train, y_train, log_alpha, model, get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
@@ -279,21 +247,26 @@ class HeldOutSmoothedHinge():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = self.model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
+        mask, dense = model.get_beta(
+            X_train, y_train, mask, dense)
+        val = self.get_val_outer(X_val, y_val, mask, dense)
+        self.val_test = self.get_val_outer(
+            self.X_test, self.y_test, mask, dense)
 
         return val, grad
 
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model,
-            max_iter=self.model.max_iter, tol=tol, compute_jac=False)
-        mask, dense = self.model.get_primal(mask, dense)
-        val = self.value(mask, dense)
-        self.value_test(mask, dense)
+            X, y, log_alpha, model,  # TODO max_iter
+            max_iter=model.max_iter, tol=tol, compute_jac=False)
+        mask, dense = model.get_beta(mask, dense)
+        val = self.get_val_outer(
+            X[self.idx_val], y[self.idx_val], mask, dense)
         return val
+
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
+            X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
 class SmoothedSURE():
@@ -312,17 +285,11 @@ class SmoothedSURE():
     for multiple parameter selection. SIAM J. Imaging Sci., 7(4), 2448-2487.
     """
 
-    def __init__(self, X, y, model, sigma, finite_difference_step=None,
+    def __init__(self, sigma, finite_difference_step=None,
                  random_state=42):
         """
         Parameters
         ----------
-        X_ : {ndarray, sparse matrix} of (n_samples, n_features)
-            Validation data
-        y : {ndarray, sparse matrix} of (n_samples)
-            Validation target
-        model: instance of Model
-            The model (e.g. instance of Lasso or SparseLogreg)
         sigma: float
             Noise level
         finite_difference_step: float, optional
@@ -332,17 +299,10 @@ class SmoothedSURE():
             The seed of the pseudo random number generator.
             Pass an int for reproducible output across multiple function calls.
         """
-        self.X_val = X
-        self.y_val = y
-        self.model = model
         self.sigma = sigma
-        if finite_difference_step:
-            self.epsilon = finite_difference_step
-        else:
-            # Use Deledalle et al. 2014 heuristic
-            self.epsilon = 2.0 * sigma / (X.shape[0]) ** 0.3
-        rng = check_random_state(random_state)
-        self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
+        self.random_state = random_state
+        self.finite_difference_step = finite_difference_step
+        self.init_delta_epsilon = False
 
         self.mask0 = None
         self.dense0 = None
@@ -355,76 +315,71 @@ class SmoothedSURE():
         self.val_test = None
         self.rmse = None
 
-    def v(self, mask, dense):
-        return (2 * self.X_val[:, mask].T @ (
-                self.X_val[:, mask] @ dense - self.y_val -
-                self.delta * self.sigma ** 2 / self.epsilon))
-
-    def v2(self, mask, dense):
-        return ((2 * self.sigma ** 2 *
-                 self.X_val[:, mask].T @ self.delta / self.epsilon))
-
-    def value(self, mask, dense, mask2, dense2):
-        dof = ((self.X_val[:, mask2] @ dense2 -
-                self.X_val[:, mask] @ dense) @ self.delta)
+    def get_val_outer(self, X, y, mask, dense, mask2, dense2):
+        X_m = X[:, mask]  # avoid multiple calls to X[:, mask]
+        dof = ((X[:, mask2] @ dense2 -
+                X_m @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
-        val = norm(self.y_val - self.X_val[:, mask] @ dense) ** 2
-        val -= self.X_val.shape[0] * self.sigma ** 2
+        val = norm(y - X_m @ dense) ** 2
+        val -= len(y) * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
-
         return val
 
-    def value_test(self, mask, dense):
-        # self.val_test = None
-        val = (
-            norm(self.y_val - self.X_val[:, mask] @ dense) ** 2 /
-            self.X_val.shape[0])
-        self.val_test = val
-        return val
-
-    def compute_rmse(self, mask, dense, beta_star):
-        if beta_star is not None:
-            diff_beta = beta_star.copy()
-            diff_beta[mask] -= dense
-            self.rmse = norm(diff_beta)
-        else:
-            self.rmse = None
-
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y, log_alpha, self.model,
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
-            self.model.X, self.model.y + self.epsilon * self.delta,
-            log_alpha, self.model,
-            tol=tol, compute_jac=False)
+            X[self.idx_train], y[self.idx_train] + self.epsilon * self.delta,
+            log_alpha, model, tol=tol, compute_jac=False)
 
-        val = self.value(mask, dense, mask2, dense2)
+        val = self.get_val_outer(mask, dense, mask2, dense2)
 
         return val
 
+    def _init_delta_epsilon(self, X):
+        if self.finite_difference_step:
+            self.epsilon = self.finite_difference_step
+        else:
+            # Use Deledalle et al. 2014 heuristic
+            self.epsilon = 2.0 * self.sigma / (X.shape[0]) ** 0.3
+        rng = check_random_state(self.random_state)
+        self.delta = rng.randn(X.shape[0])  # sample random noise for MCMC step
+        self.init_delta_epsilon = True
+
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v,
+            self, model, X, y, log_alpha, get_beta_jac_v,
             mask0=None, dense0=None, beta_star=None,
             jac0=None, max_iter=1000, tol=1e-3, compute_jac=True):
+        if not self.init_delta_epsilon:
+            self._init_delta_epsilon(X)
+
+        def v(mask, dense):
+            X_m = X[:, mask]  # avoid multiple calls to X[:, mask]
+            return (2 * X_m.T @ (
+                    X_m @ dense - y -
+                    self.delta * self.sigma ** 2 / self.epsilon))
+
+        def v2(mask, dense):
+            return ((2 * self.sigma ** 2 *
+                     X[:, mask].T @ self.delta / self.epsilon))
+
         mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
-            self.model.X, self.model.y, log_alpha, self.model, self.v,
+            X, y, log_alpha, model, v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
-            self.model.X, self.model.y + self.epsilon * self.delta,
-            log_alpha, self.model, self.v2, mask0=self.mask02,
+            X, y + self.epsilon * self.delta,
+            log_alpha, model, v2, mask0=self.mask02,
             dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
-        val = self.value(mask, dense, mask2, dense2)
-        self.value_test(mask, dense)
-        self.compute_rmse(mask, dense, beta_star)
+        val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
@@ -482,6 +437,7 @@ class CrossVal():
         self.X = X
         self.y = y
         self.dict_crits = {}
+        self.dict_models = {}
         self.val_test = None
         self.rmse = None
         self.estimator = estimator
@@ -499,32 +455,34 @@ class CrossVal():
             if issparse(X_val):
                 X_val = X_val.tocsc()
 
-            model = Model(
+            # TODO get rid of this
+            self.models[i] = Model(
                 X_train, y_train, max_iter=max_iter, estimator=estimator)
 
             criterion = HeldOutMSE(
-                X_val, y_val, model, X_test=X_val, y_test=y_val)
+                X_val, y_val, X_test=X_val, y_test=y_val)
 
             self.dict_crits[i] = criterion
         self.n_splits = cv.n_splits
-        self.model = self.dict_crits[0].model
 
-    def get_val(self, log_alpha, tol=1e-3):
+    def get_val(self, model, log_alpha, tol=1e-3):
         val = 0
         for i in range(self.n_splits):
-            vali = self.dict_crits[i].get_val(log_alpha, tol=tol)
+            vali = self.dict_crits[i].get_val(self.models[i], log_alpha,
+                                              tol=tol)
             val += vali
         val /= self.n_splits
         return val
 
     def get_val_grad(
-            self, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
+            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
             compute_jac=True, beta_star=None):
         val = 0
         grad = 0
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
-                log_alpha, get_beta_jac_v, max_iter=max_iter, tol=tol,
+                self.models[i], log_alpha, get_beta_jac_v, max_iter=max_iter,
+                tol=tol,
                 compute_jac=compute_jac, beta_star=beta_star)
             val += vali
             if gradi is not None:

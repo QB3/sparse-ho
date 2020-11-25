@@ -21,26 +21,16 @@ n_active = 5
 SNR = 3
 rho = 0.5
 
-X_train, y_train, beta_star, noise, sigma_star = get_synt_data(
+X, y, beta_star, noise, sigma_star = get_synt_data(
     dictionary_type="Toeplitz", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=n_active, rho=rho,
     SNR=SNR, seed=0)
-X_train_s = csc_matrix(X_train)
+X_train_s = csc_matrix(X)
 
-X_test, y_test, beta_star, noise, sigma = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=1)
-X_test_s = csc_matrix(X_test)
+idx_train = np.arange(0, 50)
+idx_val = np.arange(50, 100)
 
-X_val, y_val, beta_star, noise, sigma = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=2)
-X_test_s = csc_matrix(X_test)
-
-
-alpha_max = (X_train.T @ y_train).max() / n_samples
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 p_alpha = 0.7
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
@@ -55,13 +45,13 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=None),
+    Lasso(max_iter=max_iter, estimator=None),
 ]
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = [
-    Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator),
+    Lasso(max_iter=max_iter, estimator=estimator),
 ]
 
 
@@ -71,46 +61,47 @@ def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
     if crit == 'cv':
         n_outer = 2
-        criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test,
-                               y_test=y_test)
+        criterion = HeldOutMSE(idx_train, idx_val)
     else:
         n_outer = 2
-        criterion = SmoothedSURE(X_train, y_train, model, sigma=sigma_star)
+        criterion = SmoothedSURE(sigma_star)
+    # TODO MM@QBE if else scheme surprising
 
-    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(algo, criterion, log_alpha, monitor1, n_outer=n_outer,
-                tol=1e-16)
+    grad_search(
+        algo, criterion, model, X, y, log_alpha, monitor1, n_outer=n_outer,
+        tol=1e-16)
 
-    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, log_alpha, monitor2, n_outer=n_outer,
+    grad_search(algo, criterion, model, X, y, log_alpha, monitor2, n_outer=n_outer,
                 tol=1e-16)
 
-    criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+    criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(algo, criterion, log_alpha, monitor3, n_outer=n_outer,
-                tol=1e-16)
+    grad_search(
+        algo, criterion, model, X, y, log_alpha, monitor3, n_outer=n_outer,
+        tol=1e-16)
 
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    assert np.allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads))
-    assert np.allclose(
+    np.testing.assert_allclose(
+        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-8)
+    np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
-    assert np.allclose(
-        np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
 
 
 if __name__ == '__main__':
     models = [
-        Lasso(X_train, y_train, max_iter=max_iter, estimator=estimator)]
-    crits = ['cv']
+        Lasso(max_iter=max_iter, estimator=None)]
+    crits = ['sure']
+    # crits = ['cv']
     for model in models:
         for crit in crits:
             test_grad_search(model, crit)

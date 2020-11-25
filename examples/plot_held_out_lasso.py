@@ -28,10 +28,8 @@ from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
 from sklearn.datasets import make_regression
 
-from sklearn.model_selection import train_test_split
+from libsvmdata.datasets import fetch_libsvm
 
-
-from sparse_ho.datasets import get_data
 
 print(__doc__)
 
@@ -39,18 +37,17 @@ dataset = 'rcv1'
 # dataset = 'simu'
 
 if dataset == 'rcv1':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data('rcv1_train')
+    X, y = fetch_libsvm('rcv1_train')
 else:
     X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.5)
 
-n_samples, n_features = X_train.shape
+n_samples = X.shape[0]
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
 
 print("Starting path computation...")
-n_samples = len(y_train)
-alpha_max = np.max(np.abs(X_train.T.dot(y_train))) / X_train.shape[0]
+n_samples = len(y[idx_train])
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 n_alphas = 10
@@ -71,13 +68,12 @@ estimator = linear_model.Lasso(
 print('scikit-learn started')
 
 t0 = time.time()
-model = Lasso(X_train, y_train, estimator=estimator)
-criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = Forward(criterion)
+model = Lasso(estimator=estimator)
+criterion = HeldOutMSE(idx_train, idx_val)
+algo = Forward()
 monitor_grid_sk = Monitor()
 grid_search(
-    algo, criterion, None, None, monitor_grid_sk, log_alphas=log_alphas,
-    tol=tol)
+    algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
@@ -91,12 +87,13 @@ print('scikit-learn finished')
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso(X_train, y_train, estimator=estimator)
-criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+model = Lasso(estimator=estimator)
+criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
-    algo, criterion, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
+    algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
+    n_outer=10, tol=tol)
 
 t_grad_search = time.time() - t0
 

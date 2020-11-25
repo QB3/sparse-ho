@@ -45,7 +45,7 @@ def get_only_jac_backward(X, alpha, list_beta, v, model, jac_v0=None):
         L = norm(X, axis=0) ** 2 / n_samples
     v_ = v.copy()
     list_beta = np.asarray(list_beta)
-    jac_t_v = model._init_g_backward(None)
+    jac_t_v = model._init_g_backward(None, n_features)
     for k in (np.arange(list_beta.shape[0] - 1, -1, -1)):
         beta = list_beta[k, :]
         jac_t_v = model._update_bcd_jac_backward(

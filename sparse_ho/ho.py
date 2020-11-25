@@ -6,9 +6,8 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, criterion, log_alpha0, monitor, n_outer=100, verbose=False,
-        tolerance_decrease='constant', tol=1e-5,
-        convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
+        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100, verbose=False,
+        tolerance_decrease='constant', tol=1e-5, t_max=10000):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
@@ -16,6 +15,7 @@ def grad_search(
     ----------
     algo: TODO
     criterion: TODO
+    model: TODO
     log_alpha0: float
         log of the regularization coefficient alpha
     tol : float
@@ -26,18 +26,9 @@ def grad_search(
         number of maximum iteration in the outer loop (for the line search)
     tolerance_decrease: string
         tolerance decrease strategy for approximate gradient
-    TODO: convexify and gamma should be remove no? beta_star also?
-    convexify: bool
-        True if you want to regularize the problem
-    gamma: non negative float
-        convexification coefficient
     criterion: string
         criterion to optimize during hyperparameter optimization
         you may choose between "cv" and "sure"
-    gamma_sure:
-        constant for sure problem
-     sigma,
-        constant for sure problem
     random_state: int
     beta_star: np.array, shape (n_features,)
         True coefficients of the underlying model (if known)
@@ -46,103 +37,31 @@ def grad_search(
 
     def _get_val_grad(log_alpha, tol=tol):
         return criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
+    # TODO fix this proj param pb
     def _proj_param(log_alpha):
-        return criterion.model.proj_param(log_alpha)
+        # return log_alpha
+        return criterion.proj_hyperparam(model, X, y, log_alpha)
 
     return _grad_search(
-        _get_val_grad, _proj_param, log_alpha0, monitor, algo,
+        _get_val_grad, _proj_param, log_alpha0, monitor,
         criterion, n_outer=n_outer, verbose=verbose,
         tolerance_decrease=tolerance_decrease, tol=tol, t_max=t_max)
 
 
 def _grad_search(
-        _get_val_grad, proj_param, log_alpha0, monitor, algo, criterion,
+        _get_val_grad, proj_hyperparam, log_alpha0, monitor, criterion,
         n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
-        convexify=False, gamma_convex=False, beta_star=None, t_max=10000):
+        t_max=10000):
     """
     This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
     Parameters
     --------------
-    X_train: np.array, shape (n_samples, n_features)
-        observation used for training
+    TODO
 
-    y_train: np.array, shape (n_samples, n_features)
-        targets used for training
-
-    log_alpha: float
-        log of the regularization coefficient alpha
-
-    X_val: np.array, shape (n_samples, n_features)
-        observation used for cross-validation
-
-    y_val: np.array, shape (n_samples, n_features)
-        targets used for cross-validation
-
-    X_test: np.array, shape (n_samples, n_features)
-        observation used for testing
-
-    y_test: np.array, shape (n_samples, n_features)
-        targets used for testing
-
-    tol : float
-        tolerance for the inner optimization solver
-    monitor: Monitor object
-        used to store the value of the cross-validation function
-
-    warm_start: WarmStart object
-        used for warm start for all methods
-
-    method: string
-        method used to compute the hypergradient, you may want to use
-
-        "implicit" "forward" "backward" "fast_forward_iterdiff"
-    maxit: int
-        maximum number of iterations in the inner optimization solver
-
-    n_outer: int
-        number of maximum iteration in the outer loop (for the line search)
-
-    tolerance_decrease: string
-        tolerance decrease strategy for approximate gradient
-
-    niter_jac: int
-        maximum number of iteration for the fast_forward_iterdiff
-        method in the Jacobian computation
-
-    model: string
-        model used, "lasso", "wlasso", "mcp"
-
-    tol_jac: float
-        tolerance for the Jacobian loop
-
-    convexify: bool
-        True if you want to regularize the problem
-
-    gamma: non negative float
-        convexification coefficient
-
-    criterion: string
-        criterion to optimize during hyperparameter optimization
-        you may choose between "cv" and "sure"
-
-    C: float
-        constant for sure problem
-
-    gamma_sure:
-        constant for sure problem
-
-     sigma,
-        constant for sure problem
-
-    random_state: int
-
-    beta_star: np.array, shape (n_features,)
-        True coefficients of the underlying model (if known)
-        used to compute metrics
     """
 
     try:
@@ -174,11 +93,6 @@ def _grad_search(
         except Exception:
             monitor(g_func, criterion.val_test, lambdak,
                     grad_lambda, criterion.rmse)
-
-        # TODO this should be removed into the SURE class no?
-        if convexify:
-            g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
-            grad_lambda += gamma_convex * np.exp(lambdak)
 
         old_grads.append(norm(grad_lambda))
         if np.isnan(old_grads[-1]):
@@ -225,15 +139,12 @@ def _grad_search(
             g_func, grad_lambda = _get_val_grad(
                 lambdak, tol=tol)
 
-            if convexify:
-                g_func += gamma_convex * np.sum(np.exp(lambdak) ** 2)
-                grad_lambda += gamma_convex * np.exp(lambdak)
             tol *= 0.5
         else:
             old_lambdak = lambdak.copy()
             lambdak -= step_size * grad_lambda
 
-        lambdak = proj_param(lambdak)
+        lambdak = proj_hyperparam(lambdak)
         g_func_old = g_func
 
         if verbose:
@@ -245,14 +156,15 @@ def _grad_search(
 
 
 def grad_search_wolfe(
-        algo, criterion, log_alpha0, monitor, n_outer=10, warm_start=None,
-        tol=1e-3, maxit_ln=5):
+        algo, criterion, model, log_alpha0, monitor, n_outer=10,
+        warm_start=None, tol=1e-3, maxit_ln=5):
 
     def _get_val_grad(log_alpha, tol=tol):
-        return criterion.get_val_grad(log_alpha, algo.get_beta_jac_v, tol=tol)
+        return criterion.get_val_grad(model, log_alpha, algo.get_beta_jac_v,
+                                      tol=tol)
 
-    def _get_val(lambdak, tol=tol):
-        return criterion.get_val(lambdak, tol=tol)
+    def _get_val(log_alpha, tol=tol):
+        return criterion.get_val(model, log_alpha, tol=tol)
 
     log_alphak = log_alpha0
     for i in range(n_outer):
