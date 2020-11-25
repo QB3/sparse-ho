@@ -30,7 +30,7 @@ X_s = csc_matrix(X)
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
-alpha_max = (X[idx_train, :].T @ y[idx_train]).max() / n_samples
+alpha_max = (np.abs(X[idx_train, :].T @ y[idx_train])).max() / n_samples
 p_alpha = 0.9
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)

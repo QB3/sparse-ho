@@ -67,7 +67,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     temp3[np.isclose(beta_star, C)] = np.ones(
         (np.isclose(beta_star, C)).sum()) * C
     # temp3 = temp3[full_supp]
-    # import ipdb; ipdb.set_trace()
     v = temp3[full_supp] - yX[full_supp, :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
@@ -95,7 +94,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
         full_supp = np.logical_and(np.logical_not(np.isclose(list_beta[i, :], 0)), np.logical_not(np.isclose(list_beta[i, :], C)))
-        # import ipdb; ipdb.set_trace()
         if not np.all(full_supp == full_supp_star):
             supp_id = i + 1
             break

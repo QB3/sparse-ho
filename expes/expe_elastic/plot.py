@@ -155,7 +155,6 @@ for idx, dataset in enumerate(dataset_names):
         #     len(objs_test)) + 1]
         # if method == 'grid_search' or method == "implicit_forward":
         if method.startswith(('grid_search', "implicit_forward", "random")):
-            # import ipdb; ipdb.set_trace()
             axarr3.flat[idx].plot(
                 np.array(log_alpha), obj,
                 "bX", color=dict_color[method],

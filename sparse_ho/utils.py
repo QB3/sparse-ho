@@ -137,10 +137,6 @@ def init_dbeta0_new_p(jac0, mask, mask_old):
 
 @njit
 def init_dbeta0_new(dbeta0, mask, mask_old):
-    # dbeta0_new = np.zeros(mask.shape[0])
-    # dbeta0_new[mask_old] = dbeta0
-    # # import ipdb; ipdb.set_trace()
-    # return dbeta0_new[mask]
     mask_both = np.logical_and(mask_old, mask)
     size_mat = mask.sum()
     dbeta0_new = np.zeros(size_mat)
