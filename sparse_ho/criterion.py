@@ -143,9 +143,10 @@ class HeldOutLogistic():
             compute_jac=True, beta_star=None):
 
         def get_v(mask, dense):
-            temp = sigma(y * (X[:, mask] @ dense))
-            v = X[:, mask].T @ (y * (temp - 1))
-            v /= X.shape[0]
+            X_supp = X[:, mask]
+            temp = sigma(y * (X_supp @ dense))
+            v = X_supp.T @ (y * (temp - 1))
+            v /= len(y)
             return v
 
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
@@ -309,12 +310,13 @@ class SmoothedSURE():
         self.rmse = None
 
     def value_outer_crit(self, X, y, mask, dense, mask2, dense2):
+        X_supp = X[:, mask]  # avoid multiple calls to X[:, mask]
         dof = ((X[:, mask2] @ dense2 -
-                X[:, mask] @ dense) @ self.delta)
+                X_supp @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
-        val = norm(y - X[:, mask] @ dense) ** 2
-        val -= X.shape[0] * self.sigma ** 2
+        val = norm(y - X_supp @ dense) ** 2
+        val -= len(y) * self.sigma ** 2
         val += 2 * self.sigma ** 2 * dof
         return val
 
@@ -349,8 +351,9 @@ class SmoothedSURE():
             self._init_delta_epsilon(X)
 
         def v(mask, dense):
-            return (2 * X[:, mask].T @ (
-                    X[:, mask] @ dense - y -
+            X_supp = X[:, mask]  # avoid multiple calls to X[:, mask]
+            return (2 * X_supp.T @ (
+                    X_supp @ dense - y -
                     self.delta * self.sigma ** 2 / self.epsilon))
 
         def v2(mask, dense):
