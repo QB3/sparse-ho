@@ -56,7 +56,6 @@ class HeldOutMSE():
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
-        self.get_mse_test(mask, dense)
         return self.get_val_outer(mask, dense)
 
     def get_val_grad(
