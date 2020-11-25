@@ -247,7 +247,8 @@ class Lasso():
 
     @staticmethod
     def get_hessian(X_train, y_train, mask, dense, log_alpha):
-        hessian = X_train[:, mask].T @ X_train[:, mask]
+        X_m = X_train[:, mask]
+        hessian = X_m.T @ X_m
         return hessian
 
     def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
