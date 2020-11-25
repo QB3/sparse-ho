@@ -145,6 +145,7 @@ class HeldOutLogistic():
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
+
         def get_v(mask, dense):
             X_val_m = X_val[:, mask]
             temp = sigma(y_val * (X_val_m @ dense))
