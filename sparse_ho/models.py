@@ -199,7 +199,7 @@ class Lasso():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
@@ -461,7 +461,7 @@ class WeightedLasso():
         jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         """Maybe we could do this in place.
         """
         if self.log_alpha_max is None:
@@ -826,7 +826,7 @@ class SVM():
         else:
             return - w
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
@@ -1068,7 +1068,7 @@ class SparseLogreg():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= (4 * X.shape[0])
@@ -1485,7 +1485,7 @@ class SVR():
         #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
         # return - res
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
@@ -1705,7 +1705,7 @@ class ElasticNet():
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
-    def proj_param(self, X, y, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]

@@ -86,8 +86,8 @@ class HeldOutMSE():
             self.X_test, self.y_test, mask, dense)
         return val, grad
 
-    def proj_param(self, model, X, y, log_alpha):
-        return model.proj_param(
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
@@ -170,8 +170,8 @@ class HeldOutLogistic():
             self.X_test, self.y_test, mask, dense)
         return val, grad
 
-    def proj_param(self, model, X, y, log_alpha):
-        return model.proj_param(
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
@@ -265,8 +265,8 @@ class HeldOutSmoothedHinge():
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
 
-    def proj_param(self, model, X, y, log_alpha):
-        return model.proj_param(
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 

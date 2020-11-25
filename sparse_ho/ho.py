@@ -42,7 +42,7 @@ def grad_search(
     # TODO fix this proj param pb
     def _proj_param(log_alpha):
         # return log_alpha
-        return criterion.proj_param(model, X, y, log_alpha)
+        return criterion.proj_hyperparam(model, X, y, log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor,
@@ -51,7 +51,7 @@ def grad_search(
 
 
 def _grad_search(
-        _get_val_grad, proj_param, log_alpha0, monitor, criterion,
+        _get_val_grad, proj_hyperparam, log_alpha0, monitor, criterion,
         n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
         t_max=10000):
     """
@@ -144,7 +144,7 @@ def _grad_search(
             old_lambdak = lambdak.copy()
             lambdak -= step_size * grad_lambda
 
-        lambdak = proj_param(lambdak)
+        lambdak = proj_hyperparam(lambdak)
         g_func_old = g_func
 
         if verbose:
