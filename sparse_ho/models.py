@@ -798,7 +798,7 @@ class SVM():
         if full_supp.sum() != 0:
             full_jac[full_supp] = jac
         full_jac[maskC] = C
-        maskp, densep = self. get_beta(X, y, mask, dense)
+        maskp, densep = self.get_beta(X, y, mask, dense)
         # primal dual relation
         jac_primal = (y[mask] * full_jac[mask]) @ X[mask, :]
         return jac_primal[maskp] @ v

@@ -47,7 +47,7 @@ def get_beta_jac_t_v_implicit(
     mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
 
-    maskp, densep = model. get_beta(X_train, y_train, mask, dense)
+    maskp, densep = model.get_beta(X_train, y_train, mask, dense)
     v = get_v(maskp, densep)
 
     # TODO: to clean

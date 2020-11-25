@@ -78,7 +78,7 @@ class HeldOutMSE():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model. get_beta(
+        mask, dense = model.get_beta(
             X_train, y_train, mask, dense)
         val = self.get_val_outer(X_val, y_val, mask, dense)
         # TODO put the following in a callback function
@@ -162,7 +162,7 @@ class HeldOutLogistic():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model. get_beta(
+        mask, dense = model.get_beta(
             X_train, y_train, mask, dense)
         val = self.get_val_outer(
             X_val, y_val, mask, dense)
@@ -248,7 +248,7 @@ class HeldOutSmoothedHinge():
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model. get_beta(
+        mask, dense = model.get_beta(
             X_train, y_train, mask, dense)
         val = self.get_val_outer(X_val, y_val, mask, dense)
         self.val_test = self.get_val_outer(
@@ -260,7 +260,7 @@ class HeldOutSmoothedHinge():
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
-        mask, dense = model. get_beta(mask, dense)
+        mask, dense = model.get_beta(mask, dense)
         val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
