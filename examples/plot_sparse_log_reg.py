@@ -39,7 +39,7 @@ dataset = 'rcv1_train'
 
 if dataset != 'simu':
     X, y = fetch_libsvm(dataset)
-    X = X[:, :50]
+    X = X[:, :100]
 else:
     X, y = make_classification(
         n_samples=100, n_features=1_000, random_state=42, flip_y=0.02)
@@ -103,7 +103,7 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max), monitor_grad,
-            n_outer=5, tol=tol)
+            n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 
 t_grad_search = time.time() - t0
