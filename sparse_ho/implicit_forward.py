@@ -44,7 +44,6 @@ class ImplicitForward():
 
 def get_beta_jac_fast_iterdiff(
         X, y, log_alpha, get_v, model, mask0=None, dense0=None, jac0=None, tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False):
-    n_samples, n_features = X.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0, jac0=jac0, tol=tol,
@@ -53,16 +52,14 @@ def get_beta_jac_fast_iterdiff(
     dbeta0_new = model._init_dbeta0(mask, mask0, jac0)
     reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
-    v = None
     _, r = model._init_beta_r(X, y, mask, dense)
     jac = get_only_jac(
-        model.reduce_X(X, mask), model.reduce_y(y, mask), r, n_samples, reduce_alpha, model.sign(dense, log_alpha), v,
-        dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose)
+        model.reduce_X(X, mask), model.reduce_y(y, mask), r, reduce_alpha, model.sign(dense, log_alpha), dbeta=dbeta0_new, niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose)
     return mask, dense, jac
 
 
 def get_only_jac(
-        Xs, y, r, n_samples, alpha, sign_beta, v, dbeta=None, niter_jac=100, tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False):
+        Xs, y, r, alpha, sign_beta, dbeta=None, niter_jac=100, tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False):
     n_samples, n_features = Xs.shape
 
     is_sparse = issparse(Xs)
