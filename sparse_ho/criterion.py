@@ -38,10 +38,7 @@ class HeldOutMSE():
         self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense):
-        """Compute the MSE on the validation set.
-        """
-        if X is None or y is None:
-            return None
+        """Compute the MSE on the validation set."""
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
@@ -105,13 +102,9 @@ class HeldOutLogistic():
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
-        if X is None or y is None:
-            return None
-        else:
-            val = np.sum(
-                np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
-            val /= X.shape[0]
-            return val
+        val = np.sum(np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
+        val /= X.shape[0]
+        return val
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
@@ -419,11 +412,11 @@ class CrossVal():
 
         cv = check_cv(cv)
 
-        for i, (train, val) in enumerate(cv.split(X)):
-            X_train = X[train, :]
-            y_train = y[train]
-            X_val = X[val, :]
-            y_val = y[val]
+        for i, (idx_train, idx_val) in enumerate(cv.split(X)):
+            X_train = X[idx_train, :]
+            y_train = y[idx_train]
+            X_val = X[idx_val, :]
+            y_val = y[idx_val]
 
             if issparse(X_train):
                 X_train = X_train.tocsc()
@@ -434,8 +427,7 @@ class CrossVal():
             self.models[i] = Model(
                 X_train, y_train, max_iter=max_iter, estimator=estimator)
 
-            criterion = HeldOutMSE(
-                X_val, y_val, X_test=X_val, y_test=y_val)
+            criterion = HeldOutMSE(idx_train, idx_val)
 
             self.dict_crits[i] = criterion
         self.n_splits = cv.n_splits
