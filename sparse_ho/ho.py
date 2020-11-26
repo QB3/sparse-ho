@@ -35,9 +35,10 @@ def grad_search(
         used to compute metrics
     """
 
-    def _get_val_grad(log_alpha, tol=tol):
+    def _get_val_grad(log_alpha, tol=tol, monitor=None):
         return criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+            monitor=monitor)
 
     # TODO fix this proj param pb
     def _proj_param(log_alpha):
@@ -86,13 +87,13 @@ def _grad_search(
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
-        g_func, grad_lambda = _get_val_grad(lambdak, tol=tol)
-        try:
-            monitor(g_func, criterion.val_test, lambdak.copy(),
-                    grad_lambda, criterion.rmse)
-        except Exception:
-            monitor(g_func, criterion.val_test, lambdak,
-                    grad_lambda, criterion.rmse)
+        g_func, grad_lambda = _get_val_grad(lambdak, tol=tol, monitor=monitor)
+        # try:
+        #     monitor(g_func, criterion.val_test, lambdak.copy(),
+        #             grad_lambda, criterion.rmse)
+        # except Exception:
+        #     monitor(g_func, criterion.val_test, lambdak,
+        #             grad_lambda, criterion.rmse)
 
         old_grads.append(norm(grad_lambda))
         if np.isnan(old_grads[-1]):
