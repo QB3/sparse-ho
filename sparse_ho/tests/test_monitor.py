@@ -43,23 +43,22 @@ mses_estim = []
 def callback(val, grad, mask, dense, log_alpha):
     beta = np.zeros(len(mask))
     beta[mask] = dense
-    # to put in the example, rather
-    # mse_pred = norm(X_unseen[:, mask] @ dense - y_unseen) ** 2 / len(y_unseen)
-    # mse_estim = norm(beta - beta_star) ** 2 / len(beta)
-    # mses_pred.append(mse_pred)
-    # mses_estim.append(mse_estim)
-    objs.append(norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 /
-                len(idx_val))
+    objs.append(
+        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
 
 
-model = Lasso(estimator=estimator)
-criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward()
-monitor = Monitor(callback=callback)
+def test_monitor():
+    model = Lasso(estimator=estimator)
+    criterion = HeldOutMSE(idx_train, idx_val)
+    algo = ImplicitForward()
+    monitor = Monitor(callback=callback)
 
-grad_search(
-    algo, criterion, model, X, y, np.log(alpha_max / 10), monitor,
-    n_outer=10, tol=tol)
+    grad_search(
+        algo, criterion, model, X, y, np.log(alpha_max / 10), monitor,
+        n_outer=10, tol=tol)
 
-np.testing.assert_allclose(np.array(monitor.objs),
-                           np.array(objs))
+    np.testing.assert_allclose(np.array(monitor.objs), np.array(objs))
+
+
+if __name__ == '__main__':
+    test_monitor()
