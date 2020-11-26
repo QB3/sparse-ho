@@ -5,7 +5,7 @@ from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.forward import Forward
+from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho import grad_search
 from sparse_ho.datasets import get_synt_data
@@ -36,23 +36,30 @@ estimator = linear_model.Lasso(
 
 
 mses_pred = []
+objs = []
 mses_estim = []
 
 
 def callback(val, grad, mask, dense, log_alpha):
     beta = np.zeros(len(mask))
     beta[mask] = dense
-    mse_pred = norm(X_unseen[:, mask] @ dense - y_unseen) ** 2 / len(y_unseen)
-    mse_estim = norm(beta - beta_star) ** 2 / len(beta)
-    mses_pred.append(mse_pred)
-    mses_estim.append(mse_estim)
+    # to put in the example, rather
+    # mse_pred = norm(X_unseen[:, mask] @ dense - y_unseen) ** 2 / len(y_unseen)
+    # mse_estim = norm(beta - beta_star) ** 2 / len(beta)
+    # mses_pred.append(mse_pred)
+    # mses_estim.append(mse_estim)
+    objs.append(norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 /
+                len(idx_val))
 
 
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = Forward()
+algo = ImplicitForward()
 monitor = Monitor(callback=callback)
+
 grad_search(
     algo, criterion, model, X, y, np.log(alpha_max / 10), monitor,
     n_outer=10, tol=tol)
-objs = np.array(monitor.objs)
+
+np.testing.assert_allclose(np.array(monitor.objs),
+                           np.array(objs))
