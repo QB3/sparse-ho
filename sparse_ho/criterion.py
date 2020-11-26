@@ -415,13 +415,9 @@ class CrossVal():
         for i, (idx_train, idx_val) in enumerate(cv.split(X)):
             X_train = X[idx_train, :]
             y_train = y[idx_train]
-            X_val = X[idx_val, :]
-            y_val = y[idx_val]
 
             if issparse(X_train):
                 X_train = X_train.tocsc()
-            if issparse(X_val):
-                X_val = X_val.tocsc()
 
             # TODO get rid of this
             self.models[i] = Model(

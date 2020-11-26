@@ -42,17 +42,16 @@ def grad_search(
 
     # TODO fix this proj param pb
     def _proj_param(log_alpha):
-        # return log_alpha
         return criterion.proj_hyperparam(model, X, y, log_alpha)
 
     return _grad_search(
         _get_val_grad, _proj_param, log_alpha0, monitor,
-        criterion, n_outer=n_outer, verbose=verbose,
+        n_outer=n_outer, verbose=verbose,
         tolerance_decrease=tolerance_decrease, tol=tol, t_max=t_max)
 
 
 def _grad_search(
-        _get_val_grad, proj_hyperparam, log_alpha0, monitor, criterion,
+        _get_val_grad, proj_hyperparam, log_alpha0, monitor,
         n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
         t_max=10000):
     """
