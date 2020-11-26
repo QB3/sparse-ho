@@ -169,32 +169,35 @@ class Monitor():
     """
     Class used to store computed metrics at each iteration of the outer loop.
     """
-    def __init__(self):
+
+    def __init__(self, callback=None):
         self.t0 = time.time()
-        self.objs = []
-        self.objs_test = []
+        self.objs = []   # todo naming?
         self.times = []
         self.log_alphas = []
         self.grads = []
-        self.rmse = []
+        # self.rmse = []   for me this is handled by the callback
+        self.callback = callback
 
     def __call__(
-            self, obj, obj_test=None, log_alpha=None, grad=None, rmse=None):
+            self, obj, grad, mask=None, dense=None, log_alpha=None):
         self.objs.append(obj)
-        self.objs_test.append(obj_test)
         try:
             self.log_alphas.append(log_alpha.copy())
         except Exception:
             self.log_alphas.append(log_alpha)
         self.times.append(time.time() - self.t0)
         self.grads.append(grad)
-        self.rmse.append(rmse)
+        if self.callback is not None:
+            self.callback(obj, grad, mask, dense, log_alpha)
+            # TODO all needed?
 
 
 class WarmStart():
     """
     Class used to warm start all algorithms.
     """
+
     def __init__(self):
         self.beta_old = None
         self.beta_old2 = None

@@ -16,10 +16,8 @@ def hyperopt_wrapper(
 
     def objective(log_alpha):
         val_func, _ = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star, compute_jac=False)
-        monitor(
-            val_func, criterion.val_test, log_alpha, None,
-            criterion.rmse)
+            log_alpha, algo.get_beta_jac_v, tol=tol, compute_jac=False,
+            monitor=monitor)
         return val_func
 
     space = hp.uniform(

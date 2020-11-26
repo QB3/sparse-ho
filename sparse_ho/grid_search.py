@@ -60,14 +60,13 @@ def grid_search(
         if samp == "lhs":
             log_alpha = log_alpha[0]
         g_func, grad_lambda = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol, beta_star=beta_star, compute_jac=False)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+            compute_jac=False, monitor=monitor)
 
         if g_func < min_g_func:
             min_g_func = g_func
             log_alpha_opt = log_alpha
 
-        monitor(g_func, criterion.val_test, log_alpha, None,
-                criterion.rmse)
         if monitor.times[-1] > t_max:
             break
     return log_alpha_opt, min_g_func
