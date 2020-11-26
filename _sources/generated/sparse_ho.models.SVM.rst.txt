@@ -15,12 +15,12 @@
    
       ~SVM.__init__
       ~SVM.get_L
+      ~SVM.get_beta
       ~SVM.get_full_jac_v
       ~SVM.get_hessian
       ~SVM.get_jac_obj
       ~SVM.get_jac_v
-      ~SVM.get_primal
-      ~SVM.proj_param
+      ~SVM.proj_hyperparam
       ~SVM.reduce_X
       ~SVM.reduce_y
       ~SVM.restrict_full_supp

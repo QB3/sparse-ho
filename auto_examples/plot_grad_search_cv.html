@@ -104,148 +104,123 @@ for a Lasso using a full cross-validation score.</p>
 <span class="c1">#</span>
 <span class="c1"># License: BSD (3-clause)</span>
 
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="c1"># import time</span>
+<span class="c1"># import numpy as np</span>
+<span class="c1"># import matplotlib.pyplot as plt</span>
+<span class="c1"># import seaborn as sns</span>
+<span class="c1"># import sklearn</span>
 
-<span class="kn">from</span> <span class="nn">libsvmdata</span> <span class="kn">import</span> <span class="n">fetch_libsvm</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_regression</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LassoCV</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="c1"># from libsvmdata import fetch_libsvm</span>
+<span class="c1"># from sklearn.datasets import make_regression</span>
+<span class="c1"># from sklearn.linear_model import LassoCV</span>
+<span class="c1"># from sklearn.model_selection import KFold</span>
 
-<span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">Lasso</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.criterion</span> <span class="kn">import</span> <span class="n">HeldOutMSE</span><span class="p">,</span> <span class="n">CrossVal</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.implicit_forward</span> <span class="kn">import</span> <span class="n">ImplicitForward</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.ho</span> <span class="kn">import</span> <span class="n">grad_search</span>
+<span class="c1"># from sparse_ho.models import Lasso</span>
+<span class="c1"># from sparse_ho.criterion import HeldOutMSE, CrossVal</span>
+<span class="c1"># from sparse_ho.implicit_forward import ImplicitForward</span>
+<span class="c1"># from sparse_ho.utils import Monitor</span>
+<span class="c1"># from sparse_ho.ho import grad_search</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="vm">__doc__</span><span class="p">)</span>
+<span class="c1"># print(__doc__)</span>
 
-<span class="c1"># dataset = &#39;rcv1&#39;</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;simu&#39;</span>
+<span class="c1"># # dataset = &#39;rcv1&#39;</span>
+<span class="c1"># dataset = &#39;simu&#39;</span>
 
-<span class="k">if</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;rcv1&#39;</span><span class="p">:</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <span class="n">fetch_libsvm</span><span class="p">(</span><span class="s1">&#39;rcv1_train&#39;</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span>
-        <span class="n">n_samples</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
-        <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="c1"># if dataset == &#39;rcv1&#39;:</span>
+<span class="c1">#     X, y = fetch_libsvm(&#39;rcv1_train&#39;)</span>
+<span class="c1"># else:</span>
+<span class="c1">#     X, y = make_regression(</span>
+<span class="c1">#         n_samples=500, n_features=1000, noise=40,</span>
+<span class="c1">#         random_state=42)</span>
 
-<span class="n">kf</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="c1"># kf = KFold(n_splits=5, shuffle=True, random_state=42)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Starting path computation...&quot;</span><span class="p">)</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
-<span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)))</span> <span class="o">/</span> <span class="n">n_samples</span>
+<span class="c1"># print(&quot;Starting path computation...&quot;)</span>
+<span class="c1"># n_samples = len(y)</span>
+<span class="c1"># alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples</span>
 
-<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">10</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a>
+<span class="c1"># n_alphas = 10</span>
+<span class="c1"># p_alphas = np.geomspace(1, 0.001, n_alphas)</span>
+<span class="c1"># alphas = alpha_max * p_alphas</span>
 
-<span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="c1"># tol = 1e-8</span>
 
-<span class="n">max_iter</span> <span class="o">=</span> <span class="mf">1e5</span>
+<span class="c1"># max_iter = 1e5</span>
+
+<span class="c1"># ##############################################################################</span>
+<span class="c1"># # Cross-validation with scikit-learn</span>
+<span class="c1"># # ----------------------------------</span>
+<span class="c1"># print(&#39;scikit started&#39;)</span>
+
+<span class="c1"># t0 = time.time()</span>
+<span class="c1"># reg = LassoCV(</span>
+<span class="c1">#     cv=kf, verbose=True, tol=tol, fit_intercept=False,</span>
+<span class="c1">#     alphas=alphas, max_iter=max_iter).fit(X, y)</span>
+<span class="c1"># reg.score(X, y)</span>
+<span class="c1"># t_sk = time.time() - t0</span>
+
+<span class="c1"># print(&#39;scikit finished&#39;)</span>
+
+<span class="c1"># ##############################################################################</span>
+<span class="c1"># # Now do the hyperparameter optimization with implicit differentiation</span>
+<span class="c1"># # --------------------------------------------------------------------</span>
+
+<span class="c1"># estimator = sklearn.linear_model.Lasso(</span>
+<span class="c1">#     fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)</span>
+
+<span class="c1"># print(&#39;sparse-ho started&#39;)</span>
+
+<span class="c1"># t0 = time.time()</span>
+<span class="c1"># Model = Lasso</span>
+<span class="c1"># Criterion = HeldOutMSE</span>
+<span class="c1"># log_alpha0 = np.log(alpha_max / 10)</span>
+<span class="c1"># monitor_grad = Monitor()</span>
+<span class="c1"># criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)</span>
+<span class="c1"># algo = ImplicitForward()</span>
+<span class="c1"># grad_search(</span>
+<span class="c1">#     algo, criterion, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)</span>
+
+<span class="c1"># t_grad_search = time.time() - t0</span>
+
+<span class="c1"># print(&#39;sparse-ho finished&#39;)</span>
+
+<span class="c1"># ##############################################################################</span>
+<span class="c1"># # Plot results</span>
+<span class="c1"># # ------------</span>
+<span class="c1"># objs = reg.mse_path_.mean(axis=1)</span>
+
+<span class="c1"># p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max</span>
+<span class="c1"># objs_grad = np.array(monitor_grad.objs)</span>
+
+
+<span class="c1"># print(&quot;Time to compute CV for scikit-learn: %.2f&quot; % t_sk)</span>
+<span class="c1"># print(&quot;Time to compute CV for sparse-ho: %.2f&quot; % t_grad_search)</span>
+
+<span class="c1"># print(&#39;Minimum objective grid-search %.5f&#39; % objs.min())</span>
+<span class="c1"># print(&#39;Minimum objective grad-search %.5f&#39; % objs_grad.min())</span>
+
+
+<span class="c1"># current_palette = sns.color_palette(&quot;colorblind&quot;)</span>
+
+<span class="c1"># fig = plt.figure(figsize=(5, 3))</span>
+<span class="c1"># plt.semilogx(</span>
+<span class="c1">#     p_alphas, objs, color=current_palette[0])</span>
+<span class="c1"># plt.semilogx(</span>
+<span class="c1">#     p_alphas, objs, &#39;bo&#39;, label=&#39;0-order method (grid-search)&#39;,</span>
+<span class="c1">#     color=current_palette[1])</span>
+<span class="c1"># plt.semilogx(</span>
+<span class="c1">#     p_alphas_grad, objs_grad, &#39;bX&#39;, label=&#39;1-st order method&#39;,</span>
+<span class="c1">#     color=current_palette[2])</span>
+<span class="c1"># plt.xlabel(r&quot;$\lambda / \lambda_{\max}$&quot;)</span>
+<span class="c1"># plt.ylabel(&quot;Cross-validation loss&quot;)</span>
+<span class="c1"># axes = plt.gca()</span>
+<span class="c1"># plt.tick_params(width=5)</span>
+<span class="c1"># plt.legend()</span>
+<span class="c1"># plt.tight_layout()</span>
+<span class="c1"># plt.show(block=False)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting path computation...
-</pre></div>
-</div>
-<div class="section" id="cross-validation-with-scikit-learn">
-<h2>Cross-validation with scikit-learn<a class="headerlink" href="#cross-validation-with-scikit-learn" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;scikit started&#39;</span><span class="p">)</span>
-
-<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">reg</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span>
-    <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
-<span class="n">reg</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
-<span class="n">t_sk</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;scikit finished&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>scikit started
-[Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:    9.3s finished
-scikit finished
-</pre></div>
-</div>
-</div>
-<div class="section" id="now-do-the-hyperparameter-optimization-with-implicit-differentiation">
-<h2>Now do the hyperparameter optimization with implicit differentiation<a class="headerlink" href="#now-do-the-hyperparameter-optimization-with-implicit-differentiation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span>
-    <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sparse-ho started&#39;</span><span class="p">)</span>
-
-<span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">Model</span> <span class="o">=</span> <span class="n">Lasso</span>
-<span class="n">Criterion</span> <span class="o">=</span> <span class="n">HeldOutMSE</span>
-<span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
-<span class="n">monitor_grad</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">CrossVal</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">Model</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
-<span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">()</span>
-<span class="n">grad_search</span><span class="p">(</span>
-    <span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="n">monitor_grad</span><span class="p">,</span> <span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-
-<span class="n">t_grad_search</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sparse-ho finished&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho started
-sparse-ho finished
-</pre></div>
-</div>
-</div>
-<div class="section" id="plot-results">
-<h2>Plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">mse_path_</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.exp" title="numpy.exp" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">exp</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><span class="n">log_alphas</span><span class="p">))</span> <span class="o">/</span> <span class="n">alpha_max</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
-
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time to compute CV for scikit-learn: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">t_sk</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time to compute CV for sparse-ho: </span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">t_grad_search</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Minimum objective grid-search </span><span class="si">%.5f</span><span class="s1">&#39;</span> <span class="o">%</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Minimum objective grad-search </span><span class="si">%.5f</span><span class="s1">&#39;</span> <span class="o">%</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-
-
-<span class="n">current_palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;colorblind&quot;</span><span class="p">)</span>
-
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">,</span> <span class="s1">&#39;bo&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;0-order method (grid-search)&#39;</span><span class="p">,</span>
-    <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a><span class="p">,</span> <span class="s1">&#39;bX&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1-st order method&#39;</span><span class="p">,</span>
-    <span class="n">color</span><span class="o">=</span><span class="n">current_palette</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\lambda / \lambda_{\max}$&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Cross-validation loss&quot;</span><span class="p">)</span>
-<span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-<img alt="plot grad search cv" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_grad_search_cv_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time to compute CV for scikit-learn: 9.36
-Time to compute CV for sparse-ho: 2.05
-Minimum objective grid-search 1938.13556
-Minimum objective grad-search 1932.51526
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.247 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-grad-search-cv-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/63181d815e1d8c3490d642d68c95f73f/plot_grad_search_cv.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_grad_search_cv.py</span></code></a></p>
@@ -255,7 +230,6 @@ Minimum objective grad-search 1932.51526
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
 </div>
 
 

@@ -15,13 +15,13 @@
    
       ~WeightedLasso.__init__
       ~WeightedLasso.get_L
+      ~WeightedLasso.get_beta
       ~WeightedLasso.get_full_jac_v
       ~WeightedLasso.get_hessian
       ~WeightedLasso.get_jac_obj
       ~WeightedLasso.get_jac_v
       ~WeightedLasso.get_mask_jac_v
-      ~WeightedLasso.get_primal
-      ~WeightedLasso.proj_param
+      ~WeightedLasso.proj_hyperparam
       ~WeightedLasso.reduce_X
       ~WeightedLasso.reduce_y
       ~WeightedLasso.restrict_full_supp

@@ -97,7 +97,7 @@
 <h1>sparse_ho.criterion.HeldOutMSE<a class="headerlink" href="#sparse-ho-criterion-heldoutmse" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.criterion.HeldOutMSE">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">HeldOutMSE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">HeldOutMSE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx_train</span></em>, <em class="sig-param"><span class="n">idx_val</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Held out loss for quadratic datafit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
@@ -108,20 +108,15 @@
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.criterion.HeldOutMSE.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X_val</span></em>, <em class="sig-param"><span class="n">y_val</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">convexify</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">gamma_convex</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">idx_train</span></em>, <em class="sig-param"><span class="n">idx_val</span></em>, <em class="sig-param"><span class="n">X_test</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">y_test</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>X_val</strong><span class="classifier">{ndarray, sparse matrix} of shape (n_samples, n_features)</span></dt><dd><p>Validation data</p>
+<dt><strong>idx_train: np.array</strong></dt><dd><p>indices of the training set</p>
 </dd>
-<dt><strong>y_val</strong><span class="classifier">{ndarray, sparse matrix} of shape (n_samples,)</span></dt><dd><p>Validation target</p>
+<dt><strong>idx_test: np.array</strong></dt><dd><p>indices of the testing set</p>
 </dd>
-<dt><strong>model: object of the class Model (e.g. Lasso or SparseLogreg)</strong></dt><dd></dd>
 <dt><strong>X_test</strong><span class="classifier">{ndarray, sparse matrix} of shape (n_samples_test, n_features)</span></dt><dd><p>Test data</p>
-</dd>
-<dt><strong>convexify: bool</strong></dt><dd><p>this param should be remove from here XXX</p>
-</dd>
-<dt><strong>gamma_convex: bool</strong></dt><dd><p>this param should be removed from here XXX</p>
 </dd>
 <dt><strong>y_test</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples_test)</span></dt><dd><p>Test target</p>
 </dd>
@@ -137,29 +132,23 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="sparse_ho.criterion.HeldOutMSE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X_val, y_val, model[, convexify, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.HeldOutMSE.__init__" title="sparse_ho.criterion.HeldOutMSE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(idx_train, idx_val[, X_test, y_test])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rmse</span></code>(mask, dense, beta_star)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(model, X, y, log_alpha[, tol])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_v</span></code>(mask, dense)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(model, X, y, log_alpha, …[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(log_alpha[, tol])</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_outer</span></code>(X, y, mask, dense)</p></td>
+<td><p>Compute the MSE on the validation set.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(log_alpha, get_beta_jac_v[, …])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code>(mask, dense)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_test</span></code>(mask, dense)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(model, X, y, log_alpha)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

@@ -97,7 +97,7 @@
 <h1>sparse_ho.criterion.SmoothedSURE<a class="headerlink" href="#sparse-ho-criterion-smoothedsure" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.criterion.SmoothedSURE">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">SmoothedSURE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">SmoothedSURE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smoothed version of the Stein Unbiased Risk Estimator (SURE).</p>
 <p>Implements the iterative Finite-Difference Monte-Carlo approximation of the
 SURE. By default, the approximation is ruled by a power law heuristic [1].</p>
@@ -117,16 +117,10 @@ SURE. By default, the approximation is ruled by a power law heuristic [1].</p>
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.criterion.SmoothedSURE.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>X_</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples, n_features)</span></dt><dd><p>Validation data</p>
-</dd>
-<dt><strong>y</strong><span class="classifier">{ndarray, sparse matrix} of (n_samples)</span></dt><dd><p>Validation target</p>
-</dd>
-<dt><strong>model: instance of Model</strong></dt><dd><p>The model (e.g. instance of Lasso or SparseLogreg)</p>
-</dd>
 <dt><strong>sigma: float</strong></dt><dd><p>Noise level</p>
 </dd>
 <dt><strong>finite_difference_step: float, optional</strong></dt><dd><p>Finite difference step used in the approximation of the SURE.
@@ -147,32 +141,20 @@ Pass an int for reproducible output across multiple function calls.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="sparse_ho.criterion.SmoothedSURE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(X, y, model, sigma[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="sparse_ho.criterion.SmoothedSURE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(sigma[, finite_difference_step, …])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
 </p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rmse</span></code>(mask, dense, beta_star)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(model, X, y, log_alpha[, tol])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(log_alpha[, tol])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(model, X, y, log_alpha, …[, …])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(log_alpha, get_beta_jac_v[, …])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code>(mask, dense)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">v2</span></code>(mask, dense)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code>(mask, dense, mask2, dense2)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_test</span></code>(mask, dense)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_outer</span></code>(X, y, mask, dense, mask2, dense2)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

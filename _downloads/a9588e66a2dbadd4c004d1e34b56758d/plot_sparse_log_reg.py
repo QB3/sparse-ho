@@ -15,6 +15,7 @@ for sparse logistic regression using a held-out test set.
 
 
 import time
+from libsvmdata.datasets import fetch_libsvm
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -22,45 +23,45 @@ import seaborn as sns
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
-from sklearn.linear_model import LogisticRegression
+from celer import LogisticRegression
 from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.datasets import get_data
 
 from sklearn.datasets import make_classification
-
-from sklearn.model_selection import train_test_split
 
 
 print(__doc__)
 
-# dataset = 'rcv1'
-dataset = 'simu'
+dataset = 'rcv1_train'
+# dataset = 'simu'
 
-if dataset == 'rcv1':
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data('rcv1')
+if dataset != 'simu':
+    X, y = fetch_libsvm(dataset)
+    X = X[:, :100]
 else:
     X, y = make_classification(
-        n_samples=300, n_features=1000, random_state=42, flip_y=0.02)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.5)
+        n_samples=100, n_features=1_000, random_state=42, flip_y=0.02)
 
 
-n_samples, n_features = X_train.shape
+n_samples = X.shape[0]
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
 
-alpha_max = np.max(np.abs(X_train.T @ y_train))
-alpha_max /= 4 * n_samples
+print("Starting path computation...")
+n_samples = len(y[idx_train])
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+
+alpha_max /= 4 * len(idx_train)
 log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 1000)
+log_alpha_min = np.log(alpha_max / 100)
 max_iter = 100
 
 log_alpha0 = np.log(0.1 * alpha_max)
-tol = 1e-4
+tol = 1e-8
 
-n_alphas = 10
+n_alphas = 30
 p_alphas = np.geomspace(1, 0.0001, n_alphas)
 alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
@@ -73,14 +74,13 @@ print('scikit started')
 t0 = time.time()
 
 estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, solver='saga', max_iter=max_iter)
-model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = HeldOutLogistic(X_val, y_val, model)
+    penalty='l1', fit_intercept=False, max_iter=max_iter)
+model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, log_alpha_min, log_alpha_max, monitor_grid,
-    log_alphas=log_alphas, tol=tol)
+    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
 t_sk = time.time() - t0
@@ -97,12 +97,12 @@ print('sparse-ho started')
 
 t0 = time.time()
 estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, solver='saga')
-model = SparseLogreg(X_train, y_train, max_iter=max_iter, estimator=estimator)
-criterion = HeldOutLogistic(X_val, y_val, model)
+    penalty='l1', fit_intercept=False, solver='saga', tol=tol)
+model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grad = Monitor()
-algo = ImplicitForward(tol_jac=tol, n_iter_jac=100)
-grad_search(algo, criterion, np.log(0.1 * alpha_max), monitor_grad,
+algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
+grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max), monitor_grad,
             n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 

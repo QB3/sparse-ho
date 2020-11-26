@@ -105,13 +105,13 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>(X, y[, max_iter, estimator, log_alpha_max])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>([max_iter, estimator, log_alpha_max])</p></td>
 <td><p>Linear Model trained with L1 prior as regularizer (aka the Lasso) The optimization objective for Lasso is: (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.WeightedLasso.html#sparse_ho.models.WeightedLasso" title="sparse_ho.models.WeightedLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightedLasso</span></code></a>(X, y[, max_iter, estimator, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.WeightedLasso.html#sparse_ho.models.WeightedLasso" title="sparse_ho.models.WeightedLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightedLasso</span></code></a>([max_iter, estimator, …])</p></td>
 <td><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>(X, y, logC[, max_iter, tol])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>(logC[, max_iter, tol])</p></td>
 <td><p>Support vector machines.</p></td>
 </tr>
 </tbody>
@@ -126,13 +126,13 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutMSE.html#sparse_ho.criterion.HeldOutMSE" title="sparse_ho.criterion.HeldOutMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutMSE</span></code></a>(X_val, y_val, model[, convexify, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutMSE.html#sparse_ho.criterion.HeldOutMSE" title="sparse_ho.criterion.HeldOutMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutMSE</span></code></a>(idx_train, idx_val[, X_test, y_test])</p></td>
 <td><p>Held out loss for quadratic datafit.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.SmoothedSURE.html#sparse_ho.criterion.SmoothedSURE" title="sparse_ho.criterion.SmoothedSURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SmoothedSURE</span></code></a>(X, y, model, sigma[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.SmoothedSURE.html#sparse_ho.criterion.SmoothedSURE" title="sparse_ho.criterion.SmoothedSURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SmoothedSURE</span></code></a>(sigma[, …])</p></td>
 <td><p>Smoothed version of the Stein Unbiased Risk Estimator (SURE).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutLogistic.html#sparse_ho.criterion.HeldOutLogistic" title="sparse_ho.criterion.HeldOutLogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutLogistic</span></code></a>(X_val, y_val, model[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutLogistic.html#sparse_ho.criterion.HeldOutLogistic" title="sparse_ho.criterion.HeldOutLogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutLogistic</span></code></a>(idx_train, idx_val[, …])</p></td>
 <td><p>Logistic loss on held out data</p></td>
 </tr>
 </tbody>
@@ -167,10 +167,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, criterion, log_alpha0, monitor)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, criterion, model, X, y, …)</p></td>
 <td><p>This line-search code is taken from here: <a class="reference external" href="https://github.com/fabianp/hoag/blob/master/hoag/hoag.py">https://github.com/fabianp/hoag/blob/master/hoag/hoag.py</a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search_wolfe.html#sparse_ho.grad_search_wolfe" title="sparse_ho.grad_search_wolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search_wolfe</span></code></a>(algo, criterion, …[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search_wolfe.html#sparse_ho.grad_search_wolfe" title="sparse_ho.grad_search_wolfe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search_wolfe</span></code></a>(algo, criterion, model, …)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

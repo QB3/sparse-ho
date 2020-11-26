@@ -14,12 +14,10 @@
    .. autosummary::
    
       ~HeldOutMSE.__init__
-      ~HeldOutMSE.compute_rmse
-      ~HeldOutMSE.get_v
       ~HeldOutMSE.get_val
       ~HeldOutMSE.get_val_grad
-      ~HeldOutMSE.value
-      ~HeldOutMSE.value_test
+      ~HeldOutMSE.get_val_outer
+      ~HeldOutMSE.proj_hyperparam
    
    
 

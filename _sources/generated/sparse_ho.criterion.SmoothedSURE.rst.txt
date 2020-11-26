@@ -14,13 +14,9 @@
    .. autosummary::
    
       ~SmoothedSURE.__init__
-      ~SmoothedSURE.compute_rmse
       ~SmoothedSURE.get_val
       ~SmoothedSURE.get_val_grad
-      ~SmoothedSURE.v
-      ~SmoothedSURE.v2
-      ~SmoothedSURE.value
-      ~SmoothedSURE.value_test
+      ~SmoothedSURE.get_val_outer
    
    
 

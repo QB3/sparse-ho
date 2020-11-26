@@ -28,13 +28,12 @@ for an elastic-net using a held-out validation set.
     import time
     import numpy as np
     from sklearn import linear_model
-    from numpy.linalg import norm
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
-    from sparse_ho.datasets import get_data
+    from libsvmdata.datasets import fetch_libsvm
+
     from sklearn.datasets import make_regression
-    from sklearn.model_selection import train_test_split
     from sparse_ho.implicit_forward import ImplicitForward
     from sparse_ho.criterion import HeldOutMSE
     from sparse_ho.models import ElasticNet
@@ -42,6 +41,7 @@ for an elastic-net using a held-out validation set.
     from sparse_ho.utils import Monitor
 
     Axes3D  # hack for matplotlib 3D support
+    # TODO improve example and remove this 3D graph
 
     # dataset = "rcv1"
     dataset = 'simu'
@@ -62,26 +62,23 @@ Load some data
 
 
     print("Started to load data")
+    dataset = 'rcv1'
+    # dataset = 'simu'
 
     if dataset == 'rcv1':
-        X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset)
+        X, y = fetch_libsvm('rcv1_train')
     else:
-        rng = np.random.RandomState(42)
-        X, y, beta = make_regression(
-            n_samples=100, n_features=300, noise=3.0, coef=True, n_informative=10,
-            random_state=rng,
-        )
-        X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
-        beta /= norm(beta)
-        y = X @ beta + rng.randn(X.shape[0])
-        X_train, X_test, y_train, y_test = \
-            train_test_split(X, y, test_size=0.33, random_state=rng)
-        X_train, X_val, y_train, y_val = train_test_split(
-            X_train, y_train, test_size=0.5, random_state=rng)
+        X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
 
     print("Finished loading data")
 
-    alpha_max = np.max(np.abs(X_train.T @ y_train)) / X_train.shape[0]
+    n_samples = X.shape[0]
+    idx_train = np.arange(0, n_samples // 2)
+    idx_val = np.arange(n_samples // 2, n_samples)
+
+    print("Starting path computation...")
+    n_samples = len(y[idx_train])
+    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
     log_alpha_max = np.log(alpha_max)
 
     alpha_min = 1e-4 * alpha_max
@@ -95,7 +92,6 @@ Load some data
     results = np.zeros((n_grid, n_grid))
     tol = 1e-4
     max_iter = 50000
-
 
     estimator = linear_model.ElasticNet(
         fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
@@ -111,7 +107,9 @@ Load some data
  .. code-block:: none
 
     Started to load data
+    Dataset: rcv1_train
     Finished loading data
+    Starting path computation...
 
 
 
@@ -131,8 +129,8 @@ Grid-search with scikit-learn
             print("lambda %i / %i" % (j, n_grid))
             estimator.alpha = (alphas_1[i] + alphas_2[j])
             estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
-            estimator.fit(X_train, y_train)
-            results[i, j] = np.mean((y_val - X_val @ estimator.coef_) ** 2)
+            estimator.fit(X[idx_train, :], y[idx_train])
+            results[i, j] = np.mean((y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
     t_grid_search += time.time()
     print("Finished grid-search")
 
@@ -252,8 +250,6 @@ Grid-search with scikit-learn
     lambda 1 / 10
     lambda 2 / 10
     lambda 3 / 10
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:529: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.01635056890434128, tolerance: 0.010802648335507271
-      model = cd_fast.enet_coordinate_descent(
     lambda 4 / 10
     lambda 5 / 10
     lambda 6 / 10
@@ -277,13 +273,11 @@ Grad-search with sparse-ho
     t_grad_search = - time.time()
     monitor = Monitor()
     n_outer = 10
-    model = ElasticNet(
-        X_train, y_train, max_iter=max_iter, estimator=estimator)
-    criterion = HeldOutMSE(
-        X_val, y_val, model, X_test=X_test, y_test=y_test)
+    model = ElasticNet(max_iter=max_iter, estimator=estimator)
+    criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
-    _, _, _ = grad_search(
-        algo, criterion, verbose=True,
+    grad_search(
+        algo, criterion, model, X, y, verbose=True,
         log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
         tol=tol, n_outer=n_outer, monitor=monitor)
     t_grad_search += time.time()
@@ -307,30 +301,30 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     Started grad-search
-    grad lambda [0.25461191 0.00883922]
-    value of lambda_k [-4.02603104 -2.39605297]
-    grad lambda [-0.05723497 -0.0492543 ]
-    value of lambda_k [-3.35715969 -1.82044697]
-    grad lambda [ 0.0083518  -0.03575358]
-    value of lambda_k [-3.45476226 -1.40261592]
-    grad lambda [-0.00326569 -0.0567686 ]
-    value of lambda_k [-3.41458942 -0.70427787]
-    grad lambda [-0.01145134 -0.02551311]
-    value of lambda_k [-3.26630684 -0.37391035]
-    grad lambda [-0.01176802 -0.01721395]
-    value of lambda_k [-3.10590339 -0.13927638]
-    grad lambda [-0.01739584 -0.01957343]
-    value of lambda_k [-2.85631051 -0.10069454]
-    grad lambda [-0.01334476 -0.02099397]
-    value of lambda_k [-2.65476461 -0.10069454]
-    grad lambda [-0.00824204 -0.01274176]
-    value of lambda_k [-2.52373353 -0.10069454]
-    grad lambda [-0.00351017 -0.01167868]
-    value of lambda_k [-2.4649921  -0.10069454]
-    Time grid-search 15.626118
-    Time grad-search 2.664210
-    Minimum grid search 1.453e+00
-    Minimum grad search 1.448e+00
+    grad lambda [0.21482443 0.04189048]
+    value of lambda_k [-8.30197129 -7.16578814]
+    grad lambda [0.06233496 0.0622351 ]
+    value of lambda_k [-9.14991226 -8.01237068]
+    grad lambda [0.03378978 0.0288922 ]
+    value of lambda_k [-9.63374542 -8.42607582]
+    grad lambda [0.02421421 0.0203478 ]
+    value of lambda_k [-9.99871532 -8.73276901]
+    grad lambda [0.0175788  0.01554407]
+    value of lambda_k [-10.27761774  -8.97938872]
+    grad lambda [0.01352691 0.01206075]
+    value of lambda_k [-10.50352919  -9.18081391]
+    grad lambda [0.01065587 0.00950575]
+    value of lambda_k [-10.69085813  -9.34792376]
+    grad lambda [0.00828327 0.00733894]
+    value of lambda_k [-10.84414112  -9.48373193]
+    grad lambda [0.00709898 0.00557686]
+    value of lambda_k [-10.98242273  -9.59236402]
+    grad lambda [0.00568092 0.00429159]
+    value of lambda_k [-11.09890595  -9.68036002]
+    Time grid-search 96.822570
+    Time grad-search 79.317253
+    Minimum grid search 2.050e-01
+    Minimum grad search 2.085e-01
 
 
 
@@ -378,7 +372,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.443 seconds)
+   **Total running time of the script:** ( 2 minutes  56.373 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:

@@ -14,12 +14,10 @@
    .. autosummary::
    
       ~HeldOutLogistic.__init__
-      ~HeldOutLogistic.compute_rmse
-      ~HeldOutLogistic.get_v
       ~HeldOutLogistic.get_val
       ~HeldOutLogistic.get_val_grad
-      ~HeldOutLogistic.value
-      ~HeldOutLogistic.value_test
+      ~HeldOutLogistic.get_val_outer
+      ~HeldOutLogistic.proj_hyperparam
    
    
 
