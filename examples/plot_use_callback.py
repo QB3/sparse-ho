@@ -165,7 +165,7 @@ plt.semilogx(
     color=current_palette[2])
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
-    r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$")
+    r"$\|y^{\rm{test}} - X^{\rm{test}} \hat \beta^{(\lambda)} \|^2$")
 plt.tick_params(width=5)
 plt.legend()
 plt.tight_layout()
