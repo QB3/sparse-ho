@@ -172,11 +172,10 @@ class Monitor():
 
     def __init__(self, callback=None):
         self.t0 = time.time()
-        self.objs = []   # todo naming?
+        self.objs = []   # TODO rename, use self.value_outer?
         self.times = []
         self.log_alphas = []
         self.grads = []
-        # self.rmse = []   for me this is handled by the callback
         self.callback = callback
 
     def __call__(
@@ -190,7 +189,6 @@ class Monitor():
         self.grads.append(grad)
         if self.callback is not None:
             self.callback(obj, grad, mask, dense, log_alpha)
-            # TODO all needed?
 
 
 class WarmStart():
