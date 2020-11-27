@@ -8,7 +8,7 @@ def configure_plt():
               'legend.fontsize': 12,
               'xtick.labelsize': 10,
               'ytick.labelsize': 10,
-              'text.usetex': True,
+              # 'text.usetex': True,
               'figure.figsize': (8, 6)}
     plt.rcParams.update(params)
 

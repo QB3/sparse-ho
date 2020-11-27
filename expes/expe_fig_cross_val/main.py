@@ -1,18 +1,17 @@
 import numpy as np
+from sklearn import linear_model
 
 from sparse_ho.models import Lasso
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 # from sparse_ho.forward import Forward
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.datasets.real import get_real_sim
-# from sparse_ho.datasets.real import get_rcv1
 # from sparse_ho.datasets.real import get_leukemia
 # from sparse_ho.grid_search import grid_search
 
 X_train, X_val, X_test, y_train, y_val, y_test = get_real_sim()
-# X_train, X_val, X_test, y_train, y_val, y_test = get_rcv1()
 # X_train, X_val, X_test, y_train, y_val, y_test = get_leukemia()
 n_samples, n_features = X_train.shape
 
@@ -30,8 +29,8 @@ tol = 1e-7
 
 # grid search
 # model = Lasso(X_train, y_train, np.log(alpha_max/10))
-# criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-# algo = Forward(criterion, use_sk=True)
+# criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+# algo = Forward(criterion)
 # monitor_grid_sk = Monitor()
 # grid_search(
 #     algo, None, None, monitor_grid_sk, log_alphas=log_alphas,
@@ -42,9 +41,11 @@ tol = 1e-7
 # np.save("objs.npy", objs)
 
 # grad_search
-model = Lasso(X_train, y_train, np.log(alpha_max/10))
-criterion = CV(X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(criterion, use_sk=True)
+estimator = linear_model.Lasso(
+    fit_intercept=False, warm_start=True)
+model = Lasso(X_train, y_train, np.log(alpha_max/10), estimator=estimator)
+criterion = HeldOutMSE(X_val, y_val, model, X_test=X_test, y_test=y_test)
+algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
 grad_search(
     algo, np.log(alpha_max/10), monitor_grad, n_outer=10, tol=tol)

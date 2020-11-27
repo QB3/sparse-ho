@@ -88,9 +88,7 @@ def linear_cv(
         #     tol=tol, verbose=True,
         #     solver='liblinear').fit(X, y)
         # beta_star = clf.coef_[0]
-        # import ipdb; ipdb.set_trace()
 
-        # import ipdb; ipdb.set_trace()
         blitzl1.set_use_intercept(False)
         blitzl1.set_tolerance(1e-32)
         blitzl1.set_verbose(True)
@@ -102,10 +100,9 @@ def linear_cv(
         mask = beta_star != 0
         mask = np.array(mask)
         dense = beta_star[mask]
-    # import ipdb; ipdb.set_trace()
     # if model == "lasso":
     v = - n_samples * alpha * np.sign(beta_star[mask])
-    mat_to_inv = model.get_hessian(mask, dense)
+    mat_to_inv = model.get_hessian(mask, dense, np.log(alpha))
     # mat_to_inv = X[:, mask].T  @ X[:, mask]
 
     jac_temp = cg(mat_to_inv, v, tol=1e-10)
@@ -127,7 +124,6 @@ def linear_cv(
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
         supp = list_beta[i, :] != 0
-        # import ipdb; ipdb.set_trace()
         if not np.all(supp == supp_star):
             supp_id = i + 1
             break

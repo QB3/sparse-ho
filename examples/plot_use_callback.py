@@ -1,10 +1,10 @@
 """
-============================
-Lasso with held-out test set
-============================
+===========================
+How to use custom metrics?
+===========================
 
-This example shows how to perform hyperparameter optimization
-for a Lasso using a held-out validation set.
+This example shows how to compute customize metrics using a callback function
+as in scipy.
 
 """
 
@@ -15,9 +15,11 @@ for a Lasso using a held-out validation set.
 
 import time
 import numpy as np
+from numpy.linalg import norm
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import linear_model
+from sklearn.model_selection import train_test_split
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
@@ -33,13 +35,18 @@ from libsvmdata.datasets import fetch_libsvm
 
 print(__doc__)
 
-dataset = 'rcv1'
-# dataset = 'simu'
+# dataset = 'rcv1'
+dataset = 'simu'
 
 if dataset == 'rcv1':
     X, y = fetch_libsvm('rcv1_train')
 else:
-    X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+    X, y = make_regression(
+        n_samples=1000, n_features=1000, noise=40, random_state=0)
+
+# The dataset is split in 2: the data for training and validation: X
+# Useen data X_test, asserting the quality of the model
+X, X_test, y, y_test = train_test_split(X, y, test_size=0.333)
 
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
@@ -49,6 +56,28 @@ print("Starting path computation...")
 n_samples = len(y[idx_train])
 alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
+
+tol = 1e-7
+max_iter = 1e5
+
+
+estimator = linear_model.Lasso(
+    fit_intercept=False, max_iter=1000, warm_start=True)
+
+#############################################################################
+# Call back definition
+objs_test_grid = []
+
+
+def callback_grid(val, grad, mask, dense, log_alpha):
+    beta = np.zeros(len(mask))
+    beta[mask] = dense
+    # The custom quantity is added at each outer iteration:
+    # here the loss on test data
+    objs_test_grid.append(
+        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
+    return np.array(objs_test_grid)
+
 
 n_alphas = 10
 p_alphas = np.geomspace(1, 0.0001, n_alphas)
@@ -71,7 +100,7 @@ t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = Forward()
-monitor_grid_sk = Monitor()
+monitor_grid_sk = Monitor(callback=callback_grid)
 grid_search(
     algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
@@ -81,8 +110,21 @@ print('scikit-learn finished')
 
 
 ##############################################################################
-# Grad-search with sparse-ho
-# --------------------------
+# Grad-search with sparse-ho and callback
+# ---------------------------------------
+
+objs_test_grad = []
+
+
+def callback_grad(val, grad, mask, dense, log_alpha):
+    beta = np.zeros(len(mask))
+    beta[mask] = dense
+    # The custom quantity is added at each outer iteration:
+    # here the loss on test data
+    objs_test_grad.append(
+        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
+    return np.array(objs_test_grad)
+
 
 print('sparse-ho started')
 
@@ -90,7 +132,9 @@ t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(criterion)
-monitor_grad = Monitor()
+# use Monitor(callback)
+monitor_grad = Monitor(callback=callback_grad)
+
 grad_search(
     algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
     n_outer=10, tol=tol)
@@ -107,28 +151,21 @@ p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
 
-print('sparse-ho finished')
-print("Time to compute CV for scikit-learn: %.2f" % t_sk)
-print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
-
-print('Minimum objective grid-search %.5f' % objs.min())
-print('Minimum objective grad-search %.5f' % objs_grad.min())
-
 
 current_palette = sns.color_palette("colorblind")
 
 fig = plt.figure(figsize=(5, 3))
 plt.semilogx(
-    p_alphas, objs, color=current_palette[0])
+    p_alphas, objs_test_grid, color=current_palette[0])
 plt.semilogx(
-    p_alphas, objs, 'bo', label='0-order method (grid-search)',
+    p_alphas, objs_test_grid, 'bo', label='0-order method (grid-search)',
     color=current_palette[1])
 plt.semilogx(
-    p_alphas_grad, objs_grad, 'bX', label='1-st order method',
+    p_alphas_grad, objs_test_grad, 'bX', label='1-st order method',
     color=current_palette[2])
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
-    r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$")
+    r"$\|y^{\rm{test}} - X^{\rm{test}} \hat \beta^{(\lambda)} \|^2$")
 plt.tick_params(width=5)
 plt.legend()
 plt.tight_layout()

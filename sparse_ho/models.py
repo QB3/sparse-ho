@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn import linear_model
 from numpy.linalg import norm
 from numba import njit
 from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
@@ -21,22 +20,17 @@ class Lasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
+
     def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False):
-        self.X = X
-        self.y = y
-        self.log_alpha = log_alpha
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
-        self.tol = tol
+        self.estimator = estimator
         self.log_alpha_max = log_alpha_max
-        if use_sk:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                solver='liblinear')
-        else:
-            self.clf = None
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -126,7 +120,7 @@ class Lasso():
         return norm(y) ** 2 / (2 * n_samples)
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y=None):
+    def _get_pobj(r, X, beta, alphas, y=None):
         n_samples = r.shape[0]
         return (
             norm(r) ** 2 / (2 * n_samples) + np.abs(alphas * beta).sum())
@@ -161,7 +155,8 @@ class Lasso():
     def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
-    def _init_g_backward(self, jac_v0):
+    @staticmethod
+    def _init_g_backward(jac_v0, n_features):
         if jac_v0 is None:
             return 0.0
         else:
@@ -200,18 +195,17 @@ class Lasso():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < self.log_alpha_max - 7:
-            return self.log_alpha_max - 7
+        if log_alpha < self.log_alpha_max - 12:
+            return self.log_alpha_max - 12
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:
@@ -225,39 +219,39 @@ class Lasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
-            self.clf = linear_model.Lasso(
-                fit_intercept=False, max_iter=self.max_iter, warm_start=True)
-        self.clf.alpha = alpha
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(tol=tol, alpha=alpha)
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_primal(self, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
-        hessian = self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        X_m = X_train[:, mask]
+        hessian = X_m.T @ X_m
         return hessian
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
     def compute_alpha_max(self):
@@ -267,16 +261,18 @@ class Lasso():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
-        return(
-            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
+        return norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta)
 
 
-class wLasso():
-    """Linear Model trained with L1 prior as regularizer (aka the weight Lasso)
+class WeightedLasso():
+    r"""Linear Model trained with weighted L1 regularizer (aka weighted Lasso)
+
     The optimization objective for weighted Lasso is:
-    (1 / (2 * n_samples)) * ||y - Xw||^2_2 + sum_i^n_features alpha_i |wi|
+
+    ..math::
+
+        ||y - Xw||^2_2 / (2 * n_samples) + \sum_i^{n_features} \alpha_i |wi|
 
     Parameters
     ----------
@@ -284,16 +280,17 @@ class wLasso():
         Data.
     y: {ndarray, sparse matrix} of (n_samples)
         Target
-    TODO: other parameters should be remove
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
+    log_alpha_max: float
+        logarithm of alpha_max if already precomputed
     """
-    def __init__(self, X, y, log_alpha, log_alpha_max=None,
-                 max_iter=100, tol=1e-3):
-        self.X = X
-        self.y = y
-        self.log_alpha = log_alpha
-        self.log_alpha_max = log_alpha_max
+
+    def __init__(
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
-        self.tol = tol
+        self.estimator = estimator
+        self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -375,7 +372,7 @@ class wLasso():
         return jac_t_v
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y=None):
+    def _get_pobj(r, X, beta, alphas, y=None):
         n_samples = r.shape[0]
         return (
             norm(r) ** 2 / (2 * n_samples) + norm(alphas * beta, 1))
@@ -407,9 +404,10 @@ class wLasso():
     def _init_dr(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
-    def _init_g_backward(self, jac_v0):
+    @staticmethod
+    def _init_g_backward(jac_v0, n_features):
         if jac_v0 is None:
-            return np.zeros(self.log_alpha.shape[0])
+            return np.zeros(n_features)
         else:
             return jac_v0
 
@@ -441,8 +439,8 @@ class wLasso():
             dbeta[j, j] -= alpha[j] * sign_beta[j] / L[j]
             dr[idx_nz] -= np.outer(Xjs, (dbeta[j] - dbeta_old))
 
+    # @njit
     @staticmethod
-    @njit
     def _reduce_alpha(alpha, mask):
         return alpha[mask]
 
@@ -456,20 +454,19 @@ class wLasso():
     def get_mask_jac_v(mask, jac_v):
         return jac_v[mask]
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
         jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         """Maybe we could do this in place.
         """
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
         proj_log_alpha = log_alpha.copy()
         proj_log_alpha[proj_log_alpha < -12] = -12
@@ -485,41 +482,50 @@ class wLasso():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def get_hessian(self, mask, dense):
-        hessian = self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X, y, mask, dense, log_alpha):
+        X_m = X[:, mask]
+        hessian = X_m.T @ X_m
         return hessian
 
-    def sk(self, X, y, alpha, tol, max_iter):
-        """TODO
-        """
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
+        # TODO uncomment this code when the new version of celer is released
+        # self.estimator.set_params(tol=tol)
+        # self.estimator.weights = alpha
+        # self.estimator.fit(X, y)
+        # mask = self.estimator.coef_ != 0
+        # dense = (self.estimator.coef_)[mask]
+        # return mask, dense, None
         X /= alpha
-        clf = linear_model.Lasso(
-            alpha=1, fit_intercept=False, tol=tol, max_iter=max_iter)
-        clf.fit(X, y)
-        mask = clf.coef_ != 0
-        dense = (clf.coef_ / alpha)[mask]
+        self.estimator.set_params(tol=tol, alpha=1)
+        self.estimator.fit(X, y)
+        # set proper coefficients for estimator, to predict and use warm start
+        self.estimator.coef_ /= alpha
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_primal(self, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
@@ -531,20 +537,19 @@ class SVM():
 
     Parameters
     ----------
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
-    TODO: other parameters should be remove
+    logC
+    max_iter
+    tol
+    TODO
     """
-    def __init__(self, X, y, logC, max_iter=100, tol=1e-3):
+
+    def __init__(self, logC, max_iter=100, tol=1e-3):
         self.logC = logC
         self.max_iter = max_iter
         self.tol = tol
-        self.X = X
-        self.y = y
 
-    def _init_dbeta_dr(self, X, y, dense0=None,
+    @staticmethod
+    def _init_dbeta_dr(X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_samples)
@@ -552,22 +557,23 @@ class SVM():
             dr = np.zeros(n_features)
         else:
             dbeta[mask0] = jac0.copy()
-        if issparse(self.X):
-            dr = (self.X.T).multiply(y * dbeta)
+        if issparse(X):
+            dr = (X.T).multiply(y * dbeta)
             dr = np.sum(dr, axis=1)
             dr = np.squeeze(np.array(dr))
         else:
             dr = np.sum(y * dbeta * X.T, axis=1)
         return dbeta, dr
 
-    def _init_beta_r(self, X, y, mask0, dense0):
+    @staticmethod
+    def _init_beta_r(X, y, mask0, dense0):
         beta = np.zeros(X.shape[0])
         if dense0 is None:
             r = np.zeros(X.shape[1])
         else:
             beta[mask0] = dense0
-            if issparse(self.X):
-                r = np.sum(self.X.T.multiply(y * beta), axis=1)
+            if issparse(X):
+                r = np.sum(X.T.multiply(y * beta), axis=1)
                 r = np.squeeze(np.array(r))
             else:
                 r = np.sum(y * beta * X.T, axis=1)
@@ -577,7 +583,6 @@ class SVM():
     @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, C, L, compute_jac=True):
-
         """
             beta : dual variable of the svm
             r : primal used for cheap updates
@@ -635,19 +640,20 @@ class SVM():
                     # update residuals
                     dr[idx_nz] += (dbeta[j] - dbeta_old) * y[j] * Xis
 
-    def _get_pobj0(self, r, beta, C, y):
+    @staticmethod
+    def _get_pobj0(r, beta, C, y):
         C = C[0]
-        n_samples = self.X.shape[0]
+        n_samples = r.shape[0]
         obj_prim = C * np.sum(np.maximum(
             np.ones(n_samples), np.zeros(n_samples)))
         return obj_prim
 
-    def _get_pobj(self, r, beta, C, y):
-        # r = y.copy()
+    @staticmethod
+    def _get_pobj(r, X, beta, C, y):
         C = C[0]
-        n_samples = self.X.shape[0]
+        n_samples = X.shape[0]
         obj_prim = 0.5 * norm(r) ** 2 + C * np.sum(np.maximum(
-            np.ones(n_samples) - (self.X @ r) * self.y, np.zeros(n_samples)))
+            np.ones(n_samples) - (X @ r) * y, np.zeros(n_samples)))
         obj_dual = 0.5 * r.T @ r - np.sum(beta)
         return (obj_dual + obj_prim)
 
@@ -718,11 +724,13 @@ class SVM():
         else:
             return norm(X, axis=1) ** 2
 
-    def reduce_X(self, mask):
-        return self.X[mask, :]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[mask, :]
 
-    def reduce_y(self, mask):
-        return self.y[mask]
+    @staticmethod
+    def reduce_y(y, mask):
+        return y[mask]
 
     def sign(self, x, log_C):
         sign = np.zeros(x.shape[0])
@@ -730,26 +738,28 @@ class SVM():
         sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
-    def get_jac_v(self, mask, dense, jac, v):
-        n_samples, n_features = self.X.shape
-        if issparse(self.X):
-            primal_jac = np.sum(self.X[mask, :].T.multiply(self.y[mask] * jac), axis=1)
+    @staticmethod
+    def get_jac_v(X, y, mask, dense, jac, v):
+        n_samples, n_features = X.shape
+        if issparse(X):
+            primal_jac = np.sum(X[mask, :].T.multiply(y[mask] * jac), axis=1)
             primal_jac = np.squeeze(np.array(primal_jac))
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+            primal = np.sum(X[mask, :].T.multiply(y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
         else:
-            primal_jac = np.sum(self.y[mask] * jac * self.X[mask, :].T, axis=1)
-            primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+            primal_jac = np.sum(y[mask] * jac * X[mask, :].T, axis=1)
+            primal = np.sum(y[mask] * dense * X[mask, :].T, axis=1)
         mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
-    def get_primal(self, mask, dense):
-        if issparse(self.X):
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+    @staticmethod
+    def get_beta(X, y, mask, dense):
+        if issparse(X):
+            primal = np.sum(X[mask, :].T.multiply(y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
         else:
-            primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
+            primal = np.sum(y[mask] * dense * X[mask, :].T, axis=1)
         mask_primal = primal != 0
         dense_primal = primal[mask_primal]
         return mask_primal, dense_primal
@@ -758,91 +768,72 @@ class SVM():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
-        beta = np.zeros(self.X.shape[0])
+    @staticmethod
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        beta = np.zeros(X_train.shape[0])
         beta[mask] = dense
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
+        full_supp = np.logical_and(
+            np.logical_not(np.isclose(beta, 0)),
+            np.logical_not(np.isclose(beta, np.exp(log_alpha))))
 
-        if issparse(self.X):
-            mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
+        if issparse(X_train):
+            mat = X_train[full_supp, :].multiply(y_train[full_supp, np.newaxis])
         else:
-            mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
+            mat = y_train[full_supp, np.newaxis] * X_train[full_supp, :]
         Q = mat @ mat.T
         return Q
 
-    def _get_jac_t_v(self, jac, mask, dense, C, v):
+    # @staticmethod
+    def _get_jac_t_v(self, X, y, jac, mask, dense, C, v, n_samples):
+        # TODO do you think we can improve svm computations?
+        # in particular remove the dependency in X and y?
         C = C[0]
-        n_samples = self.X.shape[0]
         beta = np.zeros(n_samples)
         beta[mask] = dense
         maskC = np.isclose(beta, C)
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
+        full_supp = np.logical_and(
+            np.logical_not(np.isclose(beta, 0)),
+            np.logical_not(np.isclose(beta, C)))
         full_jac = np.zeros(n_samples)
         if full_supp.sum() != 0:
             full_jac[full_supp] = jac
         full_jac[maskC] = C
-        maskp, densep = self.get_primal(mask, dense)
+        maskp, densep = self.get_beta(X, y, mask, dense)
         # primal dual relation
-        jac_primal = (self.y[mask] * full_jac[mask]) @ self.X[mask, :]
+        jac_primal = (y[mask] * full_jac[mask]) @ X[mask, :]
         return jac_primal[maskp] @ v
 
-        # if issparse(self.X):
-        #     mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
-        #     Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
-        # else:
-        #     mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
-        #     Q = mat @ (self.y[maskC, np.newaxis] * self.X[maskC, :]).T
-
-        # u = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones(maskC.sum()) * C)
-        # if issparse(self.X):
-        #     temp = self.X[maskC, :].multiply(self.y[maskC, np.newaxis])
-        #     w = temp @ v
-        # else:
-        #     w = ((self.y[maskC, np.newaxis] * self.X[maskC, :]) @ v)
-
-        # if issparse(self.X):
-        #     return np.array(u @ jac + C * np.sum(w))[0]
-        # else:
-        #     return np.array(u @ jac + C * np.sum(w))
-
-    def restrict_full_supp(self, mask, dense, v):
-        C = np.exp(self.logC)
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def restrict_full_supp(X, y, mask, dense, v, log_alpha):
+        C = np.exp(log_alpha)
+        n_samples = X.shape[0]
         beta = np.zeros(n_samples)
         beta[mask] = dense
         maskC = np.isclose(beta, C)
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
-        if issparse(self.X):
-            mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
-            Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
+        full_supp = np.logical_and(
+            np.logical_not(np.isclose(beta, 0)),
+            np.logical_not(np.isclose(beta, C)))
+        if issparse(X):
+            mat = X[full_supp, :].multiply(y[full_supp, np.newaxis])
+            Q = mat @ (X[maskC, :].multiply(y[maskC, np.newaxis])).T
         else:
-            mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
-            Q = mat @ (self.y[maskC, np.newaxis] * self.X[maskC, :]).T
+            mat = y[full_supp, np.newaxis] * X[full_supp, :]
+            Q = mat @ (y[maskC, np.newaxis] * X[maskC, :]).T
 
         w = (np.eye(Q.shape[0], Q.shape[1]) - Q) @ (np.ones(maskC.sum()) * C)
-        if issparse(self.X):
+        if issparse(X):
             return - np.array(w)[0]
         else:
             return - w
-        # n_samples = self.X.shape[0]
-        # beta = np.zeros(n_samples)
-        # beta[mask] = dense
-        # full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
-        # if issparse(self.X):
-        #     temp = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
-        #     res = (temp @ v)
-        # else:
-        #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
-        # return - res
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, C):
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, C):
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
         if issparse(Xs):
@@ -873,22 +864,12 @@ class SparseLogreg():
         Target
     TODO: other parameters should be remove
     """
-    def __init__(
-            self, X, y, log_alpha, log_alpha_max=None, max_iter=100, tol=1e-3, use_sk=False, verbose=False):
-        self.X = X
-        self.y = y
-        self.log_alpha = log_alpha
-        self.max_iter = max_iter
-        self.tol = tol
-        self.log_alpha_max = log_alpha_max
-        self.verbose = verbose
 
-        if use_sk:
-            self.clf = linear_model.LogisticRegression(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', verbose=self.verbose)
-        else:
-            self.clf = None
+    def __init__(
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
+        self.max_iter = max_iter
+        self.log_alpha_max = log_alpha_max
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -989,7 +970,7 @@ class SparseLogreg():
         return grad
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y):
+    def _get_pobj(r, X, beta, alphas, y):
         n_samples = r.shape[0]
         return (
             np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
@@ -1083,18 +1064,17 @@ class SparseLogreg():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
-        n_samples = self.X.shape[0]
+    @staticmethod
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= (4 * self.X.shape[0])
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= (4 * X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < -18:
-            return - 18.0
+        if log_alpha < self.log_alpha_max - 8:
+            return self.log_alpha_max - 8
         elif log_alpha > self.log_alpha_max + np.log(0.9):
             return self.log_alpha_max + np.log(0.9)
         else:
@@ -1104,62 +1084,58 @@ class SparseLogreg():
     def get_L(X, is_sparse=False):
         return 0.0
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return np.sign(x)
 
-    def get_primal(self, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
-        a = self.y * (self.X[:, mask] @ dense)
+    @staticmethod
+    def get_hessian(X, y, mask, dense, log_alpha):
+        X_m = X[:, mask]
+        a = y * (X_m @ dense)
         temp = sigma(a) * (1 - sigma(a))
-        is_sparse = issparse(self.X)
+        is_sparse = issparse(X)
         if is_sparse:
             hessian = csc_matrix(
-                self.X[:, mask].T.multiply(temp)) @ self.X[:, mask]
+                X_m.T.multiply(temp)) @ X_m
         else:
-            hessian = (self.X[:, mask].T * temp) @ self.X[:, mask]
+            hessian = (X_m.T * temp) @ X_m
         return hessian
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
-    def compute_alpha_max(self):
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= (4 * self.X.shape[0])
-            self.log_alpha_max = np.log(alpha_max)
-        return self.log_alpha_max
+    def compute_alpha_max(self, X, y):
+        alpha_max = np.max(np.abs(X.T @ y))
+        alpha_max /= (4 * X.shape[0])
+        log_alpha_max = np.log(alpha_max)
+        return log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, sign_beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
         return(
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
-    def sk(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
         n_samples = X.shape[0]
-        if self.clf is None:
-            self.clf = linear_model.LogisticRegression(
-                fit_intercept=False, max_iter=max_iter, warm_start=True,
-                penalty='l1', solver='liblinear', verbose=self.verbose)
-
-        self.clf.C = 1 / (alpha * n_samples)
-        self.clf.tol = tol
-        self.clf.max_iter = max_iter
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
+        self.estimator.max_iter = self.max_iter
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask[0], dense, None
 
 
@@ -1180,6 +1156,7 @@ class SVR():
         Target
     TODO: other parameters should be remove
     """
+
     def __init__(self, X, y, logC, log_epsilon, max_iter=100, tol=1e-3):
         self.hyperparam = np.array([logC, log_epsilon])
         self.max_iter = max_iter
@@ -1221,7 +1198,6 @@ class SVR():
     # @njit
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, r, dr, hyperparam, L, compute_jac=True):
-
         """
             beta : dual variable of the svm
             r : primal used for cheap updates
@@ -1420,7 +1396,7 @@ class SVR():
         dense_primal = primal[mask_primal]
         return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
 
-    def get_primal(self, mask, dense):
+    def get_beta(self, mask, dense):
         if issparse(self.X):
             primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
@@ -1434,11 +1410,13 @@ class SVR():
     def get_full_jac_v(mask, jac_v, n_features):
         return jac_v
 
-    def get_hessian(self, mask, dense):
+    def get_hessian(self, X_train, y_train, mask, dense, log_alpha):
         beta = np.zeros(self.X.shape[0])
         beta[mask] = dense
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
-        Q = self.X[full_supp, :] @ self.X[full_supp, :].T
+        full_supp = np.logical_and(
+            np.logical_not(np.isclose(beta, 0)),
+            np.logical_not(np.isclose(beta, np.exp(self.hyperparam[0]))))
+        Q = X_train[full_supp, :] @ X_train[full_supp, :].T
         return Q
 
     def _get_jac_t_v(self, jac, mask, dense, C, v):
@@ -1507,7 +1485,7 @@ class SVR():
         #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
         # return - res
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if log_alpha < -16.0:
             log_alpha = -16.0
         elif log_alpha > 4:
@@ -1532,14 +1510,11 @@ class SVR():
 
 
 class ElasticNet():
-    def __init__(self, X, y, log_alpha1, log_alpha2, log_alpha_max=None, max_iter=100, tol=1e-3):
-        self.X = X
-        self.y = y
-        self.log_alpha = np.array([log_alpha1, log_alpha2])
+    def __init__(
+            self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
-        self.tol = tol
         self.log_alpha_max = log_alpha_max
-        self.clf = None
+        self.estimator = estimator
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -1631,7 +1606,7 @@ class ElasticNet():
         return norm(y) ** 2 / (2 * n_samples)
 
     @staticmethod
-    def _get_pobj(r, beta, alphas, y=None):
+    def _get_pobj(r, X, beta, alphas, y=None):
         n_samples = r.shape[0]
         pobj = norm(r) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
         pobj += 0.5 * alphas[1] * norm(beta) ** 2
@@ -1726,14 +1701,14 @@ class ElasticNet():
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    # @staticmethod
-    def _get_jac_t_v(self, jac, mask, dense, alphas, v):
+    @staticmethod
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
 
-    def proj_param(self, log_alpha):
+    def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
+            alpha_max = np.max(np.abs(X.T @ y))
+            alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
         if log_alpha[0] < self.log_alpha_max - 7:
             log_alpha[0] = self.log_alpha_max - 7
@@ -1753,41 +1728,41 @@ class ElasticNet():
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def sk(self, X, y, alpha, tol, max_iter):
-        if self.clf is None:
-            self.clf = linear_model.ElasticNet(
-                fit_intercept=False, max_iter=max_iter, warm_start=True)
-        self.clf.alpha = alpha[0] + alpha[1]
-        self.clf.l1ratio = alpha[0] / (alpha[0] + alpha[1])
-        self.clf.tol = tol
-        # clf = linear_model.Lasso(
-        #     alpha=alpha, fit_intercept=False, tol=tol, max_iter=max_iter)
-        self.clf.fit(X, y)
-        mask = self.clf.coef_ != 0
-        dense = self.clf.coef_[mask]
+    def _use_estimator(self, X, y, alpha, tol, max_iter):
+        if self.estimator is None:
+            raise ValueError("You did not pass a solver with sklearn API")
+        self.estimator.set_params(
+            tol=tol, alpha=alpha[0]+alpha[1],
+            l1_ratio=alpha[0]/(alpha[0]+alpha[1]))
+        self.estimator.fit(X, y)
+        mask = self.estimator.coef_ != 0
+        dense = self.estimator.coef_[mask]
         return mask, dense, None
 
-    def reduce_X(self, mask):
-        return self.X[:, mask]
+    @staticmethod
+    def reduce_X(X, mask):
+        return X[:, mask]
 
-    def reduce_y(self, mask):
-        return self.y
+    @staticmethod
+    def reduce_y(y, mask):
+        return y
 
     def sign(self, x, log_alpha):
         return x
 
-    def get_primal(self, mask, dense):
+    def get_beta(self, X, y, mask, dense):
         return mask, dense
 
-    def get_jac_v(self, mask, dense, jac, v):
+    def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def get_hessian(self, mask, dense):
-        n_samples = self.X.shape[0]
-        hessian = np.exp(self.log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * self.X[:, mask].T @ self.X[:, mask]
+    @staticmethod
+    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        n_samples = X_train.shape[0]
+        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
-    def restrict_full_supp(self, mask, dense, v):
+    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
         return v
 
     def compute_alpha_max(self):
@@ -1797,9 +1772,7 @@ class ElasticNet():
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, beta, dbeta, r, dr, alpha):
-        n_samples = self.X.shape[0]
+    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, r, dr, alpha):
         res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * np.sign(beta) @ dbeta[:, 0]
         res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
-        return(
-            norm(res2) + norm(res1))
+        return(norm(res2) + norm(res1))

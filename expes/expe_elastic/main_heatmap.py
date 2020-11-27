@@ -6,7 +6,7 @@ from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.criterion import CV
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from bcdsugar.utils import Monitor
@@ -72,19 +72,10 @@ monitor = Monitor()
 n_outer = 10
 model = ElasticNet(
     X_train, y_train, log_alphas_1[-1], log_alphas_2[-1], log_alpha_max, max_iter=max_iter, tol=tol)
-criterion = CV(
-    X_val, y_val, model, X_test=X_test, y_test=y_test)
-algo = ImplicitForward(
-    criterion, tol_jac=1e-2, n_iter_jac=1000, use_sk=True,
-    max_iter=max_iter)
-
-_, _, _ = grad_search(
-    algo=algo, verbose=True,
     log_alpha0=np.array(
         [np.log(alpha_max/10), np.log(alpha_max/10)]),
     tol=tol, n_outer=n_outer, monitor=monitor, tolerance_decrease='constant')
 alphas_grad = np.exp(np.array(monitor.log_alphas))
-alphas_grad /= alpha_max
 
 t_grad_search += time.time()
 
