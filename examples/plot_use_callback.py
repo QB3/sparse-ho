@@ -2,10 +2,8 @@
 ===========================
 How to use custom metrics?
 ===========================
-
 This example shows how to compute customize metrics using a callback function
 as in scipy.
-
 """
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
@@ -13,7 +11,6 @@ as in scipy.
 #
 # License: BSD (3-clause)
 
-import time
 import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
@@ -75,8 +72,7 @@ def callback_grid(val, grad, mask, dense, log_alpha):
     # The custom quantity is added at each outer iteration:
     # here the loss on test data
     objs_test_grid.append(
-        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
-    return np.array(objs_test_grid)
+        norm(X_test[:, mask] @ dense - y_test) ** 2 / len(y_test))
 
 
 n_alphas = 10
@@ -91,12 +87,8 @@ max_iter = 1e5
 # Grid-search with scikit-learn
 # -----------------------------
 
-estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
-
 print('scikit-learn started')
 
-t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = Forward()
@@ -104,10 +96,8 @@ monitor_grid_sk = Monitor(callback=callback_grid)
 grid_search(
     algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
-t_sk = time.time() - t0
 
 print('scikit-learn finished')
-
 
 ##############################################################################
 # Grad-search with sparse-ho and callback
@@ -122,13 +112,11 @@ def callback_grad(val, grad, mask, dense, log_alpha):
     # The custom quantity is added at each outer iteration:
     # here the loss on test data
     objs_test_grad.append(
-        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
-    return np.array(objs_test_grad)
+        norm(X_test[:, mask] @ dense - y_test) ** 2 / len(y_test))
 
 
 print('sparse-ho started')
 
-t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(criterion)
@@ -139,7 +127,6 @@ grad_search(
     algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
     n_outer=10, tol=tol)
 
-t_grad_search = time.time() - t0
 
 print('sparse-ho finished')
 

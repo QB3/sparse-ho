@@ -87,12 +87,6 @@ def _grad_search(
         except Exception:
             old_tol = seq_tol[0]
         g_func, grad_lambda = _get_val_grad(lambdak, tol=tol, monitor=monitor)
-        # try:
-        #     monitor(g_func, criterion.val_test, lambdak.copy(),
-        #             grad_lambda, criterion.rmse)
-        # except Exception:
-        #     monitor(g_func, criterion.val_test, lambdak,
-        #             grad_lambda, criterion.rmse)
 
         old_grads.append(norm(grad_lambda))
         if np.isnan(old_grads[-1]):
