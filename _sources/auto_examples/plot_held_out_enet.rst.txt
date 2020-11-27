@@ -321,8 +321,8 @@ Grad-search with sparse-ho
     value of lambda_k [-10.98242273  -9.59236402]
     grad lambda [0.00568092 0.00429159]
     value of lambda_k [-11.09890595  -9.68036002]
-    Time grid-search 89.150230
-    Time grad-search 79.288249
+    Time grid-search 100.870829
+    Time grad-search 87.937872
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -372,7 +372,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  48.676 seconds)
+   **Total running time of the script:** ( 3 minutes  9.049 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:

@@ -14,27 +14,6 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to use custom metrics?">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_use_callback_thumb.png
-     :alt: How to use custom metrics?
-
-     :ref:`sphx_glr_auto_examples_plot_use_callback.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /auto_examples/plot_use_callback
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to perform hyperparameter optimization for a weighted Lasso using a held...">
 
 .. only:: html
@@ -137,6 +116,27 @@ can be done with the sparse_ho library.
    :hidden:
 
    /auto_examples/plot_held_out_enet
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to compute customize metrics using a callback function as in scipy.">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_use_callback_thumb.png
+     :alt: How to use custom metrics?
+
+     :ref:`sphx_glr_auto_examples_plot_use_callback.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_use_callback
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
