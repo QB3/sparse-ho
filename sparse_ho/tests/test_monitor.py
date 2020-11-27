@@ -32,12 +32,10 @@ max_iter = 1e5
 
 
 estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=10_000, warm_start=True)
+    fit_intercept=False, max_iter=max_iter, warm_start=True)
 
 
-mses_pred = []
 objs = []
-mses_estim = []
 
 
 def callback(val, grad, mask, dense, log_alpha):
