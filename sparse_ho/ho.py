@@ -13,34 +13,33 @@ def grad_search(
 
     Parameters
     ----------
-    algo: BaseAlgo instance
+    algo: instance of BaseAlgo
         algorithm used to compute hypergradient.
-    criterion: BaseCriterion
+    criterion:  instance of BaseCriterion
         criterion to optimize during hyperparameter optimization
         (outer optimization problem).
-    model: BaseModel
+    model:  instance of BaseModel
         model on which hyperparameter has to be selected
         (inner optimization problem).
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of shape (n_samples,)
+    X: array like of shape (n_samples, n_features)
+        Design matrix.
+    y: array like of shape (n_samples,)
         Target.
     log_alpha0: float
-        log of the regularization coefficient alpha.
+        initial value of the logarithm of the regularization coefficient alpha.
     monitor: instance of Monitor
         used to store the value of the cross-validation function.
-    n_outer: int
-        Defaults to 100.
-        number of maximum iteration in the outer loop (for the line search).
-    verbose: Bool
-        Defaults False. Indicates whether information about hyperparameter
-        optimization process  is printed or not.
-    tolerance_decrease: string
-        Defaults "constant". Tolerance decrease strategy for approximate gradient.
-    tol : float
-        Defaults 1e-5. Tolerance for the inner optimization solver.
-    t_max: float
-        Defaults 10000. Maximum running time threshold.
+    n_outer: int, optional (default=100).
+        number of maximum updates of alpha.
+    verbose: bool, optional (default=False)
+        Indicates whether information about hyperparameter
+        optimization process is printed or not.
+    tolerance_decrease: string, optional (default="constant")
+        Tolerance decrease strategy for approximate gradient.
+    tol : float, optional (default=1e-5)
+        Tolerance for the inner optimization solver.
+    t_max: float, optional (default=10000)
+        Maximum running time threshold in seconds.
     """
 
     def _get_val_grad(log_alpha, tol=tol, monitor=None):
@@ -62,13 +61,15 @@ def _grad_search(
         n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
         t_max=10000):
 
-    try:
+    is_multiparam = isinstance(log_alpha0, np.ndarray)
+    if is_multiparam:
         log_alphak = log_alpha0.copy()
         old_log_alphak = log_alphak.copy()
-    except Exception:
+    else:
         log_alphak = log_alpha0
         old_log_alphak = log_alphak
-    old_grads = []
+
+    grad_norms = []
 
     L_log_alpha = None
     val_outer_old = np.inf
@@ -86,18 +87,18 @@ def _grad_search(
             old_tol = seq_tol[0]
         val_outer, grad_outer = _get_val_grad(log_alphak, tol=tol, monitor=monitor)
 
-        old_grads.append(norm(grad_outer))
-        if np.isnan(old_grads[-1]):
+        grad_norms.append(norm(grad_outer))
+        if np.isnan(grad_norms[-1]):
             print("Nan present in gradient")
             break
 
         if L_log_alpha is None:
-            if old_grads[-1] > 1e-3:
+            if grad_norms[-1] > 1e-3:
                 # make sure we are not selecting a step size that is too small
-                try:
-                    L_log_alpha = old_grads[-1] / np.sqrt(len(log_alphak))
-                except Exception:
-                    L_log_alpha = old_grads[-1]
+                if is_multiparam:
+                    L_log_alpha = grad_norms[-1] / np.sqrt(len(log_alphak))
+                else:
+                    L_log_alpha = grad_norms[-1]
             else:
                 L_log_alpha = 1
         step_size = (1. / L_log_alpha)
