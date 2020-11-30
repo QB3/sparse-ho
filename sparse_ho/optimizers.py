@@ -138,7 +138,7 @@ class GradientDescent():
             log_alphak = log_alpha0
 
         for _ in range(self.n_outer):
-            value_outer, grad_outer = _get_val_grad(log_alphak, tol)
+            value_outer, grad_outer = _get_val_grad(log_alphak, self.tol)
             log_alphak -= self.step_size * grad_outer
             if monitor.times[-1] > self.t_max:
                 break

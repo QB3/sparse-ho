@@ -14,7 +14,6 @@ as in scipy.
 import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
@@ -87,8 +86,7 @@ algo = ImplicitForward()
 monitor = Monitor(callback=callback)
 optimizer = LineSearch(n_outer=30, tol=tol)
 
-grad_search(
-    algo, criterion, model, optimizer, X, y, np.log(alpha_max / 10), monitor)
+grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 
 
 print('sparse-ho finished')

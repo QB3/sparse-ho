@@ -1,9 +1,6 @@
 # This files contains the functions to perform first order descent for HO
 # hyperparameter setting
 
-import numpy as np
-from numpy.linalg import norm
-
 
 def grad_search(
         algo, criterion, model, optimizer, X, y, log_alpha0, monitor):

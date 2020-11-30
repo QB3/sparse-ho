@@ -13,7 +13,7 @@ from sparse_ho.optimizers import LineSearch
 
 
 X_, y_, beta_star = get_synt_data(
-    n_samples=200, n_features=70, n_times=1,SNR=5)[:3]
+    n_samples=200, n_features=70, n_times=1, SNR=5)[:3]
 
 X, X_unseen, y, y_unseen = train_test_split(X_, y_)
 
