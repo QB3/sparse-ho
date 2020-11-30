@@ -13,6 +13,8 @@ from sparse_ho.implicit import Implicit
 from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
+from sparse_ho.optimizers import LineSearch
+
 
 n_samples = 100
 n_features = 100
@@ -161,23 +163,22 @@ def test_grad_search(model, crit):
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor1, n_outer=n_outer,
-        tol=tol)
+    optimizer = LineSearch(n_outer=n_outer, tol=tol)
+    grad_search(algo, criterion, model, optimizer, X, y, log_alpha, monitor1)
 
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
+    optimizer = LineSearch(n_outer=n_outer, tol=tol)
     grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor2, n_outer=n_outer,
-        tol=tol)
+        algo, criterion, model, optimizer, X, y, log_alpha, monitor2)
 
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
+    optimizer = LineSearch(n_outer=n_outer, tol=tol)
     grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor3, n_outer=n_outer,
-        tol=tol)
+        algo, criterion, model, optimizer, X, y, log_alpha, monitor3)
 
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
@@ -198,16 +199,17 @@ def test_grad_search_custom(model, model_custom, crit):
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
+    optimizer = LineSearch(n_outer=n_outer, tol=tol)
     grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor, n_outer=n_outer,
-        tol=tol)
+        algo, criterion, model, optimizer, X, y, log_alpha, monitor)
 
     criterion = HeldOutLogistic(idx_val, idx_val)
     monitor_custom = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=5000)
+    optimizer = LineSearch(n_outer=n_outer, tol=tol)
     grad_search(
-        algo, criterion, model_custom, X, y, log_alpha, monitor_custom,
-        n_outer=n_outer, tol=tol)
+        algo, criterion, model_custom, optimizer, X, y, log_alpha,
+        monitor_custom)
 
     np.testing.assert_allclose(
         np.array(monitor.log_alphas), np.array(monitor_custom.log_alphas),
