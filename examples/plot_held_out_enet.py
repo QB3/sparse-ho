@@ -28,6 +28,8 @@ from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 
+from sparse_ho.optimizers import LineSearch
+
 Axes3D  # hack for matplotlib 3D support
 # TODO improve example and remove this 3D graph
 
@@ -101,13 +103,14 @@ print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
 n_outer = 10
+log_alpha0 = np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)])
 model = ElasticNet(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
+optimizer = LineSearch(n_outer=n_outer, tol=tol, verbose=True)
 grad_search(
-    algo, criterion, model, X, y, verbose=True,
-    log_alpha0=np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)]),
-    tol=tol, n_outer=n_outer, monitor=monitor)
+    algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
+    monitor=monitor)
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
 alphas_grad /= alpha_max

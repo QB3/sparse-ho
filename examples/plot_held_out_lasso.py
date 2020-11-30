@@ -18,6 +18,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import linear_model
+from sklearn.datasets import make_regression
+
+from libsvmdata.datasets import fetch_libsvm
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
@@ -26,9 +29,7 @@ from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-from sklearn.datasets import make_regression
-
-from libsvmdata.datasets import fetch_libsvm
+from sparse_ho.optimizers import LineSearch
 
 
 print(__doc__)
@@ -56,14 +57,14 @@ alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
 tol = 1e-7
-max_iter = 1e5
+max_iter = 1e3
 
 ##############################################################################
 # Grid-search with scikit-learn
 # -----------------------------
 
 estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
+    fit_intercept=False, max_iter=max_iter, warm_start=True)
 
 print('scikit-learn started')
 
@@ -91,9 +92,9 @@ model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
+optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
-    n_outer=10, tol=tol)
+    algo, criterion, model, optimizer, X, y, log_alpha0, monitor_grad)
 
 t_grad_search = time.time() - t0
 
@@ -117,7 +118,7 @@ print('Minimum objective grad-search %.5f' % objs_grad.min())
 
 current_palette = sns.color_palette("colorblind")
 
-fig = plt.figure(figsize=(5, 3))
+plt.figure(figsize=(5, 3))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0])
 plt.semilogx(

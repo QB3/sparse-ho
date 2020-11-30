@@ -17,13 +17,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import make_regression
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-from sklearn.datasets import make_regression
+from sparse_ho.optimizers import LineSearch
+
 
 from libsvmdata.datasets import fetch_libsvm
 
@@ -80,13 +82,13 @@ print('sparse-ho started')
 
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward(criterion)
+algo = ImplicitForward()
 # use Monitor(callback) with your custom callback
 monitor = Monitor(callback=callback)
+optimizer = LineSearch(n_outer=30, tol=tol)
 
 grad_search(
-    algo, criterion, model, X, y, np.log(alpha_max / 10), monitor,
-    n_outer=30, tol=tol)
+    algo, criterion, model, optimizer, X, y, np.log(alpha_max / 10), monitor)
 
 
 print('sparse-ho finished')
@@ -94,10 +96,7 @@ print('sparse-ho finished')
 ##############################################################################
 # Plot results
 # ------------
-
-current_palette = sns.color_palette("colorblind")
-
-fig = plt.figure(figsize=(5, 3))
+plt.figure(figsize=(5, 3))
 plt.plot(monitor.times, objs_test)
 plt.tick_params(width=5)
 plt.xlabel("Times (s)")
