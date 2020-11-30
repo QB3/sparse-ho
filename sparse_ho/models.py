@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 import numpy as np
 from numpy.linalg import norm
 from numba import njit
@@ -9,7 +11,18 @@ import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse, csc_matrix
 
 
-class Lasso():
+class BaseModel(ABC):
+
+    @abstractmethod
+    def __init__(cls):
+        pass
+
+    @abstractmethod
+    def get_hessian(cls, *args, **kwargs):
+        return NotImplemented
+
+
+class Lasso(BaseModel):
     """Linear Model trained with L1 prior as regularizer (aka the Lasso)
     The optimization objective for Lasso is:
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
@@ -266,7 +279,7 @@ class Lasso():
         return norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta)
 
 
-class WeightedLasso():
+class WeightedLasso(BaseModel):
     r"""Linear Model trained with weighted L1 regularizer (aka weighted Lasso)
 
     The optimization objective for weighted Lasso is:
@@ -531,7 +544,7 @@ class WeightedLasso():
             norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
 
 
-class SVM():
+class SVM(BaseModel):
     """Support vector machines.
     The optimization objective for the SVM is:
     TODO
@@ -857,7 +870,7 @@ class SVM():
         return norm(res)
 
 
-class SparseLogreg():
+class SparseLogreg(BaseModel):
     """Sparse Logistic Regression classifier.
     The objective function is:
 
@@ -1146,7 +1159,7 @@ class SparseLogreg():
         return mask[0], dense, None
 
 
-class SVR():
+class SVR(BaseModel):
     """
     Should we remove the SVR?
 
@@ -1539,7 +1552,7 @@ class SVR():
         return norm(res)
 
 
-class ElasticNet():
+class ElasticNet(BaseModel):
     def __init__(
             self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter

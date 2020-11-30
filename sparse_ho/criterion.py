@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from numpy.linalg import norm
 import numpy as np
 from scipy.sparse import issparse
@@ -9,7 +11,30 @@ from sparse_ho.utils import derivative_smooth_hinge
 from sparse_ho.forward import get_beta_jac_iterdiff
 
 
-class HeldOutMSE():
+class BaseCriterion(ABC):
+
+    @abstractmethod
+    def __init__(cls):
+        pass
+
+    @abstractmethod
+    def get_val_outer(cls, *args, **kwargs):
+        return NotImplemented
+
+    @abstractmethod
+    def get_val(cls, *args, **kwargs):
+        return NotImplemented
+
+    @abstractmethod
+    def get_val_grad(cls, *args, **kwargs):
+        return NotImplemented
+
+    @abstractmethod
+    def proj_hyperparam(cls, *args, **kwargs):
+        return NotImplemented
+
+
+class HeldOutMSE(BaseCriterion):
     """Held out loss for quadratic datafit.
 
     Attributes
@@ -81,7 +106,7 @@ class HeldOutMSE():
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
-class HeldOutLogistic():
+class HeldOutLogistic(BaseCriterion):
     """Logistic loss on held out data
     """
 
@@ -153,7 +178,7 @@ class HeldOutLogistic():
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
-class HeldOutSmoothedHinge():
+class HeldOutSmoothedHinge(BaseCriterion):
     """Smooth Hinge loss.
 
     Attributes
@@ -242,7 +267,7 @@ class HeldOutSmoothedHinge():
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
 
-class SmoothedSURE():
+class SmoothedSURE(BaseCriterion):
     """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
 
     Implements the iterative Finite-Difference Monte-Carlo approximation of the
@@ -372,7 +397,7 @@ class SmoothedSURE():
         return val, grad
 
 
-class CrossVal():
+class CrossVal(BaseCriterion):
     """Cross-validation loss.
 
     Attributes
