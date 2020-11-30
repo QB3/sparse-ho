@@ -85,7 +85,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 134kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:18, 172kB/s]    file_sizes:   2%|6                           | 319k/13.7M [00:01<01:03, 211kB/s]    file_sizes:   4%|#1                          | 549k/13.7M [00:01<00:47, 277kB/s]    file_sizes:  11%|###                        | 1.53M/13.7M [00:01<00:31, 384kB/s]    file_sizes:  17%|####5                      | 2.32M/13.7M [00:01<00:21, 524kB/s]    file_sizes:  30%|########1                  | 4.15M/13.7M [00:02<00:13, 729kB/s]    file_sizes:  42%|###########2               | 5.73M/13.7M [00:02<00:08, 997kB/s]    file_sizes:  53%|#############8            | 7.30M/13.7M [00:02<00:04, 1.34MB/s]    file_sizes:  65%|################8         | 8.87M/13.7M [00:02<00:02, 1.77MB/s]    file_sizes:  72%|##################7       | 9.92M/13.7M [00:02<00:01, 2.19MB/s]    file_sizes:  86%|######################2   | 11.8M/13.7M [00:03<00:00, 2.81MB/s]    file_sizes:  95%|########################7 | 13.1M/13.7M [00:03<00:00, 3.34MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.09MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:02, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 135kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:17, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 231kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 315kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 436kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:16, 610kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:01<00:10, 840kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.14MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.53MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 2.00MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 2.55MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 3.16MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.45MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -239,8 +239,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 11.73
-    Time to compute CV for sparse-ho: 19.47
+    Time to compute CV for scikit-learn: 11.81
+    Time to compute CV for sparse-ho: 21.13
     Minimum objective grid-search 0.21316
     Minimum objective grad-search 0.21211
 
@@ -250,7 +250,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  41.736 seconds)
+   **Total running time of the script:** ( 0 minutes  43.528 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

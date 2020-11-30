@@ -103,25 +103,32 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>algo: TODO</strong></dt><dd></dd>
-<dt><strong>criterion: TODO</strong></dt><dd></dd>
-<dt><strong>model: TODO</strong></dt><dd></dd>
-<dt><strong>log_alpha0: float</strong></dt><dd><p>log of the regularization coefficient alpha</p>
+<dt><strong>algo: instance of BaseAlgo</strong></dt><dd><p>algorithm used to compute hypergradient.</p>
 </dd>
-<dt><strong>tol</strong><span class="classifier">float</span></dt><dd><p>tolerance for the inner optimization solver</p>
+<dt><strong>criterion:  instance of BaseCriterion</strong></dt><dd><p>criterion to optimize during hyperparameter optimization
+(outer optimization problem).</p>
 </dd>
-<dt><strong>monitor: Monitor object</strong></dt><dd><p>used to store the value of the cross-validation function</p>
+<dt><strong>model:  instance of BaseModel</strong></dt><dd><p>model on which hyperparameter has to be selected
+(inner optimization problem).</p>
 </dd>
-<dt><strong>n_outer: int</strong></dt><dd><p>number of maximum iteration in the outer loop (for the line search)</p>
+<dt><strong>X: array like of shape (n_samples, n_features)</strong></dt><dd><p>Design matrix.</p>
 </dd>
-<dt><strong>tolerance_decrease: string</strong></dt><dd><p>tolerance decrease strategy for approximate gradient</p>
+<dt><strong>y: array like of shape (n_samples,)</strong></dt><dd><p>Target.</p>
 </dd>
-<dt><strong>criterion: string</strong></dt><dd><p>criterion to optimize during hyperparameter optimization
-you may choose between “cv” and “sure”</p>
+<dt><strong>log_alpha0: float</strong></dt><dd><p>initial value of the logarithm of the regularization coefficient alpha.</p>
 </dd>
-<dt><strong>random_state: int</strong></dt><dd></dd>
-<dt><strong>beta_star: np.array, shape (n_features,)</strong></dt><dd><p>True coefficients of the underlying model (if known)
-used to compute metrics</p>
+<dt><strong>monitor: instance of Monitor</strong></dt><dd><p>used to store the value of the cross-validation function.</p>
+</dd>
+<dt><strong>n_outer: int, optional (default=100).</strong></dt><dd><p>number of maximum updates of alpha.</p>
+</dd>
+<dt><strong>verbose: bool, optional (default=False)</strong></dt><dd><p>Indicates whether information about hyperparameter
+optimization process is printed or not.</p>
+</dd>
+<dt><strong>tolerance_decrease: string, optional (default=”constant”)</strong></dt><dd><p>Tolerance decrease strategy for approximate gradient.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, optional (default=1e-5)</span></dt><dd><p>Tolerance for the inner optimization solver.</p>
+</dd>
+<dt><strong>t_max: float, optional (default=10000)</strong></dt><dd><p>Maximum running time threshold in seconds.</p>
 </dd>
 </dl>
 </dd>

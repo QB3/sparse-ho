@@ -301,28 +301,28 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     Started grad-search
-    grad lambda [0.21482443 0.04189048]
-    value of lambda_k [-8.30197129 -7.16578814]
-    grad lambda [0.06233496 0.0622351 ]
-    value of lambda_k [-9.14991226 -8.01237068]
-    grad lambda [0.03378978 0.0288922 ]
-    value of lambda_k [-9.63374542 -8.42607582]
-    grad lambda [0.02421421 0.0203478 ]
-    value of lambda_k [-9.99871532 -8.73276901]
-    grad lambda [0.0175788  0.01554407]
-    value of lambda_k [-10.27761774  -8.97938872]
-    grad lambda [0.01352691 0.01206075]
-    value of lambda_k [-10.50352919  -9.18081391]
-    grad lambda [0.01065587 0.00950575]
-    value of lambda_k [-10.69085813  -9.34792376]
-    grad lambda [0.00828327 0.00733894]
-    value of lambda_k [-10.84414112  -9.48373193]
-    grad lambda [0.00709898 0.00557686]
-    value of lambda_k [-10.98242273  -9.59236402]
-    grad lambda [0.00568092 0.00429159]
-    value of lambda_k [-11.09890595  -9.68036002]
-    Time grid-search 89.926667
-    Time grad-search 84.539010
+    grad outer [0.21482443 0.04189048]
+    value of log_alphak [-8.30197129 -7.16578814]
+    grad outer [0.06233496 0.0622351 ]
+    value of log_alphak [-9.14991226 -8.01237068]
+    grad outer [0.03378978 0.0288922 ]
+    value of log_alphak [-9.63374542 -8.42607582]
+    grad outer [0.02421421 0.0203478 ]
+    value of log_alphak [-9.99871532 -8.73276901]
+    grad outer [0.0175788  0.01554407]
+    value of log_alphak [-10.27761774  -8.97938872]
+    grad outer [0.01352691 0.01206075]
+    value of log_alphak [-10.50352919  -9.18081391]
+    grad outer [0.01065587 0.00950575]
+    value of log_alphak [-10.69085813  -9.34792376]
+    grad outer [0.00828327 0.00733894]
+    value of log_alphak [-10.84414112  -9.48373193]
+    grad outer [0.00709898 0.00557686]
+    value of log_alphak [-10.98242273  -9.59236402]
+    grad outer [0.00568092 0.00429159]
+    value of log_alphak [-11.09890595  -9.68036002]
+    Time grid-search 88.350918
+    Time grad-search 74.360452
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -372,7 +372,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  54.702 seconds)
+   **Total running time of the script:** ( 2 minutes  42.940 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
