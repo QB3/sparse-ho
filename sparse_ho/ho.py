@@ -6,8 +6,8 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100, verbose=False,
-        tolerance_decrease='constant', tol=1e-5, t_max=10000):
+        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100,
+        verbose=False, tolerance_decrease='constant', tol=1e-5, t_max=10000):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
@@ -85,7 +85,8 @@ def _grad_search(
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
-        val_outer, grad_outer = _get_val_grad(log_alphak, tol=tol, monitor=monitor)
+        val_outer, grad_outer = _get_val_grad(log_alphak, tol=tol,
+                                              monitor=monitor)
 
         grad_norms.append(norm(grad_outer))
         if np.isnan(grad_norms[-1]):
@@ -112,8 +113,8 @@ def _grad_search(
         C = 0.25
         factor_L_log_alpha = 1.0
         if val_outer <= val_outer_old + C * tol + \
-                old_tol * (C + factor_L_log_alpha) * incr - factor_L_log_alpha * \
-                (L_log_alpha) * incr * incr:
+                old_tol * (C + factor_L_log_alpha) * incr - \
+                factor_L_log_alpha * (L_log_alpha) * incr * incr:
             L_log_alpha *= 0.95
             if verbose > 1:
                 print('increased step size')
