@@ -124,9 +124,9 @@ def _grad_search(
                 print('decrease step size')
             # decrease step size
             L_log_alpha *= 2
-            try:
+            if is_multiparam:
                 log_alphak = old_log_alphak.copy()
-            except Exception:
+            else:
                 log_alphak = old_log_alphak
             print('!!step size rejected!!', val_outer, val_outer_old)
             val_outer, grad_outer = _get_val_grad(
