@@ -43,7 +43,7 @@ class LineSearch():
         grad_norms = []
 
         L_log_alpha = None
-        val_outer_old = np.inf
+        value_outer_old = np.inf
 
         if self.tolerance_decrease == 'exponential':
             seq_tol = np.geomspace(1e-2, self.tol, self.n_outer)
@@ -56,7 +56,7 @@ class LineSearch():
                 old_tol = seq_tol[i - 1]
             except Exception:
                 old_tol = seq_tol[0]
-            val_outer, grad_outer = _get_val_grad(
+            value_outer, grad_outer = _get_val_grad(
                 log_alphak, tol=tol, monitor=monitor)
 
             grad_norms.append(norm(grad_outer))
@@ -83,7 +83,7 @@ class LineSearch():
             incr = norm(step_size * grad_outer)
             C = 0.25
             factor_L_log_alpha = 1.0
-            if val_outer <= val_outer_old + C * tol + \
+            if value_outer <= value_outer_old + C * tol + \
                     old_tol * (C + factor_L_log_alpha) * incr - \
                     factor_L_log_alpha * (L_log_alpha) * incr * incr:
                 L_log_alpha *= 0.95
@@ -91,7 +91,7 @@ class LineSearch():
                     print('increased step size')
                 log_alphak -= step_size * grad_outer
 
-            elif val_outer >= 1.2 * val_outer:
+            elif value_outer >= 1.2 * value_outer_old:
                 if self.verbose > 1:
                     print('decrease step size')
                 # decrease step size
@@ -100,9 +100,8 @@ class LineSearch():
                     log_alphak = old_log_alphak.copy()
                 else:
                     log_alphak = old_log_alphak
-                print('!!step size rejected!!', val_outer, val_outer_old)
-                val_outer, grad_outer = _get_val_grad(
-                    log_alphak, tol=tol)
+                print('!!step size rejected!!', value_outer, value_outer_old)
+                value_outer, grad_outer = _get_val_grad(log_alphak, tol=tol)
 
                 tol *= 0.5
             else:
@@ -110,14 +109,40 @@ class LineSearch():
                 log_alphak -= step_size * grad_outer
 
             log_alphak = proj_hyperparam(log_alphak)
-            val_outer_old = val_outer
+            value_outer_old = value_outer
 
             if self.verbose:
                 print('grad outer', grad_outer)
                 print('value of log_alphak', log_alphak)
             if monitor.times[-1] > self.t_max:
                 break
-        return log_alphak, val_outer, grad_outer
+        return log_alphak, value_outer, grad_outer
+
+
+class GradientDescent():
+    def __init__(
+            self, n_outer=100, step_size=None, verbose=False, tol=1e-5,
+            t_max=10_000):
+        self.n_outer = n_outer
+        self.step_size = step_size
+        self.verbose = verbose
+        self.tol = tol
+        self.t_max = t_max
+
+    def _grad_search(
+            self, _get_val_grad, proj_hyperparam, log_alpha0, monitor):
+        is_multiparam = isinstance(log_alpha0, np.ndarray)
+        if is_multiparam:
+            log_alphak = log_alpha0.copy()
+        else:
+            log_alphak = log_alpha0
+
+        for _ in range(self.n_outer):
+            value_outer, grad_outer = _get_val_grad(log_alphak, tol)
+            log_alphak -= self.step_size * grad_outer
+            if monitor.times[-1] > self.t_max:
+                break
+        return log_alphak, value_outer, grad_outer
 
 
 class LineSearchWolfe():
