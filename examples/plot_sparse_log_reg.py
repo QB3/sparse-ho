@@ -28,6 +28,7 @@ from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.forward import Forward
 from sparse_ho.grid_search import grid_search
+from sparse_ho.optimizers import LineSearch
 
 from sklearn.datasets import make_classification
 
@@ -100,10 +101,13 @@ estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, solver='saga', tol=tol)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
+
 monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
-grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max), monitor_grad,
-            n_outer=10, tol=tol)
+optimizer = LineSearch(n_outer=100, tol=tol)
+grad_search(
+    algo, criterion, model, optimizer, X, y, np.log(0.1 * alpha_max),
+    monitor_grad)
 objs_grad = np.array(monitor_grad.objs)
 
 t_grad_search = time.time() - t0
