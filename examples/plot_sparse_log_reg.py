@@ -106,7 +106,7 @@ monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 optimizer = LineSearch(n_outer=100, tol=tol)
 grad_search(
-    algo, criterion, model, optimizer, X, y, np.log(0.1 * alpha_max),
+    algo, criterion, model, optimizer, X, y, log_alpha0,
     monitor_grad)
 objs_grad = np.array(monitor_grad.objs)
 
