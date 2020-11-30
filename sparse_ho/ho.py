@@ -6,33 +6,40 @@ from numpy.linalg import norm
 
 
 def grad_search(
-        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100, verbose=False,
-        tolerance_decrease='constant', tol=1e-5, t_max=10000):
+        algo, criterion, model, X, y, log_alpha0, monitor, n_outer=100,
+        verbose=False, tolerance_decrease='constant', tol=1e-5, t_max=10000):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
     Parameters
     ----------
-    algo: TODO
-    criterion: TODO
-    model: TODO
-    log_alpha0: float
-        log of the regularization coefficient alpha
-    tol : float
-        tolerance for the inner optimization solver
-    monitor: Monitor object
-        used to store the value of the cross-validation function
-    n_outer: int
-        number of maximum iteration in the outer loop (for the line search)
-    tolerance_decrease: string
-        tolerance decrease strategy for approximate gradient
-    criterion: string
+    algo: instance of BaseAlgo
+        algorithm used to compute hypergradient.
+    criterion:  instance of BaseCriterion
         criterion to optimize during hyperparameter optimization
-        you may choose between "cv" and "sure"
-    random_state: int
-    beta_star: np.array, shape (n_features,)
-        True coefficients of the underlying model (if known)
-        used to compute metrics
+        (outer optimization problem).
+    model:  instance of BaseModel
+        model on which hyperparameter has to be selected
+        (inner optimization problem).
+    X: array like of shape (n_samples, n_features)
+        Design matrix.
+    y: array like of shape (n_samples,)
+        Target.
+    log_alpha0: float
+        initial value of the logarithm of the regularization coefficient alpha.
+    monitor: instance of Monitor
+        used to store the value of the cross-validation function.
+    n_outer: int, optional (default=100).
+        number of maximum updates of alpha.
+    verbose: bool, optional (default=False)
+        Indicates whether information about hyperparameter
+        optimization process is printed or not.
+    tolerance_decrease: string, optional (default="constant")
+        Tolerance decrease strategy for approximate gradient.
+    tol : float, optional (default=1e-5)
+        Tolerance for the inner optimization solver.
+    t_max: float, optional (default=10000)
+        Maximum running time threshold in seconds.
     """
 
     def _get_val_grad(log_alpha, tol=tol, monitor=None):
@@ -40,7 +47,6 @@ def grad_search(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
             monitor=monitor)
 
-    # TODO fix this proj param pb
     def _proj_param(log_alpha):
         return criterion.proj_hyperparam(model, X, y, log_alpha)
 
@@ -54,26 +60,19 @@ def _grad_search(
         _get_val_grad, proj_hyperparam, log_alpha0, monitor,
         n_outer=100, verbose=False, tolerance_decrease='constant', tol=1e-5,
         t_max=10000):
-    """
-    This line-search code is taken from here:
-    https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
-    Parameters
-    --------------
-    TODO
+    is_multiparam = isinstance(log_alpha0, np.ndarray)
+    if is_multiparam:
+        log_alphak = log_alpha0.copy()
+        old_log_alphak = log_alphak.copy()
+    else:
+        log_alphak = log_alpha0
+        old_log_alphak = log_alphak
 
-    """
+    grad_norms = []
 
-    try:
-        lambdak = log_alpha0.copy()
-        old_lambdak = lambdak.copy()
-    except Exception:
-        lambdak = log_alpha0
-        old_lambdak = lambdak
-    old_grads = []
-
-    L_lambda = None
-    g_func_old = np.inf
+    L_log_alpha = None
+    val_outer_old = np.inf
 
     if tolerance_decrease == 'exponential':
         seq_tol = np.geomspace(1e-2, tol, n_outer)
@@ -86,67 +85,68 @@ def _grad_search(
             old_tol = seq_tol[i - 1]
         except Exception:
             old_tol = seq_tol[0]
-        g_func, grad_lambda = _get_val_grad(lambdak, tol=tol, monitor=monitor)
+        val_outer, grad_outer = _get_val_grad(log_alphak, tol=tol,
+                                              monitor=monitor)
 
-        old_grads.append(norm(grad_lambda))
-        if np.isnan(old_grads[-1]):
+        grad_norms.append(norm(grad_outer))
+        if np.isnan(grad_norms[-1]):
             print("Nan present in gradient")
             break
 
-        if L_lambda is None:
-            if old_grads[-1] > 1e-3:
+        if L_log_alpha is None:
+            if grad_norms[-1] > 1e-3:
                 # make sure we are not selecting a step size that is too small
-                try:
-                    L_lambda = old_grads[-1] / np.sqrt(len(lambdak))
-                except Exception:
-                    L_lambda = old_grads[-1]
+                if is_multiparam:
+                    L_log_alpha = grad_norms[-1] / np.sqrt(len(log_alphak))
+                else:
+                    L_log_alpha = grad_norms[-1]
             else:
-                L_lambda = 1
-        step_size = (1. / L_lambda)
+                L_log_alpha = 1
+        step_size = (1. / L_log_alpha)
         try:
-            old_lambdak = lambdak.copy()
+            old_log_alphak = log_alphak.copy()
         except Exception:
-            old_lambdak = lambdak
-        lambdak -= step_size * grad_lambda
+            old_log_alphak = log_alphak
+        log_alphak -= step_size * grad_outer
 
-        incr = norm(step_size * grad_lambda)
+        incr = norm(step_size * grad_outer)
         C = 0.25
-        factor_L_lambda = 1.0
-        if g_func <= g_func_old + C * tol + \
-                old_tol * (C + factor_L_lambda) * incr - factor_L_lambda * \
-                (L_lambda) * incr * incr:
-            L_lambda *= 0.95
+        factor_L_log_alpha = 1.0
+        if val_outer <= val_outer_old + C * tol + \
+                old_tol * (C + factor_L_log_alpha) * incr - \
+                factor_L_log_alpha * (L_log_alpha) * incr * incr:
+            L_log_alpha *= 0.95
             if verbose > 1:
                 print('increased step size')
-            lambdak -= step_size * grad_lambda
+            log_alphak -= step_size * grad_outer
 
-        elif g_func >= 1.2 * g_func_old:
+        elif val_outer >= 1.2 * val_outer:
             if verbose > 1:
                 print('decrease step size')
             # decrease step size
-            L_lambda *= 2
-            try:
-                lambdak = old_lambdak.copy()
-            except Exception:
-                lambdak = old_lambdak
-            print('!!step size rejected!!', g_func, g_func_old)
-            g_func, grad_lambda = _get_val_grad(
-                lambdak, tol=tol)
+            L_log_alpha *= 2
+            if is_multiparam:
+                log_alphak = old_log_alphak.copy()
+            else:
+                log_alphak = old_log_alphak
+            print('!!step size rejected!!', val_outer, val_outer_old)
+            val_outer, grad_outer = _get_val_grad(
+                log_alphak, tol=tol)
 
             tol *= 0.5
         else:
-            old_lambdak = lambdak.copy()
-            lambdak -= step_size * grad_lambda
+            old_log_alphak = log_alphak.copy()
+            log_alphak -= step_size * grad_outer
 
-        lambdak = proj_hyperparam(lambdak)
-        g_func_old = g_func
+        log_alphak = proj_hyperparam(log_alphak)
+        val_outer_old = val_outer
 
         if verbose:
-            print('grad lambda', grad_lambda)
-            print('value of lambda_k', lambdak)
+            print('grad outer', grad_outer)
+            print('value of log_alphak', log_alphak)
         if monitor.times[-1] > t_max:
             break
-    return lambdak, g_func, grad_lambda
+    return log_alphak, val_outer, grad_outer
 
 
 def grad_search_wolfe(
