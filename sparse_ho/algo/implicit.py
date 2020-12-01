@@ -3,11 +3,12 @@ from numpy.linalg import norm
 from scipy.sparse import issparse, identity
 from scipy.sparse.linalg import cg
 from sparse_ho.utils import init_dbeta0_new
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
 
 
 class Implicit():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit differentiation.
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the implicit differentiation.
 
     Parameters
     ----------
@@ -35,7 +36,8 @@ class Implicit():
 
 
 def get_beta_jac_t_v_implicit(
-        X_train, y_train, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3, model="lasso", sk=False, max_iter=1000, sol_lin_sys=None, n=1,
+        X_train, y_train, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
+        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None, n=1,
         sigma=0, delta=0, epsilon=0):
     alpha = np.exp(log_alpha)
     n_samples, n_features = X_train.shape
@@ -87,6 +89,7 @@ def get_beta_jac_t_v_implicit(
                 X_train, y_train, mask, dense, v, log_alpha), x0=sol0, atol=1e-3)
         sol_lin_sys = sol[0]
     jac_t_v = model._get_jac_t_v(
-        X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(), n_samples)
+        X_train, y_train, sol_lin_sys, mask, dense, alphas,
+        v.copy(), n_samples)
 
     return mask, dense, jac_t_v, sol[0]

@@ -1,6 +1,6 @@
 import numpy as np
 # from sklearn.svm import LinearSVR
-from sparse_ho.models import SVR
+from sparse_ho.model.svr import SVR
 # from sparse_ho.forward import get_beta_jac_iterdiff
 from sklearn.datasets import make_regression
 n_samples = 100

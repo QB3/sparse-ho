@@ -3,9 +3,9 @@ from numpy.linalg import norm
 from sklearn.model_selection import train_test_split
 from sklearn import linear_model
 
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.model.lasso import Lasso
+from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.algo.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho import grad_search
 from sparse_ho.datasets import get_synt_data
