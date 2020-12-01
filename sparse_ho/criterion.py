@@ -44,7 +44,8 @@ class HeldOutMSE():
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol, compute_jac=False)
+            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
+            compute_jac=False)
         return self.get_val_outer(mask, dense)
 
     def get_val_grad(
@@ -62,7 +63,8 @@ class HeldOutMSE():
             X_train, y_train, log_alpha, model,
             get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac, full_jac_v=True)
+            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
+            full_jac_v=True)
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
@@ -110,7 +112,8 @@ class HeldOutLogistic():
         # TODO add warm start
         # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol, compute_jac=False)
+            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol,
+            compute_jac=False)
         return self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
 
@@ -129,7 +132,8 @@ class HeldOutLogistic():
             return v
 
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0, dense0=self.dense0,
+            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0,
+            dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
@@ -250,8 +254,9 @@ class SmoothedSURE():
 
     References
     ----------
-    .. [1] C.-A. Deledalle, Stein Unbiased GrAdient estimator of the Risk (SUGAR)
-    for multiple parameter selection. SIAM J. Imaging Sci., 7(4), 2448-2487.
+    .. [1] C.-A. Deledalle, Stein Unbiased GrAdient estimator of the Risk
+    (SUGAR) for multiple parameter selection.
+    SIAM J. Imaging Sci., 7(4), 2448-2487.
     """
 
     def __init__(self, sigma, finite_difference_step=None,

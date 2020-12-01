@@ -54,7 +54,8 @@ def get_v(mask, dense):
 
 def test_beta_jac():
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
-        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]), tol=tol, model=model, compute_jac=True, max_iter=max_iter)
+        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
+        tol=tol, model=model, compute_jac=True, max_iter=max_iter)
 
     estimator = linear_model.ElasticNet(
         alpha=(alpha_1 + alpha_2), fit_intercept=False,
@@ -64,23 +65,26 @@ def test_beta_jac():
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
-    assert np.allclose(dense1, estimator.coef_[estimator.coef_ != 0])
+        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
+        niter_jac=10000)
+    np.testing.assert_allclose(dense1, estimator.coef_[estimator.coef_ != 0])
     assert np.all(supp1 == supp2)
-    assert np.allclose(dense1, dense2)
+    np.testing.assert_allclose(dense1, dense2)
 
 
 def test_beta_jac_custom():
     supp, dense, jac = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+        get_v, tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
+        niter_jac=10000)
     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        get_v, tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter, niter_jac=10000)
+        get_v, tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter,
+        niter_jac=10000)
 
-    assert np.allclose(dense, dense_custom)
-    assert np.allclose(supp, supp_custom)
-    assert np.allclose(dense, dense_custom)
+    np.testing.assert_allclose(dense, dense_custom)
+    np.testing.assert_allclose(supp, supp_custom)
+    np.testing.assert_allclose(dense, dense_custom)
 
 
 def test_val_grad():
@@ -111,14 +115,14 @@ def test_val_grad():
     val_imp, grad_imp = criterion.get_val_grad(
         model, X, y, np.array([log_alpha1, log_alpha2]),
         algo.get_beta_jac_v, tol=tol)
-    assert np.allclose(val_fwd, val_imp_fwd)
-    assert np.allclose(grad_fwd, grad_imp_fwd)
-    assert np.allclose(val_imp_fwd, val_imp)
-    assert np.allclose(val_imp_fwd, val_imp_fwd_custom)
+    np.testing.assert_allclose(val_fwd, val_imp_fwd)
+    np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
+    np.testing.assert_allclose(val_imp_fwd, val_imp)
+    np.testing.assert_allclose(val_imp_fwd, val_imp_fwd_custom)
     # for the implcit the conjugate grad does not converge
     # hence the rtol=1e-2
-    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
-    assert np.allclose(grad_imp_fwd, grad_imp_fwd_custom)
+    np.testing.assert_allclose(grad_imp_fwd, grad_imp, atol=1e-3)
+    np.testing.assert_allclose(grad_imp_fwd, grad_imp_fwd_custom)
 
 
 def test_grad_search():
@@ -147,20 +151,21 @@ def test_grad_search():
     [np.linalg.norm(grad) for grad in monitor1.grads]
     [np.exp(alpha) for alpha in monitor1.log_alphas]
 
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    assert np.allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads))
-    assert np.allclose(
-        np.array(monitor1.objs), np.array(monitor3.objs))
+    np.testing.assert_allclose(
+        np.array(monitor1.grads), np.array(monitor3.grads), rtol=1e-6)
+    np.testing.assert_allclose(
+        np.array(monitor1.objs), np.array(monitor3.objs), rtol=1e-6)
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
 
-    assert np.allclose(
-        np.array(monitor1.log_alphas), np.array(monitor2.log_alphas), atol=1e-2)
-    assert np.allclose(
+    np.testing.assert_allclose(
+        np.array(monitor1.log_alphas), np.array(monitor2.log_alphas),
+        atol=1e-2)
+    np.testing.assert_allclose(
         np.array(monitor1.grads), np.array(monitor2.grads), atol=1e-2)
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor2.objs), atol=1e-2)
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor2.times))
