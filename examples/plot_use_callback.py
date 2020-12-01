@@ -18,9 +18,9 @@ import seaborn as sns
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.model.lasso import Lasso
+from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.algo.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sklearn.datasets import make_regression

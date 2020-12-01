@@ -22,11 +22,11 @@ import seaborn as sns
 
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
-from sparse_ho.models import SparseLogreg
+from sparse_ho.model.sparselogreg import SparseLogreg
 from celer import LogisticRegression
-from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.forward import Forward
+from sparse_ho.criterion.hout_logistic import HeldOutLogistic
+from sparse_ho.algo.implicit_forward import ImplicitForward
+from sparse_ho.algo.forward import Forward
 from sparse_ho.grid_search import grid_search
 
 from sklearn.datasets import make_classification

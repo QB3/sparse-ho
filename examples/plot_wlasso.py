@@ -24,9 +24,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.utils import check_random_state
 from scipy.linalg import toeplitz
 
-from sparse_ho.models import WeightedLasso
-from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.model.wlasso import WeightedLasso
+from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.algo.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 
