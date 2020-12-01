@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from sklearn import datasets
 from sklearn.svm import LinearSVC
-from sparse_ho.criterion.hout_logistic import HeldOutLogistic
+from sparse_ho.criterion.held_out_logistic import HeldOutLogistic
 from sparse_ho.algo.forward import Forward
 from sparse_ho.algo.implicit import Implicit
 from sparse_ho.algo.implicit_forward import ImplicitForward
@@ -11,7 +11,7 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from scipy.sparse import issparse
 from sparse_ho.ho import grad_search
-from sparse_ho.criterion.hout_smoothed_hinge import HeldOutSmoothedHinge
+from sparse_ho.criterion.held_out_smoothed_hinge import HeldOutSmoothedHinge
 from sparse_ho.utils import Monitor
 
 

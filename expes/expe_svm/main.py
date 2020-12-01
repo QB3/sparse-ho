@@ -5,7 +5,7 @@ import pandas
 from bcdsugar.utils import Monitor
 from sparse_ho.ho import grad_search
 from itertools import product
-from sparse_ho.criterion.hout_smoothed_hinge import HeldOutSmoothedHinge
+from sparse_ho.criterion.held_out_smoothed_hinge import HeldOutSmoothedHinge
 from sparse_ho.model.svm import SVM
 from sparse_ho.algo.forward import Forward
 from sparse_ho.algo.implicit_forward import ImplicitForward

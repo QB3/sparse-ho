@@ -1,6 +1,6 @@
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 
 
 class CrossVal():

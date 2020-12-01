@@ -5,7 +5,7 @@ from sparse_ho.utils import Monitor
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.model.lasso import Lasso
 from sparse_ho.algo.forward import Forward
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 from sparse_ho.criterion.smoothed_sure import SmoothedSURE
 from sparse_ho.grid_search import grid_search
 

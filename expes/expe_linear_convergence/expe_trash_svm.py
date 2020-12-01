@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # from scipy.sparse.linalg import norm
 
 from sparse_ho.model.sparselogreg import SparseLogreg
-from sparse_ho.criterion.hout_logistic import HeldOutLogistic
+from sparse_ho.criterion.held_out_logistic import HeldOutLogistic
 from sparse_ho.algo.forward import Forward
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.real import get_real_sim

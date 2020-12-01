@@ -23,7 +23,7 @@ from libsvmdata.datasets import fetch_libsvm
 
 from sklearn.datasets import make_regression
 from sparse_ho.algo.implicit_forward import ImplicitForward
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 from sparse_ho.model.enet import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor

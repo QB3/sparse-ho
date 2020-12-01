@@ -4,7 +4,7 @@ from sparse_ho.model.enet import ElasticNet
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 from sparse_ho.algo.forward import Forward
 from sparse_ho.algo.implicit import Implicit
 from sparse_ho.algo.implicit_forward import ImplicitForward

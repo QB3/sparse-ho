@@ -14,8 +14,8 @@ from sparse_ho.datasets.real import get_data
 
 from sparse_ho.model.lasso import Lasso
 from sparse_ho.model.sparselogreg import SparseLogreg
-from sparse_ho.criterion.hout_mse import HeldOutMSE
-from sparse_ho.criterion.hout_logistic import HeldOutLogistic
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_logistic import HeldOutLogistic
 from sparse_ho.utils import Monitor
 
 from sparse_ho.algo.forward import Forward

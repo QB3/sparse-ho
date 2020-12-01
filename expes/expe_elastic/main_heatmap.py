@@ -6,7 +6,7 @@ from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sparse_ho.algo.implicit_forward import ImplicitForward
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 from sparse_ho.model.enet import ElasticNet
 from sparse_ho.ho import grad_search
 from bcdsugar.utils import Monitor

@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import linear_model
 
 from sparse_ho.model.lasso import Lasso
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 # from sparse_ho.forward import Forward
 from sparse_ho.algo.implicit_forward import ImplicitForward
 from sparse_ho.utils import Monitor

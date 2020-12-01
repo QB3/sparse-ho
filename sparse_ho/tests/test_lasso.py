@@ -14,7 +14,7 @@ from sparse_ho.algo.forward import Forward
 from sparse_ho.algo.implicit_forward import ImplicitForward
 from sparse_ho.algo.implicit import Implicit
 from sparse_ho.algo.backward import Backward
-from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.held_out_mse import HeldOutMSE
 from sparse_ho.criterion.smoothed_sure import SmoothedSURE
 
 n_samples = 100
