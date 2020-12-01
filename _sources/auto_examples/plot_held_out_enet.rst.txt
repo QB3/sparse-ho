@@ -321,8 +321,8 @@ Grad-search with sparse-ho
     value of log_alphak [-10.98242273  -9.59236402]
     grad outer [0.00568092 0.00429159]
     value of log_alphak [-11.09890595  -9.68036002]
-    Time grid-search 88.350918
-    Time grad-search 74.360452
+    Time grid-search 92.651644
+    Time grad-search 76.468516
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -372,7 +372,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  42.940 seconds)
+   **Total running time of the script:** ( 2 minutes  49.359 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
