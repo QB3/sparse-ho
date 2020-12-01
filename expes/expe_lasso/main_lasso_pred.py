@@ -12,13 +12,15 @@ import pandas as pd
 
 from sparse_ho.datasets.real import get_data
 
-from sparse_ho.models import Lasso, SparseLogreg
-from sparse_ho.criterion import HeldOutMSE, HeldOutLogistic
+from sparse_ho.model.lasso import Lasso
+from sparse_ho.model.sparselogreg import SparseLogreg
+from sparse_ho.criterion.hout_mse import HeldOutMSE
+from sparse_ho.criterion.hout_logistic import HeldOutLogistic
 from sparse_ho.utils import Monitor
 
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
+from sparse_ho.algo.forward import Forward
+from sparse_ho.algo.implicit_forward import ImplicitForward
+from sparse_ho.algo.implicit import Implicit
 from sparse_ho.grid_search import grid_search
 from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
 # from sparse_ho.bayesian import hyperopt_lasso

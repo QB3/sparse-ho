@@ -6,10 +6,10 @@ from lightning.classification import SDCAClassifier
 
 from scipy.sparse.linalg import cg
 from scipy.sparse import csc_matrix
-from sparse_ho.models import SVM
+from sparse_ho.model.svm import SVM
 # from cvxopt import spmatrix, matrix
 # from cvxopt import solvers
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 

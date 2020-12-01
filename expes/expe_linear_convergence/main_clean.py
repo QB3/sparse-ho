@@ -9,13 +9,14 @@ import blitzl1
 # from celer import LogisticRegression
 from scipy.sparse.linalg import cg
 from scipy.sparse import csc_matrix
-from sparse_ho.models import Lasso, SparseLogreg
+from sparse_ho.model.lasso import Lasso
+from sparse_ho.model.sparselogreg import SparseLogreg
 # , SparseLogreg
 # import matplotlib.pyplot as plt
 
 from celer import Lasso as Lasso_cel
 # from sparse_ho.utils import sigma
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.datasets.real import load_libsvm
 
 p_alphas = {}
