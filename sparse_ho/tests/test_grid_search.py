@@ -48,14 +48,16 @@ def test_grid_search():
     criterion = HeldOutMSE(idx_train, idx_train)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
@@ -69,14 +71,16 @@ def test_grid_search():
     criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[

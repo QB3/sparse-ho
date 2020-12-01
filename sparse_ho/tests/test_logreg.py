@@ -102,8 +102,8 @@ def test_beta_jac_custom_solver(model, model_custom):
         get_v, tol=tol, model=model, tol_jac=1e-12)
 
     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], log_alpha, get_v, tol=tol, model=model_custom,
-        tol_jac=1e-12)
+        X[idx_train, :], y[idx_train], log_alpha, get_v, tol=tol,
+        model=model_custom, tol_jac=1e-12)
 
     assert np.all(supp == supp_custom)
     assert np.allclose(dense, dense_custom)

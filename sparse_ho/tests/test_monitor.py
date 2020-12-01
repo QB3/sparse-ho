@@ -21,7 +21,8 @@ idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(
+    np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 alphas = alpha_max * np.geomspace(1, 0.01, 10)
@@ -36,13 +37,14 @@ estimator = linear_model.Lasso(
 
 
 objs = []
+X_val = X[idx_val]
 
 
 def callback(val, grad, mask, dense, log_alpha):
     beta = np.zeros(len(mask))
     beta[mask] = dense
     objs.append(
-        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
+        norm(X_val[:, mask] @ dense - y[idx_val]) ** 2 / len(idx_val))
 
 
 def test_monitor():

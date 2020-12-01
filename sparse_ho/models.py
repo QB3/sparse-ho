@@ -1,7 +1,8 @@
 import numpy as np
 from numpy.linalg import norm
 from numba import njit
-from sparse_ho.utils import ST, init_dbeta0_new, init_dbeta0_new_p, prox_elasticnet
+from sparse_ho.utils import (ST, init_dbeta0_new, init_dbeta0_new_p,
+                             prox_elasticnet)
 from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
 from sparse_ho.utils import sigma
 import scipy.sparse.linalg as slinalg
@@ -751,7 +752,8 @@ class SVM():
             primal = np.sum(y[mask] * dense * X[mask, :].T, axis=1)
         mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
-        return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
+        return (primal_jac[primal_jac != 0].T
+                @ v(mask_primal, dense_primal)[primal_jac != 0])
 
     @staticmethod
     def get_beta(X, y, mask, dense):
@@ -777,7 +779,8 @@ class SVM():
             np.logical_not(np.isclose(beta, np.exp(log_alpha))))
 
         if issparse(X_train):
-            mat = X_train[full_supp, :].multiply(y_train[full_supp, np.newaxis])
+            mat = X_train[full_supp, :].multiply(
+                y_train[full_supp, np.newaxis])
         else:
             mat = y_train[full_supp, np.newaxis] * X_train[full_supp, :]
         Q = mat @ mat.T
@@ -837,17 +840,21 @@ class SVM():
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
         if issparse(Xs):
-            yXdbeta = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
+            yXdbeta = (Xs[full_supp, :].multiply(
+                ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
         else:
-            yXdbeta = (ys[full_supp, np.newaxis] * Xs[full_supp, :]).T @ dbeta[full_supp]
+            yXdbeta = (ys[full_supp, np.newaxis] *
+                       Xs[full_supp, :]).T @ dbeta[full_supp]
         q = yXdbeta.T @ yXdbeta
         if issparse(Xs):
-            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
+            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(
+                ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
         else:
-            linear_term = yXdbeta.T @ ((ys[maskC, np.newaxis] * Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
+            linear_term = (yXdbeta.T @ ((ys[maskC, np.newaxis]
+                                         * Xs[maskC, :]).T
+                                        @ (np.ones(maskC.sum()) * C)))
         res = q + linear_term - C * np.sum(dbeta[full_supp])
-        return(
-            norm(res))
+        return norm(res)
 
 
 class SparseLogreg():
@@ -972,8 +979,8 @@ class SparseLogreg():
     @staticmethod
     def _get_pobj(r, X, beta, alphas, y):
         n_samples = r.shape[0]
-        return (
-            np.sum(np.log(1 + np.exp(- r))) / (n_samples) + np.abs(alphas * beta).sum())
+        return (np.sum(np.log(1 + np.exp(- r))) / (n_samples)
+                + np.abs(alphas * beta).sum())
 
     @staticmethod
     def _get_pobj0(r, beta, alphas, y):
@@ -1215,7 +1222,8 @@ class SVR():
                 beta[j] = proj_box_svm(zj, C)
                 r += (beta[j] - beta_old) * X[j, :]
                 if compute_jac:
-                    dF = np.array([np.sum(dr[:, 0].T * X[j, :]), epsilon + np.sum(dr[:, 1].T * X[j, :])])
+                    dF = np.array([np.sum(dr[:, 0].T * X[j, :]),
+                                   epsilon + np.sum(dr[:, 1].T * X[j, :])])
                     dbeta_old = dbeta[j, :]
                     dzj = dbeta[j, :] - dF / L[j]
                     dbeta[j, :] = ind_box(zj, C) * dzj
@@ -1223,19 +1231,24 @@ class SVR():
                     dr[:, 0] += (dbeta[j, 0] - dbeta_old[0]) * X[j, :]
                     dr[:, 1] += (dbeta[j, 1] - dbeta_old[1]) * X[j, :]
             if j >= n_samples:
-                F = - np.sum(r * X[j - n_samples, :]) + epsilon + y[j - n_samples]
+                F = - np.sum(r * X[j - n_samples, :]) + \
+                    epsilon + y[j - n_samples]
                 beta_old = beta[j]
                 zj = beta[j] - F / L[j - n_samples]
                 beta[j] = proj_box_svm(zj, C)
                 r -= (beta[j] - beta_old) * X[j - n_samples, :]
                 if compute_jac:
-                    dF = np.array([- np.sum(dr[:, 0].T * X[j - n_samples, :]), - np.sum(dr[:, 1].T * X[j - n_samples, :] + epsilon)])
+                    dF = np.array([- np.sum(dr[:, 0].T * X[j - n_samples, :]),
+                                   - np.sum(dr[:, 1].T * X[j - n_samples, :]
+                                            + epsilon)])
                     dbeta_old = dbeta[j, :]
                     dzj = dbeta[j, :] - dF / L[j - n_samples]
                     dbeta[j, :] = ind_box(zj, C) * dzj
                     dbeta[j, 0] += C * (C <= zj)
-                    dr[:, 0] -= (dbeta[j, 0] - dbeta_old[0]) * X[j - n_samples, :]
-                    dr[:, 1] -= (dbeta[j, 1] - dbeta_old[1]) * X[j - n_samples, :]
+                    dr[:, 0] -= (dbeta[j, 0] - dbeta_old[0]) * \
+                        X[j - n_samples, :]
+                    dr[:, 1] -= (dbeta[j, 1] - dbeta_old[1]) * \
+                        X[j - n_samples, :]
 
     @staticmethod
     @njit
@@ -1284,7 +1297,8 @@ class SVR():
         obj_prim = 0.5 * norm(r) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(self.X @ r - y) - hyperparam[1], np.zeros(n_samples)))
         obj_dual = 0.5 * r.T @ r + hyperparam[1] * np.sum(beta)
-        obj_dual -= np.sum(y * (beta[0:n_samples] - beta[n_samples:(2 * n_samples)]))
+        obj_dual -= np.sum(y * (beta[0:n_samples] -
+                                beta[n_samples:(2 * n_samples)]))
         return (obj_dual + obj_prim)
 
     @staticmethod
@@ -1329,7 +1343,8 @@ class SVR():
                 dbeta[j, :] = dzj
                 dr += (dbeta[j, :] - dbeta_old) * Xs[j, :]
             if j >= n_samples:
-                dF = np.array([- np.sum(dr * Xs[j - n_samples, :]), hyperparam[1]])
+                dF = np.array(
+                    [- np.sum(dr * Xs[j - n_samples, :]), hyperparam[1]])
                 dbeta_old = dbeta[j, :]
                 dzj = dbeta[j, :] - dF / L[j - n_samples]
                 dbeta[j, :] = dzj
@@ -1385,20 +1400,24 @@ class SVR():
     def get_jac_v(self, mask, dense, jac, v):
         n_samples, n_features = self.X.shape
         if issparse(self.X):
-            primal_jac = np.sum(self.X[mask, :].T.multiply(self.y[mask] * jac), axis=1)
+            primal_jac = np.sum(self.X[mask, :].T.multiply(
+                self.y[mask] * jac), axis=1)
             primal_jac = np.squeeze(np.array(primal_jac))
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+            primal = np.sum(self.X[mask, :].T.multiply(
+                self.y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
         else:
             primal_jac = self.X[mask, :].T @ jac
             primal = self.X[mask, :].T
         mask_primal = np.repeat(True, primal.shape[0])
         dense_primal = primal[mask_primal]
-        return primal_jac[primal_jac != 0].T @ v(mask_primal, dense_primal)[primal_jac != 0]
+        return (primal_jac[primal_jac != 0].T
+                @ v(mask_primal, dense_primal)[primal_jac != 0])
 
     def get_beta(self, mask, dense):
         if issparse(self.X):
-            primal = np.sum(self.X[mask, :].T.multiply(self.y[mask] * dense), axis=1)
+            primal = np.sum(self.X[mask, :].T.multiply(
+                self.y[mask] * dense), axis=1)
             primal = np.squeeze(np.array(primal))
         else:
             primal = np.sum(self.y[mask] * dense * self.X[mask, :].T, axis=1)
@@ -1425,7 +1444,8 @@ class SVR():
         beta = np.zeros(n_samples)
         beta[mask] = dense
         maskC = np.isclose(beta, C)
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
+        full_supp = np.logical_and(np.logical_not(
+            np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
 
         full_jac = np.zeros(n_samples)
         full_jac[full_supp] = jac
@@ -1437,8 +1457,10 @@ class SVR():
         return jac_primal @ v
 
         # if issparse(self.X):
-        #     mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
-        #     Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
+        #     mat = self.X[full_supp, :].multiply(
+        #         self.y[full_supp, np.newaxis])
+        #     Q = mat @ (self.X[maskC, :].multiply(
+        #          self.y[maskC, np.newaxis])).T
         # else:
         #     mat = self.y[full_supp, np.newaxis] * self.X[full_supp, :]
         #     Q = mat @ (self.y[maskC, np.newaxis] * self.X[maskC, :]).T
@@ -1461,7 +1483,8 @@ class SVR():
         beta = np.zeros(n_samples)
         beta[mask] = dense
         maskC = np.isclose(beta, C)
-        full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
+        full_supp = np.logical_and(np.logical_not(
+            np.isclose(beta, 0)), np.logical_not(np.isclose(beta, C)))
         if issparse(self.X):
             mat = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
             Q = mat @ (self.X[maskC, :].multiply(self.y[maskC, np.newaxis])).T
@@ -1477,12 +1500,15 @@ class SVR():
         # n_samples = self.X.shape[0]
         # beta = np.zeros(n_samples)
         # beta[mask] = dense
-        # full_supp = np.logical_and(np.logical_not(np.isclose(beta, 0)), np.logical_not(np.isclose(beta, np.exp(self.logC))))
+        # full_supp = np.logical_and(
+        #   np.logical_not(np.isclose(beta, 0)),
+        #   np.logical_not(np.isclose(beta, np.exp(self.logC))))
         # if issparse(self.X):
-        #     temp = self.X[full_supp, :].multiply(self.y[full_supp, np.newaxis])
+        #     temp = self.X[full_supp, :].multiply(
+        #       self.y[full_supp, np.newaxis])
         #     res = (temp @ v)
         # else:
-        #     res = ((self.y[full_supp, np.newaxis] * self.X[full_supp, :]) @ v)
+        #     res = ((self.y[full_supp, None] * self.X[full_supp, :]) @ v)
         # return - res
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -1496,17 +1522,21 @@ class SVR():
         full_supp = sign_beta == 0.0
         maskC = sign_beta == 1.0
         if issparse(Xs):
-            yXdbeta = (Xs[full_supp, :].multiply(ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
+            yXdbeta = (Xs[full_supp, :].multiply(
+                ys[full_supp, np.newaxis])).T @ dbeta[full_supp]
         else:
-            yXdbeta = (ys[full_supp, np.newaxis] * Xs[full_supp, :]).T @ dbeta[full_supp]
+            yXdbeta = (ys[full_supp, np.newaxis] *
+                       Xs[full_supp, :]).T @ dbeta[full_supp]
         q = yXdbeta.T @ yXdbeta
         if issparse(Xs):
-            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
+            linear_term = yXdbeta.T @ ((Xs[maskC, :].multiply(
+                ys[maskC, np.newaxis])).T @ (np.ones(maskC.sum()) * C))
         else:
-            linear_term = yXdbeta.T @ ((ys[maskC, np.newaxis] * Xs[maskC, :]).T @ (np.ones(maskC.sum()) * C))
+            linear_term = (yXdbeta.T @ ((ys[maskC, None]
+                                         * Xs[maskC, :]).T
+                                        @ (np.ones(maskC.sum()) * C)))
         res = q + linear_term - C * np.sum(dbeta[full_supp])
-        return(
-            norm(res))
+        return norm(res)
 
 
 class ElasticNet():
@@ -1552,9 +1582,12 @@ class ElasticNet():
             beta[j] = prox_elasticnet(zj, alpha[0] / L[j], alpha[1] / L[j])
             if compute_jac:
                 dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
-                dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
-                dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
+                dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * \
+                    np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
+                                    ) / L[j] / (1 + alpha[1] / L[j])
+                dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
+                                    ) / (1 + alpha[1] / L[j])
                 # update residuals
                 dr[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
                 dr[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
@@ -1577,12 +1610,16 @@ class ElasticNet():
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
             zj = beta[j] + r[idx_nz] @ Xjs / (L[j] * n_samples)
-            beta[j:j+1] = prox_elasticnet(zj, alphas[0] / L[j], alphas[1] / L[j])
+            beta[j:j+1] = prox_elasticnet(zj,
+                                          alphas[0] / L[j], alphas[1] / L[j])
             if compute_jac:
                 dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
-                dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * np.abs(np.sign(beta[j])) * dzj
-                dbeta[j:j+1, 0] -= alphas[0] * np.sign(beta[j]) / L[j] / (1 + (alphas[1] / L[j]))
-                dbeta[j:j+1, 1] -= (alphas[1] / L[j] * beta[j]) / (1 + (alphas[1] / L[j]))
+                dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * \
+                    np.abs(np.sign(beta[j])) * dzj
+                dbeta[j:j+1, 0] -= alphas[0] * \
+                    np.sign(beta[j]) / L[j] / (1 + (alphas[1] / L[j]))
+                dbeta[j:j+1, 1] -= (alphas[1] / L[j] * beta[j]
+                                    ) / (1 + (alphas[1] / L[j]))
                 # update residuals
                 dr[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
                 dr[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
@@ -1669,8 +1706,10 @@ class ElasticNet():
             dzj = dbeta[j, :] + Xs[:, j] @ dr / (L[j] * n_samples)
             dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
 
-            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
-            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
+                                ) / L[j] / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
+                                ) / (1 + alpha[1] / L[j])
             # update residuals
             dr[:, 0] -= Xs[:, j] * (dbeta[j, 0] - dbeta_old[0])
             dr[:, 1] -= Xs[:, j] * (dbeta[j, 1] - dbeta_old[1])
@@ -1690,8 +1729,10 @@ class ElasticNet():
             dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
             dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
 
-            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])) / L[j] / (1 + alpha[1] / L[j])
-            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]) / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
+                                ) / L[j] / (1 + alpha[1] / L[j])
+            dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
+                                ) / (1 + alpha[1] / L[j])
             # update residuals
             dr[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
             dr[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
@@ -1703,7 +1744,8 @@ class ElasticNet():
 
     @staticmethod
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
-        return np.array([alphas[0] * np.sign(dense) @ jac, alphas[1] * dense @ jac])
+        return np.array([alphas[0] * np.sign(dense) @ jac,
+                         alphas[1] * dense @ jac])
 
     def proj_hyperparam(self, X, y, log_alpha):
         if self.log_alpha_max is None:
@@ -1759,7 +1801,8 @@ class ElasticNet():
     @staticmethod
     def get_hessian(X_train, y_train, mask, dense, log_alpha):
         n_samples = X_train.shape[0]
-        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
+        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + \
+            (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
     def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
@@ -1773,6 +1816,9 @@ class ElasticNet():
         return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, r, dr, alpha):
-        res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * np.sign(beta) @ dbeta[:, 0]
-        res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
+        res1 = (1 / n_samples) * dr[:, 0].T @ dr[:, 0] + alpha[1] * \
+            dbeta[:, 0].T @ dbeta[:, 0] + \
+            alpha[0] * np.sign(beta) @ dbeta[:, 0]
+        res2 = (1 / n_samples) * dr[:, 1].T @ dr[:, 1] + alpha[1] * \
+            dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
         return(norm(res2) + norm(res1))

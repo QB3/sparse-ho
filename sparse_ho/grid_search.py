@@ -8,8 +8,8 @@ except Exception:
 
 
 def grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor, max_evals=50,
-        tol=1e-5, nb_hyperparam=1,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
+        max_evals=50, tol=1e-5, nb_hyperparam=1,
         beta_star=None, random_state=42, samp="grid", log_alphas=None,
         t_max=1000, reverse=True):
 
@@ -19,7 +19,8 @@ def grid_search(
         else:
             log_alphas = np.linspace(log_alpha_min, log_alpha_max, max_evals)
         if nb_hyperparam == 2:
-            log_alphas = np.array(np.meshgrid(log_alphas, log_alphas)).T.reshape(-1, 2)
+            log_alphas = np.array(np.meshgrid(
+                log_alphas, log_alphas)).T.reshape(-1, 2)
 
     elif samp == "random":
         rng = np.random.RandomState(random_state)
@@ -36,7 +37,8 @@ def grid_search(
                 log_alphas2 = -np.sort(-log_alphas2)
             else:
                 log_alphas2 = np.sort(log_alphas2)
-            log_alphas = np.array(np.meshgrid(log_alphas, log_alphas2)).T.reshape(-1, 2)
+            log_alphas = np.array(np.meshgrid(
+                log_alphas, log_alphas2)).T.reshape(-1, 2)
 
     elif samp == "lhs":
         xlimits = np.array([[log_alpha_min, log_alpha_max]])

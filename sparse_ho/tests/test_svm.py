@@ -51,18 +51,22 @@ def test_beta_jac(model):
     full_supp = np.logical_and(beta > 0, beta < C)
     # full_supp = np.logical_or(beta <= 0, beta >= C)
 
-    Q = (y[idx_train, np.newaxis] * X[idx_train, :])  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
-    v = (np.eye(len(idx_train), len(idx_train)) - Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
+    Q = (y[idx_train, np.newaxis] * X[idx_train, :]
+         )  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
+    v = (np.eye(len(idx_train), len(idx_train)) -
+         Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
     jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
     assert np.allclose(jac_dense, jac1[dense1 < C])
 
     if issparse(X):
         primal = np.sum(
-            X[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1), axis=1)
+            X[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1),
+            axis=1)
         primal = primal.T
     else:
-        primal = np.sum(y[idx_train][supp1] * dense1 * X[idx_train, :][supp1, :].T, axis=1)
+        primal = np.sum(y[idx_train][supp1] * dense1 *
+                        X[idx_train, :][supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
     clf.fit(X[idx_train, :], y[idx_train])

@@ -77,8 +77,8 @@ def test_grad_search(model, crit):
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, model, X, y, log_alpha, monitor2, n_outer=n_outer,
-                tol=1e-16)
+    grad_search(algo, criterion, model, X, y, log_alpha, monitor2,
+                n_outer=n_outer, tol=1e-16)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
