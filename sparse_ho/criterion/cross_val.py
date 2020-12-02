@@ -1,10 +1,8 @@
-from numpy.linalg import norm
-import numpy as np
 from scipy.sparse import issparse
 from sklearn.model_selection import check_cv
 
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.criterion.base import BaseCriterion
+from sparse_ho.criterion import HeldOutMSE
 
 
 class CrossVal(BaseCriterion):
