@@ -15,17 +15,18 @@ import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
-
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.utils import Monitor
-from sparse_ho.ho import grad_search
 from sklearn.datasets import make_regression
 
 from libsvmdata.datasets import fetch_libsvm
+
+from sparse_ho.models import Lasso
+from sparse_ho.criterion import HeldOutMSE
+from sparse_ho import ImplicitForward
+from sparse_ho.utils import Monitor
+from sparse_ho.ho import grad_search
 
 
 print(__doc__)

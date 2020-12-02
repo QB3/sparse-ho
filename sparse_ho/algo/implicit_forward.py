@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import issparse
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
 
 
 class ImplicitForward():

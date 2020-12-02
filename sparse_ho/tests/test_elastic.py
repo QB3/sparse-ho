@@ -1,16 +1,17 @@
 import numpy as np
+from scipy.sparse import csc_matrix
 from sklearn import linear_model
+
 from sparse_ho.models import ElasticNet
-from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho.datasets import get_synt_data
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.forward import Forward
-from sparse_ho.implicit import Implicit
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho import Forward
+from sparse_ho import Implicit
+from sparse_ho import ImplicitForward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
-from scipy.sparse import csc_matrix
 
 
 n_samples = 100

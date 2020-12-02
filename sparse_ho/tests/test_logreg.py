@@ -5,11 +5,11 @@ from sklearn.linear_model import LogisticRegression
 from scipy.sparse import csc_matrix
 
 from sparse_ho.models import SparseLogreg
-from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho import Forward
+from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search

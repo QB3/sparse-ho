@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
 
 
 class Backward():

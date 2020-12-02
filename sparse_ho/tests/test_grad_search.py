@@ -4,13 +4,12 @@ import pytest
 from sklearn import linear_model
 
 from sparse_ho.utils import Monitor
-
-from sparse_ho.datasets.synthetic import get_synt_data
+from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
 
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
+from sparse_ho import Forward
+from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 from sparse_ho.ho import grad_search
 
