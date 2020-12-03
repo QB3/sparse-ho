@@ -1,8 +1,7 @@
-from scipy.sparse import issparse
+import copy
 from sklearn.model_selection import check_cv
 
 from sparse_ho.criterion.base import BaseCriterion
-from sparse_ho.criterion import HeldOutMSE
 
 
 class CrossVal(BaseCriterion):
@@ -16,16 +15,10 @@ class CrossVal(BaseCriterion):
         XXX
     """
 
-    def __init__(self, X, y, Model, cv=None, max_iter=1000, estimator=None):
+    def __init__(self, criterion, cv=None):
         """
         Parameters
         ----------
-        X : {ndarray, sparse matrix} of shape (n_samples, n_features)
-            Data
-        y : {ndarray, sparse matrix} of shape (n_samples,)
-            Target
-        Model: class
-            The Model class definition (e.g. Lasso or SparseLogreg)
         cv : int, cross-validation generator or iterable, default=None
             Determines the cross-validation splitting strategy.
             Possible inputs for cv are:
@@ -41,30 +34,23 @@ class CrossVal(BaseCriterion):
         estimator: instance of ``sklearn.base.BaseEstimator``
             An estimator that follows the scikit-learn API.
         """
-        self.X = X
-        self.y = y
+        self.criterion = criterion
+        self.cv = cv
+        self.dict_crits = None
+        self.dict_models = None
+        self.n_splits = None
+
+    def _initialize(self, model, X):
         self.dict_crits = {}
         self.dict_models = {}
-        self.rmse = None
-        self.estimator = estimator
-
-        cv = check_cv(cv)
+        self.n_splits = self.cv.get_n_splits(X)
+        cv = check_cv(self.cv)
 
         for i, (idx_train, idx_val) in enumerate(cv.split(X)):
-            X_train = X[idx_train, :]
-            y_train = y[idx_train]
-
-            if issparse(X_train):
-                X_train = X_train.tocsc()
-
-            # TODO get rid of this
-            self.models[i] = Model(
-                X_train, y_train, max_iter=max_iter, estimator=estimator)
-
-            criterion = HeldOutMSE(idx_train, idx_val)
-
-            self.dict_crits[i] = criterion
-        self.n_splits = cv.n_splits
+            self.dict_crits[i] = copy.deepcopy(self.criterion)
+            self.dict_crits[i].idx_train = idx_train
+            self.dict_crits[i].idx_val = idx_val
+            self.dict_models[i] = copy.deepcopy(model)
 
     def get_val(self, model, log_alpha, tol=1e-3):
         val = 0
@@ -76,14 +62,17 @@ class CrossVal(BaseCriterion):
         return val
 
     def get_val_grad(
-            self, model, log_alpha, get_beta_jac_v, max_iter=10000, tol=1e-5,
-            compute_jac=True, monitor=None):
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            tol=1e-5, compute_jac=True, monitor=None):
+        if self.dict_crits is None:
+            self._initialize(model, X)
+
         val = 0
         grad = 0
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
-                self.models[i], log_alpha, get_beta_jac_v, max_iter=max_iter,
-                tol=tol, compute_jac=compute_jac)
+                self.dict_models[i], X, y, log_alpha, get_beta_jac_v,
+                max_iter=max_iter, tol=tol, compute_jac=compute_jac)
             val += vali
             if gradi is not None:
                 grad += gradi
@@ -95,3 +84,10 @@ class CrossVal(BaseCriterion):
         if monitor is not None:
             monitor(val, grad, log_alpha=log_alpha)
         return val, grad
+
+    def get_val_outer(cls, *args, **kwargs):
+        return NotImplemented
+
+    def proj_hyperparam(self, model, X, y, log_alpha):
+        # TODO to improve this proj_hyperparam procedure
+        return model.proj_hyperparam(X, y, log_alpha)
