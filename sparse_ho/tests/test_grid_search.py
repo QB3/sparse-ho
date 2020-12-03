@@ -1,10 +1,11 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 from sklearn import linear_model
+
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.synthetic import get_synt_data
+from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
-from sparse_ho.forward import Forward
+from sparse_ho import Forward
 from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 from sparse_ho.grid_search import grid_search
 
