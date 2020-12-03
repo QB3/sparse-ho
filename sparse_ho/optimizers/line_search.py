@@ -101,7 +101,8 @@ class LineSearch():
                 else:
                     log_alphak = old_log_alphak
                 print('!!step size rejected!!', value_outer, value_outer_old)
-                value_outer, grad_outer = _get_val_grad(log_alphak, tol=tol)
+                value_outer, grad_outer = _get_val_grad(
+                    log_alphak, tol=tol, monitor=monitor)
 
                 tol *= 0.5
             else:

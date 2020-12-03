@@ -1,7 +1,7 @@
 """
-============================
-Lasso with held-out test set
-============================
+==================================
+Elastic net with held-out test set
+==================================
 
 This example shows how to perform hyperparameter optimization
 for an elastic-net using a held-out validation set.
