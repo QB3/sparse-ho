@@ -29,10 +29,8 @@ from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho import ImplicitForward
 from sparse_ho import Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.optimizers import LineSearch, GradientDescent
-from sparse_ho.utils_plot import configure_plt
+from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
-configure_plt()
 
 print(__doc__)
 
@@ -87,10 +85,11 @@ objs = np.array(monitor_grid.objs)
 ##############################################################################
 # Grad-search
 # -----------
-optimizer_names = ['line-search', 'gradient-descent']
+optimizer_names = ['line-search', 'gradient-descent', 'adam']
 optimizers = {
     'line-search': LineSearch(n_outer=10, tol=tol),
-    'gradient-descent': GradientDescent(n_outer=100, step_size=100)}
+    'gradient-descent': GradientDescent(n_outer=10, step_size=100),
+    'adam': Adam(n_outer=10, lr=0.11, verbose=True)}
 
 monitors = {}
 
@@ -109,15 +108,12 @@ for optimizer_name in optimizer_names:
         monitor_grad)
     monitors[optimizer_name] = monitor_grad
 
-# objs_grad = np.array(monitor_grad.objs)
-
-print(monitors['gradient-descent'].objs)
-print(monitors['line-search'].objs)
-
 
 current_palette = sns.color_palette("colorblind")
 dict_colors = {
-    'line-search': current_palette[2], 'gradient-descent': current_palette[3]}
+    'line-search': current_palette[2],
+    'gradient-descent': current_palette[3],
+    'adam': current_palette[4]}
 
 plt.figure(figsize=(5, 3))
 plt.semilogx(
@@ -137,7 +133,6 @@ for optimizer_name in optimizer_names:
         r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
         r"\hat \beta^{(\lambda)} } \right ) $")
 
-# axes = plt.gca()
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

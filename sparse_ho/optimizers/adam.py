@@ -25,7 +25,7 @@ class Adam():
             verbose=False, tol=1e-5, t_max=10000):
         self.n_outer = n_outer
         self.epsilon = epsilon
-        lr = lr
+        self.lr = lr
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self.verbose = verbose
@@ -43,12 +43,10 @@ class Adam():
 
         for i in range(self.n_outer):
             t += 1
-            val, grad = _get_val_grad(log_alpha)
+            value_outer, grad = _get_val_grad(log_alpha, self.tol, monitor)
 
-            print(
-                "%i / %i | crosss entropy %f | acc val %f | accuracy test %f" %
-                (i, self.n_outer, val, monitor.acc_vals[-1],
-                    monitor.acc_tests[-1]))
+            if self.verbose:
+                print("Value outer criterion: %f" % value_outer)
 
             if (i > 1) and (monitor.objs[-1] > monitor.objs[-2]):
                 break
