@@ -22,6 +22,7 @@ import seaborn as sns
 from sklearn import linear_model
 from sklearn.datasets import make_regression
 
+
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import Forward
@@ -29,6 +30,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
+from sparse_ho.optimizers import LineSearch
 
 from libsvmdata.datasets import fetch_libsvm
 
@@ -49,7 +51,8 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 n_alphas = 10
@@ -58,14 +61,14 @@ alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
 tol = 1e-7
-max_iter = 1e5
+max_iter = 1e3
 
 ##############################################################################
 # Grid-search with scikit-learn
 # -----------------------------
 
 estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
+    fit_intercept=False, max_iter=max_iter, warm_start=True)
 
 print('scikit-learn started')
 
@@ -75,7 +78,8 @@ criterion = HeldOutMSE(idx_train, idx_val)
 algo = Forward()
 monitor_grid_sk = Monitor()
 grid_search(
-    algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
+    algo, criterion, model, X, y, None, None, monitor_grid_sk,
+    log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
@@ -93,9 +97,9 @@ model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(criterion)
 monitor_grad = Monitor()
+optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
-    n_outer=10, tol=tol)
+    algo, criterion, model, optimizer, X, y, log_alpha0, monitor_grad)
 
 t_grad_search = time.time() - t0
 
@@ -119,7 +123,7 @@ print('Minimum objective grad-search %.5f' % objs_grad.min())
 
 current_palette = sns.color_palette("colorblind")
 
-fig = plt.figure(figsize=(5, 3))
+plt.figure(figsize=(5, 3))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0])
 plt.semilogx(

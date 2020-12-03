@@ -29,6 +29,8 @@ from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
+from sparse_ho.optimizers import LineSearch
+
 
 ##############################################################################
 # Dataset creation
@@ -58,7 +60,8 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 ##############################################################################
 # Max penalty value
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 n_alphas = 30
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 ##############################################################################
@@ -86,8 +89,8 @@ model = WeightedLasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
 monitor = Monitor()
-grad_search(
-    algo, criterion, model, X, y, log_alpha0, monitor, n_outer=20, tol=1e-6)
+optimizer = LineSearch(n_outer=20, tol=1e-6)
+grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 ##############################################################################
 
 ##############################################################################

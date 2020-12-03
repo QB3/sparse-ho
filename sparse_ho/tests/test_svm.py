@@ -16,6 +16,7 @@ from sparse_ho.ho import grad_search
 from sparse_ho.criterion import HeldOutSmoothedHinge
 from sparse_ho.utils import Monitor
 
+from sparse_ho.optimizers import LineSearch
 
 n_samples = 100
 n_features = 300
@@ -116,20 +117,22 @@ def test_grad_search(model):
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
-    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor1,
-                n_outer=n_outer, tol=1e-13)
+    optimizer = LineSearch(n_outer=n_outer, tol=1e-13)
+    grad_search(
+        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor1)
 
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor2,
-                n_outer=n_outer, tol=1e-13)
+    optimizer = LineSearch(n_outer=n_outer, tol=1e-13)
+    grad_search(
+        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor2)
 
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
-    grad_search(algo, criterion, model, X, y, np.log(1e-3), monitor3,
-                n_outer=n_outer, tol=1e-13)
+    grad_search(
+        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor3)
 
     assert np.allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
