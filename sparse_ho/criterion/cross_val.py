@@ -35,7 +35,7 @@ class CrossVal(BaseCriterion):
             An estimator that follows the scikit-learn API.
         """
         self.criterion = criterion
-        self.cv = cv
+        self.cv = check_cv(cv)
         self.dict_crits = None
         self.dict_models = None
         self.n_splits = None
@@ -44,9 +44,8 @@ class CrossVal(BaseCriterion):
         self.dict_crits = {}
         self.dict_models = {}
         self.n_splits = self.cv.get_n_splits(X)
-        cv = check_cv(self.cv)
 
-        for i, (idx_train, idx_val) in enumerate(cv.split(X)):
+        for i, (idx_train, idx_val) in enumerate(self.cv.split(X)):
             self.dict_crits[i] = copy.deepcopy(self.criterion)
             self.dict_crits[i].idx_train = idx_train
             self.dict_crits[i].idx_val = idx_val
