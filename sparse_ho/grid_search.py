@@ -12,7 +12,6 @@ def grid_search(
         max_evals=50, tol=1e-5, nb_hyperparam=1,
         beta_star=None, random_state=42, samp="grid", log_alphas=None,
         t_max=1000, reverse=True):
-
     if log_alphas is None and samp == "grid":
         if reverse:
             log_alphas = np.linspace(log_alpha_max, log_alpha_min, max_evals)
