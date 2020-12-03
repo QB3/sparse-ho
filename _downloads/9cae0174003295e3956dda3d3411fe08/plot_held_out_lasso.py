@@ -14,19 +14,21 @@ for a Lasso using a held-out validation set.
 # License: BSD (3-clause)
 
 import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn import linear_model
+from sklearn.datasets import make_regression
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho import Forward
+from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-from sklearn.datasets import make_regression
 
 from libsvmdata.datasets import fetch_libsvm
 

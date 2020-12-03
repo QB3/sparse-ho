@@ -26,19 +26,21 @@ for a Lasso using a held-out validation set.
     # License: BSD (3-clause)
 
     import time
+
     import numpy as np
     import matplotlib.pyplot as plt
     import seaborn as sns
+
     from sklearn import linear_model
+    from sklearn.datasets import make_regression
 
     from sparse_ho.models import Lasso
     from sparse_ho.criterion import HeldOutMSE
-    from sparse_ho.forward import Forward
-    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho import Forward
+    from sparse_ho import ImplicitForward
     from sparse_ho.utils import Monitor
     from sparse_ho.ho import grad_search
     from sparse_ho.grid_search import grid_search
-    from sklearn.datasets import make_regression
 
     from libsvmdata.datasets import fetch_libsvm
 
@@ -85,7 +87,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:08, 107kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:08, 106kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:46, 128kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:21, 165kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<01:00, 220kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:42, 300kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:28, 415kB/s]    file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01<00:17, 580kB/s]    file_sizes:  38%|##########2                | 5.23M/13.7M [00:02<00:10, 799kB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:06, 1.09MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:03, 1.45MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:01, 1.90MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03<00:00, 2.42MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 3.00MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.22MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:04, 110kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:06, 108kB/s]    file_sizes:   1%|1                          | 73.7k/13.7M [00:00<02:09, 105kB/s]    file_sizes:   1%|4                           | 197k/13.7M [00:00<01:37, 139kB/s]    file_sizes:   3%|8                           | 426k/13.7M [00:01<01:10, 188kB/s]    file_sizes:   6%|#8                          | 885k/13.7M [00:01<00:50, 257kB/s]    file_sizes:   9%|##5                        | 1.28M/13.7M [00:01<00:36, 346kB/s]    file_sizes:  13%|###5                       | 1.80M/13.7M [00:01<00:25, 463kB/s]    file_sizes:  17%|####5                      | 2.33M/13.7M [00:02<00:18, 604kB/s]    file_sizes:  20%|#####3                     | 2.72M/13.7M [00:02<00:14, 745kB/s]    file_sizes:  24%|######3                    | 3.24M/13.7M [00:02<00:11, 938kB/s]    file_sizes:  27%|#######1                  | 3.77M/13.7M [00:02<00:08, 1.13MB/s]    file_sizes:  32%|########3                 | 4.42M/13.7M [00:03<00:06, 1.38MB/s]    file_sizes:  36%|#########3                | 4.95M/13.7M [00:03<00:05, 1.58MB/s]    file_sizes:  41%|##########6               | 5.60M/13.7M [00:03<00:04, 1.83MB/s]    file_sizes:  47%|############3             | 6.52M/13.7M [00:03<00:03, 2.19MB/s]    file_sizes:  51%|#############3            | 7.05M/13.7M [00:03<00:02, 2.25MB/s]    file_sizes:  58%|###############           | 7.96M/13.7M [00:04<00:02, 2.61MB/s]    file_sizes:  64%|################5         | 8.75M/13.7M [00:04<00:01, 2.81MB/s]    file_sizes:  69%|##################        | 9.54M/13.7M [00:04<00:01, 2.99MB/s]    file_sizes:  76%|###################7      | 10.5M/13.7M [00:04<00:01, 3.27MB/s]    file_sizes:  82%|#####################2    | 11.2M/13.7M [00:05<00:00, 3.36MB/s]    file_sizes:  89%|#######################   | 12.2M/13.7M [00:05<00:00, 3.56MB/s]    file_sizes:  97%|#########################2| 13.3M/13.7M [00:05<00:00, 3.84MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:05<00:00, 2.48MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -239,8 +241,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 12.25
-    Time to compute CV for sparse-ho: 20.49
+    Time to compute CV for scikit-learn: 11.66
+    Time to compute CV for sparse-ho: 19.33
     Minimum objective grid-search 0.21316
     Minimum objective grad-search 0.21211
 
@@ -250,7 +252,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.880 seconds)
+   **Total running time of the script:** ( 0 minutes  43.963 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

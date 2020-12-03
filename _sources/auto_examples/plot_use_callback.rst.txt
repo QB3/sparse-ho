@@ -28,17 +28,18 @@ as in scipy.
     from numpy.linalg import norm
     import matplotlib.pyplot as plt
     import seaborn as sns
+
     from sklearn import linear_model
     from sklearn.model_selection import train_test_split
-
-    from sparse_ho.models import Lasso
-    from sparse_ho.criterion import HeldOutMSE
-    from sparse_ho.implicit_forward import ImplicitForward
-    from sparse_ho.utils import Monitor
-    from sparse_ho.ho import grad_search
     from sklearn.datasets import make_regression
 
     from libsvmdata.datasets import fetch_libsvm
+
+    from sparse_ho.models import Lasso
+    from sparse_ho.criterion import HeldOutMSE
+    from sparse_ho import ImplicitForward
+    from sparse_ho.utils import Monitor
+    from sparse_ho.ho import grad_search
 
 
     print(__doc__)
@@ -179,7 +180,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.799 seconds)
+   **Total running time of the script:** ( 0 minutes  1.731 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_use_callback.py:

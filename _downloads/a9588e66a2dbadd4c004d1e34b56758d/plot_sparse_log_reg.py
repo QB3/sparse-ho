@@ -20,16 +20,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from sklearn.datasets import make_classification
+from celer import LogisticRegression
+
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
-from celer import LogisticRegression
 from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.forward import Forward
+from sparse_ho import ImplicitForward
+from sparse_ho import Forward
 from sparse_ho.grid_search import grid_search
-
-from sklearn.datasets import make_classification
 
 
 print(__doc__)
@@ -80,7 +80,8 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, log_alphas=log_alphas, tol=tol)
+    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
+    monitor_grid, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
 t_sk = time.time() - t0
@@ -102,8 +103,8 @@ model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
-grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max), monitor_grad,
-            n_outer=10, tol=tol)
+grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max),
+            monitor_grad, n_outer=10, tol=tol)
 objs_grad = np.array(monitor_grad.objs)
 
 t_grad_search = time.time() - t0

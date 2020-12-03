@@ -34,7 +34,7 @@ for an elastic-net using a held-out validation set.
     from libsvmdata.datasets import fetch_libsvm
 
     from sklearn.datasets import make_regression
-    from sparse_ho.implicit_forward import ImplicitForward
+    from sparse_ho import ImplicitForward
     from sparse_ho.criterion import HeldOutMSE
     from sparse_ho.models import ElasticNet
     from sparse_ho.ho import grad_search
@@ -321,8 +321,8 @@ Grad-search with sparse-ho
     value of log_alphak [-10.98242273  -9.59236402]
     grad outer [0.00568092 0.00429159]
     value of log_alphak [-11.09890595  -9.68036002]
-    Time grid-search 92.651644
-    Time grad-search 76.468516
+    Time grid-search 99.192647
+    Time grad-search 82.333305
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -372,7 +372,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  49.359 seconds)
+   **Total running time of the script:** ( 3 minutes  1.758 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
