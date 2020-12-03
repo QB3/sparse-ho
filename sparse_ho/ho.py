@@ -25,7 +25,7 @@ def grad_search(
         used to store the value of the cross-validation function.
     """
 
-    def _get_val_grad(log_alpha, tol, monitor=None):
+    def _get_val_grad(log_alpha, tol, monitor):
         return criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
             monitor=monitor)

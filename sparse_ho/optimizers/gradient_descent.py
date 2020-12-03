@@ -35,11 +35,12 @@ class GradientDescent():
             log_alphak = log_alpha0
 
         for _ in range(self.n_outer):
-            value_outer, grad_outer = _get_val_grad(log_alphak, self.tol)
+            value_outer, grad_outer = _get_val_grad(
+                log_alphak, self.tol, monitor)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
                 print("Value outer criterion: %f" % value_outer)
-            if monitor.times[-1] > self.t_max:
+            if len(monitor.times) > 0 and monitor.times[-1] > self.t_max:
                 break
         return log_alphak, value_outer, grad_outer
