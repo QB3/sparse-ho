@@ -1,6 +1,0 @@
-﻿sparse\_ho.grad\_search\_wolfe
-==============================
-
-.. currentmodule:: sparse_ho
-
-.. autofunction:: grad_search_wolfe

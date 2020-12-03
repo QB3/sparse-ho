@@ -1,9 +1,9 @@
 """
-===========================
-Sparse logistic regression
-===========================
+========================
+Compare outer optimizers
+========================
 
-This example shows how to perform hyperparameter optimisation
+This example shows how to perform hyperparameter optimization
 for sparse logistic regression using a held-out test set.
 
 """
@@ -14,7 +14,6 @@ for sparse logistic regression using a held-out test set.
 # License: BSD (3-clause)
 
 
-import time
 from libsvmdata.datasets import fetch_libsvm
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,7 +29,7 @@ from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho import ImplicitForward
 from sparse_ho import Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.optimizers import LineSearch
+from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
 
 print(__doc__)
@@ -71,9 +70,6 @@ log_alphas = np.log(alphas)
 # Grid-search
 # -----------
 
-print('scikit started')
-t0 = time.time()
-
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, max_iter=max_iter)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
@@ -85,61 +81,58 @@ grid_search(
     monitor_grid, log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
-t_sk = time.time() - t0
-
-print('scikit finished')
-print("Time to compute CV for scikit-learn: %.2f" % t_sk)
-
 
 ##############################################################################
 # Grad-search
 # -----------
+optimizer_names = ['line-search', 'gradient-descent', 'adam']
+optimizers = {
+    'line-search': LineSearch(n_outer=10, tol=tol),
+    'gradient-descent': GradientDescent(n_outer=10, step_size=100),
+    'adam': Adam(n_outer=10, lr=0.11, verbose=True)}
 
-print('sparse-ho started')
+monitors = {}
 
-t0 = time.time()
-estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, solver='saga', tol=tol)
-model = SparseLogreg(max_iter=max_iter, estimator=estimator)
-criterion = HeldOutLogistic(idx_train, idx_val)
+for optimizer_name in optimizer_names:
+    estimator = LogisticRegression(
+        penalty='l1', fit_intercept=False, solver='saga', tol=tol)
+    model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+    criterion = HeldOutLogistic(idx_train, idx_val)
 
-monitor_grad = Monitor()
-algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
+    monitor_grad = Monitor()
+    algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 
-optimizer = LineSearch(n_outer=10, tol=tol)
-grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0,
-    monitor_grad)
+    optimizer = optimizers[optimizer_name]
+    grad_search(
+        algo, criterion, model, optimizer, X, y, log_alpha0,
+        monitor_grad)
+    monitors[optimizer_name] = monitor_grad
 
-objs_grad = np.array(monitor_grad.objs)
-
-t_grad_search = time.time() - t0
-
-print('sparse-ho finished')
-print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
-
-
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
-
-objs_grad = np.array(monitor_grad.objs)
 
 current_palette = sns.color_palette("colorblind")
+dict_colors = {
+    'line-search': current_palette[2],
+    'gradient-descent': current_palette[3],
+    'adam': current_palette[4]}
 
-fig = plt.figure(figsize=(5, 3))
+plt.figure(figsize=(5, 3))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0])
 plt.semilogx(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
     color=current_palette[1])
-plt.semilogx(
-    p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-    color=current_palette[2])
-plt.xlabel(r"$\lambda / \lambda_{\max}$")
-plt.ylabel(
-    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
-    r"\hat \beta^{(\lambda)} } \right ) $")
+for optimizer_name in optimizer_names:
+    monitor = monitors[optimizer_name]
+    p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
+    objs_grad = np.array(monitor.objs)
+    plt.semilogx(
+        p_alphas_grad, objs_grad, 'bX', label=optimizer_name,
+        color=dict_colors[optimizer_name], markersize=7)
+    plt.xlabel(r"$\lambda / \lambda_{\max}$")
+    plt.ylabel(
+        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+        r"\hat \beta^{(\lambda)} } \right ) $")
 
-axes = plt.gca()
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

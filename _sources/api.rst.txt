@@ -73,7 +73,6 @@ Functions
    :toctree: generated/
 
    grad_search
-   grad_search_wolfe
 
 
 Datasets

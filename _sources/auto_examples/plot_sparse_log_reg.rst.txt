@@ -42,6 +42,7 @@ for sparse logistic regression using a held-out test set.
     from sparse_ho import ImplicitForward
     from sparse_ho import Forward
     from sparse_ho.grid_search import grid_search
+    from sparse_ho.optimizers import LineSearch
 
 
     print(__doc__)
@@ -134,7 +135,7 @@ Grid-search
 
     scikit started
     scikit finished
-    Time to compute CV for scikit-learn: 0.89
+    Time to compute CV for scikit-learn: 0.95
 
 
 
@@ -153,10 +154,15 @@ Grad-search
         penalty='l1', fit_intercept=False, solver='saga', tol=tol)
     model = SparseLogreg(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
+
     monitor_grad = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
-    grad_search(algo, criterion, model, X, y, np.log(0.1 * alpha_max),
-                monitor_grad, n_outer=10, tol=tol)
+
+    optimizer = LineSearch(n_outer=10, tol=tol)
+    grad_search(
+        algo, criterion, model, optimizer, X, y, log_alpha0,
+        monitor_grad)
+
     objs_grad = np.array(monitor_grad.objs)
 
     t_grad_search = time.time() - t0
@@ -226,7 +232,7 @@ Grad-search
     /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
       sol = celer(
     sparse-ho finished
-    Time to compute CV for sparse-ho: 1.13
+    Time to compute CV for sparse-ho: 1.43
 
 
 
@@ -234,7 +240,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.452 seconds)
+   **Total running time of the script:** ( 0 minutes  2.868 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

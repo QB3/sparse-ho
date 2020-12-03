@@ -34,6 +34,7 @@ for a Lasso using a held-out validation set.
     from sklearn import linear_model
     from sklearn.datasets import make_regression
 
+
     from sparse_ho.models import Lasso
     from sparse_ho.criterion import HeldOutMSE
     from sparse_ho import Forward
@@ -41,6 +42,7 @@ for a Lasso using a held-out validation set.
     from sparse_ho.utils import Monitor
     from sparse_ho.ho import grad_search
     from sparse_ho.grid_search import grid_search
+    from sparse_ho.optimizers import LineSearch
 
     from libsvmdata.datasets import fetch_libsvm
 
@@ -61,7 +63,8 @@ for a Lasso using a held-out validation set.
 
     print("Starting path computation...")
     n_samples = len(y[idx_train])
-    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+    alpha_max /= len(idx_train)
     log_alpha0 = np.log(alpha_max / 10)
 
     n_alphas = 10
@@ -70,7 +73,7 @@ for a Lasso using a held-out validation set.
     log_alphas = np.log(alphas)
 
     tol = 1e-7
-    max_iter = 1e5
+    max_iter = 1e3
 
 
 
@@ -87,7 +90,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:04, 110kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:06, 108kB/s]    file_sizes:   1%|1                          | 73.7k/13.7M [00:00<02:09, 105kB/s]    file_sizes:   1%|4                           | 197k/13.7M [00:00<01:37, 139kB/s]    file_sizes:   3%|8                           | 426k/13.7M [00:01<01:10, 188kB/s]    file_sizes:   6%|#8                          | 885k/13.7M [00:01<00:50, 257kB/s]    file_sizes:   9%|##5                        | 1.28M/13.7M [00:01<00:36, 346kB/s]    file_sizes:  13%|###5                       | 1.80M/13.7M [00:01<00:25, 463kB/s]    file_sizes:  17%|####5                      | 2.33M/13.7M [00:02<00:18, 604kB/s]    file_sizes:  20%|#####3                     | 2.72M/13.7M [00:02<00:14, 745kB/s]    file_sizes:  24%|######3                    | 3.24M/13.7M [00:02<00:11, 938kB/s]    file_sizes:  27%|#######1                  | 3.77M/13.7M [00:02<00:08, 1.13MB/s]    file_sizes:  32%|########3                 | 4.42M/13.7M [00:03<00:06, 1.38MB/s]    file_sizes:  36%|#########3                | 4.95M/13.7M [00:03<00:05, 1.58MB/s]    file_sizes:  41%|##########6               | 5.60M/13.7M [00:03<00:04, 1.83MB/s]    file_sizes:  47%|############3             | 6.52M/13.7M [00:03<00:03, 2.19MB/s]    file_sizes:  51%|#############3            | 7.05M/13.7M [00:03<00:02, 2.25MB/s]    file_sizes:  58%|###############           | 7.96M/13.7M [00:04<00:02, 2.61MB/s]    file_sizes:  64%|################5         | 8.75M/13.7M [00:04<00:01, 2.81MB/s]    file_sizes:  69%|##################        | 9.54M/13.7M [00:04<00:01, 2.99MB/s]    file_sizes:  76%|###################7      | 10.5M/13.7M [00:04<00:01, 3.27MB/s]    file_sizes:  82%|#####################2    | 11.2M/13.7M [00:05<00:00, 3.36MB/s]    file_sizes:  89%|#######################   | 12.2M/13.7M [00:05<00:00, 3.56MB/s]    file_sizes:  97%|#########################2| 13.3M/13.7M [00:05<00:00, 3.84MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:05<00:00, 2.48MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 111kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:41, 135kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<01:18, 173kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:57, 231kB/s]    file_sizes:   7%|#8                          | 909k/13.7M [00:01<00:40, 315kB/s]    file_sizes:  13%|###5                       | 1.83M/13.7M [00:01<00:27, 435kB/s]    file_sizes:  23%|######1                    | 3.14M/13.7M [00:01<00:17, 603kB/s]    file_sizes:  36%|#########7                 | 4.97M/13.7M [00:01<00:10, 835kB/s]    file_sizes:  44%|###########4              | 6.02M/13.7M [00:02<00:06, 1.11MB/s]    file_sizes:  57%|##############8           | 7.86M/13.7M [00:02<00:03, 1.50MB/s]    file_sizes:  69%|#################8        | 9.43M/13.7M [00:02<00:02, 1.97MB/s]    file_sizes:  80%|####################8     | 11.0M/13.7M [00:02<00:01, 2.51MB/s]    file_sizes:  92%|#######################8  | 12.6M/13.7M [00:03<00:00, 3.12MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.38MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -104,7 +107,7 @@ Grid-search with scikit-learn
 
 
     estimator = linear_model.Lasso(
-        fit_intercept=False, max_iter=1000, warm_start=True)
+        fit_intercept=False, max_iter=max_iter, warm_start=True)
 
     print('scikit-learn started')
 
@@ -114,7 +117,8 @@ Grid-search with scikit-learn
     algo = Forward()
     monitor_grid_sk = Monitor()
     grid_search(
-        algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
+        algo, criterion, model, X, y, None, None, monitor_grid_sk,
+        log_alphas=log_alphas, tol=tol)
     objs = np.array(monitor_grid_sk.objs)
     t_sk = time.time() - t0
 
@@ -159,9 +163,9 @@ Grad-search with sparse-ho
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(criterion)
     monitor_grad = Monitor()
+    optimizer = LineSearch(n_outer=10, tol=tol)
     grad_search(
-        algo, criterion, model, X, y, np.log(alpha_max / 10), monitor_grad,
-        n_outer=10, tol=tol)
+        algo, criterion, model, optimizer, X, y, log_alpha0, monitor_grad)
 
     t_grad_search = time.time() - t0
 
@@ -210,7 +214,7 @@ Plot results
 
     current_palette = sns.color_palette("colorblind")
 
-    fig = plt.figure(figsize=(5, 3))
+    plt.figure(figsize=(5, 3))
     plt.semilogx(
         p_alphas, objs, color=current_palette[0])
     plt.semilogx(
@@ -241,8 +245,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 11.66
-    Time to compute CV for sparse-ho: 19.33
+    Time to compute CV for scikit-learn: 12.10
+    Time to compute CV for sparse-ho: 19.80
     Minimum objective grid-search 0.21316
     Minimum objective grad-search 0.21211
 
@@ -252,7 +256,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  43.963 seconds)
+   **Total running time of the script:** ( 0 minutes  45.173 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:
