@@ -12,6 +12,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
 from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 from sparse_ho.ho import grad_search
+from sparse_ho.optimizers import LineSearch
 
 
 n_samples = 100
@@ -69,22 +70,21 @@ def test_grad_search(model, crit):
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
+    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
     grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor1, n_outer=n_outer,
-        tol=1e-16)
+        algo, criterion, model, optimizer, X, y, log_alpha, monitor1)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
-    grad_search(algo, criterion, model, X, y, log_alpha, monitor2,
-                n_outer=n_outer, tol=1e-16)
+    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
+    grad_search(algo, criterion, model, optimizer, X, y, log_alpha, monitor2)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-    grad_search(
-        algo, criterion, model, X, y, log_alpha, monitor3, n_outer=n_outer,
-        tol=1e-16)
+    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
+    grad_search(algo, criterion, model, optimizer, X, y, log_alpha, monitor3)
 
     np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
