@@ -65,7 +65,8 @@ class LineSearch():
 
             if L_log_alpha is None:
                 if grad_norms[-1] > 1e-3:
-                    # make sure we are not selecting a step size that is too small
+                    # make sure we are not selecting a step size
+                    # that is too small
                     if is_multiparam:
                         L_log_alpha = grad_norms[-1] / np.sqrt(len(log_alphak))
                     else:

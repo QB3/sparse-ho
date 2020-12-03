@@ -80,7 +80,6 @@ def test_grad_search(model, crit):
     optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
     grad_search(algo, criterion, model, optimizer, X, y, log_alpha, monitor2)
 
-
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)

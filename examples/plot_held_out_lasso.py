@@ -51,7 +51,8 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 n_alphas = 10
@@ -77,7 +78,8 @@ criterion = HeldOutMSE(idx_train, idx_val)
 algo = Forward()
 monitor_grid_sk = Monitor()
 grid_search(
-    algo, criterion, model, X, y, None, None, monitor_grid_sk, log_alphas=log_alphas, tol=tol)
+    algo, criterion, model, X, y, None, None, monitor_grid_sk,
+    log_alphas=log_alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 

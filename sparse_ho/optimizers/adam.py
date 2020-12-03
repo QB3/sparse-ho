@@ -45,9 +45,10 @@ class Adam():
             t += 1
             val, grad = _get_val_grad(log_alpha)
 
-            print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f" % (
-                i, self.n_outer, val, monitor.acc_vals[-1],
-                monitor.acc_tests[-1]))
+            print(
+                "%i / %i | crosss entropy %f | acc val %f | accuracy test %f" %
+                (i, self.n_outer, val, monitor.acc_vals[-1],
+                    monitor.acc_tests[-1]))
 
             if (i > 1) and (monitor.objs[-1] > monitor.objs[-2]):
                 break

@@ -86,7 +86,8 @@ for a Lasso using a full cross-validation score.
 # criterion = CrossVal(X, y, Model, cv=kf, estimator=estimator)
 # algo = ImplicitForward()
 # grad_search(
-#     algo, criterion, np.log(alpha_max / 10), monitor_grad, n_outer=10, tol=tol)
+#     algo, criterion, np.log(alpha_max / 10), monitor_grad, n_outer=10,
+#     tol=tol)
 
 # t_grad_search = time.time() - t0
 

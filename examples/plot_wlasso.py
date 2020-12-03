@@ -60,7 +60,8 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 ##############################################################################
 # Max penalty value
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 n_alphas = 30
 alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
 ##############################################################################

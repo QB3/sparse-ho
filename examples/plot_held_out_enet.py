@@ -35,8 +35,6 @@ Axes3D  # hack for matplotlib 3D support
 
 # dataset = "rcv1"
 dataset = 'simu'
-# use_small_part = False
-use_small_part = True
 
 ##############################################################################
 # Load some data
@@ -58,16 +56,14 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
-log_alpha_max = np.log(alpha_max)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 
 alpha_min = 1e-4 * alpha_max
 
 n_grid = 10
 alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
-log_alphas_1 = np.log(alphas_1)
 alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
-log_alphas_2 = np.log(alphas_2)
 
 results = np.zeros((n_grid, n_grid))
 tol = 1e-4
@@ -89,7 +85,8 @@ for i in range(n_grid):
         estimator.alpha = (alphas_1[i] + alphas_2[j])
         estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
         estimator.fit(X[idx_train, :], y[idx_train])
-        results[i, j] = np.mean((y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
+        results[i, j] = np.mean(
+            (y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
 t_grid_search += time.time()
 print("Finished grid-search")
 

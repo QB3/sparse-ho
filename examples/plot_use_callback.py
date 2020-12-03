@@ -15,8 +15,6 @@ import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
-import seaborn as sns
-
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
@@ -29,7 +27,6 @@ from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch
 
 from libsvmdata.datasets import fetch_libsvm
-
 
 
 print(__doc__)
@@ -52,7 +49,8 @@ idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 tol = 1e-7
