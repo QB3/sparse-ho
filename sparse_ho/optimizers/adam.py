@@ -1,12 +1,15 @@
 import numpy as np
 
+from sparse_ho.optimizers.base import BaseOptimizer
 
-class Adam():
-    """This Adam code is taken from XXX
+
+class Adam(BaseOptimizer):
+    """This Adam code is taken from
+    https://github.com/sagarvegad/Adam-optimizer/blob/master/Adam.py
 
     n_outer: int, optional (default=100).
         number of maximum updates of alpha.
-    epsilon= float, optional (default=1e-3)
+    epsilon: float, optional (default=1e-3)
     lr: float, optional (default=1e-2)
         learning rate
     beta_1: float, optional (default=0.9)
@@ -50,8 +53,6 @@ class Adam():
 
             if (i > 1) and (monitor.objs[-1] > monitor.objs[-2]):
                 break
-            # print("%i / %i  || crosss entropy %f  || accuracy %f" % (
-            #       i, n_outer, val, monitor.acc_vals[-1]))
             # updates the moving averages of the gradient
             m_t = self.beta_1*m_t + (1 - self.beta_1) * grad
             # updates the moving averages of the squared gradient

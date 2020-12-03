@@ -1,8 +1,10 @@
 import numpy as np
 from numpy.linalg import norm
 
+from sparse_ho.optimizers.base import BaseOptimizer
 
-class LineSearch():
+
+class LineSearch(BaseOptimizer):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 

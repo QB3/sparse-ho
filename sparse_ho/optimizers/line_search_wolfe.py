@@ -1,18 +1,32 @@
 from numpy.linalg import norm
 
+from sparse_ho.optimizers.base import BaseOptimizer
 
-class LineSearchWolfe():
+
+class LineSearchWolfe(BaseOptimizer):
+    """
+    n_outer: int, optional (default=100).
+        number of maximum updates of alpha.
+    maxit_ln: int, optional (default=5)
+    verbose: bool, optional (default=False)
+        Indicates whether information about hyperparameter
+        optimization process is printed or not.
+    tol : float, optional (default=1e-5)
+        Tolerance for the inner optimization solver.
+    t_max: float, optional (default=10000)
+        Maximum running time threshold in seconds.
+    """
 
     def __init__(
-            self, n_outer=100, maxit_ln=5, verbose=False,
-            tol=1e-5, t_max=10000):
+            self, n_outer=100, maxit_ln=5, verbose=False, tol=1e-5,
+            t_max=10000):
         self.n_outer = n_outer
         self.maxit_ln = maxit_ln
         self.verbose = verbose
         self.tol = tol
         self.t_max = t_max
 
-    def grad_search_wolfe(
+    def grad_search(
             self, algo, criterion, model, log_alpha0, monitor):
 
         def _get_val_grad(log_alpha, tol=self.tol):

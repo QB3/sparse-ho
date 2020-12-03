@@ -1,8 +1,10 @@
 
 import numpy as np
 
+from sparse_ho.optimizers.base import BaseOptimizer
 
-class GradientDescent():
+
+class GradientDescent(BaseOptimizer):
     """Gradient descent for the outer problem.
 
     n_outer: int, optional (default=100).
