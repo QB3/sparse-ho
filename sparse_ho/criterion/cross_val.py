@@ -19,6 +19,8 @@ class CrossVal(BaseCriterion):
         """
         Parameters
         ----------
+            criterion: instance of ``BaseCriterion``
+            A criterion that follows the sparse-ho API.
         cv : int, cross-validation generator or iterable, default=None
             Determines the cross-validation splitting strategy.
             Possible inputs for cv are:
@@ -29,10 +31,6 @@ class CrossVal(BaseCriterion):
             - An iterable yielding (train, test) splits as arrays of indices.
 
             For int/None inputs, KFold is used.
-        max_iter: int
-            Maximal number of iteration for the state-of-the-art solver
-        estimator: instance of ``sklearn.base.BaseEstimator``
-            An estimator that follows the scikit-learn API.
         """
         self.criterion = criterion
         self.cv = check_cv(cv)
