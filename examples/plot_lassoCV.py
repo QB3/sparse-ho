@@ -27,6 +27,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho import grad_search
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
+from sparse_ho.optimizers import LineSearch
 from sparse_ho.utils import Monitor
 
 print(__doc__)
@@ -85,9 +86,10 @@ log_alpha0 = np.log(alpha_max / 10)
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
 algo = ImplicitForward()
+optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, cross_val_criterion, model, X, y, log_alpha0, monitor_grad,
-    n_outer=10, tol=tol)
+    algo, cross_val_criterion, model, optimizer, X, y, log_alpha0,
+    monitor_grad)
 
 t_grad_search = time.time() - t0
 
