@@ -1,10 +1,11 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 from sklearn import linear_model
+
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.synthetic import get_synt_data
+from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
-from sparse_ho.forward import Forward
+from sparse_ho import Forward
 from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 from sparse_ho.grid_search import grid_search
 
@@ -48,14 +49,16 @@ def test_grid_search():
     criterion = HeldOutMSE(idx_train, idx_train)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[
@@ -69,14 +72,16 @@ def test_grid_search():
     criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_grid, max_evals=max_evals,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = SmoothedSURE(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor_random,
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
     assert(monitor_random.log_alphas[

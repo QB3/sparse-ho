@@ -17,16 +17,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from numpy.linalg import norm
+from scipy.linalg import toeplitz
 
-from celer import Lasso, LassoCV
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.utils import check_random_state
-from scipy.linalg import toeplitz
+from celer import Lasso, LassoCV
 
 from sparse_ho.models import WeightedLasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch

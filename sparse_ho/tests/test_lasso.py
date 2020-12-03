@@ -4,15 +4,15 @@ from sklearn import linear_model
 
 
 from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.forward import get_beta_jac_iterdiff
 from sparse_ho.models import Lasso, WeightedLasso
-from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.implicit import get_beta_jac_t_v_implicit
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
-from sparse_ho.backward import Backward
+from sparse_ho import Forward
+from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
+from sparse_ho import Backward
 from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 
 n_samples = 100

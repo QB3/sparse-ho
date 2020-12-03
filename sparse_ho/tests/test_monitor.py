@@ -5,7 +5,7 @@ from sklearn import linear_model
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho import grad_search
 from sparse_ho.datasets import get_synt_data
@@ -22,7 +22,8 @@ idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
+alpha_max = np.max(
+    np.abs(X[idx_train, :].T.dot(y[idx_train]))) / len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
 tol = 1e-7
@@ -34,13 +35,14 @@ estimator = linear_model.Lasso(
 
 
 objs = []
+X_val = X[idx_val]
 
 
 def callback(val, grad, mask, dense, log_alpha):
     beta = np.zeros(len(mask))
     beta[mask] = dense
     objs.append(
-        norm(X[np.ix_(idx_val, mask)] @ dense - y[idx_val]) ** 2 / len(idx_val))
+        norm(X_val[:, mask] @ dense - y[idx_val]) ** 2 / len(idx_val))
 
 
 def test_monitor():

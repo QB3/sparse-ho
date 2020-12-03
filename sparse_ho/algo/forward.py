@@ -3,7 +3,8 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the forward algorithm.
 
     Parameters
     ----------

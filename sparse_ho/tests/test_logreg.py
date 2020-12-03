@@ -5,11 +5,11 @@ from sklearn.linear_model import LogisticRegression
 from scipy.sparse import csc_matrix
 
 from sparse_ho.models import SparseLogreg
-from sparse_ho.forward import get_beta_jac_iterdiff
-from sparse_ho.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.forward import Forward
-from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.implicit import Implicit
+from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho import Forward
+from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.criterion import HeldOutLogistic
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
@@ -104,8 +104,8 @@ def test_beta_jac_custom_solver(model, model_custom):
         get_v, tol=tol, model=model, tol_jac=1e-12)
 
     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], log_alpha, get_v, tol=tol, model=model_custom,
-        tol_jac=1e-12)
+        X[idx_train, :], y[idx_train], log_alpha, get_v, tol=tol,
+        model=model_custom, tol_jac=1e-12)
 
     assert np.all(supp == supp_custom)
     assert np.allclose(dense, dense_custom)
