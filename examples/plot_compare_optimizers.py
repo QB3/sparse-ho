@@ -1,9 +1,9 @@
 """
-===========================
-Sparse logistic regression
-===========================
+========================
+Compare outer optimizers
+========================
 
-This example shows how to perform hyperparameter optimisation
+This example shows how to perform hyperparameter optimization
 for sparse logistic regression using a held-out test set.
 
 """
