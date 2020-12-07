@@ -28,7 +28,7 @@ class Implicit():
 
         mask, dense, jac_v, sol_lin_sys = get_beta_jac_t_v_implicit(
             X, y, log_alpha, get_v,
-            mask0=mask0, dense0=dense0,
+            mask0=mask0, dense0=dense0, max_iter=max_iter,
             sol_lin_sys=quantity_to_warm_start, tol=tol, model=model)
 
         if full_jac_v:
@@ -53,7 +53,6 @@ def get_beta_jac_t_v_implicit(
 
     maskp, densep = model.get_beta(X_train, y_train, mask, dense)
     v = get_v(maskp, densep)
-
     # TODO: to clean
     is_sparse = issparse(X_train)
     if not alpha.shape:
@@ -69,7 +68,7 @@ def get_beta_jac_t_v_implicit(
     try:
         sol = cg(
             mat_to_inv, - model.restrict_full_supp(
-                X_train, y_train, mask, dense, v),
+                X_train, y_train, mask, dense, v, log_alpha),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -91,9 +90,8 @@ def get_beta_jac_t_v_implicit(
             - model.restrict_full_supp(
                 X_train, y_train, mask, dense, v, log_alpha),
             x0=sol0, atol=1e-3)
-        sol_lin_sys = sol[0]
+    sol_lin_sys = sol[0]
     jac_t_v = model._get_jac_t_v(
-        X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(),
-        n_samples)
-
+    X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(),
+    n_samples)
     return mask, dense, jac_t_v, sol[0]

@@ -57,7 +57,6 @@ class HeldOutMSE(BaseCriterion):
         def get_v(mask, dense):
             X_val_m = X_val[:, mask]
             return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
-
         mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
             X_train, y_train, log_alpha, model,
             get_v, mask0=self.mask0, dense0=self.dense0,

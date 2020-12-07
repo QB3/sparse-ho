@@ -113,6 +113,25 @@ class Lasso(BaseModel):
             v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X[:, j] @ X
 
         return grad
+    
+    @staticmethod
+    #@njit
+    def _update_bcd_jac_backward_sparse(
+        data, indptr, indices, n_samples, n_features,
+        alpha, grad, beta, v_t_jac, L):
+        sign_beta = np.sign(beta)
+        for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+            Xjs = data[indptr[j]:indptr[j+1]]
+            idx_nz = indices[indptr[j]:indptr[j+1]]
+            grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
+            v_t_jac[j] *= np.abs(sign_beta[j])
+            for i in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+                Xis = data[indptr[i]:indptr[i+1]]
+                idx = indices[indptr[i]:indptr[i+1]]
+                if len(idx) != 0 and len(idx_nz) != 0:
+                    v_t_jac[i] -= v_t_jac[j] / (L[j] * n_samples) * Xjs[np.array([item in idx for item in idx_nz])] @ Xis[np.array([item in idx_nz for item in idx])]
+
+        return grad
 
     @staticmethod
     def _get_pobj0(r, beta, alphas, y=None):

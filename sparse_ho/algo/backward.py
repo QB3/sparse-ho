@@ -48,7 +48,12 @@ def get_only_jac_backward(X, alpha, list_beta, v, model, jac_v0=None):
     jac_t_v = model._init_g_backward(None, n_features)
     for k in (np.arange(list_beta.shape[0] - 1, -1, -1)):
         beta = list_beta[k, :]
-        jac_t_v = model._update_bcd_jac_backward(
-            X, alpha, jac_t_v, beta, v_, L)
+        if is_sparse:
+            jac_t_v = model._update_bcd_jac_backward_sparse(
+                X.data, X.indptr, X.indices, n_samples, n_features,
+                alpha, jac_t_v, beta, v_, L)
+        else:
+            jac_t_v = model._update_bcd_jac_backward(
+                X, alpha, jac_t_v, beta, v_, L)
 
     return jac_t_v
