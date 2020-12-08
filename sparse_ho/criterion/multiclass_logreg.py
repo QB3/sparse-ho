@@ -72,6 +72,7 @@ class LogisticMulticlass():
             self.one_hot_code[self.idx_val, :])
         monitor(
             val, log_alpha=log_alpha.copy(), grad=grad.copy(), acc_val=acc_val)
+        print("Value outer %f || Accuracy validation %f" % (val, acc_val))
         self.all_betas = all_betas
         return val, grad
 
