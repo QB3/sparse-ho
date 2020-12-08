@@ -61,6 +61,7 @@ for i in range(n_alphas):
 print("min cross entropy grid-search %f " % np.array(np.min(monitor_grid.objs)))
 print("max accuracy grid-search %f " % np.array(np.max(monitor_grid.acc_vals)))
 
+1 / 0
 
 # print("###################### ADAM ###################")
 # monitor_adam = Monitor()
