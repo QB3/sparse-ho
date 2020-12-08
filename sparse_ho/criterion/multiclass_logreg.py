@@ -66,8 +66,7 @@ class LogisticMulticlass():
         #     all_betas, self.X_test, self.one_hot_code[self.idx_test])
         # TODO use a callback function
         val = cross_entropy(
-            all_betas, X[self.idx_val, :],
-            self.one_hot_code[self.idx_val, :])
+            all_betas, X[self.idx_val, :], self.one_hot_code[self.idx_val, :])
         grad = self.grad_total_loss(
             all_betas, all_jacs, X[self.idx_val, :],
             self.one_hot_code[self.idx_val, :])
