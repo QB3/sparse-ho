@@ -9,7 +9,7 @@ from sparse_ho.utils_cross_entropy import (
 class LogisticMulticlass():
     """Multiclass logistic loss.
     """
-    def __init__(self, idx_val, idx_train, algo):
+    def __init__(self, idx_train, idx_val, algo):
         """
         Parameters
         ----------
