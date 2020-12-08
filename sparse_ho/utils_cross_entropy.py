@@ -1,4 +1,5 @@
 import numpy as np
+import sklearn
 from scipy.special import logsumexp
 
 
@@ -28,7 +29,8 @@ def accuracy(betas, X, Y):
     scores = X @ betas
     idx_max = np.argmax(scores, axis=1)
     idx_true = np.argmax(Y, axis=1)  # TODO to improve
-    acc = (idx_max == idx_true).mean()
+    # acc = (idx_max == idx_true).mean()
+    acc = sklearn.metrics.accuracy_score(idx_max, idx_true)
     return acc
 
 
