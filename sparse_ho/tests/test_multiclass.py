@@ -33,22 +33,15 @@ X = X[my_bool, :]
 y = y[my_bool]
 # clean data and subsample
 X, y = clean_dataset(X, y, n_samples, n_features)
-# idx_train, idx_val, idx_test = get_splits(X, y)
 idx_train = np.arange(len(y) // 2)
 idx_val = np.arange(len(y) // 2, len(y))
 
 alpha_max, n_classes = get_alpha_max(X, y)
-# alpha_max, n_classes = get_alpha_max(
-#     X[np.append(idx_val, idx_train), :], y[np.append(idx_val, idx_train)])
 tol = 1e-8
-
-n_samples, n_features = X.shape
 
 n_classes = np.unique(y).shape[0]
 
 max_iter = 10000
-
-
 algo = ImplicitForward(n_iter_jac=1000)
 estimator = LogisticRegression(
     solver='saga', penalty='l1', max_iter=max_iter,
@@ -57,10 +50,6 @@ estimator = LogisticRegression(
 model = SparseLogreg(estimator=estimator)
 logit_multiclass = LogisticMulticlass(
     idx_train=idx_train, idx_val=idx_val, algo=algo)
-
-
-alpha_max, n_classes = get_alpha_max(X, y)
-tol = 1e-8
 
 n_alphas = 10
 p_alphas = np.geomspace(1, 0.1, n_alphas)
