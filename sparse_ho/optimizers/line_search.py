@@ -115,8 +115,9 @@ class LineSearch(BaseOptimizer):
             value_outer_old = value_outer
 
             if self.verbose:
-                print('grad outer', grad_outer)
-                print('value of log_alphak', log_alphak)
+                print('value outer', value_outer)
+                # print('grad outer', grad_outer)
+                # print('value of log_alphak', log_alphak)
             if monitor.times[-1] > self.t_max:
                 break
         return log_alphak, value_outer, grad_outer
