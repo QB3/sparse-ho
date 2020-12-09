@@ -1,11 +1,9 @@
 import numpy as np
-from numpy.linalg import norm
 from joblib import Parallel, delayed
 import pandas
-# from sklearn.model_selection import KFold
 from itertools import product
 from sparse_ho.models import Lasso
-from sparse_ho.criterion import CrossVal, HeldOutMSE
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
@@ -14,13 +12,13 @@ from libsvmdata import fetch_libsvm
 from sklearn.model_selection import StratifiedShuffleSplit
 
 
-
 tol = 1e-16
 methods = ["forward", "implicit_forward", "celer"]
 p_alpha_max = 0.01
 dict_algo = {}
 dict_algo["forward"] = Forward()
-dict_algo["implicit_forward"] = ImplicitForward(tol_jac=1e-8, n_iter_jac=100000, max_iter=1000)
+dict_algo["implicit_forward"] = ImplicitForward(
+    tol_jac=1e-8, n_iter_jac=100000, max_iter=1000)
 dict_algo["implicit"] = Implicit(max_iter=1000)
 dict_algo["backward"] = Backward()
 dataset_names = ["leukemia", "rcv1_train", "real-sim", "news20"]
@@ -32,16 +30,18 @@ dict_maxits["news20"] = np.floor(np.geomspace(5, 70, 15)).astype(int)
 
 maxits = np.floor(np.geomspace(5, 60, 15)).astype(int)
 dataset_name = "real-sim"
+
+
 def parallel_function(
-        dataset_name, p_alpha_max, method="forward", maxit=10, random_state=42):
-    r_state = np.random.RandomState(random_state)
+        dataset_name, p_alpha_max, method="forward", maxit=10,
+        random_state=42):
     X, y = fetch_libsvm(dataset_name)
     n_samples = len(y)
-    sss1=StratifiedShuffleSplit(
-            n_splits=2, test_size=0.3333, random_state=0)
-    idx_train, idx_val = sss1.split(X, y) 
+    sss1 = StratifiedShuffleSplit(n_splits=2, test_size=0.3333, random_state=0)
+    idx_train, idx_val = sss1.split(X, y)
     idx_train = idx_train[0]
     idx_val = idx_val[0]
+
     for i in range(2):
         alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
         log_alpha = np.log(alpha_max * p_alpha_max)
@@ -52,6 +52,8 @@ def parallel_function(
                 tol=1e-12, max_iter=maxit)
             model = Lasso(estimator=clf, max_iter=maxit)
             criterion = HeldOutMSE(idx_train, idx_val)
+            algo = ImplicitForward(
+                tol_jac=1e-8, n_iter_jac=maxit)
             algo = dict_algo["implicit_forward"]
             algo.max_iter = maxit
             val, grad = criterion.get_val_grad(
@@ -76,7 +78,7 @@ def parallel_function(
         true_val, true_grad = criterion.get_val_grad(
                 model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
                 monitor=true_monitor)
-    
+
     return (
         dataset_name, p_alpha_max, method, maxit,
         val, grad, monitor.times[0], true_val, true_grad,
