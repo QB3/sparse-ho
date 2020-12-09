@@ -34,8 +34,8 @@ class ImplicitForward():
             X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             # tol_jac=self.tol_jac,
-            tol_jac=self.tol_jac, tol=tol, niter_jac=self.n_iter_jac, model=model,
-            max_iter=self.max_iter, verbose=self.verbose)
+            tol_jac=self.tol_jac, tol=tol, niter_jac=self.n_iter_jac,
+            model=model, max_iter=self.max_iter, verbose=self.verbose)
         jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])

@@ -66,7 +66,7 @@ def parallel_function(
         true_monitor = Monitor()
         clf = Lasso_celer(
                 alpha=np.exp(log_alpha), fit_intercept=False, warm_start=True,
-                tol=1e-14, max_iter=10000)
+                tol=1e-12, max_iter=10000)
         criterion = HeldOutMSE(None, None)
         cross_val = CrossVal(criterion, cv=kf)
         algo = Implicit(criterion)
@@ -97,9 +97,10 @@ backend = 'loky'
 n_jobs = 1
 results = Parallel(n_jobs=n_jobs, verbose=100, backend=backend)(
     delayed(parallel_function)(
-        dataset_name, p_alpha_max, method=method, maxit=maxit)
-    for method, maxit in product(
-        methods, maxits))
+        dataset_name=dataset_name, p_alpha_max,
+        method=method, maxit=maxit)
+    for dataset_name, method, maxit in product(
+        dataset_names, methods, maxits))
 print('OK finished parallel')
 
 df = pandas.DataFrame(results)
