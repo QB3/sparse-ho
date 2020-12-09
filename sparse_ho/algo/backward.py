@@ -14,8 +14,9 @@ class Backward():
     verbose: bool
     """
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, use_stop_crit=True):
         self.verbose = verbose
+        self.use_stop_crit = use_stop_crit
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
@@ -24,7 +25,8 @@ class Backward():
         mask, dense, list_sign = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=None, max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, return_all=True)
+            compute_jac=compute_jac, return_all=True,
+            use_stop_crit=self.use_stop_crit)
         v = np.zeros(X.shape[1])
         v[mask] = get_v(mask, dense)
         jac_v = get_only_jac_backward(
