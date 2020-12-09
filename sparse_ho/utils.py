@@ -182,7 +182,7 @@ class Monitor():
 
     def __call__(
             self, obj, grad, mask=None, dense=None, log_alpha=None,
-            acc_val=None):
+            acc_val=None, acc_test=None):
         self.objs.append(obj)
         try:
             self.log_alphas.append(log_alpha.copy())
@@ -194,7 +194,8 @@ class Monitor():
             self.callback(obj, grad, mask, dense, log_alpha)
         if acc_val is not None:
             self.acc_vals.append(acc_val)
-
+        if acc_test is not None:
+            self.acc_vals.append(acc_test)
 
 
 class WarmStart():

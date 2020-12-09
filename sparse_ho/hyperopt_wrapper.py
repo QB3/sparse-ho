@@ -4,24 +4,29 @@
 # License: BSD (3-clause)
 
 
+import numpy as np
 from hyperopt import hp
 from hyperopt import fmin, tpe, rand
 from sklearn.utils import check_random_state
 
 
 def hyperopt_wrapper(
-        algo, criterion, log_alpha_min, log_alpha_max, monitor, max_evals=50,
-        tol=1e-5, beta_star=None, random_state=42, t_max=1000,
-        method='bayesian'):
+        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
+        max_evals=50, tol=1e-5, random_state=42, t_max=1000,
+        method='bayesian', size_space=1):
 
     def objective(log_alpha):
-        val_func, _ = criterion.get_val_grad(
-            log_alpha, algo.get_beta_jac_v, tol=tol, compute_jac=False,
-            monitor=monitor)
+        log_alpha = np.array(log_alpha)
+        val_func = criterion.get_val(
+            model, X, y, log_alpha, algo.get_beta_jac_v, monitor, tol=tol)
         return val_func
 
-    space = hp.uniform(
-        'log_alpha', log_alpha_min, log_alpha_max)
+    space = [
+        hp.uniform(str(dim), log_alpha_min, log_alpha_max) for dim in range(
+            size_space)]
+
+    # space = hp.uniform(
+    #     'log_alpha', log_alpha_min, log_alpha_max)
 
     rng = check_random_state(random_state)
 

@@ -1,26 +1,14 @@
 import numpy as np
-from numpy.linalg import norm
-
 import sklearn
-from sklearn.preprocessing import OneHotEncoder
-import pandas as pd
-import scipy
+from sklearn.linear_model import LogisticRegression
 
 from libsvmdata.datasets import fetch_libsvm
-from celer import LogisticRegression
-# from sklearn.linear_model import LogisticRegression
 
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho import ImplicitForward
-from sparse_ho.optimizers import LineSearch, GradientDescent
-
-from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.utils_datasets import (
-    get_alpha_max, clean_dataset, get_splits)
-
-from sklearn.linear_model import LogisticRegression
+from sparse_ho.datasets.utils_datasets import (get_alpha_max, clean_dataset)
 
 
 # load data
