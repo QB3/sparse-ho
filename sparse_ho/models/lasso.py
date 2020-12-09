@@ -113,12 +113,12 @@ class Lasso(BaseModel):
             v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X[:, j] @ X
 
         return grad
-    
+
     @staticmethod
     @njit
     def _update_bcd_jac_backward_sparse(
-        data, indptr, indices, n_samples, n_features,
-        alpha, grad, beta, v_t_jac, L):
+            data, indptr, indices, n_samples, n_features,
+            alpha, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
             if L[j] != 0:
@@ -131,7 +131,7 @@ class Lasso(BaseModel):
                     Xis = data[indptr[i]:indptr[i+1]]
                     idx = indices[indptr[i]:indptr[i+1]]
                     product = sparse_scalar_product(Xjs, idx_nz, Xis, idx)
-                    v_t_jac[i] -=  cste * product
+                    v_t_jac[i] -= cste * product
 
         return grad
 
