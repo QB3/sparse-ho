@@ -5,13 +5,11 @@ from itertools import product
 from libsvmdata.datasets import fetch_libsvm
 from celer import LogisticRegression
 
-from sparse_ho.ho_dirty import (
-    grad_search, grad_search_backtracking_cd_dirty2, grad_search_scipy)
+from sparse_ho.ho import grad_search, hyperopt_wrapper
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.utils_datasets import clean_dataset, get_alpha_max
 from sparse_ho.utils import Monitor
 from sparse_ho.criterion import LogisticMulticlass
-from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
 
 
 dataset_names = ["rcv1_multiclass"]
@@ -138,5 +136,6 @@ df.columns = [
 
 for dataset_name in dataset_names:
     for method in methods:
-        df[(df['dataset'] == dataset_name) & (df['method'] == method)].to_pickle(
-            "results/%s_%s.pkl" % (dataset_name, method))
+        df[(df['dataset'] == dataset_name) & (
+            df['method'] == method)].to_pickle(
+                "results/%s_%s.pkl" % (dataset_name, method))

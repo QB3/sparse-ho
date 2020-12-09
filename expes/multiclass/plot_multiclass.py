@@ -1,8 +1,4 @@
 import numpy as np
-from numpy.linalg import norm
-from sklearn.preprocessing import OneHotEncoder
-import pandas as pd
-import scipy
 
 from libsvmdata.datasets import fetch_libsvm
 from celer import LogisticRegression
@@ -11,13 +7,13 @@ from celer import LogisticRegression
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho import ImplicitForward
-from sparse_ho.optimizers import LineSearch, GradientDescent
+from sparse_ho.optimizers import GradientDescent
 
-from sparse_ho.ho import grad_search
+from sparse_ho.ho import grad_search, hyperopt_wrapper
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.utils_datasets import (
     get_alpha_max, clean_dataset, get_splits)
-from sparse_ho.hyperopt_wrapper import hyperopt_wrapper
+
 
 # load data
 n_samples = 1_000
@@ -54,14 +50,14 @@ n_alphas = 10
 p_alphas = np.geomspace(1, 0.001, n_alphas)
 p_alphas = np.tile(p_alphas, (n_classes, 1))
 
+print("###################### GRID SEARCH ###################")
 monitor_grid = Monitor()
 for i in range(n_alphas):
     log_alpha_i = np.log(alpha_max * p_alphas[:, i])
-    val, grad = logit_multiclass.get_val_grad(
+    logit_multiclass.get_val_grad(
         model, X, y, log_alpha_i, None, monitor_grid,
         tol)
 
-1/0
 print("###################### GRAD SEARCH LS ###################")
 n_outer = 100
 model = SparseLogreg(estimator=estimator)
