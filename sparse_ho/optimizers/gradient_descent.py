@@ -20,13 +20,15 @@ class GradientDescent(BaseOptimizer):
         Maximum running time threshold in seconds.
     """
     def __init__(
-            self, n_outer=100, step_size=None, verbose=False, tol=1e-5,
+            self, n_outer=100, step_size=None, p_grad0=1,
+            verbose=False, tol=1e-5,
             t_max=10_000):
         self.n_outer = n_outer
         self.step_size = step_size
         self.verbose = verbose
         self.tol = tol
         self.t_max = t_max
+        self.p_grad0 = p_grad0
 
     def _grad_search(
             self, _get_val_grad, proj_hyperparam, log_alpha0, monitor):
@@ -36,13 +38,19 @@ class GradientDescent(BaseOptimizer):
         else:
             log_alphak = log_alpha0
 
-        for _ in range(self.n_outer):
+        for i in range(self.n_outer):
             value_outer, grad_outer = _get_val_grad(
                 log_alphak, self.tol, monitor)
+            if self.step_size is None:
+                self.step_size = self.p_grad0 / np.linalg.norm(grad_outer)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
                 print("Value outer criterion: %f" % value_outer)
             if len(monitor.times) > 0 and monitor.times[-1] > self.t_max:
                 break
+
+            if i > 0 and (monitor.objs[-1] > monitor.objs[-2]):
+                # import ipdb; ipdb.set_trace()
+                self.step_size /= 10
         return log_alphak, value_outer, grad_outer

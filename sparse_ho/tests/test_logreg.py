@@ -71,7 +71,7 @@ def test_beta_jac(model):
 
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_alpha,
-        get_v, tol=tol, model=model, tol_jac=1e-12)
+        tol=tol, model=model, tol_jac=1e-12)
 
     supp3, dense3, jac3 = get_beta_jac_iterdiff(
         X[idx_train, :], y[idx_train], log_alpha, tol=tol,
@@ -79,7 +79,7 @@ def test_beta_jac(model):
 
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
         X_s[idx_train, :], y[idx_train], log_alpha,
-        get_v_s, tol=tol, model=model, tol_jac=1e-12)
+        tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)
     assert np.allclose(dense1, dense_sk, atol=1e-4)
@@ -101,10 +101,10 @@ def test_beta_jac(model):
 def test_beta_jac_custom_solver(model, model_custom):
     supp, dense, jac = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_alpha,
-        get_v, tol=tol, model=model, tol_jac=1e-12)
+        tol=tol, model=model, tol_jac=1e-12)
 
     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], log_alpha, get_v, tol=tol,
+        X[idx_train, :], y[idx_train], log_alpha, tol=tol,
         model=model_custom, tol_jac=1e-12)
 
     assert np.all(supp == supp_custom)
