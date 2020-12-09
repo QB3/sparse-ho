@@ -232,20 +232,11 @@ class WeightedLasso(BaseModel):
         return hessian
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
-        # TODO uncomment this code when the new version of celer is released
-        # self.estimator.set_params(tol=tol)
-        # self.estimator.weights = alpha
-        # self.estimator.fit(X, y)
-        # mask = self.estimator.coef_ != 0
-        # dense = (self.estimator.coef_)[mask]
-        # return mask, dense, None
-        X /= alpha
-        self.estimator.set_params(tol=tol, alpha=1)
+        self.estimator.set_params(tol=tol)
+        self.estimator.weights = alpha
         self.estimator.fit(X, y)
-        # set proper coefficients for estimator, to predict and use warm start
-        self.estimator.coef_ /= alpha
         mask = self.estimator.coef_ != 0
-        dense = self.estimator.coef_[mask]
+        dense = (self.estimator.coef_)[mask]
         return mask, dense, None
 
     @staticmethod
