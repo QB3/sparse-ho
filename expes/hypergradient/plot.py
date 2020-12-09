@@ -7,7 +7,7 @@ from sparse_ho.utils_plot import configure_plt
 configure_plt()
 
 save_fig = False
-n_iter_crop = 110
+n_iter_crop = 50
 
 fig_dir = "../../../tex/ICML2020/prebuiltimages/"
 fig_dir_svg = "../../../tex/ICML2020/prebuiltimages_svg/"
@@ -54,7 +54,7 @@ dict_markers["backward"] = ">"
 
 
 # df_data = pandas.read_pickle("results_non_unique.pkl")
-df_data = pandas.read_pickle("results.pkl")
+df_data = pandas.read_pickle("real-sim.pkl")
 
 methods = df_data['method'].unique()
 list_datasets = df_data['dataset'].unique()
@@ -77,7 +77,7 @@ for dataset in list_datasets:
             df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
             label=dict_method[method], color=dict_color[method],
             marker=marker, markevery=markevery))
-        axarr.flat[0].loglog(
+        axarr.flat[0].semilogy(
             df_method['time'], np.abs(df_method['criterion grad'] - grad),
             # df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
             label=dict_method[method], color=dict_color[method],
@@ -94,17 +94,18 @@ for dataset in list_datasets:
 
     axarr.flat[0].set_xlabel("Times (s)", fontsize=18)
     axarr.flat[1].set_xlabel(r"$\#$ epochs", fontsize=18)
-    axarr.flat[1].set_ylim(1e-14)
-    axarr.flat[0].set_ylim(1e-14)
+    axarr.flat[1].set_ylim(1e-12)
+    axarr.flat[0].set_ylim(1e-12)
     axarr.flat[1].set_xlim(6, n_iter_crop)
-    axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=18)
-    axarr.flat[1].set_ylabel("Objective minus optimum", fontsize=18)
+    axarr.flat[0].set_ylabel(r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
+    axarr.flat[1].set_ylabel(r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
     fig.tight_layout()
     if save_fig:
         fig.savefig(fig_dir + "intro_influ_niter.pdf", bbox_inches="tight")
         fig.savefig(fig_dir_svg + "intro_influ_niter.svg", bbox_inches="tight")
         #
-    axarr.flat[0].set_title('dataset = %s' % (dataset))
+    axarr.flat[0].set_title(dataset)
+    axarr.flat[1].set_title(dataset)
     fig.show()
 
 labels = []
