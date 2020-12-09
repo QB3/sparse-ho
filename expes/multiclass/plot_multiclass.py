@@ -39,7 +39,8 @@ estimator = LogisticRegression(
     C=1, fit_intercept=False, warm_start=True, max_iter=2000, verbose=False)
 
 model = SparseLogreg(estimator=estimator)
-logit_multiclass = LogisticMulticlass(idx_train, idx_val, idx_test, algo)
+logit_multiclass = LogisticMulticlass(
+    idx_train, idx_val, algo, idx_test=idx_test)
 
 
 alpha_max, n_classes = get_alpha_max(X, y)
@@ -54,10 +55,10 @@ print("###################### GRID SEARCH ###################")
 monitor_grid = Monitor()
 for i in range(n_alphas):
     log_alpha_i = np.log(alpha_max * p_alphas[:, i])
-    logit_multiclass.get_val_grad(
-        model, X, y, log_alpha_i, None, monitor_grid,
-        tol)
+    logit_multiclass.get_val(
+        model, X, y, log_alpha_i, None, monitor_grid, tol)
 
+1/0
 print("###################### GRAD SEARCH LS ###################")
 n_outer = 100
 model = SparseLogreg(estimator=estimator)

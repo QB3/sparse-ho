@@ -5,11 +5,13 @@ from itertools import product
 from libsvmdata.datasets import fetch_libsvm
 from celer import LogisticRegression
 
+from sparse_ho.models import SparseLogreg
 from sparse_ho.ho import grad_search, hyperopt_wrapper
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.utils_datasets import clean_dataset, get_alpha_max
+from sparse_ho.utils_datasets import clean_dataset, get_alpha_max, get_splits
 from sparse_ho.utils import Monitor
 from sparse_ho.criterion import LogisticMulticlass
+from sparse_ho.optimizers import LineSearch
 
 
 dataset_names = ["rcv1_multiclass"]
@@ -82,29 +84,35 @@ def parallel_function(
     algo = ImplicitForward(None, n_iter_jac=2000)
     estimator = LogisticRegression(
         C=1, fit_intercept=False, warm_start=True, max_iter=30, verbose=False)
-    logit_multiclass = LogisticMulticlass(X, y, algo, estimator)
+
+    model = SparseLogreg(estimator=estimator)
+    idx_train, idx_val, idx_test = get_splits(X, y)
+
+    logit_multiclass = LogisticMulticlass(
+        idx_train, idx_val, algo, idx_test=idx_test)
+
     monitor = Monitor()
     if method == "implicit_forward":
         log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
+        optimizer = LineSearch(n_outer=100)
         grad_search(
-            logit_multiclass, log_alpha0, monitor, n_outer=n_outer, tol=tol,
-            t_max=t_max)
+            algo, logit_multiclass, model, optimizer, X, y, log_alpha0,
+            monitor)
     elif method.startswith(('random', 'bayesian')):
         max_evals = dict_max_eval[dataset_name]
         log_alpha_min = np.log(alpha_max) - 7
         hyperopt_wrapper(
-            logit_multiclass, log_alpha_min, log_alpha_max, monitor,
-            max_evals=max_evals, tol=tol, t_max=t_max, method=method,
+            algo, logit_multiclass, model, X, y, log_alpha_min, log_alpha_max,
+            monitor, max_evals=max_evals, tol=tol, t_max=t_max, method=method,
             size_space=n_classes)
     elif method == 'grid_search':
         n_alphas = 20
         p_alphas = np.geomspace(1, 0.001, n_alphas)
         p_alphas = np.tile(p_alphas, (n_classes, 1))
         for i in range(n_alphas):
-            logit_multiclass.get_val_grad(
-                np.log(alpha_max * p_alphas[:, i]), monitor)
-            print("%i / %i  || crosss entropy %f  || accuracy val %f  || accuracy test %f" % (
-                i, n_alphas, monitor.objs[-1], monitor.acc_vals[-1], monitor.acc_tests[-1]))
+            log_alpha_i = np.log(alpha_max * p_alphas[:, i])
+            logit_multiclass.get_val(
+                model, X, y, log_alpha_i, None, monitor, tol)
 
     monitor.times = np.array(monitor.times).copy()
     monitor.objs = np.array(monitor.objs).copy()
