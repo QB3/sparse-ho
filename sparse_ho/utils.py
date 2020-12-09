@@ -2,6 +2,28 @@ import time
 import numpy as np
 from numba import njit
 
+@njit
+def sparse_scalar_product(Xjs, idx_j, Xis, idx_i):
+    product = 0
+    if len(idx_j) != 0 and len(idx_i) != 0:
+        cursor_j = 0
+        cursor_i = 0
+        for k in range(len(idx_j) + len(idx_i)):
+            if idx_j[cursor_j] == idx_i[cursor_i]:
+                product += Xjs[cursor_j] * Xis[cursor_i]
+                cursor_i += 1
+                cursor_j += 1
+            
+            elif idx_j[cursor_j] < idx_i[cursor_i]:
+                cursor_j += 1
+            else:
+                cursor_i += 1
+            if cursor_j >= (len(idx_j)) or cursor_i >= (len(idx_i)):
+                break
+        return product
+    else:
+        return 0.0
+ 
 
 @njit
 def ST(x, alpha):

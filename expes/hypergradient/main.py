@@ -14,17 +14,20 @@ from libsvmdata import fetch_libsvm
 
 
 
-tol = 1e-13
-# methods = ['backward']
-methods = ["forward", "implicit_forward", "implicit"]
+tol = 1e-32
+methods = ["forward", "backward", "implicit_forward", "celer"]
 p_alpha_max = 0.1
 dict_algo = {}
 dict_algo["forward"] = Forward()
-dict_algo["implicit_forward"] = ImplicitForward(tol_jac=tol, n_iter_jac=100000, max_iter=1000)
+dict_algo["implicit_forward"] = ImplicitForward(tol_jac=1e-10, n_iter_jac=100000, max_iter=1000)
 dict_algo["implicit"] = Implicit(max_iter=1000)
 dict_algo["backward"] = Backward()
-dataset_name = "real-sim"
-maxits = np.floor(np.geomspace(5, 40, 15)).astype(int)
+dataset_names = ["leukemia", "rcv1_train", "real-sim", "news20"]
+dict_maxits = {}
+dict_maxits["leukemia"] = np.floor(np.geomspace(5, 70, 15)).astype(int)
+dict_maxits["rcv1_train"] = np.floor(np.geomspace(5, 70, 15)).astype(int)
+dict_maxits["real-sim"] = np.floor(np.geomspace(5, 70, 15)).astype(int)
+dict_maxits["news20"] = np.floor(np.geomspace(5, 70, 15)).astype(int)
 
 def parallel_function(
         dataset_name, p_alpha_max, method="forward", maxit=10, random_state=42):
@@ -38,26 +41,38 @@ def parallel_function(
         log_alpha = np.log(alpha_max * p_alpha_max)
         monitor = Monitor()
 
-        model = Lasso(max_iter=maxit)
-        criterion = HeldOutMSE(None, None)
-        cross_val = CrossVal(criterion, cv=kf)
-        algo = dict_algo[method]
-        algo.max_iter = maxit
-        val, grad = cross_val.get_val_grad(
-                model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
-                monitor=monitor, max_iter=maxit)
+        if method == "celer":
+            clf = Lasso_celer(
+                alpha=np.exp(log_alpha), fit_intercept=False, warm_start=True,
+                tol=1e-12, max_iter=maxit)
+            model = Lasso(estimator=clf, max_iter=maxit)
+            criterion = HeldOutMSE(None, None)
+            cross_val = CrossVal(criterion, cv=kf)
+            algo = dict_algo["implicit_forward"]
+            algo.max_iter = maxit
+            val, grad = cross_val.get_val_grad(
+                    model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
+                    monitor=monitor, max_iter=maxit)
+        else:
+            model = Lasso(max_iter=maxit)
+            criterion = HeldOutMSE(None, None)
+            cross_val = CrossVal(criterion, cv=kf)
+            algo = dict_algo[method]
+            algo.max_iter = maxit
+            val, grad = cross_val.get_val_grad(
+                    model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+                    monitor=monitor, max_iter=maxit)
 
         true_monitor = Monitor()
         clf = Lasso_celer(
                 alpha=np.exp(log_alpha), fit_intercept=False, warm_start=True,
-                tol=1e-12, max_iter=10000)
-        # cross_val_criterion = CrossVal(criterion, cv=kf)
+                tol=1e-14, max_iter=10000)
         criterion = HeldOutMSE(None, None)
         cross_val = CrossVal(criterion, cv=kf)
         algo = Implicit(criterion)
         model = Lasso(estimator=clf, max_iter=10000)
         true_val, true_grad = cross_val.get_val_grad(
-                model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+                model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
                 monitor=true_monitor)
     
     return (
@@ -94,9 +109,8 @@ df.columns = [
     'criterion grad',  'time',
     'criterion true value', 'criterion true grad', 'true time']
 
-df.to_pickle("results.pkl")
 # df.to_pickle("results.pkl")
 
-# for dataset_name in dataset_names:
-#     df[df['dataset'] == dataset_name].to_pickle(
-#         "%s.pkl" % dataset_name)
+for dataset_name in dataset_names:
+    df[df['dataset'] == dataset_name].to_pickle(
+        "%s.pkl" % dataset_name)

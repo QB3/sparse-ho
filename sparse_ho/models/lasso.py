@@ -4,7 +4,7 @@ import scipy.sparse.linalg as slinalg
 from numba import njit
 
 from sparse_ho.utils import init_dbeta0_new, ST
-
+from sparse_ho.utils import sparse_scalar_product
 from sparse_ho.models.base import BaseModel
 
 
@@ -115,21 +115,23 @@ class Lasso(BaseModel):
         return grad
     
     @staticmethod
-    #@njit
+    @njit
     def _update_bcd_jac_backward_sparse(
         data, indptr, indices, n_samples, n_features,
         alpha, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
-            Xjs = data[indptr[j]:indptr[j+1]]
-            idx_nz = indices[indptr[j]:indptr[j+1]]
-            grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
-            v_t_jac[j] *= np.abs(sign_beta[j])
-            for i in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
-                Xis = data[indptr[i]:indptr[i+1]]
-                idx = indices[indptr[i]:indptr[i+1]]
-                if len(idx) != 0 and len(idx_nz) != 0:
-                    v_t_jac[i] -= v_t_jac[j] / (L[j] * n_samples) * Xjs[np.array([item in idx for item in idx_nz])] @ Xis[np.array([item in idx_nz for item in idx])]
+            if L[j] != 0:
+                Xjs = data[indptr[j]:indptr[j+1]]
+                idx_nz = indices[indptr[j]:indptr[j+1]]
+                grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
+                v_t_jac[j] *= np.abs(sign_beta[j])
+                cste = v_t_jac[j] / (L[j] * n_samples)
+                for i in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+                    Xis = data[indptr[i]:indptr[i+1]]
+                    idx = indices[indptr[i]:indptr[i+1]]
+                    product = sparse_scalar_product(Xjs, idx_nz, Xis, idx)
+                    v_t_jac[i] -=  cste * product
 
         return grad
 

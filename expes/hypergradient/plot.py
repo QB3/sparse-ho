@@ -7,7 +7,7 @@ from sparse_ho.utils_plot import configure_plt
 configure_plt()
 
 save_fig = False
-n_iter_crop = 35
+n_iter_crop = 110
 
 fig_dir = "../../../tex/ICML2020/prebuiltimages/"
 fig_dir_svg = "../../../tex/ICML2020/prebuiltimages_svg/"
@@ -16,7 +16,7 @@ current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
-dict_method['implicit'] = 'Implicit'
+dict_method['celer'] = 'Imp. F. Iterdiff. + celer'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
@@ -30,13 +30,13 @@ dict_color["random"] = current_palette[5]
 dict_color["bayesian"] = current_palette[0]
 dict_color["implicit_forward"] = current_palette[2]
 dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
+dict_color["celer"] = current_palette[1]
 
 dict_markevery = {}
 dict_markevery["forward"] = 2
 dict_markevery["implicit_forward"] = 1
 dict_markevery["backward"] = 3
-dict_markevery["implicit"] = 4
+dict_markevery["celer"] = 4
 
 # dict_marker = {}
 # dict_marker["forward"] = "o"
@@ -46,7 +46,7 @@ dict_markevery["implicit"] = 4
 dict_markers = {}
 dict_markers["forward"] = 'o'
 dict_markers["implicit_forward"] = 'X'
-dict_markers['implicit'] = 'v'
+dict_markers['celer'] = 'v'
 dict_markers['grid_search'] = 'd'
 dict_markers['bayesian'] = 'P'
 dict_markers['random'] = '*'
@@ -77,8 +77,8 @@ for dataset in list_datasets:
             df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
             label=dict_method[method], color=dict_color[method],
             marker=marker, markevery=markevery))
-        axarr.flat[0].semilogy(
-            df_method['maxit'], df_method['time'],
+        axarr.flat[0].loglog(
+            df_method['time'], np.abs(df_method['criterion grad'] - grad),
             # df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
             label=dict_method[method], color=dict_color[method],
             marker=marker, markevery=markevery)
@@ -92,11 +92,12 @@ for dataset in list_datasets:
         # plt.tight_layout()
         # plt.show(block=False)
 
-    axarr.flat[0].set_xlabel(r"$\#$ epochs", fontsize=18)
-    axarr.flat[0].set_xlim(6, n_iter_crop)
+    axarr.flat[0].set_xlabel("Times (s)", fontsize=18)
     axarr.flat[1].set_xlabel(r"$\#$ epochs", fontsize=18)
+    axarr.flat[1].set_ylim(1e-14)
+    axarr.flat[0].set_ylim(1e-14)
     axarr.flat[1].set_xlim(6, n_iter_crop)
-    axarr.flat[0].set_ylabel("Times (s)", fontsize=18)
+    axarr.flat[0].set_ylabel("Objective minus optimum", fontsize=18)
     axarr.flat[1].set_ylabel("Objective minus optimum", fontsize=18)
     fig.tight_layout()
     if save_fig:
