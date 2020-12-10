@@ -19,7 +19,7 @@ tol = 1e-16
 methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
-dataset_names = ["rcv1_train", "real-sim"]
+dataset_names = ["real-sim"]
 # dataset_names = ["leukemia", "rcv1_train", "real-sim", "news20"]
 maxits = [5, 10, 100, 200, 500, 1_000, 2000]
 
@@ -54,7 +54,7 @@ def parallel_function(
         elif method == "ground_truth":
             for file in os.listdir("results/"):
                 if file.startswith(
-                    "multiclass_%s_%i_%s" % (
+                    "hypergradient_%s_%i_%s" % (
                         dataset_name, div_alpha, method)):
                     return
                 else:
@@ -94,7 +94,7 @@ def parallel_function(
     df.columns = [
         'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad',
         'time']
-    str_results = "results/multiclass_%s_%i_%s_%i.pkl" % (
+    str_results = "results/hypergradient_%s_%i_%s_%i.pkl" % (
         dataset_name, div_alpha, method, maxit)
     df.to_pickle(str_results)
 
