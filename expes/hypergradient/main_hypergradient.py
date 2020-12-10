@@ -16,16 +16,22 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-16
-methods = ["forward", "implicit_forward", "celer", "ground_truth"]
+methods = ["forward", "implicit_forward", "celer", "ground_truth", 'backward']
 # methods = ["ground_truth"]
-div_alphas = [10, 100]
+div_alphas = [10]
 dataset_names = ["real-sim"]
 # dataset_names = ["leukemia", "rcv1_train", "real-sim", "news20"]
-maxits = [5, 10, 100, 200, 500, 1_000, 2000]
+rep = 5
 
+dict_maxits = {}
+dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
+dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
+dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
+dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, rep, dtype=np.int)
 
 def parallel_function(
-        dataset_name, div_alpha, method, maxit, random_state=42):
+        dataset_name, div_alpha, method, ind_rep, random_state=42):
+    maxit = dict_maxits[(dataset_name, div_alpha)][ind_rep]
     print("Dataset %s, algo %s, maxit %i" % (dataset_name, method, maxit))
     X, y = fetch_libsvm(dataset_name)
     n_samples = len(y)
@@ -101,13 +107,11 @@ def parallel_function(
 
 print("enter parallel")
 backend = 'loky'
-n_jobs = len(methods) * len(maxits) * len(dataset_names) * len(div_alphas)
-n_jobs = min(n_jobs, 15)
-# n_jobs = 1
-with parallel_backend(backend, n_jobs=n_jobs, inner_max_num_threads=1):
+n_jobs = 15
+with parallel_backend(backend, n_jobs=n_jobs):
     Parallel()(
         delayed(parallel_function)(
-            dataset_name, div_alpha, method, maxit)
-        for dataset_name, div_alpha, method, maxit in product(
-            dataset_names, div_alphas, methods, maxits))
+            dataset_name, div_alpha, method, ind_rep)
+        for dataset_name, div_alpha, method, ind_rep in product(
+            dataset_names, div_alphas, methods, range(rep)))
 print('OK finished parallel')
