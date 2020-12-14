@@ -51,7 +51,7 @@ noise = rng.randn(n_samples)
 y = X @ w_true
 y += noise / norm(noise) * 0.5 * norm(y)
 ##############################################################################
-X, X_test, y, y_test = train_test_split(X, y, test_size=0.333)
+X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
 
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)

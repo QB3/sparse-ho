@@ -1,5 +1,6 @@
 
 import numpy as np
+from numpy.linalg import norm
 
 from sparse_ho.optimizers.base import BaseOptimizer
 
@@ -46,7 +47,10 @@ class GradientDescent(BaseOptimizer):
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
-                print("Value outer criterion: %f" % value_outer)
+                print(
+                    "Iteration %i / %i ||" % (i+1, self.n_outer) +
+                    "Value outer criterion: %f ||" % value_outer +
+                    "norm grad %f" % norm(grad_outer))
             if len(monitor.times) > 0 and monitor.times[-1] > self.t_max:
                 break
 
