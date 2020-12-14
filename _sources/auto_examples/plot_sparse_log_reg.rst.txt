@@ -135,7 +135,7 @@ Grid-search
 
     scikit started
     scikit finished
-    Time to compute CV for scikit-learn: 0.95
+    Time to compute CV for scikit-learn: 1.40
 
 
 
@@ -211,28 +211,8 @@ Grad-search
  .. code-block:: none
 
     sparse-ho started
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
-    /home/circleci/.local/lib/python3.8/site-packages/celer/homotopy.py:280: RuntimeWarning: divide by zero encountered in true_divide
-      sol = celer(
     sparse-ho finished
-    Time to compute CV for sparse-ho: 1.43
+    Time to compute CV for sparse-ho: 1.66
 
 
 
@@ -240,7 +220,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.868 seconds)
+   **Total running time of the script:** ( 0 minutes  3.622 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

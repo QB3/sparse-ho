@@ -301,28 +301,18 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     Started grad-search
-    grad outer [0.21482443 0.04189048]
-    value of log_alphak [-8.30197129 -7.16578814]
-    grad outer [0.06233496 0.0622351 ]
-    value of log_alphak [-9.14991226 -8.01237068]
-    grad outer [0.03378978 0.0288922 ]
-    value of log_alphak [-9.63374542 -8.42607582]
-    grad outer [0.02421421 0.0203478 ]
-    value of log_alphak [-9.99871532 -8.73276901]
-    grad outer [0.0175788  0.01554407]
-    value of log_alphak [-10.27761774  -8.97938872]
-    grad outer [0.01352691 0.01206075]
-    value of log_alphak [-10.50352919  -9.18081391]
-    grad outer [0.01065587 0.00950575]
-    value of log_alphak [-10.69085813  -9.34792376]
-    grad outer [0.00828327 0.00733894]
-    value of log_alphak [-10.84414112  -9.48373193]
-    grad outer [0.00709898 0.00557686]
-    value of log_alphak [-10.98242273  -9.59236402]
-    grad outer [0.00568092 0.00429159]
-    value of log_alphak [-11.09890595  -9.68036002]
-    Time grid-search 99.417383
-    Time grad-search 95.721019
+    value outer 0.8551751982506366
+    value outer 0.34034529061405916
+    value outer 0.2645849966855643
+    value outer 0.24082599258483148
+    value outer 0.2277828703820517
+    value outer 0.22001886348958233
+    value outer 0.21510196052666733
+    value outer 0.21192462659206457
+    value outer 0.20986643770498575
+    value outer 0.20847322496646925
+    Time grid-search 125.436203
+    Time grad-search 83.424669
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -372,7 +362,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  15.409 seconds)
+   **Total running time of the script:** ( 3 minutes  29.111 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
