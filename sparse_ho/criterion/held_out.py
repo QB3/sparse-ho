@@ -42,10 +42,11 @@ class HeldOutMSE(BaseCriterion):
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
         # TODO add warm start
+        # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
             compute_jac=False)
-        return self.get_val_outer(mask, dense)
+        return self.get_val_outer(X, y, mask, dense)
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
