@@ -18,15 +18,13 @@ from sparse_ho.datasets.utils_datasets import (
 # load data
 n_samples = 1_000
 n_features = 1_000
-# n_samples = 1_100
-# n_features = 3_200
 # X, y = fetch_libsvm('sensit')
 # X, y = fetch_libsvm('usps')
-X, y = fetch_libsvm('rcv1_multiclass')
+# X, y = fetch_libsvm('rcv1_multiclass')
 # X, y = fetch_libsvm('sector_scale')
 # X, y = fetch_libsvm('sector')
 # X, y = fetch_libsvm('smallNORB')
-# X, y = fetch_libsvm('mnist')
+X, y = fetch_libsvm('mnist')
 
 
 # clean data and subsample
@@ -58,11 +56,10 @@ for i in range(n_alphas):
     logit_multiclass.get_val(
         model, X, y, log_alpha_i, None, monitor_grid, tol)
 
-1/0
 print("###################### GRAD SEARCH LS ###################")
-n_outer = 100
+n_outer = 30
 model = SparseLogreg(estimator=estimator)
-logit_multiclass = LogisticMulticlass(idx_train, idx_val, idx_test, algo)
+logit_multiclass = LogisticMulticlass(idx_train, idx_val, algo, idx_test)
 
 monitor = Monitor()
 log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
@@ -70,15 +67,28 @@ log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 idx_min = np.argmin(np.array(monitor_grid.objs))
 log_alpha0 = monitor_grid.log_alphas[idx_min]
 optimizer = GradientDescent(
-    n_outer=n_outer, step_size=None, p_grad0=0.1, tol=tol)
+    n_outer=n_outer, step_size=None, p_grad0=0.01, tol=tol)
 grad_search(
     algo, logit_multiclass, model, optimizer, X, y, log_alpha0, monitor)
 
 
-print("###################### USE HYPEROPT ###################")
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 10_000)
-monitor_hyp = Monitor()
-hyperopt_wrapper(
-    algo, logit_multiclass, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_hyp, tol=tol, size_space=n_classes, max_evals=10)
+# print("###################### USE HYPEROPT ###################")
+# log_alpha_max = np.log(alpha_max)
+# log_alpha_min = np.log(alpha_max / 10_000)
+# monitor_hyp = Monitor()
+# hyperopt_wrapper(
+#     algo, logit_multiclass, model, X, y, log_alpha_min, log_alpha_max,
+#     monitor_hyp, tol=tol, size_space=n_classes, max_evals=10)
+
+print("Grid-search: mininum cross-entropy %f " % np.array(
+    monitor_grid.objs).min())
+print("Sparse-ho: mininum cross-entropy %f " % np.array(monitor.objs).min())
+
+print("Grid-search: maximum accuracy on validation %f " % np.array(
+    monitor_grid.acc_vals).max())
+print("Sparse-ho: maximum accuracy on validation %f " % np.array(
+    monitor.acc_vals).max())
+
+
+# This example highlights the mismatch between the cross-entropy and the
+# accuracy
