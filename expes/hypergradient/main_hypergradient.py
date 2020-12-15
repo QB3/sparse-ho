@@ -3,42 +3,44 @@ from itertools import product
 import numpy as np
 from joblib import Parallel, delayed, parallel_backend
 import pandas
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import StratifiedShuffleSplit, KFold
 
 from celer import Lasso as Lasso_celer
 from libsvmdata import fetch_libsvm
 
 from sparse_ho.models import Lasso
-from sparse_ho.criterion import HeldOutMSE
+from sparse_ho.criterion import HeldOutMSE, CrossVal
 from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
 
 
 tol = 1e-16
-methods = ["forward", "implicit_forward", "celer", "ground_truth", 'backward']
+methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
-div_alphas = [10]
-dataset_names = ["real-sim"]
-# dataset_names = ["leukemia", "rcv1_train", "real-sim", "news20"]
-rep = 5
+div_alphas = [10, 100]
+# dataset_names = ["sector_train"]
+dataset_names = ["rcv1_train", "real-sim", "news20"]
+# dataset_names = ["rcv1_train"]
+rep = 10
 
 dict_maxits = {}
 dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
 dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
 dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
 dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, rep, dtype=np.int)
+dict_maxits[("news20", 10)] = np.linspace(5, 1000, rep, dtype=np.int)
+dict_maxits[("news20", 100)] = np.linspace(5, 10000, rep, dtype=np.int)
+
 
 def parallel_function(
-        dataset_name, div_alpha, method, ind_rep, random_state=42):
+        dataset_name, div_alpha, method, ind_rep, random_state=10):
     maxit = dict_maxits[(dataset_name, div_alpha)][ind_rep]
     print("Dataset %s, algo %s, maxit %i" % (dataset_name, method, maxit))
     X, y = fetch_libsvm(dataset_name)
     n_samples = len(y)
-    sss1 = StratifiedShuffleSplit(n_splits=2, test_size=0.3333, random_state=0)
-    idx_train, idx_val = sss1.split(X, y)
-    idx_train = idx_train[0]
-    idx_val = idx_val[0]
+
+    kf = KFold(n_splits=5, random_state=random_state, shuffle=True)
 
     for i in range(2):
         alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
@@ -50,15 +52,16 @@ def parallel_function(
                 # TODO maybe change this tol
                 tol=1e-12, max_iter=maxit)
             model = Lasso(estimator=clf, max_iter=maxit)
-            criterion = HeldOutMSE(idx_train, idx_val)
+            criterion = HeldOutMSE(None, None)
+            cross_val = CrossVal(cv=kf, criterion=criterion)
             algo = ImplicitForward(
                 tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
             algo.max_iter = maxit
-            val, grad = criterion.get_val_grad(
+            val, grad = cross_val.get_val_grad(
                     model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-12,
                     monitor=monitor, max_iter=maxit)
         elif method == "ground_truth":
-            for file in os.listdir("results/"):
+            for file in os.listdir("results_gpu/"):
                 if file.startswith(
                     "hypergradient_%s_%i_%s" % (
                         dataset_name, div_alpha, method)):
@@ -67,29 +70,31 @@ def parallel_function(
                     clf = Lasso_celer(
                             alpha=np.exp(log_alpha), fit_intercept=False,
                             warm_start=True, tol=1e-14, max_iter=10000)
-                    criterion = HeldOutMSE(idx_train, idx_val)
+                    criterion = HeldOutMSE(None, None)
+                    cross_val = CrossVal(cv=kf, criterion=criterion)
                     algo = Implicit(criterion)
                     model = Lasso(estimator=clf, max_iter=10000)
-                    val, grad = criterion.get_val_grad(
+                    val, grad = cross_val.get_val_grad(
                         model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
                         monitor=monitor)
         else:
             model = Lasso(max_iter=maxit)
-            criterion = HeldOutMSE(idx_train, idx_val)
+            criterion = HeldOutMSE(None, None)
+            cross_val = CrossVal(cv=kf, criterion=criterion)
             if method == "forward":
-                algo = Forward()
+                algo = Forward(use_stop_crit=False)
             elif method == "implicit_forward":
-                algo = ImplicitForward(
+                algo = ImplicitForward(use_stop_crit=False,
                     tol_jac=1e-8, n_iter_jac=maxit, max_iter=1000)
             elif method == "implicit":
-                algo = Implicit(max_iter=1000)
+                algo = Implicit(use_stop_crit=False, max_iter=1000)
             elif method == "backward":
                 algo = Backward()
             else:
                 1 / 0
             algo.max_iter = maxit
             algo.use_stop_crit = False
-            val, grad = criterion.get_val_grad(
+            val, grad = cross_val.get_val_grad(
                     model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
                     monitor=monitor, max_iter=maxit)
 
@@ -108,7 +113,7 @@ def parallel_function(
 print("enter parallel")
 backend = 'loky'
 n_jobs = 15
-with parallel_backend(backend, n_jobs=n_jobs):
+with parallel_backend(backend, n_jobs=n_jobs, inner_max_num_threads=1):
     Parallel()(
         delayed(parallel_function)(
             dataset_name, div_alpha, method, ind_rep)

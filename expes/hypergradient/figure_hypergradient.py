@@ -4,20 +4,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-from sparse_ho.utils_plot import configure_plt
+from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 25
 
 save_fig = False
 n_iter_crop = 180
 
-fig_dir = "../../../tex/ICML2020/prebuiltimages/"
-fig_dir_svg = "../../../tex/ICML2020/prebuiltimages_svg/"
+fig_dir = "results/"
+fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
+dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
 dict_method['celer'] = 'Imp. F. Iterdiff. + celer'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
@@ -61,10 +61,14 @@ epoch_lims["rcv1_train", 10] = 145
 epoch_lims["rcv1_train", 100] = 990
 ##############################################
 time_lims = {}
-time_lims["real-sim", 10] = 10
-time_lims["real-sim", 100] = 30
-time_lims["rcv1_train", 10] = 25
-time_lims["rcv1_train", 100] = 75
+time_lims["real-sim", 10] = 50
+time_lims["real-sim", 100] = 100
+time_lims["rcv1_train", 10] = 50
+time_lims["rcv1_train", 100] = 500
+time_lims["news20", 10] = 1000
+time_lims["news20", 100] = 10000
+time_lims["finance", 10] = 1000
+time_lims["finance", 100] = 10000
 ##############################################
 
 dict_title = {}
@@ -92,6 +96,8 @@ div_alphas = df_data['div_alpha'].unique()
 
 fig, axarr = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False, figsize=[14, 10],)
+fig2, axarr2 = plt.subplots(
+    len(div_alphas), len(list_datasets), sharex=False, sharey=False, figsize=[14, 10],)
 # for n_features in list_n_features:
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
@@ -105,12 +111,11 @@ for idx1, dataset in enumerate(list_datasets):
             marker = dict_markers[method]
             df_method = df_div[df_div['method'] == method]
             df_method = df_method.sort_values('maxit')
-            # lines.append(axarr.flat[1].semilogy(
-            #         # df_method['maxit'], df_method['time'],
-            #     df_method['maxit'], np.abs(df_method['grad'] - grad),
-            #     label=dict_method[method], color=dict_color[method],
-            #     marker=""))
-            axarr.flat[idx2 * len(list_datasets) + idx1].semilogy(
+            lines.append(axarr2.flat[idx2 * len(list_datasets) + idx1].semilogy(
+                df_method['maxit'], np.abs(df_method['grad'] - grad),
+                label=dict_method[method], color=dict_color[method],
+                marker=""))
+            axarr.flat[idx2 * len(list_datasets) + idx1].loglog(
                 df_method['time'], np.abs(df_method['grad'] - grad),
                 # df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
                 label=dict_method[method], color=dict_color[method],
@@ -125,39 +130,54 @@ for idx1, dataset in enumerate(list_datasets):
             # plt.tight_layout()
             # plt.show(block=False)
 
-        # axarr.flat[1].set_xlabel(r"$\#$ epochs", fontsize=18)
-        # axarr.flat[1].set_ylim(1e-12)
+        # axarr2.flat[idx2 * len(list_datasets) + idx1].set_xlabel(r"$\#$ epochs", fontsize=18)
+        axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(1e-12)
         axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(1e-12)
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim((0, time_lims[dataset, div_alpha]))
+        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim((1e0, time_lims[dataset, div_alpha]))
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
                 r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
                 + "\n"
                 + "\n"
                 +r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
         axarr.flat[idx1].set_title(dict_title[dataset])
+        axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
+                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
+                + "\n"
+                + "\n"
+                +r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+        axarr2.flat[idx1].set_title(dict_title[dataset])
+  
         # axarr.flat[1].set_ylabel(r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
 for i in np.arange(len(list_datasets)):
     axarr.flat[-(i + 1)].set_xlabel("Times (s)", size=fontsize)
+    axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", size=fontsize)
+
 fig.tight_layout()
+fig2.tight_layout()
 if save_fig:
     fig.savefig(fig_dir + "intro_influ_niter.pdf", bbox_inches="tight")
     fig.savefig(fig_dir_svg + "intro_influ_niter.svg", bbox_inches="tight")
             #
         # axarr.flat[1].set_title(dataset)
+# plot_legend_apart(
+#     axarr[0][0],
+#     fig_dir + "test.pdf", ncol=3)
 fig.show()
+fig2.show()
 
-labels = []
-for method in methods:
-    labels.append(dict_method[method])
-# labels = ['Seq. F. Iterdiff (ours)', 'F. Iterdiff', 'B. Iterdiff', ]
-fig3 = plt.figure(figsize=[9.33, 1])
-fig3.legend(
-    [l[0] for l in lines], labels, ncol=3, loc='upper center', fontsize=18)
-fig3.tight_layout()
-#
-if save_fig:
-    fig3.savefig(
-        fig_dir + "legend_intro_influ_niter.pdf", bbox_inches="tight")
-    fig3.savefig(
-        fig_dir_svg + "legend_intro_influ_niter.svg", bbox_inches="tight")
-fig3.show()
+
+# labels = []
+# for method in methods:
+#     labels.append(dict_method[method])
+# # labels = ['Seq. F. Iterdiff (ours)', 'F. Iterdiff', 'B. Iterdiff', ]
+# fig3 = plt.figure(figsize=[9.33, 1])
+# fig3.legend(
+#     [l[0] for l in lines], labels, ncol=3, loc='upper center', fontsize=18)
+# fig3.tight_layout()
+# #
+# if save_fig:
+#     fig3.savefig(
+#         fig_dir + "legend_intro_influ_niter.pdf", bbox_inches="tight")
+#     fig3.savefig(
+#         fig_dir_svg + "legend_intro_influ_niter.svg", bbox_inches="tight")
+# fig3.show()
