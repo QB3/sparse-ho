@@ -15,13 +15,12 @@ from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
 
 
-tol = 1e-16
+tol = 1e-14
 methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
 # dataset_names = ["sector_train"]
-dataset_names = ["rcv1_train", "real-sim", "news20"]
-# dataset_names = ["rcv1_train"]
+dataset_names = ["real-sim", "rcv1_train", "news20"]
 rep = 10
 
 dict_maxits = {}
@@ -29,8 +28,8 @@ dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
 dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
 dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
 dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, rep, dtype=np.int)
-dict_maxits[("news20", 10)] = np.linspace(5, 1000, rep, dtype=np.int)
-dict_maxits[("news20", 100)] = np.linspace(5, 10000, rep, dtype=np.int)
+dict_maxits[("news20", 10)] = np.linspace(5, 500, rep, dtype=np.int)
+dict_maxits[("news20", 100)] = np.linspace(5, 2500, rep, dtype=np.int)
 
 
 def parallel_function(
@@ -50,18 +49,18 @@ def parallel_function(
             clf = Lasso_celer(
                 alpha=np.exp(log_alpha), fit_intercept=False,
                 # TODO maybe change this tol
-                tol=1e-12, max_iter=maxit)
+                tol=tol, max_iter=maxit)
             model = Lasso(estimator=clf, max_iter=maxit)
             criterion = HeldOutMSE(None, None)
             cross_val = CrossVal(cv=kf, criterion=criterion)
             algo = ImplicitForward(
-                tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
+                tol_jac=1e-8, n_iter_jac=maxit, use_stop_crit=False)
             algo.max_iter = maxit
             val, grad = cross_val.get_val_grad(
-                    model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-12,
+                    model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
                     monitor=monitor, max_iter=maxit)
         elif method == "ground_truth":
-            for file in os.listdir("results_gpu/"):
+            for file in os.listdir("results/"):
                 if file.startswith(
                     "hypergradient_%s_%i_%s" % (
                         dataset_name, div_alpha, method)):
@@ -69,13 +68,13 @@ def parallel_function(
                 else:
                     clf = Lasso_celer(
                             alpha=np.exp(log_alpha), fit_intercept=False,
-                            warm_start=True, tol=1e-14, max_iter=10000)
+                            warm_start=True, tol=1e-13, max_iter=10000)
                     criterion = HeldOutMSE(None, None)
                     cross_val = CrossVal(cv=kf, criterion=criterion)
                     algo = Implicit(criterion)
                     model = Lasso(estimator=clf, max_iter=10000)
                     val, grad = cross_val.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
+                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-13,
                         monitor=monitor)
         else:
             model = Lasso(max_iter=maxit)
