@@ -20,7 +20,8 @@ methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
 # dataset_names = ["sector_train"]
-dataset_names = ["real-sim", "rcv1_train", "news20"]
+# dataset_names = ["real-sim", "rcv1_train", "news20"]
+dataset_names = ["news20"]
 rep = 10
 
 dict_maxits = {}
@@ -97,9 +98,9 @@ def parallel_function(
                     model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
                     monitor=monitor, max_iter=maxit)
 
-        results = (
-            dataset_name, div_alpha, method, maxit,
-            val, grad, monitor.times[0])
+    results = (
+        dataset_name, div_alpha, method, maxit,
+        val, grad, monitor.times[0])
     df = pandas.DataFrame(results).transpose()
     df.columns = [
         'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad',
