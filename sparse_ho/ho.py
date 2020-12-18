@@ -88,7 +88,7 @@ def hyperopt_wrapper(
     def objective(log_alpha):
         log_alpha = np.array(log_alpha)
         val_func = criterion.get_val(
-            model, X, y, log_alpha, algo.get_beta_jac_v, monitor, tol=tol)
+            model, X, y, log_alpha, monitor, tol=tol)
         return val_func
 
     space = [
