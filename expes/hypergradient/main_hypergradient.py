@@ -16,7 +16,7 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-14
-methods = ["forward", "implicit_forward", "celer", "ground_truth"]
+methods = ["forward", "implicit_forward", "celer"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
 # dataset_names = ["sector_train"]
@@ -50,7 +50,7 @@ def parallel_function(
             clf = Lasso_celer(
                 alpha=np.exp(log_alpha), fit_intercept=False,
                 # TODO maybe change this tol
-                tol=tol, max_iter=maxit)
+                tol=1e-8, max_iter=maxit)
             model = Lasso(estimator=clf, max_iter=maxit)
             criterion = HeldOutMSE(None, None)
             cross_val = CrossVal(cv=kf, criterion=criterion)
