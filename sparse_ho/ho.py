@@ -51,7 +51,7 @@ def grad_search(
 
 def hyperopt_wrapper(
         algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
-        max_evals=50, tol=1e-5, random_state=42, t_max=1000,
+        max_evals=50, tol=1e-5, random_state=42, t_max=100_000,
         method='bayesian', size_space=1):
     """
     Parameters
