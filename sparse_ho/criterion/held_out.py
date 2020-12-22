@@ -40,14 +40,17 @@ class HeldOutMSE(BaseCriterion):
         """Compute the MSE on the validation set."""
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3, monitor=None):
         # TODO add warm start
         # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
             compute_jac=False)
-        return self.get_val_outer(
+        value_outer = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+        if monitor is not None:
+            monitor(value_outer, None, log_alpha=log_alpha)
+        return value_outer
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
