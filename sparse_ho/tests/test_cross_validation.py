@@ -60,7 +60,7 @@ def test_cross_val_criterion():
         max_iter=max_iter).fit(X, y)
     reg.score(X, y)
     objs_grid_sk = reg.mse_path_.mean(axis=1)
-    np.testing.assert_allclose(objs_grid_sk, monitor_grid.objs)
+    np.testing.assert_allclose(objs_grid_sk, monitor_grid.objs, rtol=1e-6)
 
 
 if __name__ == '__main__':

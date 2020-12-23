@@ -76,7 +76,7 @@ def test_beta_jac(model):
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_C,
         tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
-    np.testing.assert_allclose(primal, clf.coef_)
+    np.testing.assert_allclose(primal, clf.coef_[0])
 
     assert np.all(supp1 == supp2)
     np.testing.assert_allclose(dense1, dense2)
@@ -137,7 +137,7 @@ def test_grad_search(model):
     np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     np.testing.assert_allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads))
+        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-8)
     np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
     # np.testing.assert_allclose(

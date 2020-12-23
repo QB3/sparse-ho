@@ -88,7 +88,7 @@ def test_grad_search(model, crit):
     np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     np.testing.assert_allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-8)
+        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-6)
     np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
     assert not np.allclose(

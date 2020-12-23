@@ -68,7 +68,8 @@ def test_beta_jac():
         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
         tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
         niter_jac=10000)
-    np.testing.assert_allclose(dense1, estimator.coef_[estimator.coef_ != 0])
+    np.testing.assert_allclose(dense1, estimator.coef_[estimator.coef_ != 0],
+                               rtol=1e-6)
     assert np.all(supp1 == supp2)
     np.testing.assert_allclose(dense1, dense2)
 
@@ -83,9 +84,8 @@ def test_beta_jac_custom():
         tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter,
         niter_jac=10000)
 
-    np.testing.assert_allclose(dense, dense_custom)
+    np.testing.assert_allclose(dense, dense_custom, rtol=1e-6)
     np.testing.assert_allclose(supp, supp_custom)
-    np.testing.assert_allclose(dense, dense_custom)
 
 
 def test_val_grad():

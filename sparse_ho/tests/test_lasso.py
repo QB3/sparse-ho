@@ -80,7 +80,7 @@ def test_beta_jac():
         np.testing.assert_allclose(jac1, jac2, atol=1e-6)
 
         assert np.all(supp2 == supp3)
-        np.testing.assert_allclose(dense2, dense3)
+        np.testing.assert_allclose(dense2, dense3, atol=1e-8)
         np.testing.assert_allclose(jac2, jac3, atol=1e-6)
 
         assert np.all(supp3 == supp4)
@@ -145,12 +145,11 @@ def test_val_grad():
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
         np.testing.assert_allclose(val_fwd, val_imp_fwd)
-        np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
-        # np.testing.assert_allclose(val_imp_fwd, val_imp)
+        np.testing.assert_allclose(grad_fwd, grad_imp_fwd, rtol=1e-5)
         np.testing.assert_allclose(val_bwd, val_fwd)
         np.testing.assert_allclose(val_bwd, val_imp_fwd)
-        np.testing.assert_allclose(grad_fwd, grad_bwd)
-        np.testing.assert_allclose(grad_bwd, grad_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_bwd, atol=1e-6)
+        np.testing.assert_allclose(grad_bwd, grad_imp_fwd, rtol=1e-5)
 
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2
@@ -180,11 +179,11 @@ def test_val_grad():
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
         np.testing.assert_allclose(val_fwd, val_imp_fwd)
-        np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_imp_fwd, rtol=1e-5)
         np.testing.assert_allclose(val_imp_fwd, val_imp)
         np.testing.assert_allclose(val_bwd, val_fwd)
         np.testing.assert_allclose(val_bwd, val_imp_fwd)
-        np.testing.assert_allclose(grad_fwd, grad_bwd)
+        np.testing.assert_allclose(grad_fwd, grad_bwd, rtol=1e-6)
         np.testing.assert_allclose(grad_bwd, grad_imp_fwd)
 
 
