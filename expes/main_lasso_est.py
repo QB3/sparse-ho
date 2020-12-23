@@ -45,8 +45,8 @@
 #         n_pts_roc, seed, tol, n_outer):
 
 #     X, y, beta_star, noise, sigma_star = get_synt_data(
-#         "Gaussian", noise_type="Gaussian_iid", n_samples=n_samples,
-#         n_features=n_features, n_times=1, n_active=n_active, SNR=SNR,
+#         n_samples=n_samples,
+#         n_features=n_features, n_times=1, n_active=n_active, snr=snr,
 #         seed=seed)
 
 #     alpha_max = norm(X.T @ y, ord=np.inf) / n_samples

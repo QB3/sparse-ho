@@ -60,7 +60,7 @@ def test_beta_jac(model):
          Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
 
     jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
-    assert np.allclose(jac_dense, jac1[dense1 < C])
+    np.testing.assert_allclose(jac_dense, jac1[dense1 < C])
 
     if issparse(X):
         primal = np.sum(
@@ -76,11 +76,11 @@ def test_beta_jac(model):
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_C,
         tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
-    assert np.allclose(primal, clf.coef_)
+    np.testing.assert_allclose(primal, clf.coef_)
 
     assert np.all(supp1 == supp2)
-    assert np.allclose(dense1, dense2)
-    assert np.allclose(jac1, jac2, atol=1e-4)
+    np.testing.assert_allclose(dense1, dense2)
+    np.testing.assert_allclose(jac1, jac2, atol=1e-4)
 
 
 @pytest.mark.parametrize('model', models)
@@ -105,10 +105,10 @@ def test_val_grad(model):
     val_imp, grad_imp = criterion.get_val_grad(
         model, X, y, log_C, algo.get_beta_jac_v, tol=tol)
 
-    assert np.allclose(val_fwd, val_imp_fwd)
-    assert np.allclose(grad_fwd, grad_imp_fwd)
-    assert np.allclose(val_imp_fwd, val_imp)
-    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-5)
+    np.testing.assert_allclose(val_fwd, val_imp_fwd)
+    np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
+    np.testing.assert_allclose(val_imp_fwd, val_imp)
+    np.testing.assert_allclose(grad_imp_fwd, grad_imp, atol=1e-5)
 
 
 @pytest.mark.parametrize('model', models)
@@ -134,13 +134,13 @@ def test_grad_search(model):
     grad_search(
         algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor3)
 
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.grads), np.array(monitor3.grads))
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
-    # assert np.allclose(
+    # np.testing.assert_allclose(
     #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))

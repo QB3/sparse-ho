@@ -13,13 +13,12 @@ from sparse_ho.grid_search import grid_search
 n_samples = 100
 n_features = 10
 n_active = 2
-SNR = 3
+snr = 3
 rho = 0.5
 
-X, y, _, _, _ = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+X, y = get_synt_data(
+    n_samples=n_samples, n_features=n_features, n_times=1, n_active=n_active,
+    rho=rho, snr=snr, seed=0)[:2]
 
 alpha_max = (np.abs(X.T @ y)).max() / n_samples
 p_alpha = 0.7
@@ -61,9 +60,7 @@ def test_cross_val_criterion():
         max_iter=max_iter).fit(X, y)
     reg.score(X, y)
     objs_grid_sk = reg.mse_path_.mean(axis=1)
-    # these 2 value should be the same
-    (objs_grid_sk - np.array(monitor_grid.objs))
-    assert np.allclose(objs_grid_sk, monitor_grid.objs)
+    np.testing.assert_allclose(objs_grid_sk, monitor_grid.objs)
 
 
 if __name__ == '__main__':

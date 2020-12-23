@@ -82,19 +82,19 @@ def test_beta_jac(model):
         tol=tol, model=model, tol_jac=1e-12)
 
     assert np.all(supp1 == supp_sk)
-    assert np.allclose(dense1, dense_sk, atol=1e-4)
+    np.testing.assert_allclose(dense1, dense_sk, atol=1e-4)
 
     assert np.all(supp1 == supp2)
-    assert np.allclose(dense1, dense2)
-    assert np.allclose(jac1, jac2, atol=1e-4)
+    np.testing.assert_allclose(dense1, dense2)
+    np.testing.assert_allclose(jac1, jac2, atol=1e-4)
 
     assert np.all(supp2 == supp3)
-    assert np.allclose(dense2, dense3)
-    assert np.allclose(jac2, jac3, atol=1e-4)
+    np.testing.assert_allclose(dense2, dense3)
+    np.testing.assert_allclose(jac2, jac3, atol=1e-4)
 
     assert np.all(supp3 == supp4)
-    assert np.allclose(dense3, dense4)
-    assert np.allclose(jac3, jac4, atol=1e-4)
+    np.testing.assert_allclose(dense3, dense4)
+    np.testing.assert_allclose(jac3, jac4, atol=1e-4)
 
 
 @pytest.mark.parametrize('model,model_custom', [(models[0], models_custom[0])])
@@ -108,8 +108,8 @@ def test_beta_jac_custom_solver(model, model_custom):
         model=model_custom, tol_jac=1e-12)
 
     assert np.all(supp == supp_custom)
-    assert np.allclose(dense, dense_custom)
-    assert np.allclose(jac, jac_custom)
+    np.testing.assert_allclose(dense, dense_custom)
+    np.testing.assert_allclose(jac, jac_custom)
 
 
 @pytest.mark.parametrize('model', models)
@@ -129,13 +129,13 @@ def test_val_grad(model):
     val_imp, grad_imp = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    assert np.allclose(val_fwd, val_imp_fwd, atol=1e-4)
-    assert np.allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
-    assert np.allclose(val_imp_fwd, val_imp, atol=1e-4)
+    np.testing.assert_allclose(val_fwd, val_imp_fwd, atol=1e-4)
+    np.testing.assert_allclose(grad_fwd, grad_imp_fwd, atol=1e-4)
+    np.testing.assert_allclose(val_imp_fwd, val_imp, atol=1e-4)
 
     # for the implcit the conjugate grad does not converge
     # hence the rtol=1e-2
-    assert np.allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
+    np.testing.assert_allclose(grad_imp_fwd, grad_imp, rtol=1e-2)
 
 
 @pytest.mark.parametrize('model,model_custom', [(models[0], models_custom[0])])
@@ -150,8 +150,8 @@ def test_val_grad_custom(model, model_custom):
     val_custom, grad_custom = criterion.get_val_grad(
         model_custom, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    assert np.allclose(val, val_custom)
-    assert np.allclose(grad, grad_custom)
+    np.testing.assert_allclose(val, val_custom)
+    np.testing.assert_allclose(grad, grad_custom)
 
 
 @pytest.mark.parametrize('model', models)
@@ -180,11 +180,11 @@ def test_grad_search(model, crit):
     grad_search(
         algo, criterion, model, optimizer, X, y, log_alpha, monitor3)
 
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-4)
-    assert np.allclose(
+    np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))

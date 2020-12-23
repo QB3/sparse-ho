@@ -13,13 +13,12 @@ from sparse_ho.grid_search import grid_search
 n_samples = 100
 n_features = 100
 n_active = 5
-SNR = 3
+snr = 3
 rho = 0.5
 
 X, y, beta_star, noise, sigma_star = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+    n_samples=n_samples, n_features=n_features, n_times=1, n_active=n_active,
+    rho=rho, snr=snr, seed=0)
 X_s = csc_matrix(X)
 
 idx_train = np.arange(0, 50)

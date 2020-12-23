@@ -18,13 +18,12 @@ from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
 n_samples = 100
 n_features = 100
 n_active = 5
-SNR = 3
+snr = 3
 rho = 0.1
 
 X, y, beta_star, noise, sigma_star = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+    n_samples=n_samples, n_features=n_features, n_times=1, n_active=n_active,
+    rho=rho, snr=snr, seed=0)
 X_s = csc_matrix(X)
 
 idx_train = np.arange(0, 50)
@@ -76,17 +75,17 @@ def test_beta_jac():
 
         assert np.all(supp1 == supp1sk)
         assert np.all(supp1 == supp2)
-        assert np.allclose(dense1, dense1sk)
-        assert np.allclose(dense1, dense2)
-        assert np.allclose(jac1, jac2, atol=1e-6)
+        np.testing.assert_allclose(dense1, dense1sk)
+        np.testing.assert_allclose(dense1, dense2)
+        np.testing.assert_allclose(jac1, jac2, atol=1e-6)
 
         assert np.all(supp2 == supp3)
-        assert np.allclose(dense2, dense3)
-        assert np.allclose(jac2, jac3, atol=1e-6)
+        np.testing.assert_allclose(dense2, dense3)
+        np.testing.assert_allclose(jac2, jac3, atol=1e-6)
 
         assert np.all(supp3 == supp4)
-        assert np.allclose(dense3, dense4)
-        assert np.allclose(jac3, jac4, atol=1e-6)
+        np.testing.assert_allclose(dense3, dense4)
+        np.testing.assert_allclose(jac3, jac4, atol=1e-6)
 
         get_beta_jac_t_v_implicit(
             X[idx_train, :], y[idx_train], dict_log_alpha[key], get_v,
@@ -112,8 +111,8 @@ def test_beta_jac2():
             X_s[idx_train, :], y[idx_train], dict_log_alpha[key],
             tol=tol, model=models[key], tol_jac=tol)
         assert np.all(supp == supp_custom)
-        assert np.allclose(dense, dense_custom)
-        assert np.allclose(jac, jac_custom)
+        np.testing.assert_allclose(dense, dense_custom)
+        np.testing.assert_allclose(jac, jac_custom)
 
 
 def test_val_grad():
@@ -145,17 +144,17 @@ def test_val_grad():
         val_bwd, grad_bwd = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        assert np.allclose(val_fwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_imp_fwd)
-        # assert np.allclose(val_imp_fwd, val_imp)
-        assert np.allclose(val_bwd, val_fwd)
-        assert np.allclose(val_bwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_bwd)
-        assert np.allclose(grad_bwd, grad_imp_fwd)
+        np.testing.assert_allclose(val_fwd, val_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
+        # np.testing.assert_allclose(val_imp_fwd, val_imp)
+        np.testing.assert_allclose(val_bwd, val_fwd)
+        np.testing.assert_allclose(val_bwd, val_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_bwd)
+        np.testing.assert_allclose(grad_bwd, grad_imp_fwd)
 
         # for the implcit the conjugate grad does not converge
         # hence the rtol=1e-2
-        assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
+        np.testing.assert_allclose(grad_imp_fwd, grad_imp, atol=1e-3)
 
     for key in models.keys():
         log_alpha = dict_log_alpha[key]
@@ -180,13 +179,13 @@ def test_val_grad():
         val_bwd, grad_bwd = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        assert np.allclose(val_fwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_imp_fwd)
-        assert np.allclose(val_imp_fwd, val_imp)
-        assert np.allclose(val_bwd, val_fwd)
-        assert np.allclose(val_bwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_bwd)
-        assert np.allclose(grad_bwd, grad_imp_fwd)
+        np.testing.assert_allclose(val_fwd, val_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_imp_fwd)
+        np.testing.assert_allclose(val_imp_fwd, val_imp)
+        np.testing.assert_allclose(val_bwd, val_fwd)
+        np.testing.assert_allclose(val_bwd, val_imp_fwd)
+        np.testing.assert_allclose(grad_fwd, grad_bwd)
+        np.testing.assert_allclose(grad_bwd, grad_imp_fwd)
 
 
 if __name__ == '__main__':
