@@ -49,7 +49,7 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=find_packages(),
-          install_requires=["celer>0=.5.1", "download", "hyperopt",
+          install_requires=["celer>=0.6", "download", "hyperopt",
                             "libsvmdata", "matplotlib>=2.0.0", "numba",
                             "numpy>=1.12", "scipy>=0.18.0",
                             "scikit-learn>=0.21", "seaborn>=0.7", ]
