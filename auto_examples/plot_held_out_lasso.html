@@ -11,11 +11,11 @@
     <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
 <meta charset='utf-8'>
@@ -93,7 +93,8 @@
       
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-held-out-lasso-py"><span class="std std-ref">here</span></a>     to download the full example code</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-held-out-lasso-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
 </div>
 <div class="sphx-glr-example-title section" id="lasso-with-held-out-test-set">
 <span id="sphx-glr-auto-examples-plot-held-out-lasso-py"></span><h1>Lasso with held-out test set<a class="headerlink" href="#lasso-with-held-out-test-set" title="Permalink to this headline">¶</a></h1>
@@ -163,21 +164,21 @@ Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/bi
 
 
 file_sizes:   0%|                                   | 0.00/13.7M [00:00&lt;?, ?B/s]
-file_sizes:   0%|                           | 24.6k/13.7M [00:00&lt;02:08, 106kB/s]
-file_sizes:   0%|                           | 49.2k/13.7M [00:00&lt;02:08, 106kB/s]
-file_sizes:   1%|2                           | 106k/13.7M [00:00&lt;01:46, 128kB/s]
-file_sizes:   2%|4                           | 221k/13.7M [00:00&lt;01:21, 165kB/s]
-file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;01:00, 220kB/s]
-file_sizes:   7%|#8                          | 909k/13.7M [00:01&lt;00:42, 300kB/s]
-file_sizes:  13%|###5                       | 1.83M/13.7M [00:01&lt;00:28, 414kB/s]
-file_sizes:  27%|#######2                   | 3.66M/13.7M [00:01&lt;00:17, 579kB/s]
-file_sizes:  38%|##########2                | 5.23M/13.7M [00:02&lt;00:10, 798kB/s]
-file_sizes:  50%|############8             | 6.81M/13.7M [00:02&lt;00:06, 1.08MB/s]
-file_sizes:  61%|###############8          | 8.38M/13.7M [00:02&lt;00:03, 1.45MB/s]
-file_sizes:  72%|##################8       | 9.95M/13.7M [00:02&lt;00:01, 1.90MB/s]
-file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03&lt;00:00, 2.42MB/s]
-file_sizes:  95%|########################8 | 13.1M/13.7M [00:03&lt;00:00, 3.00MB/s]
-file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.22MB/s]
+file_sizes:   0%|                           | 24.6k/13.7M [00:00&lt;02:03, 111kB/s]
+file_sizes:   0%|                           | 49.2k/13.7M [00:00&lt;02:02, 111kB/s]
+file_sizes:   1%|1                          | 73.7k/13.7M [00:00&lt;02:02, 112kB/s]
+file_sizes:   1%|4                           | 197k/13.7M [00:00&lt;01:32, 147kB/s]
+file_sizes:   3%|8                           | 426k/13.7M [00:01&lt;01:07, 198kB/s]
+file_sizes:   6%|#8                          | 885k/13.7M [00:01&lt;00:47, 271kB/s]
+file_sizes:  13%|###5                       | 1.80M/13.7M [00:01&lt;00:31, 377kB/s]
+file_sizes:  26%|#######1                   | 3.64M/13.7M [00:01&lt;00:19, 528kB/s]
+file_sizes:  38%|##########2                | 5.21M/13.7M [00:01&lt;00:11, 731kB/s]
+file_sizes:  49%|############8             | 6.78M/13.7M [00:02&lt;00:06, 1.00MB/s]
+file_sizes:  61%|###############8          | 8.36M/13.7M [00:02&lt;00:03, 1.35MB/s]
+file_sizes:  72%|##################8       | 9.93M/13.7M [00:02&lt;00:02, 1.78MB/s]
+file_sizes:  84%|#####################7    | 11.5M/13.7M [00:02&lt;00:00, 2.30MB/s]
+file_sizes:  95%|########################7 | 13.1M/13.7M [00:03&lt;00:00, 2.88MB/s]
+file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.43MB/s]
 Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
 Decompressing...
 Loading svmlight file...
@@ -207,13 +208,13 @@ Starting path computation...
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>scikit-learn started
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.06099701478785846, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.06099701478785846, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 2.0066418148676917, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 2.0066418148676917, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 3.17218713503172, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 3.17218713503172, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 8.79327661352437, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 8.79327661352437, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
 scikit-learn finished
 </pre></div>
@@ -239,11 +240,11 @@ scikit-learn finished
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho started
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0023956803358942125, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0023956803358942125, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0030242011171139893, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0030242011171139893, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
-/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:512: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.003221665278488217, tolerance: 0.0010121
+/home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.003221665278488217, tolerance: 0.0010121
   model = cd_fast.sparse_enet_coordinate_descent(
 sparse-ho finished
 </pre></div>
@@ -286,13 +287,13 @@ sparse-ho finished
 <img alt="plot held out lasso" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_lasso_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho finished
-Time to compute CV for scikit-learn: 16.78
-Time to compute CV for sparse-ho: 27.22
+Time to compute CV for scikit-learn: 12.04
+Time to compute CV for sparse-ho: 19.84
 Minimum objective grid-search 0.21316
 Minimum objective grad-search 0.21211
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  58.199 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  42.477 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-lasso-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9cae0174003295e3956dda3d3411fe08/plot_held_out_lasso.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_lasso.py</span></code></a></p>
@@ -318,7 +319,7 @@ Minimum objective grad-search 0.21211
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.3.1.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.4.0.<br/>
     </p>
   </div>
 </footer>
