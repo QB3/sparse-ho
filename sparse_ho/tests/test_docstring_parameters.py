@@ -46,7 +46,11 @@ def get_name(func):
 
 # functions to ignore args / docstring of
 _docstring_ignores = [
-    "celer.dropin_sklearn.Lasso.path",
+    "sparse_ho.algo.backward.get_beta_jac_v",
+    "sparse_ho.algo.forward.get_beta_jac_v",
+    "sparse_ho.algo.implicit.get_beta_jac_v",
+    "sparse_ho.algo.implicit_forward.get_beta_jac",
+    "sparse_ho.algo.implicit_forward.get_beta_jac_v",
 ]
 _tab_ignores = []
 
@@ -199,3 +203,7 @@ def test_documented():
         raise AssertionError('\n\nFound new public members missing from '
                              'doc/python_reference.rst:\n\n* ' +
                              '\n* '.join(sorted(set(missing))))
+
+
+if __name__ == "__main__":
+    test_docstring_parameters()

@@ -25,9 +25,11 @@ def grad_search(
     criterion:  instance of BaseCriterion
         criterion to optimize during hyperparameter optimization
         (outer optimization problem).
-    model:  instance of BaseModel
+    model: instance of BaseModel
         model on which hyperparameter has to be selected
         (inner optimization problem).
+    optimizer: instance of Optimizer
+        optimizer used to minimize the criterion (outer optimization)
     X: array like of shape (n_samples, n_features)
         Design matrix.
     y: array like of shape (n_samples,)

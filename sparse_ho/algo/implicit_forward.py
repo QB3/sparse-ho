@@ -9,10 +9,10 @@ class ImplicitForward():
 
     Parameters
     ----------
-    max_iter: int
-        maximum number of iteration for the inner solver
     tol_jac: float
         tolerance for the Jacobian computation
+    max_iter: int
+        maximum number of iteration for the inner solver
     n_iter_jac: int
         maximum number of iteration for the Jacobian computation
     verbose: bool

@@ -62,6 +62,7 @@ Algorithms
 .. autosummary::
    :toctree: generated/
 
+   Implicit
    ImplicitForward
    Forward
    Backward
