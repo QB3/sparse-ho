@@ -3,22 +3,23 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-from sparse_ho.utils_plot import configure_plt
+from sparse_ho.utils_plot import configure_plt, discrete_cmap
 
 configure_plt()
 current_palette = sns.color_palette("colorblind")
 
-def discrete_cmap(N, base_cmap=None):
-    """Create an N-bin discrete colormap from the specified input map"""
 
-    # Note that if base_cmap is a string or None, you can simply do
-    #    return plt.cm.get_cmap(base_cmap, N)
-    # The following works for string, None, or a colormap instance:
+# def discrete_cmap(N, base_cmap=None):
+#     """Create an N-bin discrete colormap from the specified input map"""
 
-    base = plt.cm.get_cmap(base_cmap)
-    color_list = base(np.linspace(1/3, 1, N))
-    cmap_name = base.name + str(N)
-    return base.from_list(cmap_name, color_list, N)
+#     # Note that if base_cmap is a string or None, you can simply do
+#     #    return plt.cm.get_cmap(base_cmap, N)
+#     # The following works for string, None, or a colormap instance:
+
+#     base = plt.cm.get_cmap(base_cmap)
+#     color_list = base(np.linspace(1/3, 1, N))
+#     cmap_name = base.name + str(N)
+#     return base.from_list(cmap_name, color_list, N)
 
 
 algorithms = ['grid_search10', 'random', 'bayesian', 'grad_search']
@@ -61,9 +62,8 @@ for i, algorithm in enumerate(algorithms):
     print(objs.min())
 
 axarr[0].set_ylabel(r"$\mathcal{C}(\beta^{(\lambda)})$")
-
-# fig.colorbar(ticks=range(10))
-fig.colorbar(pcm, ax=axarr[3], ticks=np.linspace(1, 10, 10))
+cba = fig.colorbar(pcm, ax=axarr[3], ticks=np.linspace(1, 10, 10))
+cba.set_label('Iterations')
 
 save_fig = True
 # save_fig = False

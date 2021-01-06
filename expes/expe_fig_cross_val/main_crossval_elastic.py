@@ -26,8 +26,8 @@ from sparse_ho.grid_search import grid_search
 
 print(__doc__)
 
-dataset = 'real-sim'
-# dataset = 'rcv1_train'
+# dataset = 'real-sim'
+dataset = 'rcv1_train'
 # dataset = 'simu'
 
 if dataset != 'simu':
@@ -54,7 +54,7 @@ max_iter = 1e5
     # 'grid_search10', 'grid_search100', 'grad_search', 'random', 'bayesian']
 # algorithms = [
 #     'grid_search10', 'grad_search', 'random', 'bayesian', 'grid_search100']
-algorithms = ['grad_search_ls']
+algorithms = ['grad_search']
 
 max_evals = 25
 print("Starting path computation...")
@@ -74,7 +74,7 @@ for algorithm in algorithms:
     if algorithm.startswith('grad_search'):
         if algorithm == 'grad_search':
             optimizer = GradientDescent(
-                n_outer=max_evals, tol=tol, verbose=True, p_grad0=1)
+                n_outer=max_evals, tol=tol, verbose=True, p_grad0=1.9)
         else:
             optimizer = LineSearch(n_outer=25, verbose=True, tol=tol)
         grad_search(
@@ -85,7 +85,7 @@ for algorithm in algorithms:
         if algorithm == 'grid_search10':
             n_alphas = 5
         else:
-            n_alphas = 100
+            n_alphas = 30
         p_alphas = np.geomspace(1, p_alpha_min, n_alphas)
         alphas = alpha_max * p_alphas
         log_alphas = np.log(alphas)
