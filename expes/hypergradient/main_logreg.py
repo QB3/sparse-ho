@@ -5,33 +5,34 @@ from joblib import Parallel, delayed, parallel_backend
 import pandas
 from sklearn.model_selection import StratifiedShuffleSplit, KFold
 
-from celer import Lasso as Lasso_celer
+from celer import LogisticRegression
 from libsvmdata import fetch_libsvm
 
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import HeldOutMSE, CrossVal
+from sparse_ho.models import SparseLogreg
+from sparse_ho.criterion import HeldOutLogistic, CrossVal
 from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
 
 
-tol = 1e-12
+tol = 1e-6
 methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
-div_alphas = [10, 100]
-# dataset_names = ["real-sim", "rcv1_train", "news20"]
-dataset_names = ["colon"]
+div_alphas = [3, 10]
+# dataset_names = ["sector_train"]
+# dataset_names = ["rcv1_train", "real-sim", "news20"]
+dataset_names = ["real-sim"]
 rep = 10
 
 dict_maxits = {}
-dict_maxits[("colon", 10)] = np.linspace(5, 500, rep, dtype=np.int)
-dict_maxits[("colon", 100)] = np.linspace(5, 10000, rep, dtype=np.int)
+dict_maxits[("leukemia", 10)] = np.linspace(5, 50, rep, dtype=np.int)
+dict_maxits[("leukemia", 100)] = np.linspace(5, 300, rep, dtype=np.int)
 dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
-dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
-dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
-dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, rep, dtype=np.int)
-dict_maxits[("news20", 10)] = np.linspace(5, 500, rep, dtype=np.int)
-dict_maxits[("news20", 100)] = np.linspace(5, 2500, rep, dtype=np.int)
+dict_maxits[("real-sim", 3)] = np.linspace(5, 50, rep, dtype=np.int)
+dict_maxits[("rcv1_train", 10)] = np.linspace(5, 100, rep, dtype=np.int)
+dict_maxits[("rcv1_train", 3)] = np.linspace(5, 100, rep, dtype=np.int)
+dict_maxits[("news20", 10)] = np.linspace(5, 1000, rep, dtype=np.int)
+dict_maxits[("news20", 100)] = np.linspace(5, 10000, rep, dtype=np.int)
 
 
 def parallel_function(
@@ -44,49 +45,52 @@ def parallel_function(
     kf = KFold(n_splits=5, random_state=random_state, shuffle=True)
 
     for i in range(2):
-        alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
+        alpha_max = np.max(np.abs(X.T @ y))
+        alpha_max /= (4 * X.shape[0])
         log_alpha = np.log(alpha_max / div_alpha)
+        alpha = np.exp(log_alpha)
         monitor = Monitor()
         if method == "celer":
-            clf = Lasso_celer(
-                alpha=np.exp(log_alpha), fit_intercept=False,
-                # TODO maybe change this tol
+            clf = LogisticRegression(
+                C=(1 / (alpha * X.shape[0])),
+                solver="celer",
                 tol=tol, max_iter=maxit)
-            model = Lasso(estimator=clf, max_iter=maxit)
-            criterion = HeldOutMSE(None, None)
+            model = SparseLogreg(estimator=clf, max_iter=maxit)
+            criterion = HeldOutLogistic(None, None)
             cross_val = CrossVal(cv=kf, criterion=criterion)
             algo = ImplicitForward(
-                tol_jac=1e-8, n_iter_jac=maxit, use_stop_crit=False)
+                tol_jac=tol, n_iter_jac=maxit, use_stop_crit=False)
             algo.max_iter = maxit
             val, grad = cross_val.get_val_grad(
                     model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
                     monitor=monitor, max_iter=maxit)
         elif method == "ground_truth":
-            for file in os.listdir("results/"):
+            for file in os.listdir("results_logreg/"):
                 if file.startswith(
                     "hypergradient_%s_%i_%s" % (
                         dataset_name, div_alpha, method)):
                     return
                 else:
-                    clf = Lasso_celer(
-                            alpha=np.exp(log_alpha), fit_intercept=False,
-                            warm_start=True, tol=1e-14, max_iter=10000)
-                    criterion = HeldOutMSE(None, None)
+                    clf = LogisticRegression(
+                            C=(1 / (alpha * X.shape[0])),
+                            solver="celer",
+                            tol=1e-8, max_iter=maxit)
+                    criterion = HeldOutLogistic(None, None)
                     cross_val = CrossVal(cv=kf, criterion=criterion)
                     algo = Implicit(criterion)
-                    model = Lasso(estimator=clf, max_iter=10000)
+                    model = SparseLogreg(estimator=clf, max_iter=10000)
                     val, grad = cross_val.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
+                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-8,
                         monitor=monitor)
         else:
-            model = Lasso(max_iter=maxit)
-            criterion = HeldOutMSE(None, None)
+            model = SparseLogreg(max_iter=maxit)
+            criterion = HeldOutLogistic(None, None)
             cross_val = CrossVal(cv=kf, criterion=criterion)
             if method == "forward":
                 algo = Forward(use_stop_crit=False)
             elif method == "implicit_forward":
                 algo = ImplicitForward(use_stop_crit=False,
-                    tol_jac=1e-8, n_iter_jac=maxit, max_iter=1000)
+                    tol_jac=tol, n_iter_jac=maxit, max_iter=1000)
             elif method == "implicit":
                 algo = Implicit(use_stop_crit=False, max_iter=1000)
             elif method == "backward":
@@ -99,14 +103,14 @@ def parallel_function(
                     model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
                     monitor=monitor, max_iter=maxit)
 
-    results = (
-        dataset_name, div_alpha, method, maxit,
-        val, grad, monitor.times[0])
+        results = (
+            dataset_name, div_alpha, method, maxit,
+            val, grad, monitor.times[0])
     df = pandas.DataFrame(results).transpose()
     df.columns = [
         'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad',
         'time']
-    str_results = "results/hypergradient_%s_%i_%s_%i.pkl" % (
+    str_results = "results_logreg/hypergradient_%s_%i_%s_%i.pkl" % (
         dataset_name, div_alpha, method, maxit)
     df.to_pickle(str_results)
 
@@ -114,6 +118,7 @@ def parallel_function(
 print("enter parallel")
 backend = 'loky'
 n_jobs = 15
+# 
 with parallel_backend(backend, n_jobs=n_jobs, inner_max_num_threads=1):
     Parallel()(
         delayed(parallel_function)(

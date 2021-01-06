@@ -8,7 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 25
 
-save_fig = True
+save_fig = False
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -53,51 +53,40 @@ dict_markers['grid_search'] = 'd'
 dict_markers['bayesian'] = 'P'
 dict_markers['random'] = '*'
 dict_markers["backward"] = ">"
-
 ##############################################
-y_lims = {}
-y_lims["colon", 10] = 1e-10
-y_lims["colon", 100] = 1e-10
-y_lims["real-sim", 10] = 1e-10
-y_lims["real-sim", 100] = 1e-10
-y_lims["rcv1_train", 10] = 1e-10
-y_lims["rcv1_train", 100] = 1e-10
-##############################################
-
 epoch_lims = {}
-epoch_lims["colon", 10] = 250
-epoch_lims["colon", 100] = 500
 epoch_lims["real-sim", 10] = 45
-epoch_lims["real-sim", 100] = 195
+epoch_lims["real-sim", 3] = 195
 epoch_lims["rcv1_train", 10] = 145
-epoch_lims["rcv1_train", 100] = 990
+epoch_lims["rcv1_train", 3] = 990
+epoch_lims["leukemia", 10] = 300
+epoch_lims["leukemia", 100] = 300
 ##############################################
 time_lims = {}
-time_lims["real-sim", 10] = (1e0, 100)
-time_lims["real-sim", 100] = (1e0, 100)
-time_lims["rcv1_train", 10] = (1e0, 500)
-time_lims["rcv1_train", 100] = (1e0, 500)
-time_lims["news20", 10] = (1e0, 1000)
-time_lims["news20", 100] = (1e0, 10000)
-time_lims["colon", 10] = (1e-1, 50)
-time_lims["colon", 100] = (1e-1, 100)
+time_lims["real-sim", 10] = 50
+time_lims["real-sim", 3] = 100
+time_lims["rcv1_train", 10] = 50
+time_lims["rcv1_train", 3] = 500
+time_lims["news20", 10] = 1000
+time_lims["news20", 100] = 10000
+time_lims["leukemia", 10] = 50
+time_lims["leukemia", 100] = 50
 ##############################################
 
 dict_title = {}
 dict_title["rcv1_train"] = "rcv1"
 dict_title["news20"] = "20news"
-dict_title["colon"] = "colon"
+dict_title["finance"] = "finance"
 dict_title["real-sim"] = "real-sim"
-
+dict_title["leukemia"] = "leukemia"
 # df_data = pandas.read_pickle("results_non_unique.pkl")
-files = os.listdir('results/')
+files = os.listdir('results_logreg/')
 
 for i in range(len(files)):
     if i == 0:
-        df_data = pandas.read_pickle("results/" + files[i])
+        df_data = pandas.read_pickle("results_logreg/" + files[i])
     else:
-        print(files[i])
-        df_temp = pandas.read_pickle("results/" +  files[i])
+        df_temp = pandas.read_pickle("results_logreg/" +  files[i])
         df_data = pandas.concat([df_data, df_temp])
     
 
@@ -105,7 +94,6 @@ methods = df_data['method'].unique()
 methods = np.delete(methods, np.where(methods == "ground_truth"))
 list_datasets = df_data['dataset'].unique()
 div_alphas = df_data['div_alpha'].unique()
-div_alphas = np.sort(div_alphas)
 
 
 fig, axarr = plt.subplots(
@@ -145,9 +133,9 @@ for idx1, dataset in enumerate(list_datasets):
             # plt.show(block=False)
 
         # axarr2.flat[idx2 * len(list_datasets) + idx1].set_xlabel(r"$\#$ epochs", fontsize=18)
-        axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(y_lims[dataset, div_alpha])
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(y_lims[dataset, div_alpha])
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(time_lims[dataset, div_alpha])
+        axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(1e-10)
+        axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(1e-10)
+        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim((1e-2, time_lims[dataset, div_alpha]))
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
                 r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
                 + "\n"
@@ -169,13 +157,13 @@ for i in np.arange(len(list_datasets)):
 fig.tight_layout()
 fig2.tight_layout()
 if save_fig:
-    fig.savefig(fig_dir + "hypergradient_computation.pdf", bbox_inches="tight")
-    fig.savefig(fig_dir_svg + "hypergradient_computation.svg", bbox_inches="tight")
+    fig.savefig(fig_dir + "intro_influ_niter.pdf", bbox_inches="tight")
+    fig.savefig(fig_dir_svg + "intro_influ_niter.svg", bbox_inches="tight")
             #
         # axarr.flat[1].set_title(dataset)
-plot_legend_apart(
-    axarr[0][0],
-    fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
+# plot_legend_apart(
+#     axarr[0][0],
+#     fig_dir + "test.pdf", ncol=3)
 fig.show()
 fig2.show()
 
