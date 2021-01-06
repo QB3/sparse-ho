@@ -32,7 +32,7 @@ dict_title['grad_search'] = '1st order method'
 plt.close('all')
 fig, axarr = plt.subplots(
     1, len(algorithms), sharex=True, sharey=True,
-    figsize=[14, 4.5], constrained_layout=True)
+    figsize=[14, 4], constrained_layout=True)
 
 objs_full = np.load("results/objs_grid_search100.npy", allow_pickle=True)
 log_alphas_full = np.load(
