@@ -1,6 +1,6 @@
 import copy
+import numpy as np
 from sklearn.model_selection import check_cv
-
 from sparse_ho.criterion.base import BaseCriterion
 
 
@@ -53,15 +53,12 @@ class CrossVal(BaseCriterion):
             self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         if self.dict_crits is None:
             self._initialize(model, X)
-        val = 0
-        for i in range(self.n_splits):
-            vali = self.dict_crits[i].get_val(
-                self.dict_models[i], X, y, log_alpha, tol=tol)
-            val += vali
-        val /= self.n_splits
+        val = np.mean([
+            self.dict_crits[i].get_val(
+                self.dict_models[i], X, y, log_alpha, tol=tol) for i in range(
+                    self.n_splits)])
         monitor(val, None, log_alpha=log_alpha)
         return val
-
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
