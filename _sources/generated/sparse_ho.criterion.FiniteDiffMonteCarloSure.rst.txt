@@ -1,0 +1,25 @@
+﻿sparse\_ho.criterion.FiniteDiffMonteCarloSure
+=============================================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: FiniteDiffMonteCarloSure
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FiniteDiffMonteCarloSure.__init__
+      ~FiniteDiffMonteCarloSure.get_val
+      ~FiniteDiffMonteCarloSure.get_val_grad
+      ~FiniteDiffMonteCarloSure.get_val_outer
+   
+   
+
+   
+   
+   

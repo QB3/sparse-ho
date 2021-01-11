@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparse_ho.criterion.SmoothedSURE &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.criterion.FiniteDiffMonteCarloSure &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -93,17 +93,17 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="sparse-ho-criterion-smoothedsure">
-<h1>sparse_ho.criterion.SmoothedSURE<a class="headerlink" href="#sparse-ho-criterion-smoothedsure" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sparse-ho-criterion-finitediffmontecarlosure">
+<h1>sparse_ho.criterion.FiniteDiffMonteCarloSure<a class="headerlink" href="#sparse-ho-criterion-finitediffmontecarlosure" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="sparse_ho.criterion.SmoothedSURE">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">SmoothedSURE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.criterion.FiniteDiffMonteCarloSure">
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.criterion.</code><code class="sig-name descname">FiniteDiffMonteCarloSure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.FiniteDiffMonteCarloSure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smoothed version of the Stein Unbiased Risk Estimator (SURE).</p>
 <p>Implements the iterative Finite-Difference Monte-Carlo approximation of the
 SURE. By default, the approximation is ruled by a power law heuristic [1].</p>
 <p class="rubric">References</p>
 <dl class="citation">
-<dt class="label" id="rb542e0aae307-1"><span class="brackets">1</span></dt>
+<dt class="label" id="r3bd4c1fc2da9-1"><span class="brackets">1</span></dt>
 <dd><p>C.-A. Deledalle, Stein Unbiased GrAdient estimator of the Risk</p>
 </dd>
 </dl>
@@ -117,8 +117,8 @@ SIAM J. Imaging Sci., 7(4), 2448-2487.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="sparse_ho.criterion.SmoothedSURE.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.criterion.FiniteDiffMonteCarloSure.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sigma</span></em>, <em class="sig-param"><span class="n">finite_difference_step</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_state</span><span class="o">=</span><span class="default_value">42</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.FiniteDiffMonteCarloSure.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -142,7 +142,7 @@ Pass an int for reproducible output across multiple function calls.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.SmoothedSURE.__init__" title="sparse_ho.criterion.SmoothedSURE.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(sigma[, finite_difference_step, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.FiniteDiffMonteCarloSure.__init__" title="sparse_ho.criterion.FiniteDiffMonteCarloSure.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(sigma[, finite_difference_step, …])</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>
