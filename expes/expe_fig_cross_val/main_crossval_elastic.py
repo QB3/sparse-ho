@@ -1,18 +1,12 @@
-# Experiment for Lasso CV
+# Experiment for elastic net CV
 # License: BSD (3-clause)
 
-import time
 import itertools
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import celer
 import sklearn
 
 from libsvmdata import fetch_libsvm
 from sklearn.datasets import make_regression
-from celer import LassoCV
-# from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
 
 from sparse_ho import ImplicitForward
@@ -26,7 +20,6 @@ from sparse_ho.grid_search import grid_search
 
 print(__doc__)
 
-# dataset = 'real-sim'
 dataset = 'rcv1_train'
 # dataset = 'simu'
 
@@ -46,14 +39,7 @@ p_alpha_min = alpha_max / 10_000
 log_alpha_min = np.log(p_alpha_min * alpha_max)
 
 tol = 1e-8
-max_iter = 1e5
 
-# algorithms = ['grid_search100']
-# algorithms = ['grad_search']
-# algorithms = [
-    # 'grid_search10', 'grid_search100', 'grad_search', 'random', 'bayesian']
-# algorithms = [
-#     'grid_search10', 'grad_search', 'random', 'bayesian', 'grid_search100']
 algorithms = ['grad_search']
 
 max_evals = 25
@@ -94,12 +80,6 @@ for algorithm in algorithms:
         grid_search(
             algo, cross_val_criterion, model, X, y, None, None, monitor,
             log_alphas=grid_alphas)
-        # reg = LassoCV(
-        #     cv=kf, verbose=True, tol=tol, fit_intercept=False,
-        #     alphas=alphas, max_iter=max_iter).fit(X, y)
-        # reg.score(X, y)
-        # objs = reg.mse_path_.mean(axis=1)
-        # log_alphas = np.log(alphas)
     else:
         hyperopt_wrapper(
             algo, cross_val_criterion, model, X, y, log_alpha_min,

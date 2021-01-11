@@ -16,7 +16,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho import grad_search, hyperopt_wrapper
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
-from sparse_ho.optimizers import LineSearch, GradientDescent
+from sparse_ho.optimizers import GradientDescent
 from sparse_ho.utils import Monitor
 
 print(__doc__)
@@ -41,10 +41,8 @@ alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 tol = 1e-8
 max_iter = 1e5
 
-algorithms = ['random', 'bayesian']
-# algorithms = ['grad_search']
-# algorithms = [
-#     # 'grid_search10', 'grad_search', 'random', 'bayesian']
+algorithms = [
+    'grid_search10', 'grad_search', 'random', 'bayesian']
 
 p_alpha_min = 1 / 10_000
 print("Starting path computation...")
