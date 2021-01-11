@@ -1,7 +1,8 @@
+import pytest
+
 import numpy as np
 from scipy.sparse import csc_matrix
 from sklearn import linear_model
-
 
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, WeightedLasso
@@ -53,44 +54,40 @@ def get_v(mask, dense):
         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
 
 
-def test_beta_jac():
+@pytest.mark.parametrize('key', list(models.keys()))
+def test_beta_jac(key):
     #########################################################################
     # check that the methods computing the full Jacobian compute the same sol
     # maybe we could add a test comparing with sklearn
-    for key in models.keys():
-        supp1, dense1, jac1 = get_beta_jac_iterdiff(
-            X[idx_train, :], y[idx_train], dict_log_alpha[key], tol=tol,
-            model=models[key])
-        supp1sk, dense1sk, jac1sk = get_beta_jac_iterdiff(
-            X[idx_train, :], y[idx_train], dict_log_alpha[key], tol=tol,
-            model=models[key])
-        supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-            X[idx_train, :], y[idx_train], dict_log_alpha[key],
-            tol=tol, model=models[key], tol_jac=tol)
-        supp3, dense3, jac3 = get_beta_jac_iterdiff(
-            X_s[idx_train], y[idx_train], dict_log_alpha[key], tol=tol,
-            model=models[key])
-        supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
-            X_s[idx_train], y[idx_train], dict_log_alpha[key],
-            tol=tol, model=models[key], tol_jac=tol)
+    supp1, dense1, jac1 = get_beta_jac_iterdiff(
+        X, y, dict_log_alpha[key], tol=tol, model=models[key])
+    supp1sk, dense1sk, jac1sk = get_beta_jac_iterdiff(
+        X, y, dict_log_alpha[key], tol=tol, model=models[key])
+    supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
+        X, y, dict_log_alpha[key], tol=tol, model=models[key], tol_jac=tol)
+    supp3, dense3, jac3 = get_beta_jac_iterdiff(
+        X_s, y, dict_log_alpha[key], tol=tol,
+        model=models[key])
+    supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
+        X_s, y, dict_log_alpha[key],
+        tol=tol, model=models[key], tol_jac=tol)
 
-        assert np.all(supp1 == supp1sk)
-        assert np.all(supp1 == supp2)
-        assert np.allclose(dense1, dense1sk)
-        assert np.allclose(dense1, dense2)
-        assert np.allclose(jac1, jac2, atol=1e-6)
+    assert np.all(supp1 == supp1sk)
+    assert np.all(supp1 == supp2)
+    assert np.allclose(dense1, dense1sk)
+    assert np.allclose(dense1, dense2)
+    assert np.allclose(jac1, jac2, atol=1e-6)
 
-        assert np.all(supp2 == supp3)
-        assert np.allclose(dense2, dense3)
-        assert np.allclose(jac2, jac3, atol=1e-6)
+    assert np.all(supp2 == supp3)
+    assert np.allclose(dense2, dense3)
+    assert np.allclose(jac2, jac3, atol=1e-6)
 
-        assert np.all(supp3 == supp4)
-        assert np.allclose(dense3, dense4)
-        assert np.allclose(jac3, jac4, atol=1e-6)
+    assert np.all(supp3 == supp4)
+    assert np.allclose(dense3, dense4)
+    assert np.allclose(jac3, jac4, atol=1e-6)
 
-        get_beta_jac_t_v_implicit(
-            X[idx_train, :], y[idx_train], dict_log_alpha[key], get_v,
-            model=models[key])
+    get_beta_jac_t_v_implicit(
+        X, y, dict_log_alpha[key], get_v, model=models[key])
 
 
 estimator = linear_model.Lasso(
@@ -100,96 +97,61 @@ models_custom["lasso"] = Lasso(estimator=estimator)
 models_custom["wlasso"] = WeightedLasso(estimator=estimator)
 
 
-def test_beta_jac2():
+@pytest.mark.parametrize('key', list(models.keys()))
+def test_beta_jac2(key):
     #########################################################################
     # check that the methods computing the full Jacobian compute the same sol
     # maybe we could add a test comparing with sklearn
-    for key in models.keys():
-        supp, dense, jac = get_beta_jac_fast_iterdiff(
-            X_s[idx_train, :], y[idx_train], dict_log_alpha[key],
-            tol=tol, model=models[key], tol_jac=tol)
-        supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-            X_s[idx_train, :], y[idx_train], dict_log_alpha[key],
-            tol=tol, model=models[key], tol_jac=tol)
-        assert np.all(supp == supp_custom)
-        assert np.allclose(dense, dense_custom)
-        assert np.allclose(jac, jac_custom)
+    supp, dense, jac = get_beta_jac_fast_iterdiff(
+        X_s, y, dict_log_alpha[key],
+        tol=tol, model=models[key], tol_jac=tol)
+    supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+        X_s, y, dict_log_alpha[key],
+        tol=tol, model=models[key], tol_jac=tol)
+    assert np.all(supp == supp_custom)
+    assert np.allclose(dense, dense_custom)
+    assert np.allclose(jac, jac_custom)
 
 
-def test_val_grad():
+@pytest.mark.parametrize('key', list(models.keys()))
+@pytest.mark.parametrize('criterion', ['MSE', 'SURE'])
+def test_val_grad_mse(key, criterion):
     #######################################################################
     # Not all methods computes the full Jacobian, but all
     # compute the gradients
     # check that the gradient returned by all methods are the same
-    for key in models.keys():
-        log_alpha = dict_log_alpha[key]
-        model = models[key]
+    log_alpha = dict_log_alpha[key]
+    model = models[key]
 
+    if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
-        algo = Forward()
-        val_fwd, grad_fwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-        criterion = HeldOutMSE(idx_train, idx_val)
-        algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-        val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-        criterion = HeldOutMSE(idx_train, idx_val)
-        algo = Implicit()
-        val_imp, grad_imp = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-        criterion = HeldOutMSE(idx_train, idx_val)
-        algo = Backward()
-        val_bwd, grad_bwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-        assert np.allclose(val_fwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_imp_fwd)
-        # assert np.allclose(val_imp_fwd, val_imp)
-        assert np.allclose(val_bwd, val_fwd)
-        assert np.allclose(val_bwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_bwd)
-        assert np.allclose(grad_bwd, grad_imp_fwd)
-
-        # for the implcit the conjugate grad does not converge
-        # hence the rtol=1e-2
-        assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
-
-    for key in models.keys():
-        log_alpha = dict_log_alpha[key]
-        model = models[key]
+    else:
         criterion = FiniteDiffMonteCarloSure(sigma_star)
-        algo = Forward()
-        val_fwd, grad_fwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = FiniteDiffMonteCarloSure(sigma_star)
-        algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-        val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+    algo = Forward()
+    val_fwd, grad_fwd = criterion.get_val_grad(
+        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = FiniteDiffMonteCarloSure(sigma_star)
-        algo = Implicit(criterion)
-        val_imp, grad_imp = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+    algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
+    val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
+        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = FiniteDiffMonteCarloSure(sigma_star)
-        algo = Backward()
-        val_bwd, grad_bwd = criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+    algo = Implicit()
+    val_imp, grad_imp = criterion.get_val_grad(
+        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        assert np.allclose(val_fwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_imp_fwd)
-        assert np.allclose(val_imp_fwd, val_imp)
-        assert np.allclose(val_bwd, val_fwd)
-        assert np.allclose(val_bwd, val_imp_fwd)
-        assert np.allclose(grad_fwd, grad_bwd)
-        assert np.allclose(grad_bwd, grad_imp_fwd)
+    algo = Backward()
+    val_bwd, grad_bwd = criterion.get_val_grad(
+        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
+    assert np.allclose(val_fwd, val_imp_fwd)
+    assert np.allclose(grad_fwd, grad_imp_fwd)
+    assert np.allclose(val_imp_fwd, val_imp)
+    assert np.allclose(val_bwd, val_fwd)
+    assert np.allclose(val_bwd, val_imp_fwd)
+    assert np.allclose(grad_fwd, grad_bwd)
+    assert np.allclose(grad_bwd, grad_imp_fwd)
 
-if __name__ == '__main__':
-    test_beta_jac()
-    test_val_grad()
-    test_beta_jac2()
+    # for the implcit the conjugate grad does not converge
+    # hence the rtol=1e-2
+    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
