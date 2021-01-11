@@ -137,11 +137,9 @@ def test_val_grad_mse(key, criterion):
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    # XXX : Backward does not satisty dtype API with numba
-    # for warm start
-    # algo = Backward()
-    # val_bwd, grad_bwd = criterion.get_val_grad(
-    #     model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+    algo = Backward()
+    val_bwd, grad_bwd = criterion.get_val_grad(
+        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
     assert np.allclose(val_fwd, val_imp_fwd)
     assert np.allclose(grad_fwd, grad_imp_fwd)
