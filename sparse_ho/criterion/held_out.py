@@ -69,7 +69,7 @@ class HeldOutMSE(BaseCriterion):
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
 
-        assert isinstance(quantity_to_warm_start, np.ndarray)
+        # assert isinstance(quantity_to_warm_start, np.ndarray)
 
         self.mask0 = mask
         self.dense0 = dense
