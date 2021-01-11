@@ -10,7 +10,7 @@ from sparse_ho.models import Lasso
 from sparse_ho import Forward
 from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
-from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
+from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch
 
@@ -64,7 +64,7 @@ def test_grad_search(model, crit):
         criterion = HeldOutMSE(idx_train, idx_val)
     else:
         n_outer = 2
-        criterion = SmoothedSURE(sigma_star)
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
     # TODO MM@QBE if else scheme surprising
 
     criterion = HeldOutMSE(idx_train, idx_val)
