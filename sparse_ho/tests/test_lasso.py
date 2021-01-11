@@ -97,7 +97,6 @@ def test_beta_jac(key):
         X, y, dict_log_alpha[key], get_v, model=models[key])
 
 
-
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac2(key):
     #########################################################################
@@ -114,16 +113,14 @@ def test_beta_jac2(key):
     assert np.allclose(jac, jac_custom)
 
 
-list_criterions = [
-    HeldOutMSE(idx_train, idx_val),
-    FiniteDiffMonteCarloSure(sigma_star)]
-
 @pytest.mark.parametrize('key', list(models.keys()))
-@pytest.mark.parametrize('criterion', list_criterions)
+@pytest.mark.parametrize('criterion', ['MSE', 'SURE'])
 def test_val_grad_mse(key, criterion):
-    criterion.quantity_to_warm_start = None
-    if hasattr(criterion, 'quantity_to_warm_start2'):
-        criterion.quantity_to_warm_start2 = None
+
+    if criterion == 'MSE':
+        criterion = HeldOutMSE(idx_train, idx_val)
+    elif criterion == 'SURE':
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
 
     #######################################################################
     # Not all methods computes the full Jacobian, but all
@@ -163,7 +160,7 @@ def test_val_grad_mse(key, criterion):
 
 
 # if __name__ == __main__:
-for model in models.keys():
-    test_beta_jac(model)
-    for criterion in list_criterions:
-        test_val_grad_mse(model, criterion)
+#     for model in models.keys():
+#         test_beta_jac(model)
+#         for criterion in list_criterions:
+#             test_val_grad_mse(model, criterion)
