@@ -147,8 +147,38 @@ Grid-search
  .. code-block:: none
 
     scikit started
+    Iteration 1 / 30
+    Iteration 2 / 30
+    Iteration 3 / 30
+    Iteration 4 / 30
+    Iteration 5 / 30
+    Iteration 6 / 30
+    Iteration 7 / 30
+    Iteration 8 / 30
+    Iteration 9 / 30
+    Iteration 10 / 30
+    Iteration 11 / 30
+    Iteration 12 / 30
+    Iteration 13 / 30
+    Iteration 14 / 30
+    Iteration 15 / 30
+    Iteration 16 / 30
+    Iteration 17 / 30
+    Iteration 18 / 30
+    Iteration 19 / 30
+    Iteration 20 / 30
+    Iteration 21 / 30
+    Iteration 22 / 30
+    Iteration 23 / 30
+    Iteration 24 / 30
+    Iteration 25 / 30
+    Iteration 26 / 30
+    Iteration 27 / 30
+    Iteration 28 / 30
+    Iteration 29 / 30
+    Iteration 30 / 30
     scikit finished
-    Time to compute CV for scikit-learn: 0.90
+    Time to compute CV for scikit-learn: 1.07
 
 
 
@@ -228,7 +258,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute CV for sparse-ho: 1.13
+    Time to compute CV for sparse-ho: 1.15
 
 
 
@@ -236,7 +266,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.440 seconds)
+   **Total running time of the script:** ( 0 minutes  2.663 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
