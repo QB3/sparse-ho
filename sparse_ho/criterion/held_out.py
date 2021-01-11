@@ -34,7 +34,6 @@ class HeldOutMSE(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense):
         """Compute the MSE on the validation set."""
@@ -104,7 +103,6 @@ class HeldOutLogistic(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
@@ -183,7 +181,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense):
         if X is None or y is None:
