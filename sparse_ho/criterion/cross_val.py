@@ -50,7 +50,7 @@ class CrossVal(BaseCriterion):
             self.dict_models[i] = copy.deepcopy(model)
 
     def get_val(
-            self, model, X, y, log_alpha, monitor, tol=1e-3):
+            self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         if self.dict_crits is None:
             self._initialize(model, X)
         val = 0

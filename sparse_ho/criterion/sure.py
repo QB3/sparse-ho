@@ -62,7 +62,7 @@ class SmoothedSURE(BaseCriterion):
         val += 2 * self.sigma ** 2 * dof
         return val
 
-    def get_val(self, model, X, y, log_alpha, monitor, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
