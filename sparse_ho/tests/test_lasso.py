@@ -13,7 +13,7 @@ from sparse_ho import Forward
 from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
 from sparse_ho import Backward
-from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
+from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
 
 n_samples = 100
 n_features = 100
@@ -160,22 +160,22 @@ def test_val_grad():
     for key in models.keys():
         log_alpha = dict_log_alpha[key]
         model = models[key]
-        criterion = SmoothedSURE(sigma_star)
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
         algo = Forward()
         val_fwd, grad_fwd = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SmoothedSURE(sigma_star)
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
         algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
         val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SmoothedSURE(sigma_star)
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
         algo = Implicit(criterion)
         val_imp, grad_imp = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-        criterion = SmoothedSURE(sigma_star)
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
         algo = Backward()
         val_bwd, grad_bwd = criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)

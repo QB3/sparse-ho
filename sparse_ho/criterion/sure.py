@@ -5,7 +5,7 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.criterion.base import BaseCriterion
 
 
-class SmoothedSURE(BaseCriterion):
+class FiniteDiffMonteCarloSure(BaseCriterion):
     """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
 
     Implements the iterative Finite-Difference Monte-Carlo approximation of the
