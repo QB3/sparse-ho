@@ -52,7 +52,6 @@ class HeldOutMSE(BaseCriterion):
             monitor(value_outer, None, log_alpha=log_alpha)
         return value_outer
 
-
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
