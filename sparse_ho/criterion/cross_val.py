@@ -49,18 +49,19 @@ class CrossVal(BaseCriterion):
             self.dict_crits[i].idx_val = idx_val
             self.dict_models[i] = copy.deepcopy(model)
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3, monitor=None):
+    def get_val(
+            self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         if self.dict_crits is None:
             self._initialize(model, X)
-        value_outer = 0
+        val = 0
         for i in range(self.n_splits):
             vali = self.dict_crits[i].get_val(
                 self.dict_models[i], X, y, log_alpha, tol=tol)
-            value_outer += vali
-        value_outer /= self.n_splits
-        if monitor is not None:
-            monitor(value_outer, None, log_alpha=log_alpha)
-        return value_outer
+            val += vali
+        val /= self.n_splits
+        monitor(val, None, log_alpha=log_alpha)
+        return val
+
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,

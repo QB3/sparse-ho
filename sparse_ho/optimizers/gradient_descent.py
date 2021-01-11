@@ -42,8 +42,9 @@ class GradientDescent(BaseOptimizer):
         for i in range(self.n_outer):
             value_outer, grad_outer = _get_val_grad(
                 log_alphak, self.tol, monitor)
-            if self.step_size is None:
+            if self.step_size is None or i < 10:
                 self.step_size = self.p_grad0 / np.linalg.norm(grad_outer)
+                self.step_size = min(self.step_size, 100)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
