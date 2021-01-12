@@ -25,7 +25,7 @@ def plot_legend_apart(ax, figname, ncol=None):
     if ncol is None:
         ncol = len(ax.lines)
     fig = plt.figure(figsize=(30, 4), constrained_layout=True)
-    fig.legend(ax.lines, [l.get_label() for l in ax.lines], ncol=ncol,
+    fig.legend(ax.lines, [line.get_label() for line in ax.lines], ncol=ncol,
                loc="upper center")
     fig.tight_layout()
     fig.savefig(figname)
