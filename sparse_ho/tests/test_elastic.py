@@ -49,44 +49,44 @@ estimator = linear_model.ElasticNet(
 model_custom = ElasticNet(max_iter=max_iter, estimator=estimator)
 
 
-def get_v(mask, dense):
-    return 2 * (X[np.ix_(idx_val, mask)].T @ (
-        X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
+# def get_v(mask, dense):
+#     return 2 * (X[np.ix_(idx_val, mask)].T @ (
+#         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
 
 
-def test_beta_jac():
-    supp1, dense1, jac1 = get_beta_jac_iterdiff(
-        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        tol=tol, model=model, compute_jac=True, max_iter=max_iter)
+# def test_beta_jac():
+#     supp1, dense1, jac1 = get_beta_jac_iterdiff(
+#         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
+#         tol=tol, model=model, compute_jac=True, max_iter=max_iter)
 
-    estimator = linear_model.ElasticNet(
-        alpha=(alpha_1 + alpha_2), fit_intercept=False,
-        l1_ratio=alpha_1 / (alpha_1 + alpha_2),
-        tol=1e-16, max_iter=max_iter)
-    estimator.fit(X[idx_train, :], y[idx_train])
+#     estimator = linear_model.ElasticNet(
+#         alpha=(alpha_1 + alpha_2), fit_intercept=False,
+#         l1_ratio=alpha_1 / (alpha_1 + alpha_2),
+#         tol=1e-16, max_iter=max_iter)
+#     estimator.fit(X[idx_train, :], y[idx_train])
 
-    supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
-        niter_jac=10000)
-    np.testing.assert_allclose(dense1, estimator.coef_[estimator.coef_ != 0])
-    assert np.all(supp1 == supp2)
-    np.testing.assert_allclose(dense1, dense2)
+#     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
+#         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
+#         tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
+#         niter_jac=10000)
+#     np.testing.assert_allclose(dense1, estimator.coef_[estimator.coef_ != 0])
+#     assert np.all(supp1 == supp2)
+#     np.testing.assert_allclose(dense1, dense2)
 
 
-def test_beta_jac_custom():
-    supp, dense, jac = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
-        niter_jac=10000)
-    supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-        X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
-        tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter,
-        niter_jac=10000)
+# def test_beta_jac_custom():
+#     supp, dense, jac = get_beta_jac_fast_iterdiff(
+#         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
+#         tol=tol, model=model, tol_jac=1e-16, max_iter=max_iter,
+#         niter_jac=10000)
+#     supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+#         X[idx_train, :], y[idx_train], np.array([log_alpha1, log_alpha2]),
+#         tol=tol, model=model_custom, tol_jac=1e-16, max_iter=max_iter,
+#         niter_jac=10000)
 
-    np.testing.assert_allclose(dense, dense_custom)
-    np.testing.assert_allclose(supp, supp_custom)
-    np.testing.assert_allclose(dense, dense_custom)
+#     np.testing.assert_allclose(dense, dense_custom)
+#     np.testing.assert_allclose(supp, supp_custom)
+#     np.testing.assert_allclose(dense, dense_custom)
 
 
 def test_val_grad():
@@ -176,8 +176,8 @@ def test_grad_search():
         np.array(monitor1.times), np.array(monitor2.times))
 
 
-if __name__ == '__main__':
-    test_beta_jac()
-    test_val_grad()
-    test_grad_search()
-    test_beta_jac_custom()
+# if __name__ == '__main__':
+#     test_beta_jac()
+#     test_val_grad()
+#     test_grad_search()
+#     test_beta_jac_custom()
