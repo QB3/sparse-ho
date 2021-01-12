@@ -7,7 +7,7 @@ torch.set_default_dtype(torch.double)
 np.set_printoptions(precision=3, suppress=True)
 
 
-def enet_cvx_py(X, y, alpha, idx_train, idx_val):
+def enet_cvx_py(X, y, alpha_lambda, idx_train, idx_val):
     N, n = X.shape
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [
@@ -41,15 +41,11 @@ def enet_cvx_py(X, y, alpha, idx_train, idx_val):
 
     # sweep over values of alpha, holding lambda=0, evaluating the gradient
     # along the way
-    # alphas = [1., 1.]
-    # alphas = np.logspace(-3, 2, 200)
+
     test_losses = []
-    grads = []
-    # for alpha_vals in alphas:
-    # print(alpha_vals)
-    alpha_vals = 1.
+
     alpha_lambda_tch = torch.tensor(
-        [alpha_vals, alpha_vals], requires_grad=True)
+        alpha_lambda, requires_grad=True)
     alpha_lambda_tch.grad = None
     a_tch, b_tch = fit_lr(
         Xtrain, ytrain, alpha_lambda_tch[0], alpha_lambda_tch[1])
