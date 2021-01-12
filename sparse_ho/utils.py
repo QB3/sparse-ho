@@ -200,9 +200,12 @@ class Monitor():
         self.log_alphas = []
         self.grads = []
         self.callback = callback
+        self.acc_vals = []
+        self.all_betas = []
 
     def __call__(
-            self, obj, grad, mask=None, dense=None, log_alpha=None):
+            self, obj, grad, mask=None, dense=None, log_alpha=None,
+            acc_val=None, acc_test=None):
         self.objs.append(obj)
         try:
             self.log_alphas.append(log_alpha.copy())
@@ -212,6 +215,10 @@ class Monitor():
         self.grads.append(grad)
         if self.callback is not None:
             self.callback(obj, grad, mask, dense, log_alpha)
+        if acc_val is not None:
+            self.acc_vals.append(acc_val)
+        if acc_test is not None:
+            self.acc_vals.append(acc_test)
 
 
 class WarmStart():

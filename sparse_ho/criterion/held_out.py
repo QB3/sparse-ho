@@ -34,18 +34,22 @@ class HeldOutMSE(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense):
         """Compute the MSE on the validation set."""
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
+        # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
             compute_jac=False)
-        return self.get_val_outer(mask, dense)
+        value_outer = self.get_val_outer(
+            X[self.idx_val, :], y[self.idx_val], mask, dense)
+        if monitor is not None:
+            monitor(value_outer, None, log_alpha=log_alpha)
+        return value_outer
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
@@ -63,6 +67,9 @@ class HeldOutMSE(BaseCriterion):
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
+
+        # assert isinstance(quantity_to_warm_start, np.ndarray)
+
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
@@ -98,7 +105,6 @@ class HeldOutLogistic(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
@@ -106,14 +112,17 @@ class HeldOutLogistic(BaseCriterion):
         val /= X.shape[0]
         return val
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
         # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol,
             compute_jac=False)
-        return self.get_val_outer(
+        val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+        if monitor is not None:
+            monitor(val, None, mask, dense, log_alpha)
+        return val
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
@@ -174,7 +183,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.mask0 = None
         self.dense0 = None
         self.quantity_to_warm_start = None
-        self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense):
         if X is None or y is None:
