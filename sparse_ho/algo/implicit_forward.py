@@ -27,7 +27,6 @@ class ImplicitForward():
         self.verbose = verbose
         self.use_stop_crit = use_stop_crit
 
-
     def get_beta_jac(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,

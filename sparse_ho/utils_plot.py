@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-
 def configure_plt():
     params = {'axes.labelsize': 12,
               'font.size': 12,
@@ -32,6 +31,7 @@ def plot_legend_apart(ax, figname, ncol=None):
     fig.savefig(figname)
     os.system("pdfcrop %s %s" % (figname, figname))
     return fig
+
 
 def discrete_cmap(N, base_cmap=None):
     """Create an N-bin discrete colormap from the specified input map"""
