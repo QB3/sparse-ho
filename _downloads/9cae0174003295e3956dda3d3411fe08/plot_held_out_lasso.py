@@ -95,7 +95,7 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward(criterion)
+algo = ImplicitForward()
 monitor_grad = Monitor()
 optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(

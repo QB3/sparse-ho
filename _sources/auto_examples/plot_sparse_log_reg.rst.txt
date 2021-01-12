@@ -178,7 +178,7 @@ Grid-search
     Iteration 29 / 30
     Iteration 30 / 30
     scikit finished
-    Time to compute CV for scikit-learn: 0.99
+    Time to compute CV for scikit-learn: 0.91
 
 
 
@@ -258,7 +258,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute CV for sparse-ho: 1.15
+    Time to compute CV for sparse-ho: 1.14
 
 
 
@@ -266,7 +266,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.577 seconds)
+   **Total running time of the script:** ( 0 minutes  2.456 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
