@@ -34,21 +34,13 @@ dict_log_alpha = {}
 dict_log_alpha["lasso"] = log_alpha
 
 
-def get_v(mask, dense):
-    return 2 * (X[np.ix_(idx_val, mask)].T @ (
-        X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
-
-
-estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True)
-
-
 models = {}
 models["lasso"] = Lasso(estimator=None)
 # models["lasso_custom"] = Lasso(estimator=estimator)
 
 
-val_cvxpy, grad_cvxpy = enet_cvx_py(X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
+val_cvxpy, grad_cvxpy = enet_cvx_py(
+    X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
 grad_cvxpy *= np.exp(log_alpha)
 grad_cvxpy = grad_cvxpy[0]
 
@@ -57,9 +49,10 @@ list_algos = [
     ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
     Backward()]
 
-@pytest.mark.pararmetrize('algo', list_algos)
+
 @pytest.mark.parametrize('model', list(models.keys()))
 @pytest.mark.parametrize('criterion', ['MSE'])
+@pytest.mark.pararmetrize('algo', list_algos)
 def test_val_grad_mse(model, criterion, algo):
 
     if criterion == 'MSE':
@@ -77,7 +70,6 @@ def test_val_grad_mse(model, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    import ipdb; ipdb.set_trace()
     np.testing.assert_allclose(val, val_cvxpy, rtol=1e-5)
     np.testing.assert_allclose(grad, grad_cvxpy, rtol=1e-5)
 
