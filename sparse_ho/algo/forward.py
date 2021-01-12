@@ -11,8 +11,9 @@ class Forward():
     verbose: bool
     """
 
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=False, use_stop_crit=True):
         self.verbose = verbose
+        self.use_stop_crit = use_stop_crit
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
@@ -21,8 +22,9 @@ class Forward():
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=100, tol=tol,  # TODO replace 100 by better value
-            compute_jac=compute_jac, verbose=self.verbose)
+            max_iter=max_iter, tol=tol,
+            compute_jac=compute_jac, verbose=self.verbose,
+            use_stop_crit=self.use_stop_crit)
         if jac is not None:
             jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
             if full_jac_v:
@@ -35,7 +37,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
-        save_iterates=False, verbose=False):
+        save_iterates=False, verbose=False, use_stop_crit=True):
     """
     Parameters
     --------------
@@ -66,6 +68,8 @@ def get_beta_jac_iterdiff(
     return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way
+    use_stop_crit: bool
+        use a stopping criterion or do all the iterations
     """
     n_samples, n_features = X.shape
     is_sparse = issparse(X)
@@ -122,8 +126,10 @@ def get_beta_jac_iterdiff(
         if i > 1:
             if verbose:
                 print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
-        if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
-            break
+
+        if use_stop_crit:
+            if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
+                break
         if return_all:
             list_beta.append(beta.copy())
         if save_iterates:

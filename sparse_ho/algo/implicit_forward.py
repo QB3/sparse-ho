@@ -20,11 +20,12 @@ class ImplicitForward():
 
     def __init__(
             self, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
-            verbose=False):
+            verbose=False, use_stop_crit=True):
         self.max_iter = max_iter
         self.tol_jac = tol_jac
         self.n_iter_jac = n_iter_jac
         self.verbose = verbose
+        self.use_stop_crit = use_stop_crit
 
     def get_beta_jac(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
@@ -46,8 +47,9 @@ class ImplicitForward():
             X, y, log_alpha, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             # tol_jac=self.tol_jac,
-            tol_jac=tol, tol=tol, niter_jac=self.n_iter_jac, model=model,
-            max_iter=self.max_iter, verbose=self.verbose)
+            tol_jac=self.tol_jac, tol=tol, niter_jac=self.n_iter_jac,
+            model=model, max_iter=self.max_iter, verbose=self.verbose,
+            use_stop_crit=self.use_stop_crit)
         jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
@@ -56,12 +58,13 @@ class ImplicitForward():
 
 def get_beta_jac_fast_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
-        tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False):
+        tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False,
+        use_stop_crit=True):
 
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0, jac0=jac0, tol=tol,
-        max_iter=max_iter, compute_jac=False, model=model, verbose=verbose)
-
+        max_iter=max_iter, compute_jac=False, model=model, verbose=verbose,
+        use_stop_crit=use_stop_crit)
     dbeta0_new = model._init_dbeta0(mask, mask0, jac0)
     reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
@@ -69,13 +72,16 @@ def get_beta_jac_fast_iterdiff(
     jac = get_only_jac(
         model.reduce_X(X, mask), model.reduce_y(y, mask), r, reduce_alpha,
         model.sign(dense, log_alpha), dbeta=dbeta0_new, niter_jac=niter_jac,
-        tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose)
+        tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose,
+        use_stop_crit=use_stop_crit)
+
     return mask, dense, jac
 
 
 def get_only_jac(
         Xs, y, r, alpha, sign_beta, dbeta=None, niter_jac=100, tol_jac=1e-4,
-        model="lasso", mask=None, dense=None, verbose=False):
+        model="lasso", mask=None, dense=None, verbose=False,
+        use_stop_crit=True):
     n_samples, n_features = Xs.shape
 
     is_sparse = issparse(Xs)
@@ -103,7 +109,8 @@ def get_only_jac(
             model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, r, dr,
                               alpha))
 
-        if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
-            break
+        if use_stop_crit and i > 1:
+            if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
+                break
 
     return dbeta
