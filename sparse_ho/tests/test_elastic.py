@@ -14,6 +14,8 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 
 from sparse_ho.optimizers import LineSearch
+from sparse_ho.wrap_cvxpylayer import enet_cvx_py
+
 
 n_samples = 100
 n_features = 100
@@ -27,8 +29,8 @@ X, y, beta_star, noise, sigma_star = get_synt_data(
     SNR=SNR, seed=0)
 X_s = csc_matrix(X)
 
-idx_train = np.arange(0, 50)
-idx_val = np.arange(50, 100)
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
 
 alpha_max = (np.abs(X[idx_train, :].T @ y[idx_train])).max() / n_samples
 
@@ -36,7 +38,7 @@ tol = 1e-16
 
 p_alpha = 0.7
 alpha_1 = p_alpha * alpha_max
-alpha_2 = 0.01
+alpha_2 = alpha_1 / 10
 log_alpha1 = np.log(alpha_1)
 log_alpha2 = np.log(alpha_2)
 max_iter = 100
@@ -94,23 +96,29 @@ def test_val_grad():
     # Not all methods computes the full Jacobian, but all
     # compute the gradients
     # check that the gradient returned by all methods are the same
+    log_alpha_init = np.array([log_alpha1, log_alpha2])
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
-        model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        model, X, y, log_alpha_init, algo.get_beta_jac_v,
         tol=tol)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-        model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        model, X, y, log_alpha_init, algo.get_beta_jac_v,
         tol=tol)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
     val_imp_fwd_custom, grad_imp_fwd_custom = criterion.get_val_grad(
-        model, X, y, np.array([log_alpha1, log_alpha2]), algo.get_beta_jac_v,
+        model, X, y, log_alpha_init, algo.get_beta_jac_v,
         tol=tol)
+
+    grad_cvx = enet_cvx_py(X, y, np.exp(log_alpha_init), idx_train, idx_val)
+    grad_cvx *= np.exp(log_alpha_init)
+
+    np.testing.assert_allclose(grad_cvx, grad_imp_fwd_custom)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Implicit()
@@ -177,7 +185,7 @@ def test_grad_search():
 
 
 if __name__ == '__main__':
-    test_beta_jac()
+    # test_beta_jac()
     test_val_grad()
-    test_grad_search()
-    test_beta_jac_custom()
+    # test_grad_search()
+    # test_beta_jac_custom()
