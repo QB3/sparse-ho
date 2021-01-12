@@ -118,6 +118,7 @@ def test_val_grad():
     grad_cvx = enet_cvx_py(X, y, np.exp(log_alpha_init), idx_train, idx_val)
     grad_cvx *= np.exp(log_alpha_init)
 
+    import ipdb; ipdb.set_trace()
     np.testing.assert_allclose(grad_cvx, grad_imp_fwd_custom)
 
     criterion = HeldOutMSE(idx_train, idx_val)
