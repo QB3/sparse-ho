@@ -57,7 +57,7 @@ def get_v(mask, dense):
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = {}
-# models_custom["lasso"] = Lasso(estimator=estimator)
+models_custom["lasso"] = Lasso(estimator=estimator)
 models_custom["wlasso"] = WeightedLasso(estimator=estimator)
 
 
