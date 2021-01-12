@@ -15,9 +15,11 @@ from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
 from sparse_ho import Backward
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
+from sparse_ho.wrap_cvxpylayer import enet_cvx_py
 
-n_samples = 100
-n_features = 100
+
+n_samples = 10
+n_features = 10
 n_active = 5
 SNR = 3
 rho = 0.1
@@ -28,8 +30,8 @@ X, y, beta_star, noise, sigma_star = get_synt_data(
     SNR=SNR, seed=0)
 X_s = csc_matrix(X)
 
-idx_train = np.arange(0, 50)
-idx_val = np.arange(50, 100)
+idx_train = np.arange(0, n_features//2)
+idx_val = np.arange(n_features//2, n_features)
 
 alpha_max = (np.abs(X[idx_train, :].T @ y[idx_train])).max() / n_samples
 p_alpha = 0.8
@@ -113,9 +115,19 @@ def test_beta_jac2(model):
     assert np.allclose(jac, jac_custom)
 
 
+grad_cvxpy = enet_cvx_py(X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
+grad_cvxpy *= np.exp(log_alpha)
+grad_cvxpy = grad_cvxpy[0]
+
+list_algos = [
+    Forward(),
+    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
+    Backward()]
+
+@pytest.mark.pararmetrize('algo', list_algos)
 @pytest.mark.parametrize('model', list(models.keys()))
-@pytest.mark.parametrize('criterion', ['MSE', 'SURE'])
-def test_val_grad_mse(model, criterion):
+@pytest.mark.parametrize('criterion', ['MSE'])
+def test_val_grad_mse(model, criterion, algo):
 
     if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
@@ -129,39 +141,15 @@ def test_val_grad_mse(model, criterion):
     log_alpha = dict_log_alpha[model]
     model = models[model]
 
-    algo = Forward()
-    val_fwd, grad_fwd = criterion.get_val_grad(
+    val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    algo = ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)
-    val_imp_fwd, grad_imp_fwd = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-    algo = Backward()
-    val_bwd, grad_bwd = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-    assert np.allclose(val_fwd, val_imp_fwd)
-    assert np.allclose(grad_fwd, grad_imp_fwd)
-    # assert np.allclose(val_bwd, val_fwd)
-    # assert np.allclose(val_bwd, val_imp_fwd)
-    assert np.allclose(grad_fwd, grad_imp_fwd)
-
-    if model == 'wlasso':
-        return
-
-    # # there are compilationpb with numba
-    # assert np.allclose(grad_fwd, grad_bwd, rtol=1e-3)
-
-    algo = Implicit()
-    val_imp, grad_imp = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
-    assert np.allclose(val_imp_fwd, val_imp)
-    assert np.allclose(grad_imp_fwd, grad_imp, atol=1e-3)
+    import ipdb; ipdb.set_trace()
+    np.testing.assert_allclose(grad, grad_cvxpy, rtol=1e-5)
 
 
 if __name__ == "__main__":
-    for model in models:
-        for criterion in ['MSE', 'SURE']:
-            test_val_grad_mse(model, criterion)
+    for algo in list_algos:
+        for model in models:
+            for criterion in ['MSE', 'SURE']:
+                test_val_grad_mse(model, criterion, algo)

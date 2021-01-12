@@ -4,7 +4,7 @@ import torch
 from cvxpylayers.torch import CvxpyLayer
 
 torch.set_default_dtype(torch.double)
-np.set_printoptions(precision=3, suppress=True)
+# np.set_printoptions(precision=3, suppress=True)
 
 
 def enet_cvx_py(X, y, lambda_alpha, idx_train, idx_val):
@@ -42,8 +42,6 @@ def enet_cvx_py(X, y, lambda_alpha, idx_train, idx_val):
     # sweep over values of alpha, holding lambda=0, evaluating the gradient
     # along the way
 
-    test_losses = []
-
     lambda_alpha_tch = torch.tensor(
         lambda_alpha, requires_grad=True)
     lambda_alpha_tch.grad = None
@@ -52,7 +50,8 @@ def enet_cvx_py(X, y, lambda_alpha, idx_train, idx_val):
 
     test_loss = (Xtest @ a_tch[0] - ytest).pow(2).mean()
     test_loss.backward()
-    test_losses.append(test_loss.item())
+    # test_losses.append(test_loss.item())
     grad_alpha_lambda = lambda_alpha_tch.grad
-    # grads.append(grad_alpha_lambda)
-    return np.array(grad_alpha_lambda)
+    val = test_loss.detach().numpy()
+    grad = np.array(grad_alpha_lambda)
+    return val, grad
