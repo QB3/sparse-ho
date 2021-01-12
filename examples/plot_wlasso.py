@@ -89,7 +89,7 @@ model = WeightedLasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
 monitor = Monitor()
-optimizer = LineSearch(n_outer=20, tol=1e-6)
+optimizer = LineSearch(n_outer=20, tol=1e-6, verbose=True)
 grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 ##############################################################################
 
