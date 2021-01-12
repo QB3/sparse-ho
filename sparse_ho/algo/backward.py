@@ -35,6 +35,8 @@ class Backward():
 
         if not full_jac_v:
             jac_v = model.get_mask_jac_v(mask, jac_v)
+
+        jac_v = np.atleast_1d(jac_v)
         return mask, dense, jac_v, jac_v
 
 

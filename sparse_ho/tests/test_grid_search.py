@@ -6,7 +6,7 @@ from sparse_ho.utils import Monitor
 from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
 from sparse_ho import Forward
-from sparse_ho.criterion import HeldOutMSE, SmoothedSURE
+from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
 from sparse_ho.grid_search import grid_search
 
 
@@ -69,7 +69,7 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(estimator=estimator)
 
-    criterion = SmoothedSURE(sigma=sigma_star)
+    criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_grid, _ = grid_search(
         algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
@@ -77,7 +77,7 @@ def test_grid_search():
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
-    criterion = SmoothedSURE(sigma=sigma_star)
+    criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
     algo = Forward()
     log_alpha_opt_random, _ = grid_search(
         algo, criterion, model, X, y, log_alpha_min, log_alpha_max,

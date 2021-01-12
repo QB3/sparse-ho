@@ -90,7 +90,9 @@ def get_beta_jac_t_v_implicit(
             - model.restrict_full_supp(
                 X_train, y_train, mask, dense, v, log_alpha),
             x0=sol0, atol=1e-3)
+
     sol_lin_sys = sol[0]
+
     jac_t_v = model._get_jac_t_v(
         X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(),
         n_samples)
