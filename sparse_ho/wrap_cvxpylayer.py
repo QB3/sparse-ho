@@ -2,44 +2,9 @@ import cvxpy as cp
 import numpy as np
 import torch
 from cvxpylayers.torch import CvxpyLayer
-# from sklearn.model_selection import train_test_split
 
 torch.set_default_dtype(torch.double)
 np.set_printoptions(precision=3, suppress=True)
-
-
-# torch.manual_seed(0)
-# np.random.seed(0)
-# n = 2
-# N = 60
-# X, y = make_blobs(N, n, centers=np.array([[2, 2], [-2, -2]]), cluster_std=3)
-# Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=.5)
-
-# Xtrain, Xtest, ytrain, ytest = map(
-#     torch.from_numpy, [Xtrain, Xtest, ytrain, ytest])
-# Xtrain.requires_grad_(True)
-# m = Xtrain.shape[0]
-
-# a = cp.Variable((n, 1))
-# b = cp.Variable((1, 1))
-# X = cp.Parameter((m, n))
-# Y = ytrain.numpy()[:, np.newaxis]
-
-# log_likelihood = (1. / m) * cp.sum(
-#     cp.multiply(Y, X @ a + b) - cp.logistic(X @ a + b)
-# )
-# regularization = - 0.1 * cp.norm(a, 1) - 0.1 * cp.sum_squares(a)
-# prob = cp.Problem(cp.Maximize(log_likelihood + regularization))
-# fit_logreg = CvxpyLayer(prob, [X], [a, b])
-
-# torch.manual_seed(0)
-# np.random.seed(0)
-# n = 1
-# N = 60
-# X = np.random.randn(N, n)
-# theta = np.random.randn(n)
-# y = X @ theta + .5 * np.random.randn(N)
-# Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=.5)
 
 
 def enet_cvx_py(X, y, alpha, idx_train, idx_val):
@@ -74,7 +39,6 @@ def enet_cvx_py(X, y, alpha, idx_train, idx_val):
     # this object is now callable with pytorch tensors
     fit_lr(Xtrain, ytrain, torch.zeros(1), torch.zeros(1))
 
-
     # sweep over values of alpha, holding lambda=0, evaluating the gradient
     # along the way
     # alphas = [1., 1.]
@@ -92,5 +56,6 @@ def enet_cvx_py(X, y, alpha, idx_train, idx_val):
     test_loss = (Xtest @ a_tch.flatten() + b_tch - ytest).pow(2).mean()
     test_loss.backward()
     test_losses.append(test_loss.item())
-    grad_alpha_lmabda = alpha_lambda_tch.grad
-    grads.append(grad_alpha_lmabda)
+    grad_alpha_lambda = alpha_lambda_tch.grad
+    # grads.append(grad_alpha_lambda)
+    return grad_alpha_lambda
