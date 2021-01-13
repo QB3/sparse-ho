@@ -39,6 +39,7 @@ alpha_max = (np.abs(X[idx_train, :].T @ y[idx_train])).max() / n_samples
 p_alpha = 0.8
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
+log_alpha_max = np.log(alpha_max)
 tol = 1e-16
 
 # Set alpha1 alpha2 for the enet
@@ -192,9 +193,67 @@ def test_val_grad(model_name, criterion, algo):
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
+# @pytest.mark.parametrize('algo', list_algos)
+# def test_check_grad_sparseho(model_name, criterion, algo):
+#     """Check that all methods return the same gradient, comparing to cvxpylayer
+#     """
+#     if criterion == 'MSE':
+#         criterion = HeldOutMSE(idx_train, idx_val)
+#     elif criterion == 'SURE':
+#         criterion = FiniteDiffMonteCarloSure(sigma_star)
+#     elif criterion == 'logistic':
+#         criterion = HeldOutLogistic(idx_train, idx_val)
+
+#     model = models[model_name]
+
+#     def get_val(log_alpha):
+#         # import ipdb; ipdb.set_trace()
+#         val, grad = criterion.get_val_grad(
+#             model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
+#         return val
+
+#     def get_grad(log_alpha):
+#         # import ipdb; ipdb.set_trace()
+#         val, grad = criterion.get_val_grad(
+#             model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
+#         return grad
+
+#     from scipy.optimize import check_grad
+
+#     print("Check grad sparse ho")
+#     list_log_alphas = np.log(np.geomspace(alpha_max/4, alpha_max/40, num=5))
+#     for log_alpha in list_log_alphas:
+#         print(check_grad(get_val, get_grad, [log_alpha]))
+
+
+# def check_grad_logreg_cvxpy():
+
+#     def get_val(alpha):
+#         val_cvxpy, grad_cvxpy = logreg_cvxpy(
+#             X, y, np.exp(dict_log_alpha["logreg"]), idx_train, idx_val)
+#         return val_cvxpy
+
+#     def get_grad(alpha):
+#         val_cvxpy, grad_cvxpy = logreg_cvxpy(
+#             X, y, np.exp(dict_log_alpha["logreg"]), idx_train, idx_val)
+#         return grad_cvxpy
+
+#     from scipy.optimize import check_grad
+
+#     print("Check grad cvxpy")
+#     # list_log_alphas = np.log(np.geomspace(alpha_max, alpha_max/10, num=5))
+#     list_alphas = np.geomspace(alpha_max, alpha_max/10, num=5)
+#     for alpha in list_alphas:
+#         print(check_grad(get_val, get_grad, [alpha]))
+
+
 if __name__ == "__main__":
+    print("#######################################################")
     for algo in list_algos:
-        test_val_grad('logreg', 'logistic', algo)
+        print("################################")
+        test_check_grad_sparseho('logreg', 'logistic', algo)
+    print("#######################################################")
+    check_grad_logreg_cvxpy()
     #     for model_name in models.keys():
     #         test_val_grad(model_name, 'logistic', algo)
     # for key in list(custom_models.keys()):
