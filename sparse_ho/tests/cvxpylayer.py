@@ -16,13 +16,11 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
 
     # set up variables and parameters
     beta = cp.Variable(n)
-    X = cp.Parameter((m, n))
-    Y = cp.Parameter(m)
     lambda_cp = cp.Parameter(nonneg=True)
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = (1/(2 * m)) * cp.sum(cp.square(X @ beta - Y))
+    loss = (1/(2 * m)) * cp.sum(cp.square(Xtrain @ beta - ytrain))
     reg = lambda_cp * cp.norm1(beta) + alpha_cp * cp.sum_squares(beta) / 2
     objective = loss + reg
 
@@ -31,9 +29,9 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, [X, Y, lambda_cp, alpha_cp], [beta])
+    layer = CvxpyLayer(problem, [lambda_cp, alpha_cp], [beta])
     lambda_alpha_th = torch.tensor(lambda_alpha, requires_grad=True)
-    beta_, = layer(Xtrain, ytrain, lambda_alpha_th[0], lambda_alpha_th[1])
+    beta_, = layer(lambda_alpha_th[0], lambda_alpha_th[1])
 
     # get test loss and it's gradient
     test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
@@ -53,12 +51,10 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
 
     # set up variables and parameters
     beta = cp.Variable(n)
-    X = cp.Parameter((m, n))
-    Y = cp.Parameter(m)
     lambda_cp = cp.Parameter(shape=n, nonneg=True)
 
     # set up objective
-    loss = (1/(2 * m)) * cp.sum(cp.square(X @ beta - Y))
+    loss = (1/(2 * m)) * cp.sum(cp.square(Xtrain @ beta - ytrain))
     reg = lambda_cp @ cp.abs(beta)
     objective = loss + reg
 
@@ -67,9 +63,9 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, [X, Y, lambda_cp], [beta])
+    layer = CvxpyLayer(problem, [lambda_cp], [beta])
     lambdas_th = torch.tensor(lambdas, requires_grad=True)
-    beta_, = layer(Xtrain, ytrain, lambdas_th)
+    beta_, = layer(lambdas_th)
 
     # get test loss and it's gradient
     test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
@@ -94,7 +90,7 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = cp.sum(cp.logistic(X @ beta) - cp.multiply(y, X @ beta)) / m
+    loss = cp.sum(cp.logistic(Xtrain @ beta) - cp.multiply(ytrain, Xtrain @ beta)) / m
     reg = alpha_cp * cp.norm(beta, 1)
     objective = loss + reg
 
