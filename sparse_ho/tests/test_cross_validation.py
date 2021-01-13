@@ -1,3 +1,6 @@
+# XXX: move to test criterion
+
+
 import numpy as np
 import sklearn
 from sklearn.model_selection import KFold

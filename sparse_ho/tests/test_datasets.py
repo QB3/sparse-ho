@@ -1,3 +1,5 @@
+# XXX: remove dataset submodule: use libsvm or celer
+
 import numpy as np
 
 from sparse_ho.datasets.real import get_data

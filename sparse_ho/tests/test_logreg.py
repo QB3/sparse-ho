@@ -1,3 +1,6 @@
+# XXX: same as test regressors
+# TODO logreg avec cvxpy
+
 import numpy as np
 import pytest
 from sklearn import datasets

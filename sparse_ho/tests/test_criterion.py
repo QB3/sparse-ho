@@ -29,6 +29,10 @@ model = Lasso(estimator=estimator)
 
 log_alphas = np.log(np.geomspace(alpha_max, alpha_max / 100))
 
+# TODO list_criterions = [...]
+# test val from get_val_grad === get_val
+# verify dtype from criterion, bonne shape
+
 
 def test_cross_val_criterion():
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
