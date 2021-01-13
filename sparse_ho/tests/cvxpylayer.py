@@ -180,6 +180,7 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
 
 from sparse_ho.datasets.synthetic import get_synt_data
 
+
 # Generate data
 n_samples = 10
 n_features = 10
