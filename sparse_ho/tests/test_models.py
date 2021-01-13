@@ -1,6 +1,7 @@
 # TODO make Backward in the test
 # TODO add test for the logreg (in another file)
 # TODO include tests for the wLasso with custom solver
+# TODO add logreg and SVM here?
 import pytest
 from scipy.sparse import csc_matrix
 
