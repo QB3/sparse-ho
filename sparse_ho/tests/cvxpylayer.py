@@ -122,8 +122,9 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     log_likelihood = cp.sum(
         cp.logistic(X @ beta) - cp.multiply(y, X @ beta)
     )
-    problem = cp.Problem(cp.Minimize(log_likelihood / m + lambd * cp.norm(
-        beta, 1)))
+    loss = log_likelihood / m
+    reg = lambd * cp.norm(beta, 1)
+    problem = cp.Problem(cp.Minimize(loss + reg))
     # problem = cp.Problem(objective)
     assert problem.is_dpp()
     cvxpylayer = CvxpyLayer(problem, parameters=[lambd], variables=[beta])
