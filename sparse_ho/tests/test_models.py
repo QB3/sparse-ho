@@ -1,3 +1,4 @@
+# TODO include test for the wLasso here
 import pytest
 from scipy.sparse import csc_matrix
 
@@ -6,8 +7,7 @@ from sklearn import linear_model
 import celer
 
 from sparse_ho.datasets.synthetic import get_synt_data
-from sparse_ho.models import Lasso
-from sparse_ho.models import ElasticNet
+from sparse_ho.models import Lasso, ElasticNet, WeightedLasso
 
 from sparse_ho import Forward
 from sparse_ho import ImplicitForward
@@ -17,7 +17,7 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
-from sparse_ho.wrap_cvxpylayer import enet_cvx_py
+from sparse_ho.wrap_cvxpylayer import enet_cvxpy, wLasso_cvxpy
 
 
 # Generate data
@@ -47,11 +47,14 @@ log_alpha2 = np.log(alpha_2)
 dict_log_alpha = {}
 dict_log_alpha["lasso"] = log_alpha
 dict_log_alpha["enet"] = np.array([log_alpha1, log_alpha2])
+tab = np.linspace(1, 1000, n_features)
+dict_log_alpha["wLasso"] = log_alpha + np.log(tab / tab.max())
 
 # Set models to be tested
 models = {}
 models["lasso"] = Lasso(estimator=None)
 models["enet"] = ElasticNet(estimator=None)
+models["wLasso"] = WeightedLasso(estimator=None)
 custom_models = {}
 custom_models["lasso"] = Lasso(estimator=celer.Lasso(
     warm_start=True, fit_intercept=False))
@@ -65,22 +68,6 @@ list_algos = [
 # Backward()]
 # TODO make Backward pass
 # TODO add test for the logreg
-
-
-# Compute "ground truth" with cvxpylayer
-dict_vals_cvxpy = {}
-dict_grads_cvxpy = {}
-val_cvxpy, grad_cvxpy = enet_cvx_py(
-    X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
-dict_vals_cvxpy["lasso"] = val_cvxpy
-grad_cvxpy *= np.exp(log_alpha)
-grad_cvxpy = grad_cvxpy[0]
-dict_grads_cvxpy["lasso"] = grad_cvxpy
-val_cvxpy, grad_cvxpy = enet_cvx_py(
-    X, y, np.exp(dict_log_alpha["enet"]), idx_train, idx_val)
-dict_vals_cvxpy["enet"] = val_cvxpy
-grad_cvxpy *= np.exp(dict_log_alpha["enet"])
-dict_grads_cvxpy["enet"] = grad_cvxpy
 
 
 def get_v(mask, dense):
@@ -135,6 +122,27 @@ def test_beta_jac_custom(key):
     assert np.allclose(jac, jac_custom)
 
 
+# Compute "ground truth" with cvxpylayer
+dict_vals_cvxpy = {}
+dict_grads_cvxpy = {}
+val_cvxpy, grad_cvxpy = enet_cvxpy(
+    X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
+dict_vals_cvxpy["lasso"] = val_cvxpy
+grad_cvxpy *= np.exp(log_alpha)
+grad_cvxpy = grad_cvxpy[0]
+dict_grads_cvxpy["lasso"] = grad_cvxpy
+val_cvxpy, grad_cvxpy = enet_cvxpy(
+    X, y, np.exp(dict_log_alpha["enet"]), idx_train, idx_val)
+dict_vals_cvxpy["enet"] = val_cvxpy
+grad_cvxpy *= np.exp(dict_log_alpha["enet"])
+dict_grads_cvxpy["enet"] = grad_cvxpy
+val_cvxpy, grad_cvxpy = wLasso_cvxpy(
+    X, y, np.exp(dict_log_alpha["wLasso"]), idx_train, idx_val)
+dict_vals_cvxpy["wLasso"] = val_cvxpy
+grad_cvxpy *= np.exp(dict_log_alpha["wLasso"])
+dict_grads_cvxpy["wLasso"] = grad_cvxpy
+
+
 @pytest.mark.parametrize('model_name', list(models.keys()))
 @pytest.mark.parametrize('criterion', ['MSE'])
 @pytest.mark.parametrize('algo', list_algos)
@@ -152,8 +160,8 @@ def test_val_grad_mse(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, rtol=1e-5)
-    np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, rtol=1e-5)
+    np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-6)
+    np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
 if __name__ == "__main__":
@@ -163,3 +171,5 @@ if __name__ == "__main__":
                 test_val_grad_mse(model, criterion, algo)
     for key in list(custom_models.keys()):
         test_beta_jac_custom(key)
+    for key in list(models.keys()):
+        test_beta_jac(key)
