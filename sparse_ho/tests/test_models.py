@@ -74,8 +74,9 @@ custom_models["logreg"] = SparseLogreg(
 list_algos = [
     Forward(),
     ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
-    Implicit()]
-# Backward()]
+    Implicit(),
+    # Backward()  # XXX to fix
+]
 
 
 def get_v(mask, dense):
@@ -85,9 +86,7 @@ def get_v(mask, dense):
 
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac(key):
-    """
-    Tests that the algorithms computing the Jacobian return the same Jacobian
-    """
+    """Tests that algorithms computing the Jacobian return the same Jacobian"""
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
         X, y, dict_log_alpha[key], tol=tol, model=models[key])
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
@@ -117,8 +116,7 @@ def test_beta_jac(key):
 
 @pytest.mark.parametrize('key', list(custom_models.keys()))
 def test_beta_jac_custom(key):
-    """Check that using sk or celer yields the same solution as sparse ho
-    """
+    """Check that using sk or celer yields the same solution as sparse ho"""
     supp, dense, jac = get_beta_jac_fast_iterdiff(
         X_s, y, dict_log_alpha[key],
         tol=tol, model=models[key], tol_jac=tol)
@@ -195,8 +193,7 @@ def test_val_grad(model_name, criterion, algo):
 
 @pytest.mark.parametrize('algo', list_algos)
 def test_check_grad_sparseho(model_name, criterion, algo):
-    """Check that all methods return the same gradient, comparing to cvxpylayer
-    """
+    """Check that all methods return a good gradient using check_grad"""
     if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
     elif criterion == 'SURE':
@@ -241,8 +238,7 @@ def check_grad_logreg_cvxpy():
     from scipy.optimize import check_grad
 
     print("Check grad cvxpy")
-    # list_log_alphas = np.log(np.geomspace(alpha_max, alpha_max/10, num=5))
-    list_alphas = np.geomspace(alpha_max, alpha_max/10, num=5)
+    list_alphas = np.geomspace(alpha_max, alpha_max / 10, num=5)
     for alpha in list_alphas:
         print(check_grad(get_val, get_grad, [alpha]))
 

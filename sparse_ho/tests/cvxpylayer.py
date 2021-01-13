@@ -12,16 +12,18 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
         torch.from_numpy, [
             X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
 
-    m, n = Xtrain.shape
+    n_samples_train, n_features = Xtrain.shape
 
     # set up variables and parameters
-    beta = cp.Variable(n)
+    beta_cp = cp.Variable(n_features)
     lambda_cp = cp.Parameter(nonneg=True)
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = (1/(2 * m)) * cp.sum(cp.square(Xtrain @ beta - ytrain))
-    reg = lambda_cp * cp.norm1(beta) + alpha_cp * cp.sum_squares(beta) / 2
+    loss = ((1 / (2 * n_samples_train)) *
+            cp.sum(cp.square(Xtrain @ beta_cp - ytrain)))
+    reg = (lambda_cp * cp.norm1(beta_cp) +
+           alpha_cp * cp.sum_squares(beta_cp) / 2)
     objective = loss + reg
 
     # define problem
@@ -29,7 +31,7 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, [lambda_cp, alpha_cp], [beta])
+    layer = CvxpyLayer(problem, [lambda_cp, alpha_cp], [beta_cp])
     lambda_alpha_th = torch.tensor(lambda_alpha, requires_grad=True)
     beta_, = layer(lambda_alpha_th[0], lambda_alpha_th[1])
 
@@ -47,15 +49,16 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
         torch.from_numpy, [
             X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
 
-    m, n = Xtrain.shape
+    n_samples_train, n_features = Xtrain.shape
 
     # set up variables and parameters
-    beta = cp.Variable(n)
-    lambda_cp = cp.Parameter(shape=n, nonneg=True)
+    beta_cp = cp.Variable(n_features)
+    lambdas_cp = cp.Parameter(shape=n_features, nonneg=True)
 
     # set up objective
-    loss = (1/(2 * m)) * cp.sum(cp.square(Xtrain @ beta - ytrain))
-    reg = lambda_cp @ cp.abs(beta)
+    loss = ((1 / (2 * n_samples_train)) *
+            cp.sum(cp.square(Xtrain @ beta_cp - ytrain)))
+    reg = lambdas_cp @ cp.abs(beta_cp)
     objective = loss + reg
 
     # define problem
@@ -63,7 +66,7 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, [lambda_cp], [beta])
+    layer = CvxpyLayer(problem, [lambdas_cp], [beta_cp])
     lambdas_th = torch.tensor(lambdas, requires_grad=True)
     beta_, = layer(lambdas_th)
 
@@ -82,10 +85,10 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
         torch.from_numpy, [
             X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
 
-    n_samples_train, n = Xtrain.shape
+    n_samples_train, n_features = Xtrain.shape
 
     # set up variables and parameters
-    beta_cp = cp.Variable(n)
+    beta_cp = cp.Variable(n_features)
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
