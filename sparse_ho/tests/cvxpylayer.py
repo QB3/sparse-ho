@@ -82,17 +82,18 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
         torch.from_numpy, [
             X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
 
-    m, n = Xtrain.shape
+    n_samples_train, n = Xtrain.shape
 
     # set up variables and parameters
-    beta = cp.Variable(n)
+    beta_cp = cp.Variable(n)
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = cp.sum(cp.logistic(cp.multiply(-ytrain, Xtrain @ beta))) / m
-    # loss = cp.sum(cp.logistic(Xtrain @ beta) -
-    #               cp.multiply(ytrain, Xtrain @ beta)) / m
-    reg = alpha_cp * cp.norm(beta, 1)
+    loss = cp.sum(
+        cp.logistic(cp.multiply(-ytrain, Xtrain @ beta_cp))) / n_samples_train
+    # loss = cp.sum(cp.logistic(Xtrain @ beta_cp) -
+    #               cp.multiply(ytrain, Xtrain @ beta_cp)) / n_samples_train
+    reg = alpha_cp * cp.norm(beta_cp, 1)
     objective = loss + reg
 
     # define problem
@@ -100,7 +101,7 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, parameters=[alpha_cp], variables=[beta])
+    layer = CvxpyLayer(problem, parameters=[alpha_cp], variables=[beta_cp])
     alpha_th = torch.tensor(alpha, requires_grad=True)
     beta_, = layer(alpha_th)
 
