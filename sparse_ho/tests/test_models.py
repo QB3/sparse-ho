@@ -228,13 +228,13 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     for log_alpha in list_log_alphas:
         grad_error = check_grad(get_val, get_grad, [log_alpha])
         print("grad_error %f" % grad_error)
-        assert grad_error < 1.
+        np.testing.assert_(grad_error < 1)
 
 
 list_model_names = ["lasso", "logreg"]
 
 
-@pytest.mark.parametrize('model', list_model_names)
+@pytest.mark.parametrize('model_name', list_model_names)
 def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
@@ -268,7 +268,7 @@ def test_check_grad_logreg_cvxpy(model_name):
     for alpha in list_alphas:
         grad_error = check_grad(get_val, get_grad, [alpha])
         print("grad_error %f" % grad_error)
-        assert grad_error < 1.
+        np.testing.assert_(grad_error < 1)
 
 if __name__ == "__main__":
     print("#" * 30)
