@@ -26,18 +26,21 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     reg = lambda_cp * cp.norm1(beta) + alpha_cp * cp.sum_squares(beta) / 2
     objective = loss + reg
 
+    # define problem
     problem = cp.Problem(cp.Minimize(objective))
+    assert problem.is_dpp()
+
+    # solve problem
     layer = CvxpyLayer(problem, [X, Y, lambda_cp, alpha_cp], [beta])
-
     lambda_alpha_th = torch.tensor(lambda_alpha, requires_grad=True)
-    beta_ = layer(Xtrain, ytrain, lambda_alpha_th[0], lambda_alpha_th[1])
+    beta_, = layer(Xtrain, ytrain, lambda_alpha_th[0], lambda_alpha_th[1])
 
-    test_loss = (Xtest @ beta_[0] - ytest).pow(2).mean()
+    # get test loss and it's gradient
+    test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()
 
-    grad_alpha_lambda = lambda_alpha_th.grad
     val = test_loss.detach().numpy()
-    grad = np.array(grad_alpha_lambda)
+    grad = np.array(lambda_alpha_th.grad)
     return val, grad
 
 
@@ -59,20 +62,21 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
     reg = lambda_cp @ cp.abs(beta)
     objective = loss + reg
 
+    # define problem
     problem = cp.Problem(cp.Minimize(objective))
+    assert problem.is_dpp()
 
+    # solve problem
     layer = CvxpyLayer(problem, [X, Y, lambda_cp], [beta])
-
-    # solve the problem
     lambdas_th = torch.tensor(lambdas, requires_grad=True)
-    beta_ = layer(Xtrain, ytrain, lambdas_th)
+    beta_, = layer(Xtrain, ytrain, lambdas_th)
 
-    test_loss = (Xtest @ beta_[0] - ytest).pow(2).mean()
+    # get test loss and it's gradient
+    test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()
 
-    grad_alpha_lambda = lambdas_th.grad
     val = test_loss.detach().numpy()
-    grad = np.array(grad_alpha_lambda)
+    grad = np.array(lambdas_th.grad)
     return val, grad
 
 
@@ -83,26 +87,33 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
 
     m, n = Xtrain.shape
 
+    # set up variables and parameters
     beta = cp.Variable(n)
+    # X = cp.Parameter((m, n))
+    # Y = cp.Parameter(m)
     alpha_cp = cp.Parameter(nonneg=True)
 
+    # set up objective
     loss = cp.sum(cp.logistic(X @ beta) - cp.multiply(y, X @ beta)) / m
     reg = alpha_cp * cp.norm(beta, 1)
     objective = loss + reg
+
+    # define problem
     problem = cp.Problem(cp.Minimize(objective))
-
     assert problem.is_dpp()
+
+    # solve problem
+    # layer = CvxpyLayer(problem, parameters=[X, Y, alpha_cp], variables=[beta])
     layer = CvxpyLayer(problem, parameters=[alpha_cp], variables=[beta])
-
-    # solve the problem
     alpha_th = torch.tensor(alpha, requires_grad=True)
-    solution, = layer(alpha_th)
+    # beta_, = layer(Xtrain, ytrain, alpha_th)
+    beta_, = layer(alpha_th)
 
-    # Evaluate test loss and backward
-    loss = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
-    val = loss(Xtest @ solution, ytest)
-    val.backward()
+    # get test loss and it's gradient
+    loss_th = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
+    test_loss = loss_th(Xtest @ beta_, ytest)
+    test_loss.backward()
 
-    val = val.detach().numpy()
-    grad = alpha_th.grad
+    val = test_loss.detach().numpy()
+    grad = np.array(alpha_th.grad)
     return val, grad
