@@ -19,7 +19,8 @@ from sparse_ho import ImplicitForward
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
-from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
+from sparse_ho.criterion import (
+    HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
 from sparse_ho.tests.cvxpylayer import \
     enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy
 
@@ -68,7 +69,8 @@ custom_models["lasso"] = Lasso(estimator=celer.Lasso(
     warm_start=True, fit_intercept=False))
 custom_models["enet"] = ElasticNet(
     estimator=linear_model.ElasticNet(warm_start=True, fit_intercept=False))
-custom_models["logreg"] = log_alpha - np.log(2)
+custom_models["logreg"] = SparseLogreg(
+    estimator=celer.LogisticRegression(warm_start=True, fit_intercept=False))
 
 # list of algorithms to be tested
 list_algos = [
@@ -157,16 +159,25 @@ grad_cvxpy *= np.exp(dict_log_alpha["logreg"])
 dict_grads_cvxpy["logreg"] = grad_cvxpy
 
 
+dict_criterion = {}
+dict_criterion["lasso"] = 'MSE'
+dict_criterion["enet"] = 'MSE'
+dict_criterion["wLasso"] = 'MSE'
+dict_criterion["logreg"] = 'logistic'
+
+
 @pytest.mark.parametrize('model_name', list(models.keys()))
-@pytest.mark.parametrize('criterion', ['MSE'])
+# @pytest.mark.parametrize('criterion', ['MSE'])
 @pytest.mark.parametrize('algo', list_algos)
-def test_val_grad_mse(model_name, criterion, algo):
+def test_val_grad(model_name, algo):
     """Check that all methods return the same gradient, comparing to cvxpylayer
     """
-    if criterion == 'MSE':
+    if dict_criterion[model_name] == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
-    elif criterion == 'SURE':
+    elif dict_criterion[model_name] == 'SURE':
         criterion = FiniteDiffMonteCarloSure(sigma_star)
+    elif dict_criterion[model_name] == 'logistic':
+        criterion = HeldOutLogistic(idx_train, idx_val)
 
     log_alpha = dict_log_alpha[model_name]
     model = models[model_name]
@@ -174,16 +185,17 @@ def test_val_grad_mse(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
+    # if model_name == "logreg":
+    #     import ipdb; ipdb.set_trace()
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
 if __name__ == "__main__":
-    for algo in list_algos:
-        for model in models:
-            for criterion in ['MSE']:
-                test_val_grad_mse(model, criterion, algo)
+    # for algo in list_algos:
+    #     for model_name in models.keys():
+    #         test_val_grad(model_name, algo)
     # for key in list(custom_models.keys()):
     #     test_beta_jac_custom(key)
-    # for key in list(models.keys()):
-    #     test_beta_jac(key)
+    for key in list(models.keys()):
+        test_beta_jac(key)
