@@ -1,4 +1,6 @@
-# TODO include test for the wLasso here
+# TODO make Backward in the test
+# TODO add test for the logreg (in another file)
+# TODO include tests for the wLasso with custom solver
 import pytest
 from scipy.sparse import csc_matrix
 
@@ -66,8 +68,6 @@ list_algos = [
     Forward(),
     ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)]
 # Backward()]
-# TODO make Backward pass
-# TODO add test for the logreg
 
 
 def get_v(mask, dense):
