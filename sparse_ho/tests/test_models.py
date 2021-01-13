@@ -20,7 +20,8 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
-from sparse_ho.tests.cvxpylayer import enet_cvxpy, wLasso_cvxpy, logreg_cvxpy
+from sparse_ho.tests.cvxpylayer import \
+    enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy
 
 
 # Generate data
@@ -142,7 +143,7 @@ val_cvxpy, grad_cvxpy = enet_cvxpy(
 dict_vals_cvxpy["enet"] = val_cvxpy
 grad_cvxpy *= np.exp(dict_log_alpha["enet"])
 dict_grads_cvxpy["enet"] = grad_cvxpy
-val_cvxpy, grad_cvxpy = wLasso_cvxpy(
+val_cvxpy, grad_cvxpy = weighted_lasso_cvxpy(
     X, y, np.exp(dict_log_alpha["wLasso"]), idx_train, idx_val)
 dict_vals_cvxpy["wLasso"] = val_cvxpy
 grad_cvxpy *= np.exp(dict_log_alpha["wLasso"])
