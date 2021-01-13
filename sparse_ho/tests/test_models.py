@@ -3,9 +3,10 @@
 # TODO include tests for logreg wLasso with custom solver
 # TODO add logreg and SVM here?
 import pytest
-from scipy.sparse import csc_matrix
 
 import numpy as np
+from scipy.optimize import check_grad
+from scipy.sparse import csc_matrix
 from sklearn import linear_model
 import celer
 
@@ -171,6 +172,9 @@ dict_grads_cvxpy["logreg"] = grad_cvxpy
 def test_val_grad(model_name, criterion, algo):
     """Check that all methods return the same gradient, comparing to cvxpylayer
     """
+    if criterion == 'logistic':
+        pytest.xfail("cvxpylayer seems broken for logistic")
+
     if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
     elif criterion == 'SURE':
@@ -184,15 +188,20 @@ def test_val_grad(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    # if model_name == 'logreg':
-    #     import ipdb; ipdb.set_trace()
-
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
+@pytest.mark.parametrize(
+    'model_name,criterion', [
+        ('lasso', 'MSE'),
+        ('enet', 'MSE'),
+        ('wLasso', 'MSE'),
+        ('logreg', 'logistic'),
+    ]
+)
 @pytest.mark.parametrize('algo', list_algos)
-def test_check_grad_sparseho(model_name, criterion, algo):
+def test_check_grad_sparse_ho(model_name, criterion, algo):
     """Check that all methods return a good gradient using check_grad"""
     if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
@@ -202,28 +211,28 @@ def test_check_grad_sparseho(model_name, criterion, algo):
         criterion = HeldOutLogistic(idx_train, idx_val)
 
     model = models[model_name]
+    log_alpha = dict_log_alpha[model_name]
 
     def get_val(log_alpha):
-        # import ipdb; ipdb.set_trace()
         val, grad = criterion.get_val_grad(
-            model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
         return val
 
     def get_grad(log_alpha):
-        # import ipdb; ipdb.set_trace()
         val, grad = criterion.get_val_grad(
-            model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
+            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
         return grad
-
-    from scipy.optimize import check_grad
 
     print("Check grad sparse ho")
     list_log_alphas = np.log(np.geomspace(alpha_max/4, alpha_max/40, num=5))
     for log_alpha in list_log_alphas:
-        print(check_grad(get_val, get_grad, [log_alpha]))
+        grad_error = check_grad(get_val, get_grad, [log_alpha])
+        assert grad_error < 1.
 
 
-def check_grad_logreg_cvxpy():
+def test_check_grad_logreg_cvxpy():
+
+    pytest.xfail("cvxpylayer seems broken for logistic")
 
     def get_val(alpha):
         val_cvxpy, grad_cvxpy = logreg_cvxpy(
@@ -240,16 +249,17 @@ def check_grad_logreg_cvxpy():
     print("Check grad cvxpy")
     list_alphas = np.geomspace(alpha_max, alpha_max / 10, num=5)
     for alpha in list_alphas:
-        print(check_grad(get_val, get_grad, [alpha]))
+        grad_error = check_grad(get_val, get_grad, [alpha])
+        assert grad_error < 1.
 
 
 if __name__ == "__main__":
-    print("#######################################################")
+    print("#" * 30)
     for algo in list_algos:
-        print("################################")
-        test_check_grad_sparseho('logreg', 'logistic', algo)
-    print("#######################################################")
-    check_grad_logreg_cvxpy()
+        print("#" * 20)
+        test_check_grad_sparse_ho('logreg', 'logistic', algo)
+    print("#" * 30)
+    test_check_grad_logreg_cvxpy()
     #     for model_name in models.keys():
     #         test_val_grad(model_name, 'logistic', algo)
     # for key in list(custom_models.keys()):
