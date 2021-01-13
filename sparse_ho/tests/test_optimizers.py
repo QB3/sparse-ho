@@ -56,10 +56,10 @@ models_custom = [
 
 
 @pytest.mark.parametrize('model', models)
-@pytest.mark.parametrize('crit', ['cv', 'sure'])
+@pytest.mark.parametrize('crit', ['MSE', 'sure'])
 def test_grad_search(model, crit):
     """check that the paths are the same in the line search"""
-    if crit == 'cv':
+    if crit == 'MSE':
         n_outer = 2
         criterion = HeldOutMSE(idx_train, idx_val)
     else:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     models = [
         Lasso(max_iter=max_iter, estimator=None)]
     crits = ['sure']
-    # crits = ['cv']
+    # crits = ['MSE']
     for model in models:
         for crit in crits:
             test_grad_search(model, crit)

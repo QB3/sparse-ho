@@ -20,7 +20,7 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
-from sparse_ho.wrap_cvxpylayer import enet_cvxpy, wLasso_cvxpy
+from sparse_ho.tests.cvxpylayer import enet_cvxpy, wLasso_cvxpy
 
 
 # Generate data

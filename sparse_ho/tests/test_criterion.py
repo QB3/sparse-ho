@@ -32,16 +32,6 @@ model = Lasso(estimator=estimator)
 log_alphas = np.log(np.geomspace(alpha_max, alpha_max / 100))
 
 
-# dict_log_alpha = {}
-# dict_log_alpha["lasso"] = log_alpha
-# tab = np.linspace(1, 1000, n_features)
-# dict_log_alpha["wlasso"] = log_alpha + np.log(tab / tab.max())
-
-# estimator = sklearn.linear_model.Lasso(
-#     fit_intercept=False, max_iter=1000, warm_start=True)
-# model = Lasso(estimator=estimator)
-
-
 def test_cross_val_criterion():
     # TODO we also need to add a test for sparse matrices
     alpha_min = alpha_max / 10
