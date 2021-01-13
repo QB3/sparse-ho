@@ -77,6 +77,7 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
 
 
 def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
+    assert np.all(np.unique(y) == np.array([-1, 1]))
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [
             X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
@@ -88,8 +89,9 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = cp.sum(cp.logistic(Xtrain @ beta) -
-                  cp.multiply(ytrain, Xtrain @ beta)) / m
+    loss = cp.sum(cp.logistic(cp.multiply(-ytrain, Xtrain @ beta))) / m
+    # loss = cp.sum(cp.logistic(Xtrain @ beta) -
+    #               cp.multiply(ytrain, Xtrain @ beta)) / m
     reg = alpha_cp * cp.norm(beta, 1)
     objective = loss + reg
 
@@ -105,7 +107,7 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     # get test loss and it's gradient
     # loss_th = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
     # test_loss = loss_th(Xtest @ beta_, ytest)
-    ytest[ytest == 0] = -1
+    # ytest[ytest == 0] = -1
     test_loss = torch.mean(torch.log(1 + torch.exp(-ytest * (Xtest @ beta_))))
     test_loss.backward()
 

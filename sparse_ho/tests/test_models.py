@@ -148,10 +148,10 @@ val_cvxpy, grad_cvxpy = weighted_lasso_cvxpy(
 dict_vals_cvxpy["wLasso"] = val_cvxpy
 grad_cvxpy *= np.exp(dict_log_alpha["wLasso"])
 dict_grads_cvxpy["wLasso"] = grad_cvxpy
-y01 = y.copy()
-y01[y01 == -1] = 0
+# y01 = y.copy()
+# y01[y01 == -1] = 0
 val_cvxpy, grad_cvxpy = logreg_cvxpy(
-    X, y01, np.exp(dict_log_alpha["logreg"]), idx_train, idx_val)
+    X, y, np.exp(dict_log_alpha["logreg"]), idx_train, idx_val)
 dict_vals_cvxpy["logreg"] = val_cvxpy
 grad_cvxpy *= np.exp(dict_log_alpha["logreg"])
 dict_grads_cvxpy["logreg"] = grad_cvxpy
@@ -185,8 +185,8 @@ def test_val_grad(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    if model_name == 'logreg':
-        import ipdb; ipdb.set_trace()
+    # if model_name == 'logreg':
+    #     import ipdb; ipdb.set_trace()
 
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
