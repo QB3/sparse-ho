@@ -12,9 +12,7 @@ import celer
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
 
-from sparse_ho import Forward
-from sparse_ho import ImplicitForward
-# from sparse_ho import Backward
+from sparse_ho import Forward, Implicit, ImplicitForward
 
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
@@ -75,7 +73,8 @@ custom_models["logreg"] = SparseLogreg(
 # list of algorithms to be tested
 list_algos = [
     Forward(),
-    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000)]
+    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
+    Implicit()]
 # Backward()]
 
 
@@ -192,10 +191,10 @@ def test_val_grad(model_name, criterion, algo):
 
 
 if __name__ == "__main__":
-    # for algo in list_algos:
-    #     for model_name in models.keys():
-    #         test_val_grad(model_name, algo)
+    for algo in list_algos:
+        for model_name in models.keys():
+            test_val_grad(model_name, algo)
     # for key in list(custom_models.keys()):
     #     test_beta_jac_custom(key)
-    for key in list(models.keys()):
-        test_beta_jac(key)
+    # for key in list(models.keys()):
+    #     test_beta_jac(key)
