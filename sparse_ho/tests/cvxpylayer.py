@@ -7,6 +7,11 @@ torch.set_default_dtype(torch.double)
 # np.set_printoptions(precision=3, suppress=True)
 
 
+def lasso_cvxpy(X, y, lambd, idx_train, idx_val):
+    val, grad = enet_cvxpy(X, y, [lambd, 0], idx_train, idx_val)
+    return val, grad[0]
+
+
 def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [
