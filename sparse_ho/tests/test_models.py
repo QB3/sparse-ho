@@ -24,8 +24,7 @@ from sparse_ho.tests.cvxpylayer import \
 
 
 # Generate data
-n_samples = 10
-n_features = 10
+n_samples, n_features = 10, 10
 X, y, _, _, sigma_star = get_synt_data(
     dictionary_type="Toeplitz", n_samples=n_samples,
     n_features=n_features, n_times=1, n_active=5, rho=0.1,
@@ -186,14 +185,18 @@ def test_val_grad(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
+    if model_name == 'logreg':
+        import ipdb; ipdb.set_trace()
+
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
 if __name__ == "__main__":
     for algo in list_algos:
-        for model_name in models.keys():
-            test_val_grad(model_name, algo)
+        test_val_grad('logreg', 'logistic', algo)
+    #     for model_name in models.keys():
+    #         test_val_grad(model_name, 'logistic', algo)
     # for key in list(custom_models.keys()):
     #     test_beta_jac_custom(key)
     # for key in list(models.keys()):

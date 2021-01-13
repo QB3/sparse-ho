@@ -85,12 +85,11 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
 
     # set up variables and parameters
     beta = cp.Variable(n)
-    # X = cp.Parameter((m, n))
-    # Y = cp.Parameter(m)
     alpha_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = cp.sum(cp.logistic(Xtrain @ beta) - cp.multiply(ytrain, Xtrain @ beta)) / m
+    loss = cp.sum(cp.logistic(Xtrain @ beta) -
+                  cp.multiply(ytrain, Xtrain @ beta)) / m
     reg = alpha_cp * cp.norm(beta, 1)
     objective = loss + reg
 
@@ -99,15 +98,15 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    # layer = CvxpyLayer(problem, parameters=[X, Y, alpha_cp], variables=[beta])
     layer = CvxpyLayer(problem, parameters=[alpha_cp], variables=[beta])
     alpha_th = torch.tensor(alpha, requires_grad=True)
-    # beta_, = layer(Xtrain, ytrain, alpha_th)
     beta_, = layer(alpha_th)
 
     # get test loss and it's gradient
-    loss_th = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
-    test_loss = loss_th(Xtest @ beta_, ytest)
+    # loss_th = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
+    # test_loss = loss_th(Xtest @ beta_, ytest)
+    ytest[ytest == 0] = -1
+    test_loss = torch.mean(torch.log(1 + torch.exp(-ytest * (Xtest @ beta_))))
     test_loss.backward()
 
     val = test_loss.detach().numpy()
