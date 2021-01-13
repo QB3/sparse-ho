@@ -159,24 +159,26 @@ grad_cvxpy *= np.exp(dict_log_alpha["logreg"])
 dict_grads_cvxpy["logreg"] = grad_cvxpy
 
 
-dict_criterion = {}
-dict_criterion["lasso"] = 'MSE'
-dict_criterion["enet"] = 'MSE'
-dict_criterion["wLasso"] = 'MSE'
-dict_criterion["logreg"] = 'logistic'
-
-
-@pytest.mark.parametrize('model_name', list(models.keys()))
-# @pytest.mark.parametrize('criterion', ['MSE'])
+@pytest.mark.parametrize(
+    'model_name,criterion', [
+        ('lasso', 'MSE'),
+        ('enet', 'MSE'),
+        ('wLasso', 'MSE'),
+        # ('lasso', 'SURE'),
+        # ('enet', 'SURE'),
+        # ('wLasso', 'SURE'),
+        ('logreg', 'logistic'),
+    ]
+)
 @pytest.mark.parametrize('algo', list_algos)
-def test_val_grad(model_name, algo):
+def test_val_grad(model_name, criterion, algo):
     """Check that all methods return the same gradient, comparing to cvxpylayer
     """
-    if dict_criterion[model_name] == 'MSE':
+    if criterion == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
-    elif dict_criterion[model_name] == 'SURE':
+    elif criterion == 'SURE':
         criterion = FiniteDiffMonteCarloSure(sigma_star)
-    elif dict_criterion[model_name] == 'logistic':
+    elif criterion == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
 
     log_alpha = dict_log_alpha[model_name]
@@ -185,8 +187,6 @@ def test_val_grad(model_name, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    # if model_name == "logreg":
-    #     import ipdb; ipdb.set_trace()
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
