@@ -1,6 +1,6 @@
 # TODO make Backward in the test
-# TODO include tests for logreg wLasso with custom solver
-# TODO add SVM and SVR here?
+# TODO include tests for wLasso with custom solver
+# TODO add SVM and SVR here -->> We will do it with QK
 import pytest
 import itertools
 

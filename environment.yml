@@ -9,6 +9,9 @@ dependencies:
     - seaborn>=0.7
     - matplotlib>=2.0.0
     - pip
+    - cvxpy
+    - torch==1.3.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+    - cvxpylayers
 
     - pip:
         - download
