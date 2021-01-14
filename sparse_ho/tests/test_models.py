@@ -13,7 +13,7 @@ import celer
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
 
-from sparse_ho import Forward, ImplicitForward
+from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
@@ -75,7 +75,7 @@ custom_models["logreg"] = SparseLogreg(
 list_algos = [
     Forward(),
     ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
-    # Implicit(),
+    Implicit()
     # Backward()  # XXX to fix
 ]
 
