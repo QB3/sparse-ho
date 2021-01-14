@@ -216,40 +216,29 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     model = models[model_name]
     log_alpha = dict_log_alpha[model_name]
 
-    if model_name == 'lasso' or model_name == 'logreg':
-        def get_val(log_alpha):
+    def get_val(log_alpha):
+        if model_name == 'lasso' or model_name == 'logreg':
             val, grad = criterion.get_val_grad(
-                # model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-                model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
-            return val
-
-        def get_grad(log_alpha):
-            print('log alpha', log_alpha)
-            val, grad = criterion.get_val_grad(
-                # model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-                model, X, y, log_alpha[0], algo.get_beta_jac_v, tol=tol)
-            print('grad', grad)
-            return grad
-    else:
-        def get_val(log_alpha):
+                model, X, y, np.float(log_alpha), algo.get_beta_jac_v, tol=tol)
+        else:
             val, grad = criterion.get_val_grad(
                 model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-            return val
+        return val
 
-        def get_grad(log_alpha):
-            print('log alpha', log_alpha)
+    def get_grad(log_alpha):
+        print('log alpha', log_alpha)
+        if model_name == 'lasso' or model_name == 'logreg':
+            val, grad = criterion.get_val_grad(
+                model, X, y, np.float(log_alpha), algo.get_beta_jac_v, tol=tol)
+        else:
             val, grad = criterion.get_val_grad(
                 model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-            print('grad', grad)
-            return grad
+        print('grad', grad)
+        return grad
 
     print("Check grad sparse ho")
     for log_alpha in dict_list_log_alphas[model_name]:
-        if model_name == 'lasso' or model_name == 'logreg':
-            grad_error = check_grad(get_val, get_grad, np.array([log_alpha]))
-        else:
-            grad_error = check_grad(get_val, get_grad, log_alpha)
-        # grad_error = check_grad(get_val, get_grad, log_alpha)
+        grad_error = check_grad(get_val, get_grad, log_alpha)
         print("grad_error %f" % grad_error)
         assert grad_error < 1
 
