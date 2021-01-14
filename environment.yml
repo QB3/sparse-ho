@@ -15,5 +15,4 @@ dependencies:
         - hyperopt
         - cvxpy
         - torch
-        - cvxpy
         - cvxpylayers
