@@ -239,29 +239,19 @@ def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
     print(model_name)
-    if model_name == "logreg":
-        def get_val(alpha):
-            val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
-            return val_cvxpy
+    cvxpy_func = {
+        'logreg': logreg_cvxpy, 'lasso': lasso_cvxpy
+    }[model_name]
 
-        def get_grad(alpha):
-            val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
-            return grad_cvxpy
+    def get_val(alpha):
+        val_cvxpy, grad_cvxpy = cvxpy_func(
+            X, y, alpha[0], idx_train, idx_val)
+        return val_cvxpy
 
-    elif model_name == "lasso":
-        def get_val(alpha):
-            val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
-            return val_cvxpy
-
-        def get_grad(alpha):
-            val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
-            return grad_cvxpy
-
-    from scipy.optimize import check_grad
+    def get_grad(alpha):
+        val_cvxpy, grad_cvxpy = cvxpy_func(
+            X, y, alpha[0], idx_train, idx_val)
+        return grad_cvxpy
 
     print("Check grad cvxpy")
     list_alphas = np.geomspace(alpha_max, alpha_max / 10, num=5)
@@ -269,6 +259,7 @@ def test_check_grad_logreg_cvxpy(model_name):
         grad_error = check_grad(get_val, get_grad, [alpha])
         print("grad_error %f" % grad_error)
         np.testing.assert_(grad_error < 1)
+
 
 if __name__ == "__main__":
     print("#" * 30)
