@@ -27,6 +27,7 @@ class SVM(BaseModel):
         self.logC = logC
         self.max_iter = max_iter
         self.tol = tol
+        self.dual = False
 
     @staticmethod
     def _init_dbeta_dr(X, y, dense0=None,
@@ -333,4 +334,5 @@ class SVM(BaseModel):
                                          * Xs[maskC, :]).T
                                         @ (np.ones(maskC.sum()) * C)))
         res = q + linear_term - C * np.sum(dbeta[full_supp])
+        print(norm(res))
         return norm(res)

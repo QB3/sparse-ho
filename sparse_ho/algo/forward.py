@@ -21,14 +21,16 @@ class Forward():
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            max_iter=100, tol=tol,  # TODO replace 100 by better value
+            max_iter=max_iter, tol=tol,  # TODO replace 100 by better value
             compute_jac=compute_jac, verbose=self.verbose)
+
         if jac is not None:
             jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
             if full_jac_v:
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:
             jac_v = None
+
         return mask, dense, jac_v, jac
 
 
@@ -106,6 +108,7 @@ def get_beta_jac_iterdiff(
         list_beta = []
         list_jac = []
     # print(tol)
+
     for i in range(max_iter):
         if verbose:
             print("%i -st iteration over %i" % (i, max_iter))
@@ -118,7 +121,6 @@ def get_beta_jac_iterdiff(
                 X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
 
         pobj.append(model._get_pobj(r, X, beta, alphas, y))
-
         if i > 1:
             if verbose:
                 print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
@@ -135,8 +137,11 @@ def get_beta_jac_iterdiff(
 
     mask = beta != 0
     dense = beta[mask]
-
     jac = model._get_jac(dbeta, mask)
+    if model.dual:
+        model.r = r
+        if compute_jac:
+            model.dr = dr
 
     if save_iterates:
         return np.array(list_beta), np.array(list_jac)

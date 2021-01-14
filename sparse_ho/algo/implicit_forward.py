@@ -47,10 +47,12 @@ class ImplicitForward():
             jac0=quantity_to_warm_start,
             # tol_jac=self.tol_jac,
             tol_jac=tol, tol=tol, niter_jac=self.n_iter_jac, model=model,
-            max_iter=self.max_iter, verbose=self.verbose)
+            max_iter=max_iter, verbose=self.verbose)
+
         jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
+
         return mask, dense, jac_v, jac
 
 
@@ -85,8 +87,7 @@ def get_only_jac(
 
     if dbeta is None:
         model._init_dbeta(n_features)
-    else:
-        dbeta = dbeta.copy()
+
     dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
     for i in range(niter_jac):
         if verbose:
@@ -98,12 +99,12 @@ def get_only_jac(
         else:
             model._update_only_jac(
                 Xs, y, r, dbeta, dr, L, alpha, sign_beta)
-
         objs.append(
             model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, r, dr,
                               alpha))
 
         if i > 1 and np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
             break
-
+    if model.dual:
+        model.dr = dr
     return dbeta
