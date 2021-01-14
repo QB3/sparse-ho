@@ -7,7 +7,7 @@ torch.set_default_dtype(torch.double)
 
 
 def lasso_cvxpy(X, y, lambd, idx_train, idx_val):
-    val, grad = enet_cvxpy(X, y, [lambd, 0], idx_train, idx_val)
+    val, grad = enet_cvxpy(X, y, [float(lambd), 0], idx_train, idx_val)
     return val, grad[0]
 
 
@@ -84,6 +84,7 @@ def weighted_lasso_cvxpy(X, y, lambdas, idx_train, idx_val):
 
 
 def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
+    alpha = float(alpha)
     assert np.all(np.unique(y) == np.array([-1, 1]))
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [

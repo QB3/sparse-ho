@@ -232,40 +232,40 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
         assert grad_error < 1
 
 
-list_model_names = ["lasso", "logreg"]
+list_model_names = ["lasso", "enet", "wLasso", "logreg"]
 
 
 @pytest.mark.parametrize('model_name', list_model_names)
 def test_check_grad_logreg_cvxpy(model_name):
 
-    # pytest.xfail("cvxpylayer seems broken for logistic")
+    pytest.xfail("cvxpylayer seems broken for logistic")
     print(model_name)
     cvxpy_func = dict_cvxpy_func[model_name]
 
     def get_val(log_alpha):
         val_cvxpy, _ = cvxpy_func(
-            X, y, np.exp(log_alpha[0]), idx_train, idx_val)
+            X, y, np.exp(log_alpha), idx_train, idx_val)
         return val_cvxpy
 
     def get_grad(log_alpha):
         _, grad_cvxpy = cvxpy_func(
-            X, y, np.exp(log_alpha[0]), idx_train, idx_val)
-        grad_cvxpy *= np.exp(log_alpha[0])
+            X, y, np.exp(log_alpha), idx_train, idx_val)
+        grad_cvxpy *= np.exp(log_alpha)
         return grad_cvxpy
 
     print("Check grad cvxpy")
     for log_alpha in dict_list_log_alphas[model_name]:
-        grad_error = check_grad(get_val, get_grad, [log_alpha])
+        grad_error = check_grad(get_val, get_grad, log_alpha)
         print("grad_error %f" % grad_error)
-        # assert grad_error < 1
+        assert grad_error < 1
 
 
 if __name__ == "__main__":
-    print("#" * 30)
-    for algo in list_algos:
-        print("#" * 20)
-        test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        test_check_grad_sparse_ho('enet', 'MSE', algo)
     # print("#" * 30)
-    # for model_name in list_model_names:
-    #     test_check_grad_logreg_cvxpy(model_name)
+    # for algo in list_algos:
+    #     print("#" * 20)
+    #     test_check_grad_sparse_ho('lasso', 'MSE', algo)
+    #     test_check_grad_sparse_ho('enet', 'MSE', algo)
+    print("#" * 30)
+    for model_name in list_model_names:
+        test_check_grad_logreg_cvxpy(model_name)
