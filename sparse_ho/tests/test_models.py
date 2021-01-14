@@ -74,7 +74,7 @@ custom_models["logreg"] = SparseLogreg(
 # list of algorithms to be tested
 list_algos = [
     Forward(),
-    # ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
+    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
     # Implicit(),
     # Backward()  # XXX to fix
 ]
