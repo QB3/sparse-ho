@@ -11,23 +11,23 @@ from sparse_ho.criterion.base import BaseCriterion
 class HeldOutMSE(BaseCriterion):
     """Held out loss for quadratic datafit.
 
+    Parameters
+    ----------
+    idx_train: np.array
+        indices of the training set
+    idx_test: np.array
+        indices of the testing set
+
+
     Attributes
     ----------
-    TODO
+        TODO
     """
     # XXX : this code should be the same as CrossVal as you can pass
     # cv as [(train, test)] ie directly the indices of the train
     # and test splits.
 
     def __init__(self, idx_train, idx_val):
-        """
-        Parameters
-        ----------
-        idx_train: np.array
-            indices of the training set
-        idx_test: np.array
-            indices of the testing set
-        """
         self.idx_train = idx_train
         self.idx_val = idx_val
 
@@ -88,17 +88,16 @@ class HeldOutMSE(BaseCriterion):
 
 class HeldOutLogistic(BaseCriterion):
     """Logistic loss on held out data
+
+    Parameters
+    ----------
+    idx_train: np.array
+        indices of the training set
+    idx_val: np.array
+        indices of the validation set
     """
 
     def __init__(self, idx_train, idx_val):
-        """
-        Parameters
-        ----------
-        idx_train: np.array
-            indices of the training set
-        idx_val: np.array
-            indices of the validation set
-        """
         self.idx_train = idx_train
         self.idx_val = idx_val
 
