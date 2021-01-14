@@ -75,7 +75,7 @@ custom_models["logreg"] = SparseLogreg(
 list_algos = [
     Forward(),
     ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
-    Implicit(),
+    # Implicit(),
     # Backward()  # XXX to fix
 ]
 
@@ -192,6 +192,9 @@ def test_val_grad(model_name, criterion, algo):
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
+list_log_alphas = np.log(np.geomspace(alpha_max/5, alpha_max/40, num=5))
+
+
 @pytest.mark.parametrize(
     'model_name,criterion', [
         ('lasso', 'MSE'),
@@ -224,11 +227,10 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
         return grad
 
     print("Check grad sparse ho")
-    list_log_alphas = np.log(np.geomspace(alpha_max/4, alpha_max/40, num=5))
     for log_alpha in list_log_alphas:
         grad_error = check_grad(get_val, get_grad, [log_alpha])
         print("grad_error %f" % grad_error)
-        np.testing.assert_(grad_error < 1)
+        assert grad_error < 1
 
 
 list_model_names = ["lasso", "logreg"]
@@ -240,35 +242,37 @@ def test_check_grad_logreg_cvxpy(model_name):
     pytest.xfail("cvxpylayer seems broken for logistic")
     print(model_name)
     if model_name == "logreg":
-        def get_val(alpha):
+        def get_val(log_alpha):
             val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
+                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
             return val_cvxpy
 
-        def get_grad(alpha):
+        def get_grad(log_alpha):
             val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
+                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
+            grad_cvxpy *= np.exp(log_alpha[0])
             return grad_cvxpy
 
     elif model_name == "lasso":
-        def get_val(alpha):
+        def get_val(log_alpha):
             val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
+                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
             return val_cvxpy
 
-        def get_grad(alpha):
+        def get_grad(log_alpha):
             val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, alpha[0], idx_train, idx_val)
+                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
+            grad_cvxpy *= np.exp(log_alpha[0])
             return grad_cvxpy
 
     from scipy.optimize import check_grad
 
     print("Check grad cvxpy")
-    list_alphas = np.geomspace(alpha_max, alpha_max / 10, num=5)
-    for alpha in list_alphas:
-        grad_error = check_grad(get_val, get_grad, [alpha])
+    for log_alpha in list_log_alphas:
+        grad_error = check_grad(get_val, get_grad, [log_alpha])
         print("grad_error %f" % grad_error)
-        np.testing.assert_(grad_error < 1)
+        assert grad_error < 1
+
 
 if __name__ == "__main__":
     print("#" * 30)
