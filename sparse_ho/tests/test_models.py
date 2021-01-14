@@ -21,7 +21,8 @@ from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
 from sparse_ho.tests.cvxpylayer import \
-    enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy
+    (enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
+        lasso_sure_cvxpy)
 
 
 # Generate data
@@ -86,15 +87,22 @@ dict_cvxpy_func = {
     'wLasso': weighted_lasso_cvxpy,
     'logreg': logreg_cvxpy,
     }
+
 dict_vals_cvxpy = {}
 dict_grads_cvxpy = {}
 for model in models.keys():
     val_cvxpy, grad_cvxpy = dict_cvxpy_func[model](
         X, y, np.exp(dict_log_alpha[model]), idx_train, idx_val)
-    dict_vals_cvxpy[model] = val_cvxpy
+    dict_vals_cvxpy[model, 'MSE'] = val_cvxpy
     grad_cvxpy *= np.exp(dict_log_alpha[model])
-    dict_grads_cvxpy[model] = grad_cvxpy
+    dict_grads_cvxpy[model, 'MSE'] = grad_cvxpy
 
+
+val_cvxpy, grad_cvxpy = lasso_sure_cvxpy(
+    X, y, np.exp(dict_log_alpha["lasso"]), sigma_star)
+grad_cvxpy *= np.exp(dict_log_alpha["lasso"])
+dict_vals_cvxpy["lasso", "SURE"] = val_cvxpy
+dict_grads_cvxpy["lasso", "SURE"] = grad_cvxpy
 
 # log alpha to be tested by checkgrad
 dict_list_log_alphas = {}
@@ -158,30 +166,30 @@ def test_beta_jac_custom(key):
     assert np.allclose(jac, jac_custom)
 
 
-@pytest.mark.parametrize(
-    'model_name,criterion', [
-        ('lasso', 'MSE'),
-        ('enet', 'MSE'),
-        ('wLasso', 'MSE'),
-        # ('lasso', 'SURE'),
-        # ('enet', 'SURE'),
-        # ('wLasso', 'SURE'),
-        ('logreg', 'logistic'),
-    ]
-)
+list_model_crit = [
+    ('lasso', 'MSE'),
+    ('enet', 'MSE'),
+    ('wLasso', 'MSE'),
+    ('lasso', 'SURE'),
+    # ('enet', 'SURE'),
+    # ('wLasso', 'SURE'),
+    ('logreg', 'logistic')]
+
+
+@pytest.mark.parametrize('model_name,criterion_name', list_model_crit)
 @pytest.mark.parametrize('algo', list_algos)
-def test_val_grad(model_name, criterion, algo):
+def test_val_grad(model_name, criterion_name, algo):
     """Check that all methods return the same gradient, comparing to cvxpylayer
     """
-    if criterion == 'logistic':
+    if criterion_name == 'logistic':
         pytest.xfail("cvxpylayer seems broken for logistic")
 
-    if criterion == 'MSE':
+    if criterion_name == 'MSE':
         criterion = HeldOutMSE(idx_train, idx_val)
-    elif criterion == 'SURE':
-        criterion = FiniteDiffMonteCarloSure(sigma_star)
-    elif criterion == 'logistic':
+    elif criterion_name == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
+    elif criterion_name == 'SURE':
+        criterion = FiniteDiffMonteCarloSure(sigma_star)
 
     log_alpha = dict_log_alpha[model_name]
     model = models[model_name]
@@ -189,8 +197,10 @@ def test_val_grad(model_name, criterion, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
-    np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
-    np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
+    np.testing.assert_allclose(
+        dict_vals_cvxpy[model_name, criterion_name], val, atol=1e-4)
+    np.testing.assert_allclose(
+        dict_grads_cvxpy[model_name, criterion_name], grad, atol=1e-5)
 
 
 @pytest.mark.parametrize(
@@ -262,10 +272,11 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 if __name__ == "__main__":
     # print("#" * 30)
-    # for algo in list_algos:
+    for algo in list_algos:
     #     print("#" * 20)
+        test_val_grad("lasso", "SURE", algo)
     #     test_check_grad_sparse_ho('lasso', 'MSE', algo)
     #     test_check_grad_sparse_ho('enet', 'MSE', algo)
-    print("#" * 30)
-    for model_name in list_model_names:
-        test_check_grad_logreg_cvxpy(model_name)
+    # print("#" * 30)
+    # for model_name in list_model_names:
+    #     test_check_grad_logreg_cvxpy(model_name)

@@ -136,14 +136,12 @@ def lasso_sure_cvxpy(X, y, alpha, sigma, random_state=42):
     y2 = y + epsilon * delta
     Xth, yth, y2th, deltath = map(torch.from_numpy, [X, y, y2, delta])
 
-    n_samples_train, n_features = Xth.shape
-
     # set up variables and parameters
     beta_cp = cp.Variable(n_features)
     lambda_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = ((1 / (2 * n_samples_train)) * cp.sum(
+    loss = ((1 / (2 * n_samples)) * cp.sum(
         cp.square(Xth @ beta_cp - yth)))
     reg = lambda_cp * cp.norm1(beta_cp)
     objective = loss + reg
@@ -169,7 +167,7 @@ def lasso_sure_cvxpy(X, y, alpha, sigma, random_state=42):
     lambda_cp = cp.Parameter(nonneg=True)
 
     # set up objective
-    loss = ((1 / (2 * n_samples_train)) * cp.sum(
+    loss = ((1 / (2 * n_samples)) * cp.sum(
         cp.square(Xth @ beta_cp - y2th)))
     reg = lambda_cp * cp.norm1(beta_cp)
     objective = loss + reg
@@ -184,12 +182,12 @@ def lasso_sure_cvxpy(X, y, alpha, sigma, random_state=42):
     beta2, = layer(alpha_th2)
 
     # get test loss and it's gradient
-    test_loss1 = 2 * sigma ** 2 / epsilon * (Xth @ beta2) @ deltath
-    test_loss1.backward()
-    val2 = test_loss1.detach().numpy()
+    test_loss2 = 2 * sigma ** 2 / epsilon * (Xth @ beta2) @ deltath
+    test_loss2.backward()
+    val2 = test_loss2.detach().numpy()
     grad2 = np.array(alpha_th2.grad)
 
-    val = val1 + val2
+    val = val1 + val2 - len(y) * sigma ** 2
     grad = grad1 + grad2
     return val, grad
 
