@@ -241,31 +241,20 @@ def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
     print(model_name)
-    if model_name == "logreg":
-        def get_val(log_alpha):
-            val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
-            return val_cvxpy
+    cvxpy_func = {
+        'logreg': logreg_cvxpy, 'lasso': lasso_cvxpy
+    }[model_name]
 
-        def get_grad(log_alpha):
-            val_cvxpy, grad_cvxpy = logreg_cvxpy(
-                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
-            grad_cvxpy *= np.exp(log_alpha[0])
-            return grad_cvxpy
+    def get_val(log_alpha):
+        val_cvxpy, grad_cvxpy = cvxpy_func(
+            X, y, np.exp(log_alpha[0]), idx_train, idx_val)
+        return val_cvxpy
 
-    elif model_name == "lasso":
-        def get_val(log_alpha):
-            val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
-            return val_cvxpy
-
-        def get_grad(log_alpha):
-            val_cvxpy, grad_cvxpy = lasso_cvxpy(
-                X, y, np.exp(log_alpha[0]), idx_train, idx_val)
-            grad_cvxpy *= np.exp(log_alpha[0])
-            return grad_cvxpy
-
-    from scipy.optimize import check_grad
+    def get_grad(log_alpha):
+        val_cvxpy, grad_cvxpy = cvxpy_func(
+            X, y, np.exp(log_alpha[0]), idx_train, idx_val)
+        grad_cvxpy *= np.exp(log_alpha[0])
+        return grad_cvxpy
 
     print("Check grad cvxpy")
     for log_alpha in list_log_alphas:
