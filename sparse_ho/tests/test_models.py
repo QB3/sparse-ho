@@ -130,31 +130,20 @@ def test_beta_jac_custom(key):
 
 
 # Compute "ground truth" with cvxpylayer
+dict_cvxpy_func = {
+    'lasso': lasso_cvxpy,
+    'enet': enet_cvxpy,
+    'wLasso': weighted_lasso_cvxpy,
+    'logreg': logreg_cvxpy,
+    }
 dict_vals_cvxpy = {}
 dict_grads_cvxpy = {}
-val_cvxpy, grad_cvxpy = enet_cvxpy(
-    X, y, [np.exp(log_alpha), 0], idx_train, idx_val)
-dict_vals_cvxpy["lasso"] = val_cvxpy
-grad_cvxpy *= np.exp(log_alpha)
-grad_cvxpy = grad_cvxpy[0]
-dict_grads_cvxpy["lasso"] = grad_cvxpy
-val_cvxpy, grad_cvxpy = enet_cvxpy(
-    X, y, np.exp(dict_log_alpha["enet"]), idx_train, idx_val)
-dict_vals_cvxpy["enet"] = val_cvxpy
-grad_cvxpy *= np.exp(dict_log_alpha["enet"])
-dict_grads_cvxpy["enet"] = grad_cvxpy
-val_cvxpy, grad_cvxpy = weighted_lasso_cvxpy(
-    X, y, np.exp(dict_log_alpha["wLasso"]), idx_train, idx_val)
-dict_vals_cvxpy["wLasso"] = val_cvxpy
-grad_cvxpy *= np.exp(dict_log_alpha["wLasso"])
-dict_grads_cvxpy["wLasso"] = grad_cvxpy
-# y01 = y.copy()
-# y01[y01 == -1] = 0
-val_cvxpy, grad_cvxpy = logreg_cvxpy(
-    X, y, np.exp(dict_log_alpha["logreg"]), idx_train, idx_val)
-dict_vals_cvxpy["logreg"] = val_cvxpy
-grad_cvxpy *= np.exp(dict_log_alpha["logreg"])
-dict_grads_cvxpy["logreg"] = grad_cvxpy
+for model in models.keys():
+    val_cvxpy, grad_cvxpy = dict_cvxpy_func[model](
+        X, y, np.exp(dict_log_alpha[model]), idx_train, idx_val)
+    dict_vals_cvxpy[model] = val_cvxpy
+    grad_cvxpy *= np.exp(dict_log_alpha[model])
+    dict_grads_cvxpy[model] = grad_cvxpy
 
 
 @pytest.mark.parametrize(
@@ -213,6 +202,7 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     elif criterion == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
 
+    print(model_name)
     model = models[model_name]
     log_alpha = dict_log_alpha[model_name]
 
@@ -236,14 +226,13 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
 list_model_names = ["lasso", "logreg"]
 
 
+
 @pytest.mark.parametrize('model_name', list_model_names)
 def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
     print(model_name)
-    cvxpy_func = {
-        'logreg': logreg_cvxpy, 'lasso': lasso_cvxpy
-    }[model_name]
+    cvxpy_func = dict_cvxpy_func[model_name]
 
     def get_val(log_alpha):
         val_cvxpy, grad_cvxpy = cvxpy_func(
