@@ -217,23 +217,13 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     log_alpha = dict_log_alpha[model_name]
 
     def get_val(log_alpha):
-        if model_name == 'lasso' or model_name == 'logreg':
-            val, grad = criterion.get_val_grad(
-                model, X, y, np.float(log_alpha), algo.get_beta_jac_v, tol=tol)
-        else:
-            val, grad = criterion.get_val_grad(
-                model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+        val, _ = criterion.get_val_grad(
+            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
         return val
 
     def get_grad(log_alpha):
-        print('log alpha', log_alpha)
-        if model_name == 'lasso' or model_name == 'logreg':
-            val, grad = criterion.get_val_grad(
-                model, X, y, np.float(log_alpha), algo.get_beta_jac_v, tol=tol)
-        else:
-            val, grad = criterion.get_val_grad(
-                model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-        print('grad', grad)
+        _, grad = criterion.get_val_grad(
+            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
         return grad
 
     print("Check grad sparse ho")
@@ -254,12 +244,12 @@ def test_check_grad_logreg_cvxpy(model_name):
     cvxpy_func = dict_cvxpy_func[model_name]
 
     def get_val(log_alpha):
-        val_cvxpy, grad_cvxpy = cvxpy_func(
+        val_cvxpy, _ = cvxpy_func(
             X, y, np.exp(log_alpha[0]), idx_train, idx_val)
         return val_cvxpy
 
     def get_grad(log_alpha):
-        val_cvxpy, grad_cvxpy = cvxpy_func(
+        _, grad_cvxpy = cvxpy_func(
             X, y, np.exp(log_alpha[0]), idx_train, idx_val)
         grad_cvxpy *= np.exp(log_alpha[0])
         return grad_cvxpy
