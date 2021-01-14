@@ -79,6 +79,35 @@ list_algos = [
     # Backward()  # XXX to fix
 ]
 
+# Compute "ground truth" with cvxpylayer
+dict_cvxpy_func = {
+    'lasso': lasso_cvxpy,
+    'enet': enet_cvxpy,
+    'wLasso': weighted_lasso_cvxpy,
+    'logreg': logreg_cvxpy,
+    }
+dict_vals_cvxpy = {}
+dict_grads_cvxpy = {}
+for model in models.keys():
+    val_cvxpy, grad_cvxpy = dict_cvxpy_func[model](
+        X, y, np.exp(dict_log_alpha[model]), idx_train, idx_val)
+    dict_vals_cvxpy[model] = val_cvxpy
+    grad_cvxpy *= np.exp(dict_log_alpha[model])
+    dict_grads_cvxpy[model] = grad_cvxpy
+
+
+# log alpha to be tested by checkgrad
+dict_list_log_alphas = {}
+dict_list_log_alphas["lasso"] = np.log(
+    np.geomspace(alpha_max/2, alpha_max/5, num=5))
+dict_list_log_alphas["wLasso"] = [
+    log_alpha * np.ones(n_features) for log_alpha in
+    dict_list_log_alphas["lasso"]]
+dict_list_log_alphas["logreg"] = np.log(
+    np.geomspace(alpha_max/5, alpha_max/40, num=5))
+dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
+    dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
+
 
 def get_v(mask, dense):
     return 2 * (X[np.ix_(idx_val, mask)].T @ (
@@ -129,23 +158,6 @@ def test_beta_jac_custom(key):
     assert np.allclose(jac, jac_custom)
 
 
-# Compute "ground truth" with cvxpylayer
-dict_cvxpy_func = {
-    'lasso': lasso_cvxpy,
-    'enet': enet_cvxpy,
-    'wLasso': weighted_lasso_cvxpy,
-    'logreg': logreg_cvxpy,
-    }
-dict_vals_cvxpy = {}
-dict_grads_cvxpy = {}
-for model in models.keys():
-    val_cvxpy, grad_cvxpy = dict_cvxpy_func[model](
-        X, y, np.exp(dict_log_alpha[model]), idx_train, idx_val)
-    dict_vals_cvxpy[model] = val_cvxpy
-    grad_cvxpy *= np.exp(dict_log_alpha[model])
-    dict_grads_cvxpy[model] = grad_cvxpy
-
-
 @pytest.mark.parametrize(
     'model_name,criterion', [
         ('lasso', 'MSE'),
@@ -179,19 +191,6 @@ def test_val_grad(model_name, criterion, algo):
 
     np.testing.assert_allclose(dict_vals_cvxpy[model_name], val, atol=1e-4)
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
-
-
-# log alpha to be tested by checkgrad
-dict_list_log_alphas = {}
-dict_list_log_alphas["lasso"] = np.log(
-    np.geomspace(alpha_max/2, alpha_max/5, num=5))
-dict_list_log_alphas["wLasso"] = [
-    log_alpha * np.ones(n_features) for log_alpha in
-    dict_list_log_alphas["lasso"]]
-dict_list_log_alphas["logreg"] = np.log(
-    np.geomspace(alpha_max/5, alpha_max/40, num=5))
-dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
-    dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
 
 
 @pytest.mark.parametrize(
