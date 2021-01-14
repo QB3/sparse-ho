@@ -273,7 +273,7 @@ def test_check_grad_logreg_cvxpy(model_name):
 if __name__ == "__main__":
     # print("#" * 30)
     for algo in list_algos:
-    #     print("#" * 20)
+        print("#" * 20)
         test_val_grad("lasso", "SURE", algo)
     #     test_check_grad_sparse_ho('lasso', 'MSE', algo)
     #     test_check_grad_sparse_ho('enet', 'MSE', algo)
