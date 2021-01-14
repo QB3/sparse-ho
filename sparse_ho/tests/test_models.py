@@ -3,6 +3,7 @@
 # TODO include tests for logreg wLasso with custom solver
 # TODO add logreg and SVM here?
 import pytest
+import itertools
 
 import numpy as np
 from scipy.optimize import check_grad
@@ -13,7 +14,7 @@ import celer
 from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
 
-from sparse_ho import Forward, Implicit, ImplicitForward
+from sparse_ho import Forward, ImplicitForward
 
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
@@ -181,13 +182,19 @@ def test_val_grad(model_name, criterion, algo):
     np.testing.assert_allclose(dict_grads_cvxpy[model_name], grad, atol=1e-5)
 
 
-list_log_alphas = np.log(np.geomspace(alpha_max/5, alpha_max/40, num=5))
-
+# log alpha to be tested by checkgrad
+dict_list_log_alphas = {}
+dict_list_log_alphas["lasso"] = np.log(
+    np.geomspace(alpha_max/2, alpha_max/10, num=5))
+dict_list_log_alphas["logreg"] = np.log(
+    np.geomspace(alpha_max/5, alpha_max/40, num=5))
+dict_list_log_alphas["enet"] = [i for i in itertools.product(
+    dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
 
 @pytest.mark.parametrize(
     'model_name,criterion', [
         ('lasso', 'MSE'),
-        # ('enet', 'MSE'),
+        ('enet', 'MSE'),
         # ('wLasso', 'MSE'),
         ('logreg', 'logistic'),
     ]
@@ -217,7 +224,7 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
         return grad
 
     print("Check grad sparse ho")
-    for log_alpha in list_log_alphas:
+    for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, [log_alpha])
         print("grad_error %f" % grad_error)
         assert grad_error < 1
@@ -246,7 +253,7 @@ def test_check_grad_logreg_cvxpy(model_name):
         return grad_cvxpy
 
     print("Check grad cvxpy")
-    for log_alpha in list_log_alphas:
+    for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, [log_alpha])
         print("grad_error %f" % grad_error)
         assert grad_error < 1
