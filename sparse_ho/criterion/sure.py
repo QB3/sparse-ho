@@ -5,7 +5,7 @@ from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.criterion.base import BaseCriterion
 
 
-class SmoothedSURE(BaseCriterion):
+class FiniteDiffMonteCarloSure(BaseCriterion):
     """Smoothed version of the Stein Unbiased Risk Estimator (SURE).
 
     Implements the iterative Finite-Difference Monte-Carlo approximation of the
@@ -62,17 +62,20 @@ class SmoothedSURE(BaseCriterion):
         val += 2 * self.sigma ** 2 * dof
         return val
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
+        if not self.init_delta_epsilon:
+            self._init_delta_epsilon(X)
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model,
+            X, y, log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train] + self.epsilon * self.delta,
+            X, y + self.epsilon * self.delta,
             log_alpha, model, tol=tol, compute_jac=False)
 
-        val = self.get_val_outer(mask, dense, mask2, dense2)
-
+        val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
+        if monitor is not None:
+            monitor(val, None, mask, dense, log_alpha)
         return val
 
     def _init_delta_epsilon(self, X):
