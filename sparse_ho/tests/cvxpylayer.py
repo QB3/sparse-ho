@@ -4,7 +4,6 @@ import torch
 from cvxpylayers.torch import CvxpyLayer
 
 torch.set_default_dtype(torch.double)
-# np.set_printoptions(precision=3, suppress=True)
 
 
 def lasso_cvxpy(X, y, lambd, idx_train, idx_val):
