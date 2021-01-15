@@ -49,9 +49,9 @@ class GradientDescent(BaseOptimizer):
 
             if self.verbose:
                 print(
-                    "Iteration %i / %i ||" % (i+1, self.n_outer) +
-                    "Value outer criterion: %f ||" % value_outer +
-                    "norm grad %f" % norm(grad_outer))
+                    "Iteration %i/%i ||" % (i+1, self.n_outer) +
+                    "Value outer criterion: %.2e ||" % value_outer +
+                    "norm grad %.2e" % norm(grad_outer))
             if len(monitor.times) > 0 and monitor.times[-1] > self.t_max:
                 break
 
