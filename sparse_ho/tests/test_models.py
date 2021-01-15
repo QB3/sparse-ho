@@ -221,7 +221,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     elif criterion == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
 
-    print(model_name)
     model = models[model_name]
     log_alpha = dict_log_alpha[model_name]
 
