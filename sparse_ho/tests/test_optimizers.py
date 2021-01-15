@@ -17,10 +17,10 @@ from sparse_ho.optimizers import LineSearch
 n_samples = 100
 n_features = 100
 snr = 3
-rho = 0.5
+corr = 0.5
 
 X, y, _ = make_correlated_data(
-    n_samples, n_features, rho=rho, snr=snr, random_state=42)
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
 sigma_star = 0.1
 X_train_s = csc_matrix(X)
 

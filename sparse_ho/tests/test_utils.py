@@ -12,10 +12,10 @@ from sparse_ho import grad_search
 from sparse_ho.optimizers import LineSearch
 
 
-n_samples, n_features, rho, snr = 200, 70, 0.1, 5
+n_samples, n_features, corr, snr = 200, 70, 0.1, 5
 
 X, y, _ = make_correlated_data(
-    n_samples, n_features, rho=rho, snr=snr, random_state=42)
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
 
 X, _, y, _ = train_test_split(X, y)
 

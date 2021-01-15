@@ -14,10 +14,10 @@ from sparse_ho.grid_search import grid_search
 n_samples = 100
 n_features = 10
 snr = 3
-rho = 0.5
+corr = 0.5
 
 X, y, _ = make_correlated_data(
-    n_samples, n_features, rho=rho, snr=snr, random_state=42)
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
 
 alpha_max = (np.abs(X.T @ y)).max() / n_samples
 tol = 1e-8

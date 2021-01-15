@@ -13,10 +13,10 @@ from sparse_ho.grid_search import grid_search
 n_samples = 100
 n_features = 100
 snr = 3
-rho = 0.5
+corr = 0.5
 
 X, y, _ = make_correlated_data(
-    n_samples, n_features, rho=rho, snr=snr, random_state=42)
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
 # XXX TODO add test for sparse matrices
 # X_s = csc_matrix(X)
 sigma_star = 0.1
