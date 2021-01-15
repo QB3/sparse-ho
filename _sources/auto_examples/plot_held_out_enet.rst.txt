@@ -330,8 +330,8 @@ Grad-search with sparse-ho
     value outer 0.21192462659206457
     value outer 0.20986643770498575
     value outer 0.20847322495681733
-    Time grid-search 127.762996
-    Time grad-search 98.205257
+    Time grid-search 125.765152
+    Time grad-search 116.744909
     Minimum grid search 2.050e-01
     Minimum grad search 2.085e-01
 
@@ -384,7 +384,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  46.250 seconds)
+   **Total running time of the script:** ( 4 minutes  3.215 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:

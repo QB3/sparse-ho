@@ -1,6 +1,0 @@
-﻿sparse\_ho.datasets.get\_synt\_data
-===================================
-
-.. currentmodule:: sparse_ho.datasets
-
-.. autofunction:: get_synt_data

@@ -1,6 +1,0 @@
-﻿sparse\_ho.datasets.get\_data
-=============================
-
-.. currentmodule:: sparse_ho.datasets
-
-.. autofunction:: get_data
