@@ -263,7 +263,6 @@ def test_check_grad_logreg_cvxpy(model_name):
 
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
-        print("grad_error %f" % grad_error)
         assert grad_error < 1
 
 
