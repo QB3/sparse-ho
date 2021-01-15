@@ -247,7 +247,6 @@ list_model_names = ["lasso", "enet", "wLasso", "logreg"]
 def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
-    print(model_name)
     cvxpy_func = dict_cvxpy_func[model_name]
 
     def get_val(log_alpha):
