@@ -27,8 +27,6 @@ from sparse_ho.tests.cvxpylayer import \
 n_samples, n_features = 10, 10
 X, y, _ = make_correlated_data(
     n_samples, n_features, corr=0.1, snr=3, random_state=42)
-print(X.sum())
-print(y.sum())
 sigma_star = 0.1
 
 y = np.sign(y)
