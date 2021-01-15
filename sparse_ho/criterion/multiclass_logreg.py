@@ -8,18 +8,21 @@ from sparse_ho.utils_cross_entropy import (
 
 class LogisticMulticlass():
     """Multiclass logistic loss.
+
+    Parameters
+    ----------
+    idx_train: np.array
+        indices of the training set
+    idx_val: np.array
+        indices of the validation set
+    idx_test: np.array
+        indices of the testing set
+
+    Attributes
+    ----------
+        TODO
     """
     def __init__(self, idx_train, idx_val, algo, idx_test=None):
-        """
-        Parameters
-        ----------
-        idx_train: np.array
-            indices of the training set
-        idx_val: np.array
-            indices of the validation set
-        idx_test: np.array
-            indices of the testing set
-        """
         self.idx_train = idx_train
         self.idx_val = idx_val
         # passing test is dirty but we need it for the multiclass logreg

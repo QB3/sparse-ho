@@ -11,6 +11,17 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
     Implements the iterative Finite-Difference Monte-Carlo approximation of the
     SURE. By default, the approximation is ruled by a power law heuristic [1].
 
+    Parameters
+    ----------
+    sigma: float
+        Noise level
+    finite_difference_step: float, optional
+        Finite difference step used in the approximation of the SURE.
+        By default, use a power law heuristic.
+    random_state : int, RandomState instance, default=42
+        The seed of the pseudo random number generator.
+        Pass an int for reproducible output across multiple function calls.
+
     Attributes
     ----------
     TODO
@@ -24,18 +35,6 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
     def __init__(self, sigma, finite_difference_step=None,
                  random_state=42):
-        """
-        Parameters
-        ----------
-        sigma: float
-            Noise level
-        finite_difference_step: float, optional
-            Finite difference step used in the approximation of the SURE.
-            By default, use a power law heuristic.
-        random_state : int, RandomState instance, default=42
-            The seed of the pseudo random number generator.
-            Pass an int for reproducible output across multiple function calls.
-        """
         self.sigma = sigma
         self.random_state = random_state
         self.finite_difference_step = finite_difference_step

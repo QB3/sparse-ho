@@ -1,9 +1,8 @@
 import numpy as np
-from scipy.sparse import csc_matrix
 from sklearn import linear_model
+from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
 from sparse_ho import Forward
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
@@ -12,27 +11,19 @@ from sparse_ho.grid_search import grid_search
 
 n_samples = 100
 n_features = 100
-n_active = 5
-SNR = 3
-rho = 0.5
+snr = 3
+corr = 0.5
 
-X, y, beta_star, noise, sigma_star = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
-X_s = csc_matrix(X)
+X, y, _ = make_correlated_data(
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
+sigma_star = 0.1
 
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
 alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
-p_alpha = 0.7
-alpha = p_alpha * alpha_max
-log_alpha = np.log(alpha)
 
 log_alphas = np.log(alpha_max * np.geomspace(1, 0.1))
-tol = 1e-16
-max_iter = 1000
 
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(0.0001 * alpha_max)
