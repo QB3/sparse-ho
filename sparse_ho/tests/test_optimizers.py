@@ -2,9 +2,9 @@ import numpy as np
 from scipy.sparse import csc_matrix
 import pytest
 from sklearn import linear_model
+from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets import get_synt_data
 from sparse_ho.models import Lasso
 
 from sparse_ho import Forward
@@ -14,17 +14,14 @@ from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch
 
-
 n_samples = 100
 n_features = 100
-n_active = 5
-SNR = 3
+snr = 3
 rho = 0.5
 
-X, y, beta_star, noise, sigma_star = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+X, y, _ = make_correlated_data(
+    n_samples, n_features, rho=rho, snr=snr, random_state=42)
+sigma_star = 0.1
 X_train_s = csc_matrix(X)
 
 idx_train = np.arange(0, 50)
@@ -89,7 +86,7 @@ def test_grad_search(model, crit):
     np.testing.assert_allclose(
         np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
     np.testing.assert_allclose(
-        np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-8)
+        np.array(monitor1.grads), np.array(monitor3.grads), rtol=1e-6)
     np.testing.assert_allclose(
         np.array(monitor1.objs), np.array(monitor3.objs))
     assert not np.allclose(

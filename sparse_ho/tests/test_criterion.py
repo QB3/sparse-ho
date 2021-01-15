@@ -3,24 +3,21 @@ import sklearn
 import sklearn.linear_model
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LassoCV
+from celer.datasets import make_correlated_data
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import CrossVal, HeldOutMSE
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho import Forward
 from sparse_ho.grid_search import grid_search
 
 n_samples = 100
 n_features = 10
-n_active = 2
-SNR = 3
+snr = 3
 rho = 0.5
 
-X, y, _, _, _ = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+X, y, _ = make_correlated_data(
+    n_samples, n_features, rho=rho, snr=snr, random_state=42)
 
 alpha_max = (np.abs(X.T @ y)).max() / n_samples
 tol = 1e-8

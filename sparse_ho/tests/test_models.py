@@ -9,10 +9,9 @@ from scipy.optimize import check_grad
 from scipy.sparse import csc_matrix
 from sklearn import linear_model
 import celer
+from celer.datasets import make_correlated_data
 
-from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
-
 from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
@@ -24,13 +23,12 @@ from sparse_ho.tests.cvxpylayer import \
     (enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
         lasso_sure_cvxpy)
 
-
 # Generate data
 n_samples, n_features = 10, 10
-X, y, _, _, sigma_star = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=5, rho=0.1,
-    SNR=3, seed=0)
+X, y, _ = make_correlated_data(
+    n_samples, n_features, rho=0.1, snr=3, random_state=42)
+sigma_star = 0.1
+
 y = np.sign(y)
 X_s = csc_matrix(X)
 idx_train = np.arange(0, n_features//2)
@@ -271,12 +269,12 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    # print("#" * 30)
+    print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
         test_val_grad("lasso", "SURE", algo)
-    #     test_check_grad_sparse_ho('lasso', 'MSE', algo)
-    #     test_check_grad_sparse_ho('enet', 'MSE', algo)
-    # print("#" * 30)
-    # for model_name in list_model_names:
-    #     test_check_grad_logreg_cvxpy(model_name)
+        test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        test_check_grad_sparse_ho('enet', 'MSE', algo)
+    print("#" * 30)
+    for model_name in list_model_names:
+        test_check_grad_logreg_cvxpy(model_name)
