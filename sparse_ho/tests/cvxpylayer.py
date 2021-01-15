@@ -113,9 +113,6 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     beta_, = layer(alpha_th)
 
     # get test loss and it's gradient
-    # loss_th = torch.nn.modules.loss.BCEWithLogitsLoss(reduction='mean')
-    # test_loss = loss_th(Xtest @ beta_, ytest)
-    # ytest[ytest == 0] = -1
     test_loss = torch.mean(torch.log(1 + torch.exp(-ytest * (Xtest @ beta_))))
     test_loss.backward()
 

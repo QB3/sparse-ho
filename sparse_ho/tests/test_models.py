@@ -219,7 +219,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     elif criterion == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
 
-    print(model_name)
     model = models[model_name]
     log_alpha = dict_log_alpha[model_name]
 
@@ -236,7 +235,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     print("Check grad sparse ho")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
-        print("grad_error %f" % grad_error)
         assert grad_error < 1
 
 
@@ -247,7 +245,6 @@ list_model_names = ["lasso", "enet", "wLasso", "logreg"]
 def test_check_grad_logreg_cvxpy(model_name):
 
     pytest.xfail("cvxpylayer seems broken for logistic")
-    print(model_name)
     cvxpy_func = dict_cvxpy_func[model_name]
 
     def get_val(log_alpha):
@@ -261,10 +258,8 @@ def test_check_grad_logreg_cvxpy(model_name):
         grad_cvxpy *= np.exp(log_alpha)
         return grad_cvxpy
 
-    print("Check grad cvxpy")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
-        print("grad_error %f" % grad_error)
         assert grad_error < 1
 
 
