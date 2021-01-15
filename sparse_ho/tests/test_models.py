@@ -261,7 +261,6 @@ def test_check_grad_logreg_cvxpy(model_name):
         grad_cvxpy *= np.exp(log_alpha)
         return grad_cvxpy
 
-    print("Check grad cvxpy")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
         print("grad_error %f" % grad_error)
