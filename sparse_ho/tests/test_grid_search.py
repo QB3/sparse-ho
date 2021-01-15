@@ -1,5 +1,4 @@
 import numpy as np
-# from scipy.sparse import csc_matrix
 from sklearn import linear_model
 from celer.datasets import make_correlated_data
 
@@ -17,8 +16,6 @@ corr = 0.5
 
 X, y, _ = make_correlated_data(
     n_samples, n_features, corr=corr, snr=snr, random_state=42)
-# XXX TODO add test for sparse matrices
-# X_s = csc_matrix(X)
 sigma_star = 0.1
 
 idx_train = np.arange(0, 50)

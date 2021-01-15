@@ -171,8 +171,6 @@ list_model_crit = [
     ('enet', 'MSE'),
     ('wLasso', 'MSE'),
     ('lasso', 'SURE'),
-    # ('enet', 'SURE'),
-    # ('wLasso', 'SURE'),
     ('logreg', 'logistic')]
 
 

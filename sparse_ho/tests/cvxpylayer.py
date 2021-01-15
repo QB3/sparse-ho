@@ -100,8 +100,6 @@ def logreg_cvxpy(X, y, alpha, idx_train, idx_val):
     # set up objective
     loss = cp.sum(
         cp.logistic(cp.multiply(-ytrain, Xtrain @ beta_cp))) / n_samples_train
-    # loss = cp.sum(cp.logistic(Xtrain @ beta_cp) -
-    #               cp.multiply(ytrain, Xtrain @ beta_cp)) / n_samples_train
     reg = alpha_cp * cp.norm(beta_cp, 1)
     objective = loss + reg
 
