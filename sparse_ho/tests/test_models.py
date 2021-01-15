@@ -237,7 +237,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     print("Check grad sparse ho")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
-        print("grad_error %f" % grad_error)
         assert grad_error < 1
 
 
