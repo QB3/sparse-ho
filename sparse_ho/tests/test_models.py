@@ -266,9 +266,10 @@ if __name__ == "__main__":
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("lasso", "SURE", algo)
-        test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        test_check_grad_sparse_ho('enet', 'MSE', algo)
+        # test_val_grad("lasso", "SURE", algo)
+        # test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        # test_check_grad_sparse_ho('enet', 'MSE', algo)
+        test_check_grad_sparse_ho('logreg', 'logistic', algo)
     # print("#" * 30)
     # for model_name in list_model_names:
     #     test_check_grad_logreg_cvxpy(model_name)
