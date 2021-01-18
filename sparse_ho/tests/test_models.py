@@ -194,9 +194,10 @@ def test_val_grad(model_name, criterion_name, algo):
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
 
     np.testing.assert_allclose(
-        dict_vals_cvxpy[model_name, criterion_name], val, atol=1e-4)
+        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5)
     np.testing.assert_allclose(
-        dict_grads_cvxpy[model_name, criterion_name], grad, atol=1e-5)
+        dict_grads_cvxpy[model_name, criterion_name], grad,
+        rtol=1e-5, atol=1e-5)
 
 
 @pytest.mark.parametrize(
@@ -233,7 +234,7 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     print("Check grad sparse ho")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
-        assert grad_error < 1
+        assert grad_error < 1e-3
 
 
 list_model_names = ["lasso", "enet", "wLasso", "logreg"]
@@ -268,6 +269,6 @@ if __name__ == "__main__":
         test_val_grad("lasso", "SURE", algo)
         test_check_grad_sparse_ho('lasso', 'MSE', algo)
         test_check_grad_sparse_ho('enet', 'MSE', algo)
-    print("#" * 30)
-    for model_name in list_model_names:
-        test_check_grad_logreg_cvxpy(model_name)
+    # print("#" * 30)
+    # for model_name in list_model_names:
+    #     test_check_grad_logreg_cvxpy(model_name)
