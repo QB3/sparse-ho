@@ -120,7 +120,7 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     def _get_dobj(r, X, beta, alpha, y=None):
-        # the dual variable is theta = (y - X beta) / (alpha[0] n_samples)
+        # the dual variable is theta = (y - X beta) / (alpha[0] * n_samples)
         n_samples = X.shape[0]
         theta = r / (alpha[0] * n_samples)
         dobj = alpha[0] * y @ theta
