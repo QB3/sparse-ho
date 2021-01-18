@@ -61,6 +61,35 @@ def sigma(z):
     return 1 / (1 + np.exp(-z))
 
 
+@njit
+def xlogx(x):
+    if x < 1e-10:
+        return 0.
+    else:
+        return x * np.log(x)
+
+
+@njit
+def negative_ent(x):
+    """
+    x * log(x) + (1 - x) * log(1 - x)
+    """
+    if 0. <= x <= 1.:
+        return xlogx(x) + xlogx(1. - x)
+    else:
+        return np.inf
+
+
+@njit
+def dual_logreg(y, theta, alpha):
+    d_obj = 0
+    # n_samples = len(y)
+    for i in range(y.shape[0]):
+        d_obj -= negative_ent(alpha * y[i] * theta[i])
+    # d_obj /= n_samples
+    return d_obj
+
+
 def mcp_pen(x, threshold, gamma=1.2):
     """ penalty value for mcp regularization
         Remind that gamma > 1

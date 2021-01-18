@@ -3,8 +3,7 @@ from numpy.linalg import norm
 from scipy.sparse import issparse, csc_matrix
 from numba import njit
 
-from sparse_ho.utils import init_dbeta0_new, ST
-from sparse_ho.utils import sigma
+from sparse_ho.utils import init_dbeta0_new, ST, sigma, dual_logreg
 
 from sparse_ho.models.base import BaseModel
 
@@ -133,6 +132,18 @@ class SparseLogreg(BaseModel):
         n_samples = r.shape[0]
         return (np.sum(np.log(1 + np.exp(- r))) / (n_samples)
                 + np.abs(alphas * beta).sum())
+
+    @staticmethod
+    def _get_dobj(r, X, beta, alpha, y):
+        n_samples = len(y)
+        theta = y * sigma(-y * r) / (alpha * n_samples)
+
+        d_norm_theta = np.max(np.abs(X.T @ theta))
+        if d_norm_theta > 1.:
+            theta /= d_norm_theta
+        dobj = dual_logreg(y, theta, alpha)
+
+        return dobj
 
     @staticmethod
     def _get_pobj0(r, beta, alphas, y):
