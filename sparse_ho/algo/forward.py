@@ -132,10 +132,10 @@ def get_beta_jac_iterdiff(
                 dobj = model._get_dobj(r, X, beta, alpha, y)
                 if verbose:
                     print("gap %.2e" % (pobj[-1] - dobj))
-                if pobj[-1] - dobj < np.abs(pobj0 * tol):
+                if pobj[-1] - dobj < pobj0 * tol:
                     break
             else:
-                if (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
+                if (pobj[-2] - pobj[-1] <= pobj0 * tol):
                     break
         if return_all:
             list_beta.append(beta.copy())
