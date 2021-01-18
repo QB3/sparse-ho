@@ -148,8 +148,6 @@ class SparseLogreg(BaseModel):
     def _get_pobj0(r, beta, alphas, y):
         n_samples = r.shape[0]
         return np.log(2) / n_samples
-        # return (np.sum(np.log(1)) / (n_samples))
-        # return (np.sum(np.log(1)) / (n_samples))
 
     @staticmethod
     def _get_jac(dbeta, mask):
