@@ -37,7 +37,7 @@ class Forward():
 def get_beta_jac_iterdiff(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
-        save_iterates=False, verbose=False, use_stop_crit=True):
+        save_iterates=False, verbose=False, use_stop_crit=True, Tgap=20):
     """
     Parameters
     --------------
@@ -127,9 +127,14 @@ def get_beta_jac_iterdiff(
             if verbose:
                 print("relative decrease = ", (pobj[-2] - pobj[-1]) / pobj0)
 
-        if use_stop_crit:
-            if (i > 1) and (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
-                break
+        if use_stop_crit and i % Tgap == 0 and i > 0:
+            if hasattr(model, "_get_dobj"):
+                dobj = model._get_dobj(r, X, beta, alpha, y)
+                if pobj[-1] - dobj < np.abs(pobj0 * tol):
+                    break
+            else:
+                if (pobj[-2] - pobj[-1] <= np.abs(pobj0 * tol)):
+                    break
         if return_all:
             list_beta.append(beta.copy())
         if save_iterates:
