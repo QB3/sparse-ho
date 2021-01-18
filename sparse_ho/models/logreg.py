@@ -129,9 +129,8 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     def _get_pobj(r, X, beta, alphas, y):
-        n_samples = r.shape[0]
-        return (np.sum(np.log(1 + np.exp(- r))) / (n_samples)
-                + np.abs(alphas * beta).sum())
+        pobj = (np.log(1 + np.exp(- r)).mean() + np.abs(alphas * beta).sum()
+        return pobj
 
     @staticmethod
     def _get_dobj(r, X, beta, alpha, y):

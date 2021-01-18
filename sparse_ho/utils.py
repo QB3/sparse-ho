@@ -72,6 +72,7 @@ def xlogx(x):
 @njit
 def negative_ent(x):
     """
+    Negative entropy:
     x * log(x) + (1 - x) * log(1 - x)
     """
     if 0. <= x <= 1.:
@@ -83,10 +84,11 @@ def negative_ent(x):
 @njit
 def dual_logreg(y, theta, alpha):
     d_obj = 0
-    # n_samples = len(y)
+    n_samples = len(y)
     for i in range(y.shape[0]):
-        d_obj -= negative_ent(alpha * y[i] * theta[i])
-    # d_obj /= n_samples
+        print(alpha * n_samples * y[i] * theta[i])
+        d_obj -= negative_ent(alpha * n_samples * y[i] * theta[i])
+    d_obj /= n_samples
     return d_obj
 
 
