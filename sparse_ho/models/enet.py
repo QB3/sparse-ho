@@ -5,7 +5,7 @@ import scipy.sparse.linalg as slinalg
 from numba import njit
 
 from sparse_ho.models.base import BaseModel
-from sparse_ho.utils import prox_elasticnet
+from sparse_ho.utils import prox_elasticnet, ST
 
 
 class ElasticNet(BaseModel):
@@ -117,6 +117,16 @@ class ElasticNet(BaseModel):
         pobj = norm(r) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
         pobj += 0.5 * alphas[1] * norm(beta) ** 2
         return pobj
+
+    @staticmethod
+    def _get_dobj(r, X, beta, alpha, y=None):
+        # the dual variable is theta = (y - X beta) / (alpha[0] n_samples)
+        n_samples = X.shape[0]
+        theta = r / (alpha[0] * n_samples)
+        dobj = alpha[0] * y @ theta
+        dobj -= alpha[0] ** 2 * n_samples / 2 * (theta ** 2).sum()
+        dobj -= alpha[0] ** 2 / alpha[1] / 2 * (ST(X.T @ theta, 1) ** 2).sum()
+        return dobj
 
     @staticmethod
     def _get_jac(dbeta, mask):

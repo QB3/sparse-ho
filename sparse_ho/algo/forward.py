@@ -130,6 +130,8 @@ def get_beta_jac_iterdiff(
         if use_stop_crit and i % Tgap == 0 and i > 0:
             if hasattr(model, "_get_dobj"):
                 dobj = model._get_dobj(r, X, beta, alpha, y)
+                if verbose:
+                    print("gap %.2e" % (pobj[-1] - dobj))
                 if pobj[-1] - dobj < np.abs(pobj0 * tol):
                     break
             else:
