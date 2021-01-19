@@ -124,7 +124,7 @@ class ElasticNet(BaseModel):
         n_samples = X.shape[0]
         theta = r / (alpha[0] * n_samples)
         dobj = alpha[0] * y @ theta
-        dobj -= alpha[0] ** 2 * n_samples / 2 * (theta ** 2).sum()
+        dobj -= alpha[0] ** 2 * n_samples / 2 * np.dot(theta, theta)
         dobj -= alpha[0] ** 2 / alpha[1] / 2 * (ST(X.T @ theta, 1) ** 2).sum()
         return dobj
 
