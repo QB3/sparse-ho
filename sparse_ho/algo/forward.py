@@ -70,6 +70,19 @@ def get_beta_jac_iterdiff(
         backward way
     use_stop_crit: bool
         use a stopping criterion or do all the iterations
+    gap_freq : int
+        After how many passes on the data the dual gap should be computed
+        to stop the iterations.
+
+    Returns
+    -------
+    mask : np.array, shape (n_features,)
+        The mask of non-zero coefficients in beta.
+    dense : np.array, shape (n_nonzeros,)
+        The beta coefficients on the support
+    jac : np.array, shape (n_nonzeros,) or (n_nonzeros, q)
+        The jacobian restricted to the support. If there are more than
+        one hyperparameter then it has two dimensions.
     """
     n_samples, n_features = X.shape
     is_sparse = issparse(X)
@@ -96,12 +109,11 @@ def get_beta_jac_iterdiff(
     # warm start for dbeta
     dbeta, dr = model._init_dbeta_dr(
         X, y, mask0=mask0, dense0=dense0, jac0=jac0, compute_jac=compute_jac)
-    # store the values of the objective
 
+    # store the values of the objective
     pobj0 = model._get_pobj0(r, np.zeros(X.shape[1]), alphas, y)
-    # pobj0 = model._get_pobj(r, np.zeros(X.shape[1]), alphas, y)
     pobj = []
-    # pobj.append(pobj0)
+
     ############################################
     # store the iterates if needed
     if return_all:
@@ -109,7 +121,7 @@ def get_beta_jac_iterdiff(
     if save_iterates:
         list_beta = []
         list_jac = []
-    # print(tol)
+
     for i in range(max_iter):
         if verbose:
             print("%i -st iteration over %i" % (i, max_iter))
@@ -122,6 +134,7 @@ def get_beta_jac_iterdiff(
                 X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
 
         pobj.append(model._get_pobj(r, X, beta, alphas, y))
+        assert pobj[-1] >= 0
 
         if i > 1:
             if verbose:
@@ -130,9 +143,11 @@ def get_beta_jac_iterdiff(
         if use_stop_crit and i % gap_freq == 0 and i > 0:
             if hasattr(model, "_get_dobj"):
                 dobj = model._get_dobj(r, X, beta, alpha, y)
+                dual_gap = pobj[-1] - dobj
+                assert dual_gap >= -10 * np.finfo('float').eps
                 if verbose:
-                    print("gap %.2e" % (pobj[-1] - dobj))
-                if pobj[-1] - dobj < pobj0 * tol:
+                    print("gap %.2e" % dual_gap)
+                if dual_gap < pobj0 * tol:
                     break
             else:
                 if (pobj[-2] - pobj[-1] <= pobj0 * tol):
