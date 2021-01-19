@@ -144,6 +144,8 @@ def get_beta_jac_iterdiff(
             if hasattr(model, "_get_dobj"):
                 dobj = model._get_dobj(r, X, beta, alpha, y)
                 dual_gap = pobj[-1] - dobj
+                if verbose:
+                    print("dual gap %.2e" % dual_gap)
                 assert dual_gap >= -10 * np.finfo('float').eps
                 if verbose:
                     print("gap %.2e" % dual_gap)

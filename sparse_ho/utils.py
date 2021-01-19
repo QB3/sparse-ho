@@ -86,6 +86,7 @@ def dual_logreg(y, theta, alpha):
     d_obj = 0
     n_samples = len(y)
     for i in range(y.shape[0]):
+        # d_obj -= negative_ent(alpha * y[i] * theta[i])
         d_obj -= negative_ent(alpha * n_samples * y[i] * theta[i])
     d_obj /= n_samples
     return d_obj

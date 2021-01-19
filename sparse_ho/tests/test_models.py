@@ -31,8 +31,8 @@ sigma_star = 0.1
 
 y = np.sign(y)
 X_s = csc_matrix(X)
-idx_train = np.arange(0, n_features//2)
-idx_val = np.arange(n_features//2, n_features)
+idx_train = np.arange(0, n_samples//2)
+idx_val = np.arange(n_samples//2, n_features)
 
 # Set alpha for the Lasso
 alpha_max = (np.abs(X[idx_train, :].T @ y[idx_train])).max() / n_samples
@@ -40,7 +40,7 @@ p_alpha = 0.8
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
 log_alpha_max = np.log(alpha_max)
-tol = 1e-16
+tol = 1e-15
 
 # Set alpha1 alpha2 for the enet
 alpha_1 = p_alpha * alpha_max
@@ -150,18 +150,19 @@ def test_beta_jac(key):
         X, y, dict_log_alpha[key], get_v, model=models[key])
 
 
-@pytest.mark.parametrize('key', list(custom_models.keys()))
-def test_beta_jac_custom(key):
+@pytest.mark.parametrize('model_name', list(custom_models.keys()))
+def test_beta_jac_custom(model_name):
     """Check that using sk or celer yields the same solution as sparse ho"""
-    supp, dense, jac = get_beta_jac_fast_iterdiff(
-        X_s, y, dict_log_alpha[key],
-        tol=tol, model=models[key], tol_jac=tol)
-    supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
-        X_s, y, dict_log_alpha[key],
-        tol=tol, model=custom_models[key], tol_jac=tol)
-    assert np.all(supp == supp_custom)
-    assert np.allclose(dense, dense_custom)
-    assert np.allclose(jac, jac_custom)
+    for log_alpha in dict_list_log_alphas[model_name]:
+        supp, dense, jac = get_beta_jac_fast_iterdiff(
+            X_s, y, log_alpha,
+            tol=tol, model=models[model_name], tol_jac=tol)
+        supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+            X_s, y, log_alpha,
+            tol=tol, model=custom_models[model_name], tol_jac=tol)
+        assert np.all(supp == supp_custom)
+        assert np.allclose(dense, dense_custom)
+        assert np.allclose(jac, jac_custom)
 
 
 list_model_crit = [
@@ -263,13 +264,14 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    print("#" * 30)
+    # for model_name in custom_models.keys():
+    test_beta_jac_custom("logreg")    # print("#" * 30)
     for algo in list_algos:
-        print("#" * 20)
+    #     print("#" * 20)
         # test_val_grad("lasso", "SURE", algo)
         # test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        # test_check_grad_sparse_ho('enet', 'MSE', algo)
-        test_check_grad_sparse_ho('logreg', 'logistic', algo)
+        test_check_grad_sparse_ho('enet', 'MSE', algo)
+    # test_check_grad_sparse_ho('logreg', 'logistic', Forward())
     # print("#" * 30)
     # for model_name in list_model_names:
     #     test_check_grad_logreg_cvxpy(model_name)

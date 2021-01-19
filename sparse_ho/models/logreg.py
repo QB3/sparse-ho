@@ -123,6 +123,7 @@ class SparseLogreg(BaseModel):
             v_t_jac[j] *= np.abs(sign_beta[j])
             v_t_jac -= v_t_jac[j] / (
                 L[j] * n_samples) * (X[:, j] * hess_fj) @ X
+            # TODO be careful r = y X beta
             r += X[:, j] * (beta[j-1] - beta[j])
 
         return grad
@@ -135,10 +136,10 @@ class SparseLogreg(BaseModel):
     @staticmethod
     def _get_dobj(r, X, beta, alpha, y):
         n_samples = len(y)
-        theta = y * sigma(-y * r) / (alpha * n_samples)
+        theta = y * sigma(- r) / (alpha * n_samples)
 
-        d_norm_theta = np.max(np.abs(X.T @ theta)) / n_samples
-        if d_norm_theta > n_samples:
+        d_norm_theta = np.max(np.abs(X.T @ theta))
+        if d_norm_theta > 1:
             theta /= d_norm_theta
         dobj = dual_logreg(y, theta, alpha)
 
