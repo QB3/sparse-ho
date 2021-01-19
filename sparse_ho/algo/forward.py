@@ -146,7 +146,7 @@ def get_beta_jac_iterdiff(
                 dual_gap = pobj[-1] - dobj
                 if verbose:
                     print("dual gap %.2e" % dual_gap)
-                assert dual_gap >= -10 * np.finfo('float').eps
+                assert dual_gap >= -1e-12
                 if verbose:
                     print("gap %.2e" % dual_gap)
                 if dual_gap < pobj0 * tol:
