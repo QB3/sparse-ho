@@ -80,8 +80,6 @@ list_model_crit = [
 
 @pytest.mark.parametrize('model_name,criterion', list_model_crit)
 def test_cross_val_criterion(model_name, criterion):
-    # TODO list_criterions = [...]
-    # test val from get_val_grad === get_val
     # verify dtype from criterion, bonne shape
     algo = Forward()
     monitor_get_val = Monitor()
@@ -102,5 +100,5 @@ def test_cross_val_criterion(model_name, criterion):
 
 
 if __name__ == '__main__':
-    for model_name, criterion in list_model_crit:
-        test_cross_val_criterion(model_name, criterion)
+    # for model_name, criterion in list_model_crit:
+    test_cross_val_criterion('logreg', HeldOutLogistic(idx_train, idx_val))

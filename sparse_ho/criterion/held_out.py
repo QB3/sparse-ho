@@ -113,9 +113,8 @@ class HeldOutLogistic(BaseCriterion):
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
-        # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol,
+            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
             compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
