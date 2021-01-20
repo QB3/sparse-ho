@@ -135,7 +135,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
             model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
         return grad
 
-    print("Check grad sparse ho")
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
         assert grad_error < 1e-1
@@ -167,14 +166,10 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    # for model_name in custom_models.keys():
-    test_beta_jac_custom("logreg")    # print("#" * 30)
+    test_beta_jac_custom("logreg")
+    print("#" * 30)
     for algo in list_algos:
-        # print("#" * 20)
-        # test_val_grad("lasso", "SURE", algo)
-        # test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        print("#" * 20)
+        test_val_grad("lasso", "SURE", algo)
+        test_check_grad_sparse_ho('lasso', 'MSE', algo)
         test_check_grad_sparse_ho('enet', 'MSE', algo)
-    # test_check_grad_sparse_ho('logreg', 'logistic', Forward())
-    # print("#" * 30)
-    # for model_name in list_model_names:
-    #     test_check_grad_logreg_cvxpy(model_name)
