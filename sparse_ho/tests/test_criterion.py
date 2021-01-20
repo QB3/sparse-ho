@@ -24,7 +24,7 @@ tol = 1e-15
 
 @pytest.mark.parametrize('model_name,criterion', list_model_crit)
 def test_cross_val_criterion(model_name, criterion):
-    # verify dtype from criterion, bonne shape
+    # verify dtype from criterion, and the good shape
     algo = Forward()
     monitor_get_val = Monitor()
     monitor_get_val_grad = Monitor()

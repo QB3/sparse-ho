@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from scipy.sparse import csc_matrix
 from sklearn import linear_model
 from sklearn.model_selection import KFold
 import celer
@@ -22,7 +23,7 @@ X, y, _ = make_correlated_data(
     n_samples, n_features, corr=corr, snr=snr, random_state=42)
 sigma_star = 0.1
 y = np.sign(y)
-
+X_s = csc_matrix(X)
 
 idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
@@ -48,8 +49,8 @@ models["lasso_custom"] = Lasso(estimator=celer.Lasso(
 
 
 @pytest.mark.parametrize('model_name', list(models.keys()))
-def test_cross_val_criterion(model_name):
-    # TODO we also need to add a test for sparse matrices
+@pytest.mark.parametrize('XX', [X, X_s])
+def test_cross_val_criterion(model_name, XX):
     model = models[model_name]
     alpha_min = alpha_max / 10
     log_alpha_max = np.log(alpha_max)
@@ -66,7 +67,7 @@ def test_cross_val_criterion(model_name):
     criterion = CrossVal(sub_crit, cv=kf)
     algo = Forward()
     grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+        algo, criterion, model, XX, y, log_alpha_min, log_alpha_max,
         monitor_grid, max_evals=n_alphas, tol=tol)
 
     if model_name.startswith("lasso"):
@@ -80,7 +81,7 @@ def test_cross_val_criterion(model_name):
             Cs=len(idx_train) / np.geomspace(
                 alpha_max, alpha_min, num=n_alphas),
             max_iter=max_iter, penalty='l1', solver='liblinear').fit(X, y)
-    reg.score(X, y)
+    reg.score(XX, y)
     if model_name.startswith("lasso"):
         objs_grid_sk = reg.mse_path_.mean(axis=1)
     else:
