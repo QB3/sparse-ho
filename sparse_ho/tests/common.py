@@ -1,15 +1,15 @@
-import pytest
 import itertools
 import numpy as np
+from scipy.sparse import csc_matrix
 from sklearn import linear_model
+
 import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
-from sparse_ho.criterion import (
-    HeldOutMSE, HeldOutLogistic, FiniteDiffMonteCarloSure)
-from sparse_ho.utils import Monitor
-from sparse_ho import Forward
+from sparse_ho.tests.cvxpylayer import \
+    (enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
+        lasso_sure_cvxpy)
 
 # Generate data
 n_samples, n_features = 10, 10
@@ -18,6 +18,7 @@ X, y, _ = make_correlated_data(
 sigma_star = 0.1
 
 y = np.sign(y)
+X_s = csc_matrix(X)
 idx_train = np.arange(0, n_samples//2)
 idx_val = np.arange(n_samples//2, n_features)
 
@@ -57,6 +58,29 @@ custom_models["enet"] = ElasticNet(
 custom_models["logreg"] = SparseLogreg(
     estimator=celer.LogisticRegression(warm_start=True, fit_intercept=False))
 
+# Compute "ground truth" with cvxpylayer
+dict_cvxpy_func = {
+    'lasso': lasso_cvxpy,
+    'enet': enet_cvxpy,
+    'wLasso': weighted_lasso_cvxpy,
+    'logreg': logreg_cvxpy,
+    }
+
+dict_vals_cvxpy = {}
+dict_grads_cvxpy = {}
+for model in models.keys():
+    val_cvxpy, grad_cvxpy = dict_cvxpy_func[model](
+        X, y, np.exp(dict_log_alpha[model]), idx_train, idx_val)
+    dict_vals_cvxpy[model, 'MSE'] = val_cvxpy
+    grad_cvxpy *= np.exp(dict_log_alpha[model])
+    dict_grads_cvxpy[model, 'MSE'] = grad_cvxpy
+
+val_cvxpy, grad_cvxpy = lasso_sure_cvxpy(
+    X, y, np.exp(dict_log_alpha["lasso"]), sigma_star)
+grad_cvxpy *= np.exp(dict_log_alpha["lasso"])
+dict_vals_cvxpy["lasso", "SURE"] = val_cvxpy
+dict_grads_cvxpy["lasso", "SURE"] = grad_cvxpy
+
 
 # log alpha to be tested by checkgrad
 dict_list_log_alphas = {}
@@ -70,35 +94,7 @@ dict_list_log_alphas["logreg"] = np.log(
 dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
     dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
 
-list_model_crit = [
-    ('lasso',  HeldOutMSE(idx_train, idx_val)),
-    ('enet', HeldOutMSE(idx_train, idx_val)),
-    ('wLasso', HeldOutMSE(idx_train, idx_val)),
-    ('lasso', FiniteDiffMonteCarloSure(sigma_star)),
-    ('logreg', HeldOutLogistic(idx_train, idx_val))]
 
-
-@pytest.mark.parametrize('model_name,criterion', list_model_crit)
-def test_cross_val_criterion(model_name, criterion):
-    # verify dtype from criterion, bonne shape
-    algo = Forward()
-    monitor_get_val = Monitor()
-    monitor_get_val_grad = Monitor()
-
-    model = models[model_name]
-    for log_alpha in dict_list_log_alphas[model_name]:
-        criterion.get_val(
-            model, X, y, log_alpha, tol=tol, monitor=monitor_get_val)
-        criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v,
-            tol=tol, monitor=monitor_get_val_grad)
-
-    obj_val = np.array(monitor_get_val.objs)
-    obj_val_grad = np.array(monitor_get_val_grad.objs)
-
-    np.testing.assert_allclose(obj_val, obj_val_grad)
-
-
-if __name__ == '__main__':
-    for model_name, criterion in list_model_crit:
-        test_cross_val_criterion(model_name, criterion)
+def get_v(mask, dense):
+    return 2 * (X[np.ix_(idx_val, mask)].T @ (
+        X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)

@@ -6,7 +6,7 @@ import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
-from sparse_ho.models import Lasso  # , ElasticNet, SparseLogreg
+from sparse_ho.models import Lasso
 from sparse_ho import Forward
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, CrossVal, HeldOutLogistic)
@@ -42,15 +42,9 @@ tol = 1e-8
 # Set models to be tested
 models = {}
 models["lasso"] = Lasso(estimator=None)
-# models["enet"] = ElasticNet(estimator=None)
-# models["logreg"] = SparseLogreg(estimator=None)
 
 models["lasso_custom"] = Lasso(estimator=celer.Lasso(
     warm_start=True, fit_intercept=False))
-# custom_models["enet"] = ElasticNet(
-#     estimator=linear_model.ElasticNet(warm_start=True, fit_intercept=False))
-# models["logreg_custom"] = SparseLogreg(
-#     estimator=celer.LogisticRegression(warm_start=True, fit_intercept=False))
 
 
 @pytest.mark.parametrize('model_name', list(models.keys()))
