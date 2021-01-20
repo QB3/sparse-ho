@@ -2,16 +2,10 @@
 # TODO include tests for wLasso with custom solver
 # TODO add SVM and SVR here -->> We will do it with QK
 import pytest
-import itertools
 
 import numpy as np
 from scipy.optimize import check_grad
-from scipy.sparse import csc_matrix
-from sklearn import linear_model
-import celer
-from celer.datasets import make_correlated_data
 
-from sparse_ho.models import Lasso, ElasticNet, WeightedLasso, SparseLogreg
 from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
@@ -19,14 +13,12 @@ from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
-from sparse_ho.tests.cvxpylayer import \
-    (enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
-        lasso_sure_cvxpy)
 
 from sparse_ho.tests.common import (
-    X, X_s, y, n_samples, n_features, sigma_star, idx_train, idx_val,
-    dict_log_alpha, alpha_max, models, custom_models, dict_cvxpy_func,
-    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_v)
+    X, X_s, y, sigma_star, idx_train, idx_val,
+    dict_log_alpha, models, custom_models, dict_cvxpy_func,
+    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_v,
+    list_model_crit)
 
 # list of algorithms to be tested
 list_algos = [
@@ -37,11 +29,6 @@ list_algos = [
 ]
 
 tol = 1e-15
-
-
-# def get_v(mask, dense):
-#     return 2 * (X[np.ix_(idx_val, mask)].T @ (
-#         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
 
 
 @pytest.mark.parametrize('key', list(models.keys()))
@@ -87,14 +74,6 @@ def test_beta_jac_custom(model_name):
         assert np.all(supp == supp_custom)
         assert np.allclose(dense, dense_custom)
         assert np.allclose(jac, jac_custom)
-
-
-list_model_crit = [
-    ('lasso', 'MSE'),
-    ('enet', 'MSE'),
-    ('wLasso', 'MSE'),
-    ('lasso', 'SURE'),
-    ('logreg', 'logistic')]
 
 
 @pytest.mark.parametrize('model_name,criterion_name', list_model_crit)

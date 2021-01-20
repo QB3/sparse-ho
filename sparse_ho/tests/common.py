@@ -28,7 +28,6 @@ p_alpha = 0.8
 alpha = p_alpha * alpha_max
 log_alpha = np.log(alpha)
 log_alpha_max = np.log(alpha_max)
-tol = 1e-15
 
 # Set alpha1 alpha2 for the enet
 alpha_1 = p_alpha * alpha_max
@@ -98,3 +97,11 @@ dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
 def get_v(mask, dense):
     return 2 * (X[np.ix_(idx_val, mask)].T @ (
         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
+
+
+list_model_crit = [
+    ('lasso', 'MSE'),
+    ('enet', 'MSE'),
+    ('wLasso', 'MSE'),
+    ('lasso', 'SURE'),
+    ('logreg', 'logistic')]
