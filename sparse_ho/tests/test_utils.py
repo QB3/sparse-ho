@@ -2,20 +2,22 @@ import numpy as np
 from numpy.linalg import norm
 from sklearn.model_selection import train_test_split
 from sklearn import linear_model
+from celer.datasets import make_correlated_data
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho import grad_search
-from sparse_ho.datasets import get_synt_data
 from sparse_ho.optimizers import LineSearch
 
 
-X_, y_, beta_star = get_synt_data(
-    n_samples=200, n_features=70, n_times=1, snr=5)[:3]
+n_samples, n_features, corr, snr = 200, 70, 0.1, 5
 
-X, X_unseen, y, y_unseen = train_test_split(X_, y_)
+X, y, _ = make_correlated_data(
+    n_samples, n_features, corr=corr, snr=snr, random_state=42)
+
+X, _, y, _ = train_test_split(X, y)
 
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)

@@ -4,7 +4,7 @@ import scipy.sparse.linalg as slinalg
 from numba import njit
 
 from sparse_ho.utils import init_dbeta0_new, ST
-
+from sparse_ho.utils import sparse_scalar_product
 from sparse_ho.models.base import BaseModel
 
 
@@ -115,6 +115,27 @@ class Lasso(BaseModel):
         return grad
 
     @staticmethod
+    @njit
+    def _update_bcd_jac_backward_sparse(
+            data, indptr, indices, n_samples, n_features,
+            alpha, grad, beta, v_t_jac, L):
+        sign_beta = np.sign(beta)
+        for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+            if L[j] != 0:
+                Xjs = data[indptr[j]:indptr[j+1]]
+                idx_nz = indices[indptr[j]:indptr[j+1]]
+                grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
+                v_t_jac[j] *= np.abs(sign_beta[j])
+                cste = v_t_jac[j] / (L[j] * n_samples)
+                for i in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
+                    Xis = data[indptr[i]:indptr[i+1]]
+                    idx = indices[indptr[i]:indptr[i+1]]
+                    product = sparse_scalar_product(Xjs, idx_nz, Xis, idx)
+                    v_t_jac[i] -= cste * product
+
+        return grad
+
+    @staticmethod
     def _get_pobj0(r, beta, alphas, y=None):
         n_samples = r.shape[0]
         return norm(y) ** 2 / (2 * n_samples)
@@ -124,6 +145,18 @@ class Lasso(BaseModel):
         n_samples = r.shape[0]
         return (
             norm(r) ** 2 / (2 * n_samples) + np.abs(alphas * beta).sum())
+
+    @staticmethod
+    def _get_dobj(r, X, beta, alpha, y=None):
+        # the dual variable is theta = (y - X beta) / (alpha n_samples)
+        n_samples = X.shape[0]
+        theta = r / (alpha * n_samples)
+        norm_inf_XTtheta = np.max(np.abs(X.T @ theta))
+        if norm_inf_XTtheta > 1:
+            theta /= norm_inf_XTtheta
+        dobj = alpha * y @ theta
+        dobj -= alpha ** 2 * n_samples / 2 * (theta ** 2).sum()
+        return dobj
 
     @staticmethod
     def _get_jac(dbeta, mask):

@@ -4,6 +4,29 @@ from numba import njit
 
 
 @njit
+def sparse_scalar_product(Xjs, idx_j, Xis, idx_i):
+    product = 0
+    if len(idx_j) != 0 and len(idx_i) != 0:
+        cursor_j = 0
+        cursor_i = 0
+        for k in range(len(idx_j) + len(idx_i)):
+            if idx_j[cursor_j] == idx_i[cursor_i]:
+                product += Xjs[cursor_j] * Xis[cursor_i]
+                cursor_i += 1
+                cursor_j += 1
+
+            elif idx_j[cursor_j] < idx_i[cursor_i]:
+                cursor_j += 1
+            else:
+                cursor_i += 1
+            if cursor_j >= (len(idx_j)) or cursor_i >= (len(idx_i)):
+                break
+        return product
+    else:
+        return 0.0
+
+
+@njit
 def ST(x, alpha):
     return np.sign(x) * np.maximum(np.abs(x) - alpha, 0.)
 
@@ -36,6 +59,36 @@ def ind_box(x, C):
 @njit
 def sigma(z):
     return 1 / (1 + np.exp(-z))
+
+
+@njit
+def xlogx(x):
+    if x < 1e-10:
+        return 0.
+    else:
+        return x * np.log(x)
+
+
+@njit
+def negative_ent(x):
+    """
+    Negative entropy:
+    x * log(x) + (1 - x) * log(1 - x)
+    """
+    if 0. <= x <= 1.:
+        return xlogx(x) + xlogx(1. - x)
+    else:
+        return np.inf
+
+
+@njit
+def dual_logreg(y, theta, alpha):
+    d_obj = 0
+    n_samples = len(y)
+    for i in range(y.shape[0]):
+        d_obj -= negative_ent(alpha * n_samples * y[i] * theta[i])
+    d_obj /= n_samples
+    return d_obj
 
 
 def mcp_pen(x, threshold, gamma=1.2):

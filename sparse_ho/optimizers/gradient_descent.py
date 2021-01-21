@@ -42,19 +42,19 @@ class GradientDescent(BaseOptimizer):
         for i in range(self.n_outer):
             value_outer, grad_outer = _get_val_grad(
                 log_alphak, self.tol, monitor)
-            if self.step_size is None:
-                self.step_size = self.p_grad0 / np.linalg.norm(grad_outer)
+            if self.step_size is None or i < 10:
+                self.step_size = self.p_grad0 / (
+                    np.linalg.norm(grad_outer) + 1e-2)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
                 print(
-                    "Iteration %i / %i ||" % (i+1, self.n_outer) +
-                    "Value outer criterion: %f ||" % value_outer +
-                    "norm grad %f" % norm(grad_outer))
+                    "Iteration %i/%i ||" % (i+1, self.n_outer) +
+                    "Value outer criterion: %.2e ||" % value_outer +
+                    "norm grad %.2e" % norm(grad_outer))
             if len(monitor.times) > 0 and monitor.times[-1] > self.t_max:
                 break
 
             if i > 0 and (monitor.objs[-1] > monitor.objs[-2]):
-                # import ipdb; ipdb.set_trace()
                 self.step_size /= 10
         return log_alphak, value_outer, grad_outer
