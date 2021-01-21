@@ -16,13 +16,11 @@ if __name__ == '__main__':
     Y = OneHotEncoder().fit_transform(y[:, None]).toarray()
     betas = rng.randn(X.shape[1], K)
 
-    print(cross_entropy(betas, X, Y))
-
     def f(x):
         return cross_entropy(x.reshape(X.shape[1], K), X, Y)
 
     def gradf(x):
         return grad_cross_entropy(x.reshape(X.shape[1], K), X, Y).ravel()
 
-    print(check_grad(f, gradf, x0=betas.ravel()))
-    assert np.allclose(check_grad(f, gradf, x0=betas.ravel()), 0, atol=1e-5)
+    np.testing.assert_allclose(
+        check_grad(f, gradf, x0=betas.ravel()), 0, atol=1e-5)
