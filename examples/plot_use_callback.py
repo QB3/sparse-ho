@@ -8,7 +8,7 @@ as in scipy.
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
-#
+#          Mathurin Massias <mathurin.massias@gmail.com>
 # License: BSD (3-clause)
 
 import numpy as np
@@ -41,7 +41,7 @@ else:
         n_samples=1000, n_features=1000, noise=40, random_state=0)
 
 # The dataset is split in 2: the data for training and validation: X
-# Useen data X_test, asserting the quality of the model
+# Unseen data X_test, asserting the quality of the model
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
 
 n_samples = X.shape[0]
@@ -73,13 +73,10 @@ def callback(val, grad, mask, dense, log_alpha):
     objs_test.append(
         norm(X_test[:, mask] @ dense - y_test) ** 2 / len(y_test))
 
+
 ##############################################################################
 # Grad-search with sparse-ho and callback
 # ---------------------------------------
-
-
-print('sparse-ho started')
-
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
@@ -89,9 +86,6 @@ optimizer = LineSearch(n_outer=30, tol=tol)
 
 grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 
-
-print('sparse-ho finished')
-
 ##############################################################################
 # Plot results
 # ------------
@@ -100,6 +94,5 @@ plt.plot(monitor.times, objs_test)
 plt.tick_params(width=5)
 plt.xlabel("Times (s)")
 plt.ylabel(r"$\|y^{\rm{test}} - X^{\rm{test}} \hat \beta^{(\lambda)} \|^2$")
-plt.legend()
 plt.tight_layout()
 plt.show(block=False)
