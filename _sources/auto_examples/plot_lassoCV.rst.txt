@@ -127,7 +127,7 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   10.2s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   12.7s finished
     scikit finished
 
 
@@ -234,8 +234,8 @@ Plot results
 
  .. code-block:: none
 
-    Time to compute CV for scikit-learn: 10.18
-    Time to compute CV for sparse-ho: 2.81
+    Time to compute CV for scikit-learn: 12.73
+    Time to compute CV for sparse-ho: 2.60
     Minimum objective grid-search 1938.13556
     Minimum objective grad-search 1927.89740
 
@@ -245,7 +245,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.441 seconds)
+   **Total running time of the script:** ( 0 minutes  15.729 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_lassoCV.py:

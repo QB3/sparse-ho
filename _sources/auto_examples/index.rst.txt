@@ -14,12 +14,12 @@ can be done with the sparse_ho library.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="How to use custom metrics?">
+    <div class="sphx-glr-thumbcontainer" tooltip="Monitor custom metrics along hyperoptimization">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_use_callback_thumb.png
-     :alt: How to use custom metrics?
+     :alt: Monitor custom metrics along hyperoptimization
 
      :ref:`sphx_glr_auto_examples_plot_use_callback.py`
 
