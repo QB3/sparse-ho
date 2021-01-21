@@ -1,9 +1,9 @@
 """
-===========================
-How to use custom metrics?
-===========================
-This example shows how to compute customize metrics using a callback function
-as in scipy.
+==============================================
+Monitor custom metrics along hyperoptimization
+==============================================
+This example shows how to compute customize metrics using a callback function,
+as in scipy.optimize.
 """
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
@@ -16,6 +16,7 @@ from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
 from sklearn import linear_model
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
@@ -40,25 +41,19 @@ else:
     X, y = make_regression(
         n_samples=1000, n_features=1000, noise=40, random_state=0)
 
-# The dataset is split in 2: the data for training and validation: X
-# Unseen data X_test, asserting the quality of the model
+# The dataset is split in 2: the data for training and validation: X/y and
+# the unseen data X_test/y_test, use to assess the quality of the model
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
 
 n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
-n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
-alpha_max /= len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 log_alpha0 = np.log(alpha_max / 10)
 
-tol = 1e-7
-max_iter = 1e5
-
-
 estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=max_iter, warm_start=True)
+    fit_intercept=False, max_iter=1e5, warm_start=True)
 
 #############################################################################
 # Call back definition
@@ -66,12 +61,9 @@ objs_test = []
 
 
 def callback(val, grad, mask, dense, log_alpha):
-    beta = np.zeros(len(mask))
-    beta[mask] = dense
     # The custom quantity is added at each outer iteration:
-    # here the loss on test data
-    objs_test.append(
-        norm(X_test[:, mask] @ dense - y_test) ** 2 / len(y_test))
+    # here the prediction MSE on test data
+    objs_test.append(mean_squared_error(X_test[:, mask] @ dense, y_test))
 
 
 ##############################################################################
@@ -82,7 +74,7 @@ criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
 # use Monitor(callback) with your custom callback
 monitor = Monitor(callback=callback)
-optimizer = LineSearch(n_outer=30, tol=tol)
+optimizer = LineSearch(n_outer=30)
 
 grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 
