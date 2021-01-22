@@ -504,13 +504,11 @@ class SSVR(BaseModel):
 
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
 
-        temp = dalpha[full_supp].T @ Xs[full_supp, :]
-        temp += dgamma + np.repeat(dmu, n_features)
-        quadratic_term = temp.T @ temp
-
-        linear_term = temp.T @ Xs[maskC, :].T @ alpha[maskC]
-        res = quadratic_term + linear_term
-        return norm(res)
+        vecX = dalpha[full_supp].T @ Xs[full_supp, :]
+        vecX += dgamma + np.repeat(dmu, n_features)
+        quadratic_term = vecX.T @ vecX
+        linear_term = vecX.T @ Xs[maskC, :].T @ alpha[maskC]
+        return norm(quadratic_term + linear_term)
 
     def _use_estimator(self, X, y, hyperparam, tol, max_iter):
         if self.estimator is None:
