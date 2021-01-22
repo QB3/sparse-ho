@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -45,7 +45,7 @@ dict_markers['random'] = '*'
 
 dict_title = {}
 dict_title["rcv1_train"] = "rcv1"
-dict_title["20newsgroups"] = "20news"
+dict_title["news20"] = "news20"
 dict_title["finance"] = "finance"
 dict_title["kdda_train"] = "kdda"
 dict_title["climate"] = "climate"
@@ -53,7 +53,7 @@ dict_title["leukemia"] = "leukemia"
 dict_title["real-sim"] = "real-sim"
 
 dict_markevery = {}
-dict_markevery["20newsgroups"] = 5
+dict_markevery["news20"] = 5
 dict_markevery["finance"] = 10
 dict_markevery["rcv1_train"] = 1
 dict_markevery["real-sim"] = 10
@@ -72,7 +72,7 @@ dict_marker_size['lhs'] = 4
 dict_n_feature = {}
 dict_n_feature["rcv1_train"] = r"($p=19,959$)"
 dict_n_feature["real-sim"] = r"($p=20,958$)"
-dict_n_feature["20newsgroups"] = r"($p=130,107$)"
+dict_n_feature["news20"] = r"($p=130,107$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
 dict_n_feature["leukemia"] = r"($p=7129$)"
 
@@ -80,32 +80,32 @@ dict_xmax = {}
 dict_xmax["logreg", "rcv1_train"] = 20
 dict_xmax["logreg", "real-sim"] = 30
 dict_xmax["logreg", "leukemia"] = 5
-dict_xmax["logreg", "20newsgroups"] = None
+dict_xmax["logreg", "news20"] = None
 
 dict_xmax["lasso", "rcv1_train"] = 60
 dict_xmax["lasso", "real-sim"] = 200
 dict_xmax["lasso", "leukemia"] = 5
-dict_xmax["lasso", "20newsgroups"] = 15
+dict_xmax["lasso", "news20"] = 1200
 
 dict_xticks = {}
 dict_xticks["lasso", "rcv1_train"] = (-6, -4, -2, 0)
 dict_xticks["lasso", "real-sim"] = (-6, -4, -2, 0)
 dict_xticks["lasso", "leukemia"] = (-6, -4, -2, 0)
-dict_xticks["lasso", "20newsgroups"] = (-8, -6, -4, -2, 0)
+dict_xticks["lasso", "news20"] = (-8, -6, -4, -2, 0)
 
 dict_xticks["logreg", "rcv1"] = (-8, -6, -4, -2, 0)
 dict_xticks["logreg", "real-sim"] = (-8, -6, -4, -2, 0)
 dict_xticks["logreg", "leukemia"] = (-8, -6, -4, -2, 0)
-dict_xticks["logreg", "20newsgroups"] = (-8, -6, -4, -2, 0)
+dict_xticks["logreg", "news20"] = (-8, -6, -4, -2, 0)
 
 markersize = 8
 
 # dataset_names = ["rcv1"]
-# dataset_names = ["rcv1", "20newsgroups", "finance"]
+# dataset_names = ["rcv1", "news20", "finance"]
 # dataset_names = ["rcv1", "real-sim"]
-dataset_names = ["rcv1_train", "real-sim"]
+dataset_names = ["rcv1_train", "real-sim", "news20"]
 # dataset_names = ["leukemia", "rcv1", "real-sim"]
-# dataset_names = ["rcv1", "real-sim", "20newsgroups"]
+# dataset_names = ["rcv1", "real-sim", "news20"]
 
 
 plt.close('all')
@@ -212,7 +212,7 @@ for idx, dataset in enumerate(dataset_names):
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
-axarr_grad.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
+axarr_grad.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
@@ -249,15 +249,15 @@ for method in methods:
 fig_legend = plt.figure(figsize=[18, 4])
 fig_legend.legend(
     [l[0] for l in lines], labels,
-    ncol=3, loc='upper center', fontsize=fontsize - 4)
+    ncol=4, loc='upper center', fontsize=fontsize - 4)
 fig_legend.tight_layout()
 if save_fig:
     fig_legend.savefig(
         fig_dir + "lasso_pred_legend.pdf", bbox_inches="tight")
 fig_legend.show()
 
-fig5 = plt.figure(figsize=[18, 4])
-fig5.legend([l[0] for l in lines], labels,
-            ncol=6, loc='upper center', fontsize=fontsize - 4)
-fig5.tight_layout()
-fig5.show()
+# fig5 = plt.figure(figsize=[18, 4])
+# fig5.legend([l[0] for l in lines], labels,
+#             ncol=4, loc='upper center', fontsize=fontsize - 4)
+# fig5.tight_layout()
+# fig5.show()
