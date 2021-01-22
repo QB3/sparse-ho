@@ -111,3 +111,5 @@ list_model_crit = [
     ('lasso', 'SURE'),
     ('logreg', 'logistic'),
     ('svm', 'MSE')]
+
+list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm"]

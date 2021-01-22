@@ -18,7 +18,7 @@ from sparse_ho.tests.common import (
     X, X_s, y, sigma_star, idx_train, idx_val,
     dict_log_alpha, models, custom_models, dict_cvxpy_func,
     dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_v,
-    list_model_crit)
+    list_model_crit, list_model_names)
 
 # list of algorithms to be tested
 list_algos = [
@@ -115,14 +115,7 @@ def test_val_grad(model_name, criterion_name, algo):
         rtol=1e-5, atol=1e-5)
 
 
-@pytest.mark.parametrize(
-    'model_name,criterion', [
-        ('lasso', 'MSE'),
-        ('enet', 'MSE'),
-        ('wLasso', 'MSE'),
-        ('logreg', 'logistic'),
-    ]
-)
+@pytest.mark.parametrize('model_name,criterion', list_model_crit)
 @pytest.mark.parametrize('algo', list_algos)
 def test_check_grad_sparse_ho(model_name, criterion, algo):
     """Check that all methods return a good gradient using check_grad"""
@@ -149,9 +142,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     for log_alpha in dict_list_log_alphas[model_name]:
         grad_error = check_grad(get_val, get_grad, log_alpha)
         assert grad_error < 1e-1
-
-
-list_model_names = ["lasso", "enet", "wLasso", "logreg"]
 
 
 @pytest.mark.parametrize('model_name', list_model_names)
