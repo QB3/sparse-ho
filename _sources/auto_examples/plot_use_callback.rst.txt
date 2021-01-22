@@ -24,7 +24,7 @@ Monitor custom metrics along hyperoptimization
 This example shows how to compute customize metrics using a callback function,
 as in scipy.optimize.
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-58
+.. GENERATED FROM PYTHON SOURCE LINES 8-57
 
 .. code-block:: default
 
@@ -35,7 +35,6 @@ as in scipy.optimize.
     # License: BSD (3-clause)
 
     import numpy as np
-    from numpy.linalg import norm
     import matplotlib.pyplot as plt
 
     from sklearn import linear_model
@@ -85,11 +84,11 @@ as in scipy.optimize.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-60
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Call back definition
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-68
 
 .. code-block:: default
 
@@ -109,12 +108,12 @@ Call back definition
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-72
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 Grad-search with sparse-ho and callback
 ---------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-81
+.. GENERATED FROM PYTHON SOURCE LINES 71-80
 
 .. code-block:: default
 
@@ -142,12 +141,12 @@ Grad-search with sparse-ho and callback
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-84
+.. GENERATED FROM PYTHON SOURCE LINES 81-83
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-91
+.. GENERATED FROM PYTHON SOURCE LINES 83-90
 
 .. code-block:: default
 
@@ -172,7 +171,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.220 seconds)
+   **Total running time of the script:** ( 0 minutes  1.710 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_use_callback.py:
