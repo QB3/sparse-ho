@@ -126,19 +126,18 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 # ------------
 
 scaling_factor = results.max()
-
+cmap = discrete_cmap(n_outer, 'Greens')
+c = np.linspace(1, n_outer, n_outer)
 X, Y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, results.T / scaling_factor)
 ax.scatter(
     X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
     clip_on=False, cmap="viridis")
-cmap = discrete_cmap(n_outer, 'Greens')
-colors = np.linspace(1, n_outer, n_outer)
 ax.scatter(
     np.exp(monitor.log_alphas[:, 0]) / alpha_max,
     np.exp(monitor.log_alphas[:, 1]) / alpha_max,
-    s=50, c=colors,
+    s=50, cmap=cmap, c=c,
     marker="X", label="$1$st order", clip_on=False)
 ax.set_xlim(X.min(), X.max())
 ax.set_ylim(Y.min(), Y.max())
