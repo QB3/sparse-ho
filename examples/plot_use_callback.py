@@ -12,7 +12,6 @@ as in scipy.optimize.
 # License: BSD (3-clause)
 
 import numpy as np
-from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
 from sklearn import linear_model
