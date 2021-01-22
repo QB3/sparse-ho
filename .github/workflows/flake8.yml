@@ -1,6 +1,14 @@
 name: linter
 
-on: push
+on:
+  create:
+    branches:
+      - 'master'
+    tags:
+      - '**'
+  pull_request:
+    branches:
+      - master
 
 jobs:
   lint:
