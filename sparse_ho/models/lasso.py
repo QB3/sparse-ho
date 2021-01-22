@@ -147,6 +147,18 @@ class Lasso(BaseModel):
             norm(r) ** 2 / (2 * n_samples) + np.abs(alphas * beta).sum())
 
     @staticmethod
+    def _get_dobj(r, X, beta, alpha, y=None):
+        # the dual variable is theta = (y - X beta) / (alpha n_samples)
+        n_samples = X.shape[0]
+        theta = r / (alpha * n_samples)
+        norm_inf_XTtheta = np.max(np.abs(X.T @ theta))
+        if norm_inf_XTtheta > 1:
+            theta /= norm_inf_XTtheta
+        dobj = alpha * y @ theta
+        dobj -= alpha ** 2 * n_samples / 2 * (theta ** 2).sum()
+        return dobj
+
+    @staticmethod
     def _get_jac(dbeta, mask):
         return dbeta[mask]
 

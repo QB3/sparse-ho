@@ -1,45 +1,36 @@
+import pytest
 import numpy as np
-import sklearn
-import sklearn.linear_model
-from sklearn.model_selection import KFold
 
-from sparse_ho.models import Lasso
-from sparse_ho.criterion import CrossVal, HeldOutMSE
+from sparse_ho.criterion import (
+    HeldOutMSE, HeldOutLogistic, FiniteDiffMonteCarloSure)
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.synthetic import get_synt_data
 from sparse_ho import Forward
 
-n_samples = 100
-n_features = 10
-n_active = 2
-SNR = 3
-rho = 0.5
-
-X, y, _, _, _ = get_synt_data(
-    dictionary_type="Toeplitz", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
-
-alpha_max = (np.abs(X.T @ y)).max() / n_samples
-tol = 1e-8
-
-estimator = sklearn.linear_model.Lasso(
-    fit_intercept=False, max_iter=10000, warm_start=True)
-model = Lasso(estimator=estimator)
-
-log_alphas = np.log(np.geomspace(alpha_max, alpha_max / 100))
+from sparse_ho.tests.common import (
+    X, y, sigma_star, idx_train, idx_val,
+    models, dict_list_log_alphas)
 
 
-def test_cross_val_criterion():
-    kf = KFold(n_splits=5, shuffle=True, random_state=56)
-    mse = HeldOutMSE(None, None)
-    criterion = CrossVal(mse, cv=kf)
+list_model_crit = [
+    ('lasso',  HeldOutMSE(idx_train, idx_val)),
+    ('enet', HeldOutMSE(idx_train, idx_val)),
+    ('wLasso', HeldOutMSE(idx_train, idx_val)),
+    ('lasso', FiniteDiffMonteCarloSure(sigma_star)),
+    ('logreg', HeldOutLogistic(idx_train, idx_val))]
+
+
+tol = 1e-15
+
+
+@pytest.mark.parametrize('model_name,criterion', list_model_crit)
+def test_cross_val_criterion(model_name, criterion):
+    # verify dtype from criterion, and the good shape
     algo = Forward()
-
     monitor_get_val = Monitor()
     monitor_get_val_grad = Monitor()
 
-    for log_alpha in log_alphas:
+    model = models[model_name]
+    for log_alpha in dict_list_log_alphas[model_name]:
         criterion.get_val(
             model, X, y, log_alpha, tol=tol, monitor=monitor_get_val)
         criterion.get_val_grad(
@@ -53,4 +44,5 @@ def test_cross_val_criterion():
 
 
 if __name__ == '__main__':
-    test_cross_val_criterion()
+    for model_name, criterion in list_model_crit:
+        test_cross_val_criterion(model_name, criterion)

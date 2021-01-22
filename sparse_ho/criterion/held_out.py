@@ -11,23 +11,23 @@ from sparse_ho.criterion.base import BaseCriterion
 class HeldOutMSE(BaseCriterion):
     """Held out loss for quadratic datafit.
 
+    Parameters
+    ----------
+    idx_train: np.array
+        indices of the training set
+    idx_test: np.array
+        indices of the testing set
+
+
     Attributes
     ----------
-    TODO
+        TODO
     """
     # XXX : this code should be the same as CrossVal as you can pass
     # cv as [(train, test)] ie directly the indices of the train
     # and test splits.
 
     def __init__(self, idx_train, idx_val):
-        """
-        Parameters
-        ----------
-        idx_train: np.array
-            indices of the training set
-        idx_test: np.array
-            indices of the testing set
-        """
         self.idx_train = idx_train
         self.idx_val = idx_val
 
@@ -85,17 +85,16 @@ class HeldOutMSE(BaseCriterion):
 
 class HeldOutLogistic(BaseCriterion):
     """Logistic loss on held out data
+
+    Parameters
+    ----------
+    idx_train: np.array
+        indices of the training set
+    idx_val: np.array
+        indices of the validation set
     """
 
     def __init__(self, idx_train, idx_val):
-        """
-        Parameters
-        ----------
-        idx_train: np.array
-            indices of the training set
-        idx_val: np.array
-            indices of the validation set
-        """
         self.idx_train = idx_train
         self.idx_val = idx_val
 
@@ -111,9 +110,8 @@ class HeldOutLogistic(BaseCriterion):
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
         # TODO add warm start
-        # TODO on train or on test ?
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_val], y[self.idx_val], log_alpha, model, tol=tol,
+            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
             compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
