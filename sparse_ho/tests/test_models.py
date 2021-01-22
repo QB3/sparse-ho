@@ -32,6 +32,7 @@ tol = 1e-15
 X_r = X_s.tocsr()
 X_c = X_s
 
+
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac(key):
     """Tests that algorithms computing the Jacobian return the same Jacobian"""

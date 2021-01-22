@@ -6,7 +6,7 @@ from scipy.sparse import issparse
 from numba import njit
 
 from sparse_ho.models.base import BaseModel
-from sparse_ho.utils import proj_box_svm, ind_box, compute_grad_proj
+from sparse_ho.utils import proj_box_svm, ind_box
 from sparse_ho.utils import init_dbeta0_new
 
 
@@ -277,13 +277,15 @@ class SVM(BaseModel):
         maskC = r == C
         full_supp = np.logical_and(r != 0, r != C)
         if issparse(Xs):
-            dryX = dr[full_supp].T @ (Xs[full_supp, :].T).multiply(ys[full_supp]).T
+            dryX = dr[full_supp].T @ \
+                (Xs[full_supp, :].T).multiply(ys[full_supp]).T
         else:
             dryX = dr[full_supp].T @ (ys[full_supp] * Xs[full_supp, :].T).T
         quadratic_term = dryX.T @ dryX
         if maskC.sum() != 0:
             if issparse(Xs):
-                linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ r[maskC]
+                linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ \
+                    r[maskC]
             else:
                 linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ r[maskC]
         else:
