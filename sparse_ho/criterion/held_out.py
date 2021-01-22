@@ -73,10 +73,7 @@ class HeldOutMSE(BaseCriterion):
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_beta(
-            X_train, y_train, mask, dense)
         val = self.get_val_outer(X_val, y_val, mask, dense)
-
         if monitor is not None:
             monitor(val, grad, mask, dense, log_alpha)
         return val, grad
@@ -148,7 +145,6 @@ class HeldOutLogistic(BaseCriterion):
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_beta(X_train, y_train, mask, dense)
         val = self.get_val_outer(X_val, y_val, mask, dense)
         if monitor is not None:
             monitor(val, grad, mask, dense, log_alpha)
@@ -225,8 +221,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
-        mask, dense = model.get_beta(
-            X_train, y_train, mask, dense)
+
         val = self.get_val_outer(X_val, y_val, mask, dense)
 
         if monitor is not None:
@@ -238,7 +233,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
-        mask, dense = model.get_beta(mask, dense)
         val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
