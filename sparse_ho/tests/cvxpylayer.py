@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from cvxpylayers.torch import CvxpyLayer
 from sklearn.utils import check_random_state
+from celer.datasets import make_correlated_data
 
 torch.set_default_dtype(torch.double)
 
@@ -221,22 +222,52 @@ def svm_cvxpy(X, y, C, idx_train, idx_val):
     grad = np.array(C_th.grad)
     return val, grad
 
+def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
+    Xtrain, Xtest, ytrain, ytest = map(
+        torch.from_numpy, [
+            X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
 
-# if __name__ == "__main__":
-#     from sklearn import datasets
-#     n_samples = 100
-#     n_features = 300
+    n_samples_train, n_features = Xtrain.shape
 
-#     X, y = datasets.make_classification(
-#         n_samples=n_samples,
-#         n_features=n_features, n_informative=50,
-#         random_state=11, flip_y=0.1, n_redundant=0)
+    # set up variables and parameters
+    beta_cp = cp.Variable(n_features)
+    C_cp = cp.Parameter(nonneg=True)
+    epsilon_cp = cp.Parameter(nonneg=True)
 
-#     y[y == 0.0] = -1.0
-#     idx_train = np.arange(0, 50)
-#     idx_val = np.arange(50, 100)
+    # set up objective
+    loss = cp.sum_squares(beta_cp) / 2
+    reg = C_cp * cp.sum(cp.pos(cp.abs(Xtrain @ beta_cp - ytrain) - epsilon_cp))
+    objective = loss + reg
+    # define problem
+    problem = cp.Problem(cp.Minimize(objective))
+    assert problem.is_dpp()
 
-#     C = 0.001
-#     log_C = np.log(C)
-#     tol = 1e-16
-#     val, grad = svm_cvxpy(X, y, C, idx_train, idx_val)
+    # solve problem
+    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp], variables=[beta_cp])
+    hyperparam_th = torch.tensor(hyperparam, requires_grad=True)
+    beta_, = layer(hyperparam_th[0], hyperparam_th[1])
+
+    # get test loss and it's gradient
+    test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
+    test_loss.backward()
+
+    val = test_loss.detach().numpy()
+    grad = np.array(hyperparam_th.grad)
+    return val, grad
+
+if __name__ == "__main__":
+    from sklearn import datasets
+
+    n_samples, n_features = 10, 10
+    X, y, _ = make_correlated_data(
+        n_samples, n_features, corr=0.1, snr=3, random_state=42)
+
+    idx_train = np.arange(0, 5)
+    idx_val = np.arange(5, 10)
+
+    C = 1
+    log_C = np.log(C)
+    epsilon = 0.0
+    tol = 1e-16
+    hyperparam = np.array([C, epsilon])
+    val, grad = svr_cvxpy(X, y, hyperparam, idx_train, idx_val)
