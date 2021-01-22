@@ -1,12 +1,13 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 from sklearn import svm
+from celer.datasets import make_correlated_data
+
 from cvxopt import matrix
 from cvxopt import solvers
 from sparse_ho.models import SSVR
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.datasets import get_synt_data
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import Forward
 from sparse_ho import Implicit
@@ -18,14 +19,10 @@ from sparse_ho.optimizers import LineSearch
 
 n_samples = 50
 n_features = 5
-n_active = 5
-SNR = 10
-rho = 0.3
 
-X, y, beta_star, noise, sigma_star = get_synt_data(
-    dictionary_type="Gaussian", n_samples=n_samples,
-    n_features=n_features, n_times=1, n_active=n_active, rho=rho,
-    SNR=SNR, seed=0)
+
+X, y, _ = make_correlated_data(
+    n_samples, n_features, corr=0.1, snr=3, random_state=42)
 X_s = csc_matrix(X)
 
 idx_train = np.arange(0, 25)
