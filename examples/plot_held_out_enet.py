@@ -27,11 +27,10 @@ from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
+from sparse_ho.utils_plot import configure_plt, discrete_cmap
+from sparse_ho.optimizers import GradientDescent
 
-from sparse_ho.optimizers import LineSearch
-
-Axes3D  # hack for matplotlib 3D support
-# TODO improve example and remove this 3D graph
+configure_plt()
 
 # dataset = "rcv1"
 dataset = 'simu'
@@ -45,8 +44,11 @@ dataset = 'rcv1'
 
 if dataset == 'rcv1':
     X, y = fetch_libsvm('rcv1_train')
+    # X = X[:1000, :]
+    y -= y.mean()
+    y /= np.linalg.norm(y)
 else:
-    X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+    X, y = make_regression(n_samples=10, n_features=100, noise=1)
 
 print("Finished loading data")
 
@@ -61,7 +63,7 @@ alpha_max /= len(idx_train)
 
 alpha_min = 1e-4 * alpha_max
 
-n_grid = 10
+n_grid = 5
 alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
 alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
 
@@ -99,19 +101,20 @@ estimator = linear_model.ElasticNet(
 print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
-n_outer = 10
+n_outer = 25
 log_alpha0 = np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)])
 model = ElasticNet(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
-optimizer = LineSearch(n_outer=n_outer, tol=tol, verbose=True)
+algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
+optimizer = GradientDescent(
+    n_outer=n_outer, tol=tol, p_grad0=1.9, verbose=True)
 grad_search(
     algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
     monitor=monitor)
 t_grad_search += time.time()
 alphas_grad = np.exp(np.array(monitor.log_alphas))
 alphas_grad /= alpha_max
-
+monitor.log_alphas = np.array(monitor.log_alphas)
 
 print("Time grid-search %f" % t_grid_search)
 print("Time grad-search %f" % t_grad_search)
@@ -122,25 +125,24 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 # Plot results
 # ------------
 
-idx = np.where(results == results.min())
+scaling_factor = results.max()
 
-a, b = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax.plot_surface(
-    np.log(a), np.log(b), results, rstride=1, cstride=1,
-    cmap='viridis', edgecolor='none', alpha=0.5)
-ax.scatter3D(
-    np.log(a), np.log(b), results,
-    monitor.objs, c="black", s=20, marker="o")
-ax.scatter3D(
-    np.log(alphas_grad[:, 0]), np.log(alphas_grad[:, 1]),
-    monitor.objs, c="red", s=200, marker="X")
-ax.scatter3D(
-    np.log(alphas_2[idx[1]] / alpha_max),
-    np.log(alphas_1[idx[0]] / alpha_max),
-    [results.min()], c="black", s=200, marker="X")
-ax.set_xlabel("lambda1")
-ax.set_ylabel("lambda2")
-ax.set_label("Loss on validation set")
-fig.show()
+X, Y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
+fig, ax = plt.subplots(1, 1)
+cp = ax.contourf(X, Y, results.T / scaling_factor)
+ax.scatter(
+    X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
+    clip_on=False, cmap="viridis")
+cmap = discrete_cmap(n_outer, 'Greens')
+colors = np.linspace(1, n_outer, n_outer)
+ax.scatter(
+    np.exp(monitor.log_alphas[:, 0]) / alpha_max,
+    np.exp(monitor.log_alphas[:, 1]) / alpha_max,
+    s=50, c=colors,
+    marker="X", label="$1$st order", clip_on=False)
+ax.set_xlim(X.min(), X.max())
+ax.set_ylim(Y.min(), Y.max())
+cb = fig.colorbar(cp)
+plt.xscale('log')
+plt.yscale('log')
+plt.show(block=False)
