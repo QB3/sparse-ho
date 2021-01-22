@@ -31,6 +31,7 @@ jobs:
 
     - name: test
       run: |
+        eval "$(conda shell.bash hook)"
         conda activate sparse-ho-env
         pip install pytest pytest-cov coverage numpydoc codecov
         make test-code
