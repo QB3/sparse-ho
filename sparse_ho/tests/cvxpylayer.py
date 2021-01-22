@@ -185,3 +185,58 @@ def lasso_sure_cvxpy(X, y, alpha, sigma, random_state=42):
     val = val1 + val2 - len(y) * sigma ** 2
     grad = grad1 + grad2
     return val, grad
+
+
+def svm_cvxpy(X, y, C, idx_train, idx_val):
+    C = float(C)
+    Xtrain, Xtest, ytrain, ytest = map(
+        torch.from_numpy, [
+            X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
+
+    n_samples_train, n_features = Xtrain.shape
+
+    # set up variables and parameters
+    beta_cp = cp.Variable(n_features)
+    C_cp = cp.Parameter(nonneg=True)
+
+    # set up objective
+    loss = cp.sum_squares(beta_cp) / 2
+    reg = C_cp * cp.sum(cp.pos(1 - cp.multiply(ytrain, Xtrain @ beta_cp)))
+    objective = loss + reg
+
+    # define problem
+    problem = cp.Problem(cp.Minimize(objective))
+    assert problem.is_dpp()
+
+    # solve problem
+    layer = CvxpyLayer(problem, parameters=[C_cp], variables=[beta_cp])
+    C_th = torch.tensor(C, requires_grad=True)
+    beta_, = layer(C_th)
+
+    # get test loss and it's gradient
+    test_loss = 1 / 0  # TODO code smooth hinge
+    test_loss.backward()
+
+    val = test_loss.detach().numpy()
+    grad = np.array(C_th.grad)
+    return val, grad
+
+
+if __name__ == "__main__":
+    from sklearn import datasets
+    n_samples = 100
+    n_features = 300
+
+    X, y = datasets.make_classification(
+        n_samples=n_samples,
+        n_features=n_features, n_informative=50,
+        random_state=11, flip_y=0.1, n_redundant=0)
+
+    y[y == 0.0] = -1.0
+    idx_train = np.arange(0, 50)
+    idx_val = np.arange(50, 100)
+
+    C = 0.001
+    log_C = np.log(C)
+    tol = 1e-16
+    val, grad = svm_cvxpy(X, y, C, idx_train, idx_val)
