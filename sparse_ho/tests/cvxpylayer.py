@@ -214,7 +214,7 @@ def svm_cvxpy(X, y, C, idx_train, idx_val):
     beta_, = layer(C_th)
 
     # get test loss and it's gradient
-    test_loss = 1 / 0  # TODO code smooth hinge
+    test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()
 
     val = test_loss.detach().numpy()
@@ -222,21 +222,21 @@ def svm_cvxpy(X, y, C, idx_train, idx_val):
     return val, grad
 
 
-if __name__ == "__main__":
-    from sklearn import datasets
-    n_samples = 100
-    n_features = 300
+# if __name__ == "__main__":
+#     from sklearn import datasets
+#     n_samples = 100
+#     n_features = 300
 
-    X, y = datasets.make_classification(
-        n_samples=n_samples,
-        n_features=n_features, n_informative=50,
-        random_state=11, flip_y=0.1, n_redundant=0)
+#     X, y = datasets.make_classification(
+#         n_samples=n_samples,
+#         n_features=n_features, n_informative=50,
+#         random_state=11, flip_y=0.1, n_redundant=0)
 
-    y[y == 0.0] = -1.0
-    idx_train = np.arange(0, 50)
-    idx_val = np.arange(50, 100)
+#     y[y == 0.0] = -1.0
+#     idx_train = np.arange(0, 50)
+#     idx_val = np.arange(50, 100)
 
-    C = 0.001
-    log_C = np.log(C)
-    tol = 1e-16
-    val, grad = svm_cvxpy(X, y, C, idx_train, idx_val)
+#     C = 0.001
+#     log_C = np.log(C)
+#     tol = 1e-16
+#     val, grad = svm_cvxpy(X, y, C, idx_train, idx_val)

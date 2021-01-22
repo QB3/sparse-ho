@@ -21,16 +21,15 @@ class SVM(BaseModel):
     log_C : float
         logarithm of the hyperparameter C
     max_iter : int
-        maximum number of epoches for the coordinate descent
+        maximum number of epochs for the coordinate descent
         algorithm
     tol : float
         tolerance for the stopping criterion
     """
 
-    def __init__(self, logC, max_iter=100, tol=1e-3):
-        self.logC = logC
+    def __init__(self, estimator=None, max_iter=100):
+        self.estimator = estimator
         self.max_iter = max_iter
-        self.tol = tol
         self.dual = True
         self.dr = None
 
