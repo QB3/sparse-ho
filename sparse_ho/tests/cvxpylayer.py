@@ -261,19 +261,3 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     grad = np.array(hyperparam_th.grad)
     return val, grad
 
-if __name__ == "__main__":
-    from sklearn import datasets
-
-    n_samples, n_features = 10, 10
-    X, y, _ = make_correlated_data(
-        n_samples, n_features, corr=0.1, snr=3, random_state=42)
-
-    idx_train = np.arange(0, 5)
-    idx_val = np.arange(5, 10)
-
-    C = 1
-    log_C = np.log(C)
-    epsilon = 0.0
-    tol = 1e-16
-    hyperparam = np.array([C, epsilon])
-    val, grad = svr_cvxpy(X, y, hyperparam, idx_train, idx_val)
