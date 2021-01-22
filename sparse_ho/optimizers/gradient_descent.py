@@ -45,7 +45,7 @@ class GradientDescent(BaseOptimizer):
                 log_alphak, self.tol, monitor)
             if (self.step_size is None) or not self.has_gone_up:
                 self.step_size = self.p_grad0 / (
-                    np.abs(grad_outer) + 1e-12)
+                    np.linalg.norm(grad_outer) + 1e-12)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:

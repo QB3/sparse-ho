@@ -23,7 +23,7 @@ from libsvmdata.datasets import fetch_libsvm
 
 from sklearn.datasets import make_regression
 from sparse_ho import ImplicitForward
-from sparse_ho.criterion import HeldOutMSE
+from sparse_ho.criterion import HeldOutMSE, CrossVal
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
@@ -39,8 +39,8 @@ dataset = 'simu'
 # Load some data
 
 print("Started to load data")
-dataset = 'rcv1'
-# dataset = 'simu'
+# dataset = 'rcv1'
+dataset = 'simu'
 
 if dataset == 'rcv1':
     X, y = fetch_libsvm('rcv1_train')
@@ -48,7 +48,8 @@ if dataset == 'rcv1':
     y -= y.mean()
     y /= np.linalg.norm(y)
 else:
-    X, y = make_regression(n_samples=10, n_features=100, noise=1)
+    X, y = make_regression(
+        n_samples=20, n_features=100, noise=1, random_state=42)
 
 print("Finished loading data")
 
@@ -63,13 +64,13 @@ alpha_max /= len(idx_train)
 
 alpha_min = 1e-4 * alpha_max
 
-n_grid = 5
-alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
-alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
+n_grid = 10
+alphas_1 = np.geomspace(alpha_max, alpha_min, n_grid)
+alphas_2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
 results = np.zeros((n_grid, n_grid))
-tol = 1e-4
-max_iter = 50000
+tol = 1e-5
+max_iter = 10_000
 
 estimator = linear_model.ElasticNet(
     fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
@@ -81,9 +82,8 @@ estimator = linear_model.ElasticNet(
 print("Started grid-search")
 t_grid_search = - time.time()
 for i in range(n_grid):
-    print("lambda %i / %i" % (i, n_grid))
+    print("lambda %i / %i" % (i, n_grid * n_grid))
     for j in range(n_grid):
-        print("lambda %i / %i" % (j, n_grid))
         estimator.alpha = (alphas_1[i] + alphas_2[j])
         estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
         estimator.fit(X[idx_train, :], y[idx_train])
@@ -91,7 +91,7 @@ for i in range(n_grid):
             (y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
 t_grid_search += time.time()
 print("Finished grid-search")
-
+print("Minimum grid search %0.3e" % results.min())
 
 ##############################################################################
 # Grad-search with sparse-ho
@@ -107,7 +107,7 @@ model = ElasticNet(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
 optimizer = GradientDescent(
-    n_outer=n_outer, tol=tol, p_grad0=1.9, verbose=True)
+    n_outer=n_outer, tol=tol, p_grad0=1.5, verbose=True)
 grad_search(
     algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
     monitor=monitor)
