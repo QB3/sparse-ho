@@ -3,7 +3,6 @@ import numpy as np
 import torch
 from cvxpylayers.torch import CvxpyLayer
 from sklearn.utils import check_random_state
-from celer.datasets import make_correlated_data
 
 torch.set_default_dtype(torch.double)
 
@@ -222,6 +221,7 @@ def svm_cvxpy(X, y, C, idx_train, idx_val):
     grad = np.array(C_th.grad)
     return val, grad
 
+
 def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [
@@ -240,8 +240,9 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     loss = cp.sum_squares(beta_cp) / 2
     reg = C_cp * cp.sum(xi_cp + xi_star_cp)
     objective = loss + reg
-    #define constraints
-    constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
+    # define constraints
+    constraints = [
+        ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
         Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
         xi_cp >= 0.0, xi_star_cp >= 0.0]
     # define problem
@@ -249,7 +250,8 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp], variables=[beta_cp])
+    layer = CvxpyLayer(
+        problem, parameters=[C_cp, epsilon_cp], variables=[beta_cp])
     hyperparam_th = torch.tensor(hyperparam, requires_grad=True)
     beta_, = layer(hyperparam_th[0], hyperparam_th[1])
 
