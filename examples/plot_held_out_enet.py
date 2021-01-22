@@ -17,13 +17,12 @@ import time
 import numpy as np
 from sklearn import linear_model
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 from libsvmdata.datasets import fetch_libsvm
 
 from sklearn.datasets import make_regression
 from sparse_ho import ImplicitForward
-from sparse_ho.criterion import HeldOutMSE, CrossVal
+from sparse_ho.criterion import HeldOutMSE
 from sparse_ho.models import ElasticNet
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
@@ -112,8 +111,6 @@ grad_search(
     algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
     monitor=monitor)
 t_grad_search += time.time()
-alphas_grad = np.exp(np.array(monitor.log_alphas))
-alphas_grad /= alpha_max
 monitor.log_alphas = np.array(monitor.log_alphas)
 
 print("Time grid-search %f" % t_grid_search)
@@ -142,6 +139,7 @@ ax.scatter(
 ax.set_xlim(X.min(), X.max())
 ax.set_ylim(Y.min(), Y.max())
 cb = fig.colorbar(cp)
+cb.set_label(r"$\mathcal{C}(\beta^{(\lambda)})$")
 plt.xscale('log')
 plt.yscale('log')
 plt.show(block=False)
