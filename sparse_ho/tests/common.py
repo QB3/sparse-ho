@@ -7,10 +7,10 @@ import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.models import (
-    Lasso, ElasticNet, WeightedLasso, SparseLogreg, SVM)
+    Lasso, ElasticNet, WeightedLasso, SparseLogreg, SVM, SVR)
 from sparse_ho.tests.cvxpylayer import (
     enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
-    lasso_sure_cvxpy, svm_cvxpy)
+    lasso_sure_cvxpy, svm_cvxpy, svr_cvxpy)
 
 # Generate data
 n_samples, n_features = 10, 10
@@ -43,6 +43,7 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wLasso"] = log_alpha + np.log(tab / tab.max())
 dict_log_alpha["logreg"] = (log_alpha - np.log(2))
 dict_log_alpha["svm"] = 1e-4
+dict_log_alpha["svr"] = np.array([1e-2, 1e-2])
 
 # Set models to be tested
 models = {}
@@ -51,6 +52,7 @@ models["enet"] = ElasticNet(estimator=None)
 models["wLasso"] = WeightedLasso(estimator=None)
 models["logreg"] = SparseLogreg(estimator=None)
 models["svm"] = SVM(estimator=None)
+models["svr"] = SVR(estimator=None)
 
 custom_models = {}
 custom_models["lasso"] = Lasso(estimator=celer.Lasso(
@@ -66,7 +68,8 @@ dict_cvxpy_func = {
     'enet': enet_cvxpy,
     'wLasso': weighted_lasso_cvxpy,
     'logreg': logreg_cvxpy,
-    'svm': svm_cvxpy
+    'svm': svm_cvxpy,
+    'svr': svr_cvxpy
     }
 
 dict_vals_cvxpy = {}
@@ -97,6 +100,10 @@ dict_list_log_alphas["logreg"] = np.log(
 dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
     dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
 dict_list_log_alphas["svm"] = np.log(np.geomspace(1e-8, 1e-5, num=5))
+dict_list_log_alphas["svr"] = [
+    np.array(i) for i in itertools.product(
+        np.log(np.geomspace(1e-4, 1e-2, num=5)),
+        np.log(np.geomspace(1e-4, 1e-2, num=5)))]
 
 
 def get_v(mask, dense):
@@ -110,6 +117,8 @@ list_model_crit = [
     ('wLasso', 'MSE'),
     ('lasso', 'SURE'),
     ('logreg', 'logistic'),
-    ('svm', 'MSE')]
+    ('svm', 'MSE'),
+    ('svr', 'MSE')
+    ]
 
-list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm"]
+list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr"]

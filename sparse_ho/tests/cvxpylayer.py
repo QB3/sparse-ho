@@ -260,4 +260,3 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     val = test_loss.detach().numpy()
     grad = np.array(hyperparam_th.grad)
     return val, grad
-

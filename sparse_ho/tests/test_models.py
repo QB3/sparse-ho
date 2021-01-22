@@ -36,7 +36,7 @@ X_c = X_s
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac(key):
     """Tests that algorithms computing the Jacobian return the same Jacobian"""
-    if key == "svm":
+    if key == "svm" or key == "svr":
         X_s = X_r
     else:
         X_s = X_c
@@ -70,7 +70,7 @@ def test_beta_jac(key):
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
 def test_beta_jac_custom(model_name):
     """Check that using sk or celer yields the same solution as sparse ho"""
-    if model_name == "svm":
+    if model_name == "svm" or model_name == "svr":
         X_s = X_r
     else:
         X_s = X_c
@@ -167,10 +167,10 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    test_beta_jac_custom("logreg")
+    # test_beta_jac_custom("logreg")
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("lasso", "SURE", algo)
-        test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        test_check_grad_sparse_ho('enet', 'MSE', algo)
+        # test_val_grad("lasso", "SURE", algo)
+        # test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        test_check_grad_sparse_ho('svr', 'MSE', algo)
