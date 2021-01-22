@@ -34,7 +34,6 @@ class WeightedLasso(BaseModel):
         self.max_iter = max_iter
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
-        self.dual = False
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
@@ -257,7 +256,7 @@ class WeightedLasso(BaseModel):
     def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
+    def restrict_full_supp(self, X, v, log_alpha):
         return v
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):

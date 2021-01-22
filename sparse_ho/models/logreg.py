@@ -29,7 +29,6 @@ class SparseLogreg(BaseModel):
         self.max_iter = max_iter
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
-        self.dual = False
 
     def _init_dbeta_dr(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
@@ -274,7 +273,7 @@ class SparseLogreg(BaseModel):
             hessian = (X_m.T * temp) @ X_m
         return hessian
 
-    def restrict_full_supp(self, X, y, mask, dense, v, log_alpha):
+    def restrict_full_supp(self, X, v, log_alpha):
         return v
 
     def compute_alpha_max(self, X, y):
