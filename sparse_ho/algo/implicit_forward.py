@@ -90,10 +90,14 @@ def get_only_jac(
 
     objs = []
 
-    if dbeta is None:
-        model._init_dbeta(n_features)
+    if hasattr(model, 'dual'):
+        dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
+        dbeta = model.dbeta
+    else:
+        if dbeta is None:
+            dbeta = model._init_dbeta(n_features)
+        dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
 
-    dr = model._init_dr(dbeta, Xs, y, sign_beta, alpha)
     for i in range(niter_jac):
         if verbose:
             print("%i -st iterations over %i" % (i, niter_jac))
@@ -107,9 +111,7 @@ def get_only_jac(
         objs.append(
             model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, r, dr,
                               alpha))
-
         if use_stop_crit and i > 1:
             if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
                 break
-
     return dbeta

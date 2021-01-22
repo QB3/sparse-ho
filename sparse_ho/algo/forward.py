@@ -92,7 +92,6 @@ def get_beta_jac_iterdiff(
     ############################################
     # warm start for beta
     beta, r = model._init_beta_r(X, y, mask0, dense0)
-
     ############################################
     # warm start for dbeta
     dbeta, dr = model._init_dbeta_dr(
@@ -111,7 +110,6 @@ def get_beta_jac_iterdiff(
         list_beta = []
         list_jac = []
     # print(tol)
-
     for i in range(max_iter):
         if verbose:
             print("%i -st iteration over %i" % (i, max_iter))
@@ -139,15 +137,14 @@ def get_beta_jac_iterdiff(
     else:
         if verbose:
             print('did not converge !')
-
     mask = beta != 0
     dense = beta[mask]
     jac = model._get_jac(dbeta, mask)
-    if model.dual:
+
+    if hasattr(model, 'dual'):
         model.r = r
         if compute_jac:
             model.dr = dr
-
     if save_iterates:
         return np.array(list_beta), np.array(list_jac)
     if return_all:
