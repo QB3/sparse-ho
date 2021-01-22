@@ -30,6 +30,7 @@ class GradientDescent(BaseOptimizer):
         self.tol = tol
         self.t_max = t_max
         self.p_grad0 = p_grad0
+        self.has_gone_up = False
 
     def _grad_search(
             self, _get_val_grad, proj_hyperparam, log_alpha0, monitor):
@@ -42,9 +43,9 @@ class GradientDescent(BaseOptimizer):
         for i in range(self.n_outer):
             value_outer, grad_outer = _get_val_grad(
                 log_alphak, self.tol, monitor)
-            if self.step_size is None or i < 10:
+            if (self.step_size is None) or not self.has_gone_up:
                 self.step_size = self.p_grad0 / (
-                    np.linalg.norm(grad_outer) + 1e-2)
+                    np.linalg.norm(grad_outer) + 1e-12)
             log_alphak -= self.step_size * grad_outer
 
             if self.verbose:
@@ -57,4 +58,5 @@ class GradientDescent(BaseOptimizer):
 
             if i > 0 and (monitor.objs[-1] > monitor.objs[-2]):
                 self.step_size /= 10
+                self.has_gone_up = True
         return log_alphak, value_outer, grad_outer
