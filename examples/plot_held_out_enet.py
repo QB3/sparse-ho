@@ -138,7 +138,7 @@ ax.scatter(
 ax.set_xlim(X.min(), X.max())
 ax.set_ylim(Y.min(), Y.max())
 cb = fig.colorbar(cp)
-# cb.set_label(r"$\mathcal{C}(\beta^{(\lambda)})$")
+cb.set_label("Held-out loss")
 plt.xscale('log')
 plt.yscale('log')
 plt.show(block=False)
