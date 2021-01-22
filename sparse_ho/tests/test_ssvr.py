@@ -21,16 +21,18 @@ n_samples = 50
 n_features = 5
 
 
-X, y, _ = make_correlated_data(
-    n_samples, n_features, corr=0.1, snr=3, random_state=42)
+X, y, beta = make_correlated_data(
+    n_samples, n_features, corr=0, snr=100, random_state=42)
 X_s = csc_matrix(X)
-
+beta[beta < 0] = 0
+beta /= np.sum(beta)
+y = X @ beta
 idx_train = np.arange(0, 25)
 idx_val = np.arange(25, 50)
 
 tol = 1e-16
 
-C = 1
+C = 0.001
 log_C = np.log(C)
 log_epsilon = np.log(0.1)
 max_iter = 50000
