@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from scipy.sparse import issparse
 
 from sklearn import datasets
 from sklearn.svm import LinearSVC
@@ -31,7 +30,7 @@ idx_train = np.arange(0, 50)
 idx_val = np.arange(50, 100)
 
 
-C = 0.01
+C = 0.001
 log_C = np.log(C)
 tol = 1e-16
 
@@ -48,35 +47,13 @@ def test_beta_jac(model):
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
         X[idx_train, :], y[idx_train], log_C, tol=tol,
         model=model, compute_jac=True, max_iter=10000)
-
-    beta = np.zeros(len(idx_train))
-    beta[supp1] = dense1
-    full_supp = np.logical_and(beta > 0, beta < C)
-    # full_supp = np.logical_or(beta <= 0, beta >= C)
-
-    Q = (y[idx_train, np.newaxis] * X[idx_train, :]
-         )  @  (y[idx_train, np.newaxis] * X[idx_train, :]).T
-    v = (np.eye(len(idx_train), len(idx_train)) -
-         Q)[np.ix_(full_supp, beta >= C)] @ (np.ones((beta >= C).sum()) * C)
-
-    jac_dense = np.linalg.solve(Q[np.ix_(full_supp, full_supp)], v)
-    assert np.allclose(jac_dense, jac1[dense1 < C])
-
-    if issparse(X):
-        primal = np.sum(
-            X[idx_train, :][supp1, :].T.multiply(y[idx_train][supp1] * dense1),
-            axis=1)
-        primal = primal.T
-    else:
-        primal = np.sum(y[idx_train][supp1] * dense1 *
-                        X[idx_train, :][supp1, :].T, axis=1)
     clf = LinearSVC(
         loss="hinge", fit_intercept=False, C=C, tol=tol, max_iter=100000)
     clf.fit(X[idx_train, :], y[idx_train])
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], log_C,
         tol=tol, model=model, tol_jac=1e-16, max_iter=10000)
-    assert np.allclose(primal, clf.coef_)
+    assert np.allclose(dense1, clf.coef_[clf.coef_ != 0])
 
     assert np.all(supp1 == supp2)
     assert np.allclose(dense1, dense2)
@@ -144,6 +121,16 @@ def test_grad_search(model):
     #     np.array(monitor1.objs_test), np.array(monitor3.objs_test))
     assert not np.allclose(
         np.array(monitor1.times), np.array(monitor3.times))
+
+    np.testing.assert_allclose(
+        np.array(monitor1.log_alphas), np.array(monitor2.log_alphas),
+        atol=1e-2)
+    np.testing.assert_allclose(
+        np.array(monitor1.grads), np.array(monitor2.grads), atol=1e-2)
+    np.testing.assert_allclose(
+        np.array(monitor1.objs), np.array(monitor2.objs), atol=1e-2)
+    assert not np.allclose(
+        np.array(monitor1.times), np.array(monitor2.times))
 
 
 if __name__ == '__main__':
