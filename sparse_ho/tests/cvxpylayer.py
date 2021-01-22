@@ -231,15 +231,21 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
 
     # set up variables and parameters
     beta_cp = cp.Variable(n_features)
+    xi_cp = cp.Variable(n_samples_train)
+    xi_star_cp = cp.Variable(n_samples_train)
     C_cp = cp.Parameter(nonneg=True)
     epsilon_cp = cp.Parameter(nonneg=True)
 
     # set up objective
     loss = cp.sum_squares(beta_cp) / 2
-    reg = C_cp * cp.sum(cp.pos(cp.abs(Xtrain @ beta_cp - ytrain) - epsilon_cp))
+    reg = C_cp * cp.sum(xi_cp + xi_star_cp)
     objective = loss + reg
+    #define constraints
+    constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
+        Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
+        xi_cp >= 0.0, xi_star_cp >= 0.0]
     # define problem
-    problem = cp.Problem(cp.Minimize(objective))
+    problem = cp.Problem(cp.Minimize(objective), constraints)
     assert problem.is_dpp()
 
     # solve problem
