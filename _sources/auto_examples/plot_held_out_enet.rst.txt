@@ -25,7 +25,7 @@ Elastic net with held-out test set
 This example shows how to perform hyperparameter optimization
 for an elastic-net using a held-out validation set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-39
+.. GENERATED FROM PYTHON SOURCE LINES 10-36
 
 .. code-block:: default
 
@@ -39,7 +39,6 @@ for an elastic-net using a held-out validation set.
     import numpy as np
     from sklearn import linear_model
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
 
     from libsvmdata.datasets import fetch_libsvm
 
@@ -49,11 +48,9 @@ for an elastic-net using a held-out validation set.
     from sparse_ho.models import ElasticNet
     from sparse_ho.ho import grad_search
     from sparse_ho.utils import Monitor
+    from sparse_ho.utils_plot import discrete_cmap
+    from sparse_ho.optimizers import GradientDescent
 
-    from sparse_ho.optimizers import LineSearch
-
-    Axes3D  # hack for matplotlib 3D support
-    # TODO improve example and remove this 3D graph
 
     # dataset = "rcv1"
     dataset = 'simu'
@@ -65,23 +62,27 @@ for an elastic-net using a held-out validation set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-41
+.. GENERATED FROM PYTHON SOURCE LINES 37-38
 
 Load some data
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-75
+.. GENERATED FROM PYTHON SOURCE LINES 38-76
 
 .. code-block:: default
 
 
     print("Started to load data")
-    dataset = 'rcv1'
-    # dataset = 'simu'
+    # dataset = 'rcv1'
+    dataset = 'simu'
 
     if dataset == 'rcv1':
         X, y = fetch_libsvm('rcv1_train')
+        # X = X[:1000, :]
+        y -= y.mean()
+        y /= np.linalg.norm(y)
     else:
-        X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+        X, y = make_regression(
+            n_samples=20, n_features=100, noise=1, random_state=42)
 
     print("Finished loading data")
 
@@ -97,12 +98,12 @@ Load some data
     alpha_min = 1e-4 * alpha_max
 
     n_grid = 10
-    alphas_1 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
-    alphas_2 = np.geomspace(0.6 * alpha_max, alpha_min, n_grid)
+    alphas_1 = np.geomspace(alpha_max, alpha_min, n_grid)
+    alphas_2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
     results = np.zeros((n_grid, n_grid))
-    tol = 1e-4
-    max_iter = 50000
+    tol = 1e-5
+    max_iter = 10_000
 
     estimator = linear_model.ElasticNet(
         fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
@@ -118,19 +119,18 @@ Load some data
  .. code-block:: none
 
     Started to load data
-    Dataset: rcv1_train
     Finished loading data
     Starting path computation...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-78
+.. GENERATED FROM PYTHON SOURCE LINES 77-79
 
 Grid-search with scikit-learn
 -----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-94
+.. GENERATED FROM PYTHON SOURCE LINES 79-94
 
 .. code-block:: default
 
@@ -138,9 +138,8 @@ Grid-search with scikit-learn
     print("Started grid-search")
     t_grid_search = - time.time()
     for i in range(n_grid):
-        print("lambda %i / %i" % (i, n_grid))
+        print("lambda %i / %i" % (i, n_grid * n_grid))
         for j in range(n_grid):
-            print("lambda %i / %i" % (j, n_grid))
             estimator.alpha = (alphas_1[i] + alphas_2[j])
             estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
             estimator.fit(X[idx_train, :], y[idx_train])
@@ -148,7 +147,7 @@ Grid-search with scikit-learn
                 (y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
     t_grid_search += time.time()
     print("Finished grid-search")
-
+    print("Minimum grid search %0.3e" % results.min())
 
 
 
@@ -161,117 +160,18 @@ Grid-search with scikit-learn
  .. code-block:: none
 
     Started grid-search
-    lambda 0 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 1 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 2 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 3 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 4 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 5 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 6 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 7 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 8 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
-    lambda 9 / 10
-    lambda 0 / 10
-    lambda 1 / 10
-    lambda 2 / 10
-    lambda 3 / 10
-    lambda 4 / 10
-    lambda 5 / 10
-    lambda 6 / 10
-    lambda 7 / 10
-    lambda 8 / 10
-    lambda 9 / 10
+    lambda 0 / 100
+    lambda 1 / 100
+    lambda 2 / 100
+    lambda 3 / 100
+    lambda 4 / 100
+    lambda 5 / 100
+    lambda 6 / 100
+    lambda 7 / 100
+    lambda 8 / 100
+    lambda 9 / 100
     Finished grid-search
+    Minimum grid search 1.561e+04
 
 
 
@@ -281,7 +181,7 @@ Grid-search with scikit-learn
 Grad-search with sparse-ho
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-121
+.. GENERATED FROM PYTHON SOURCE LINES 97-120
 
 .. code-block:: default
 
@@ -290,19 +190,18 @@ Grad-search with sparse-ho
     print("Started grad-search")
     t_grad_search = - time.time()
     monitor = Monitor()
-    n_outer = 10
+    n_outer = 25
     log_alpha0 = np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)])
     model = ElasticNet(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutMSE(idx_train, idx_val)
-    algo = ImplicitForward(tol_jac=1e-7, n_iter_jac=1000, max_iter=max_iter)
-    optimizer = LineSearch(n_outer=n_outer, tol=tol, verbose=True)
+    algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
+    optimizer = GradientDescent(
+        n_outer=n_outer, tol=tol, p_grad0=1.5, verbose=True)
     grad_search(
         algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
         monitor=monitor)
     t_grad_search += time.time()
-    alphas_grad = np.exp(np.array(monitor.log_alphas))
-    alphas_grad /= alpha_max
-
+    monitor.log_alphas = np.array(monitor.log_alphas)
 
     print("Time grid-search %f" % t_grid_search)
     print("Time grad-search %f" % t_grad_search)
@@ -320,56 +219,70 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     Started grad-search
-    Iteration 1/10 || Value outer criterion: 8.55e-01 || norm grad 2.19e-01
-    Iteration 2/10 || Value outer criterion: 3.40e-01 || norm grad 8.81e-02
-    Iteration 3/10 || Value outer criterion: 2.65e-01 || norm grad 4.45e-02
-    Iteration 4/10 || Value outer criterion: 2.41e-01 || norm grad 3.16e-02
-    Iteration 5/10 || Value outer criterion: 2.28e-01 || norm grad 2.35e-02
-    Iteration 6/10 || Value outer criterion: 2.20e-01 || norm grad 1.81e-02
-    Iteration 7/10 || Value outer criterion: 2.15e-01 || norm grad 1.43e-02
-    Iteration 8/10 || Value outer criterion: 2.12e-01 || norm grad 1.11e-02
-    Iteration 9/10 || Value outer criterion: 2.10e-01 || norm grad 9.03e-03
-    Iteration 10/10 || Value outer criterion: 2.08e-01 || norm grad 7.12e-03
-    Time grid-search 96.163621
-    Time grad-search 100.930672
-    Minimum grid search 2.050e-01
-    Minimum grad search 2.085e-01
+    Iteration 1/25 ||Value outer criterion: 1.64e+04 ||norm grad 5.00e+02
+    Iteration 2/25 ||Value outer criterion: 1.59e+04 ||norm grad 2.14e+02
+    Iteration 3/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.73e+02
+    Iteration 4/25 ||Value outer criterion: 1.57e+04 ||norm grad 7.03e+01
+    Iteration 5/25 ||Value outer criterion: 1.58e+04 ||norm grad 4.84e+02
+    Iteration 6/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
+    Iteration 7/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
+    Iteration 8/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.27e+01
+    Iteration 9/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.30e+01
+    Iteration 10/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.33e+01
+    Iteration 11/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.38e+01
+    Iteration 12/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.43e+01
+    Iteration 13/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.05e+02
+    Iteration 14/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.09e+02
+    Iteration 15/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.10e+02
+    Iteration 16/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.15e+02
+    Iteration 17/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.19e+02
+    Iteration 18/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.24e+02
+    Iteration 19/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.30e+02
+    Iteration 20/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.97e+02
+    Iteration 21/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.01e+02
+    Iteration 22/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.33e+02
+    Iteration 23/25 ||Value outer criterion: 1.56e+04 ||norm grad 3.13e+02
+    Iteration 24/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.03e+02
+    Iteration 25/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.33e+02
+    Time grid-search 0.081764
+    Time grad-search 1.528991
+    Minimum grid search 1.561e+04
+    Minimum grad search 1.559e+04
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-124
+.. GENERATED FROM PYTHON SOURCE LINES 121-123
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-147
+.. GENERATED FROM PYTHON SOURCE LINES 123-145
 
 .. code-block:: default
 
 
-    idx = np.where(results == results.min())
-
-    a, b = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    ax.plot_surface(
-        np.log(a), np.log(b), results, rstride=1, cstride=1,
-        cmap='viridis', edgecolor='none', alpha=0.5)
-    ax.scatter3D(
-        np.log(a), np.log(b), results,
-        monitor.objs, c="black", s=20, marker="o")
-    ax.scatter3D(
-        np.log(alphas_grad[:, 0]), np.log(alphas_grad[:, 1]),
-        monitor.objs, c="red", s=200, marker="X")
-    ax.scatter3D(
-        np.log(alphas_2[idx[1]] / alpha_max),
-        np.log(alphas_1[idx[0]] / alpha_max),
-        [results.min()], c="black", s=200, marker="X")
-    ax.set_xlabel("lambda1")
-    ax.set_ylabel("lambda2")
-    ax.set_label("Loss on validation set")
-    fig.show()
+    scaling_factor = results.max()
+    cmap = discrete_cmap(n_outer, 'Greens')
+    c = np.linspace(1, n_outer, n_outer)
+    X, Y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
+    fig, ax = plt.subplots(1, 1)
+    cp = ax.contourf(X, Y, results.T / scaling_factor)
+    ax.scatter(
+        X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
+        clip_on=False, cmap="viridis")
+    ax.scatter(
+        np.exp(monitor.log_alphas[:, 0]) / alpha_max,
+        np.exp(monitor.log_alphas[:, 1]) / alpha_max,
+        s=50, cmap=cmap, c=c,
+        marker="X", label="$1$st order", clip_on=False)
+    ax.set_xlim(X.min(), X.max())
+    ax.set_ylim(Y.min(), Y.max())
+    cb = fig.colorbar(cp)
+    cb.set_label("Held-out loss")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.show(block=False)
 
 
 
@@ -384,7 +297,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  17.350 seconds)
+   **Total running time of the script:** ( 0 minutes  1.969 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:

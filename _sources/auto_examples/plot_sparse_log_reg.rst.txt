@@ -178,7 +178,7 @@ Grid-search
     Iteration 29 / 30
     Iteration 30 / 30
     scikit finished
-    Time to compute CV for scikit-learn: 0.93
+    Time to compute CV for scikit-learn: 0.92
 
 
 
@@ -266,7 +266,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.509 seconds)
+   **Total running time of the script:** ( 0 minutes  2.501 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
