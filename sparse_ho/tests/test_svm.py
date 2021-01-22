@@ -34,7 +34,7 @@ C = 0.001
 log_C = np.log(C)
 tol = 1e-16
 
-models = [SVM(log_C, max_iter=10000, tol=tol)]
+models = [SVM(max_iter=10000)]
 
 
 def get_v(mask, dense):
