@@ -24,13 +24,15 @@ jobs:
     - name: install
       run: |
         pip install -U pip
+        conda env create --file environment.yml python=3.6
+        conda activate sparse-ho-env
         pip install -e .
 
     - name: test
       run: |
         pip install pytest pytest-cov coverage numpydoc codecov
-        pytest -lv --cov-report term-missing sparse_ho --cov=sparse_ho --cov-config .coveragerc
-        codecov
+        make test-code
+
     - name: codecov
       uses: codecov/codecov-action@v1
       with:
