@@ -96,7 +96,7 @@ dict_list_log_alphas["logreg"] = np.log(
     np.geomspace(alpha_max/5, alpha_max/40, num=5))
 dict_list_log_alphas["enet"] = [np.array(i) for i in itertools.product(
     dict_list_log_alphas["lasso"], dict_list_log_alphas["lasso"])]
-dict_list_log_alphas["svm"] = np.log(np.geomspace(1e-4, 1e-1, num=5))
+dict_list_log_alphas["svm"] = np.log(np.geomspace(1e-8, 1e-5, num=5))
 
 
 def get_v(mask, dense):

@@ -37,7 +37,7 @@ class SVM(BaseModel):
                        mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dr = np.ones(n_samples)
-        if self.dr is not None:
+        if self.dr is not None and self.dr.shape[0] == n_samples:
             dr = self.dr.copy()
         if issparse(X):
             dbeta = (X.T).multiply(y * dr)
@@ -94,34 +94,25 @@ class SVM(BaseModel):
             data, indptr, indices, y, n_samples, n_features, beta,
             dbeta, r, dr, C, L, compute_jac=True):
         # data needs to be a row sparse matrix
-        non_zeros = np.where(L != 0)[0]
         C = C[0]
-        for j in non_zeros:
+        for j in range(n_samples):
             # get the i-st row of X in sparse format
             Xis = data[indptr[j]:indptr[j+1]]
             # get the non zero indices
             idx_nz = indices[indptr[j]:indptr[j+1]]
-
-            # compute gradient_i
-            G = y[j] * np.sum(beta[idx_nz] * Xis) - 1.0
-
-            # compute projected gradient
-            PG = compute_grad_proj(r[j], G, C)
-
-            if np.abs(PG) > 1e-12:
-                r_old = r[j]
-                # update one coefficient SVM
-                zj = r[j] - G / L[j]
-                r[j] = min(max(zj, 0), C)
-                beta[idx_nz] += (r[j] - r_old) * y[j] * Xis
-                if compute_jac:
-                    dr_old = dr[j]
-                    dG = y[j] * np.sum(dbeta[idx_nz] * Xis)
-                    dzj = dr[j] - dG / L[j]
-                    dr[j:j+1] = ind_box(zj, C) * dzj
-                    dr[j:j+1] += C * (C <= zj)
-                    # update residuals
-                    dbeta[idx_nz] += (dr[j] - dr_old) * y[j] * Xis
+            # Compute the gradient
+            F = y[j] * np.sum(beta[idx_nz] * Xis) - 1.0
+            r_old = r[j]
+            zj = r[j] - F / L[j]
+            r[j] = proj_box_svm(zj, C)
+            beta[idx_nz] += (r[j] - r_old) * y[j] * Xis
+            if compute_jac:
+                dF = y[j] * np.sum(dbeta[idx_nz] * Xis)
+                dr_old = dr[j]
+                dzj = dr[j] - dF / L[j]
+                dr[j] = ind_box(zj, C) * dzj
+                dr[j] += C * (C <= zj)
+                dbeta[idx_nz] += (dr[j] - dr_old) * y[j] * Xis
 
     @staticmethod
     def _get_pobj0(r, beta, C, y):
@@ -221,7 +212,7 @@ class SVM(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
-        return X
+        return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
@@ -285,10 +276,16 @@ class SVM(BaseModel):
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, C):
         maskC = r == C
         full_supp = np.logical_and(r != 0, r != C)
-        dryX = dr[full_supp].T @ (ys[full_supp] * Xs[full_supp, :].T).T
+        if issparse(Xs):
+            dryX = dr[full_supp].T @ (Xs[full_supp, :].T).multiply(ys[full_supp]).T
+        else:
+            dryX = dr[full_supp].T @ (ys[full_supp] * Xs[full_supp, :].T).T
         quadratic_term = dryX.T @ dryX
         if maskC.sum() != 0:
-            linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ r[maskC]
+            if issparse(Xs):
+                linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ r[maskC]
+            else:
+                linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ r[maskC]
         else:
             linear_term = 0
         res = quadratic_term + linear_term

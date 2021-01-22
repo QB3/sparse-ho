@@ -29,11 +29,16 @@ list_algos = [
 ]
 
 tol = 1e-15
-
+X_r = X_s.tocsr()
+X_c = X_s
 
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac(key):
     """Tests that algorithms computing the Jacobian return the same Jacobian"""
+    if key == "svm":
+        X_s = X_r
+    else:
+        X_s = X_c
     supp1, dense1, jac1 = get_beta_jac_iterdiff(
         X, y, dict_log_alpha[key], tol=tol, model=models[key])
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
@@ -64,6 +69,11 @@ def test_beta_jac(key):
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
 def test_beta_jac_custom(model_name):
     """Check that using sk or celer yields the same solution as sparse ho"""
+    if model_name == "svm":
+        X_s = X_r
+    else:
+        X_s = X_c
+
     for log_alpha in dict_list_log_alphas[model_name]:
         supp, dense, jac = get_beta_jac_fast_iterdiff(
             X_s, y, log_alpha,
