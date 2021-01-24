@@ -5,6 +5,7 @@ from celer.datasets import make_correlated_data
 
 from cvxopt import matrix
 from cvxopt import solvers
+
 from sparse_ho.models import SSVR
 from sparse_ho.algo.forward import get_beta_jac_iterdiff
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
@@ -14,7 +15,6 @@ from sparse_ho import Implicit
 from sparse_ho import ImplicitForward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
-
 from sparse_ho.optimizers import LineSearch
 
 n_samples = 50
@@ -39,9 +39,9 @@ max_iter = 50000
 
 model = SSVR(max_iter=max_iter, estimator=None)
 estimator = svm.LinearSVR(
+    loss='epsilon_insensitive',
     epsilon=np.exp(log_epsilon), tol=1e-16, C=np.exp(log_C),
     fit_intercept=False, max_iter=1000)
-# model_custom = SVR(max_iter=max_iter, estimator=estimator)
 
 
 def get_v(mask, dense):
@@ -54,9 +54,9 @@ def test_beta_jac():
         X[idx_train, :], y[idx_train], np.array([log_C, log_epsilon]),
         tol=tol, model=model, compute_jac=True, max_iter=max_iter)
 
-    sol = primal_eps_SVR_constrained(X[idx_train, :],
-                                     y[idx_train], cost=C,
-                                     eps=np.exp(log_epsilon))
+    sol = _primal_eps_SVR_constrained(X[idx_train, :],
+                                      y[idx_train], cost=C,
+                                      eps=np.exp(log_epsilon))
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X[idx_train, :], y[idx_train], np.array([log_C, log_epsilon]),
         tol=tol, model=model, tol_jac=1e-8, max_iter=max_iter,
@@ -68,10 +68,11 @@ def test_beta_jac():
 
 
 def test_val_grad():
-    #######################################################################
-    # Not all methods computes the full Jacobian, but all
-    # compute the gradients
-    # check that the gradient returned by all methods are the same
+    """Check that the gradient returned by all methods are the same.
+
+    Not all methods compute the full Jacobian, but all compute the
+    gradients
+    """
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Forward()
     val_fwd, grad_fwd = criterion.get_val_grad(
@@ -153,20 +154,21 @@ def test_grad_search():
         np.array(monitor1.times), np.array(monitor2.times))
 
 
-def primal_eps_SVR_constrained(X, y, cost=1, eps=0.5):
+def _primal_eps_SVR_constrained(X, y, cost=1, eps=0.5):
 
     l, n = X.shape
     cost = cost
-# quadratic term matrix
+    # quadratic term matrix
     Q = np.zeros(((2*l+n), (2*l+n)))
     Q[:n, :n] = np.identity(n)
     Q = matrix(Q)
-# Linear term vector
 
+    # Linear term vector
     L = np.zeros((2*l + n))
     L[n:(2*l+n)] = np.repeat(cost, 2 * l)
     L = matrix(L)
-# Matrix of constraints (inequality)
+
+    # Matrix of constraints (inequality)
     G = np.zeros(((4*l+n+1), (2*l+n)))
     G[:l, :n] = -X
     G[:l, n:(2*l+n)] = np.concatenate(
@@ -181,13 +183,13 @@ def primal_eps_SVR_constrained(X, y, cost=1, eps=0.5):
 
     G[(4*l+1):(4*l+n+1), :n] = -np.eye(n, n)
     G = matrix(G)
-# Matrix of constraints (equality)
+
+    # Matrix of constraints (equality)
     A = np.repeat(0.0, (2*l+n))
     A[:n] = np.repeat(1.0, n)
     A = matrix(A, (1, (2*l+n)))
 
-# vector of inequality constraints
-
+    # vector of inequality constraints
     h = np.hstack((-y + eps, y + eps, np.repeat(0, 2*l), 0, np.repeat(0, n)))
     h = matrix(h)
     b = matrix(1.0)
