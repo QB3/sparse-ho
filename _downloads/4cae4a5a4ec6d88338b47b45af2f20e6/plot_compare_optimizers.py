@@ -10,24 +10,24 @@ for sparse logistic regression using a held-out test set.
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#          Mathurin Massias
 #
 # License: BSD (3-clause)
 
 
-from libsvmdata.datasets import fetch_libsvm
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
-
+import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
 from celer import LogisticRegression
+from libsvmdata.datasets import fetch_libsvm
 
+from sparse_ho import ImplicitForward, Forward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho import ImplicitForward
-from sparse_ho import Forward
+from sparse_ho.utils_plot import discrete_cmap
 from sparse_ho.grid_search import grid_search
 from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
@@ -49,22 +49,18 @@ n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
-print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train]))
 
-alpha_max /= 4 * len(idx_train)
+alpha_max /= 2 * len(idx_train)
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(alpha_max / 100)
 max_iter = 100
 
-log_alpha0 = np.log(0.1 * alpha_max)
 tol = 1e-8
 
-n_alphas = 30
-p_alphas = np.geomspace(1, 0.0001, n_alphas)
-alphas = alpha_max * p_alphas
-log_alphas = np.log(alphas)
+n_alphas = 20
+alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 ##############################################################################
 # Grid-search
@@ -78,7 +74,7 @@ algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
     algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=log_alphas, tol=tol)
+    monitor_grid, log_alphas=np.log(alphas), tol=tol)
 objs = np.array(monitor_grid.objs)
 
 
@@ -89,9 +85,10 @@ optimizer_names = ['line-search', 'gradient-descent', 'adam']
 optimizers = {
     'line-search': LineSearch(n_outer=10, tol=tol),
     'gradient-descent': GradientDescent(n_outer=10, step_size=100),
-    'adam': Adam(n_outer=10, lr=0.11, verbose=True)}
+    'adam': Adam(n_outer=10, lr=0.11)}
 
 monitors = {}
+log_alpha0 = np.log(0.1 * alpha_max)  # starting point
 
 for optimizer_name in optimizer_names:
     estimator = LogisticRegression(
@@ -111,29 +108,33 @@ for optimizer_name in optimizer_names:
 
 current_palette = sns.color_palette("colorblind")
 dict_colors = {
-    'line-search': current_palette[2],
-    'gradient-descent': current_palette[3],
-    'adam': current_palette[4]}
+    'line-search': 'Greens',
+    'gradient-descent': 'Purples',
+    'adam': 'Reds'}
 
-plt.figure(figsize=(5, 3))
-plt.semilogx(
-    p_alphas, objs, color=current_palette[0])
-plt.semilogx(
-    p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1])
+
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.plot(alphas / alphas[0], objs, color=current_palette[0])
+ax.plot(
+    alphas / alphas[0], objs, 'bo',
+    label='0-order method (grid-search)', color=current_palette[1])
+
 for optimizer_name in optimizer_names:
     monitor = monitors[optimizer_name]
     p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
     objs_grad = np.array(monitor.objs)
-    plt.semilogx(
-        p_alphas_grad, objs_grad, 'bX', label=optimizer_name,
-        color=dict_colors[optimizer_name], markersize=7)
-    plt.xlabel(r"$\lambda / \lambda_{\max}$")
-    plt.ylabel(
-        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
-        r"\hat \beta^{(\lambda)} } \right ) $")
+    cmap = discrete_cmap(len(p_alphas_grad), dict_colors[optimizer_name])
+    ax.scatter(
+        p_alphas_grad, objs_grad, label=optimizer_name,
+        marker='X', color=cmap(np.linspace(0, 1, 10)), zorder=10)
 
+ax.set_xlabel(r"$\lambda / \lambda_{\max}$")
+ax.set_ylabel(
+    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+    r"\hat \beta^{(\lambda)} } \right ) $")
+
+ax.set_xscale("log")
 plt.tick_params(width=5)
-plt.legend(loc=1)
+plt.legend()
 plt.tight_layout()
 plt.show(block=False)

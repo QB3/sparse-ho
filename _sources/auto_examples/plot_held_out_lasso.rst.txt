@@ -25,36 +25,33 @@ Lasso with held-out test set
 This example shows how to perform hyperparameter optimization
 for a Lasso using a held-out validation set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-66
+.. GENERATED FROM PYTHON SOURCE LINES 10-61
 
 .. code-block:: default
 
 
     # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
     #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #          Mathurin Massias
     #
     # License: BSD (3-clause)
 
     import time
-
+    import celer
     import numpy as np
-    import matplotlib.pyplot as plt
     import seaborn as sns
-
-    from sklearn import linear_model
-    from sklearn.datasets import make_regression
-
+    import matplotlib.pyplot as plt
+    from celer.datasets import make_correlated_data
+    from libsvmdata.datasets import fetch_libsvm
 
     from sparse_ho.models import Lasso
     from sparse_ho.criterion import HeldOutMSE
-    from sparse_ho import Forward
-    from sparse_ho import ImplicitForward
+    from sparse_ho import Forward, ImplicitForward
     from sparse_ho.utils import Monitor
+    from sparse_ho.utils_plot import discrete_cmap
     from sparse_ho.ho import grad_search
     from sparse_ho.grid_search import grid_search
     from sparse_ho.optimizers import LineSearch
-
-    from libsvmdata.datasets import fetch_libsvm
 
 
     print(__doc__)
@@ -65,7 +62,8 @@ for a Lasso using a held-out validation set.
     if dataset == 'rcv1':
         X, y = fetch_libsvm('rcv1_train')
     else:
-        X, y = make_regression(n_samples=1000, n_features=1000, noise=40)
+        X, y, _ = make_correlated_data(n_samples=1000, n_features=2000,
+                                       random_state=0)
 
     n_samples = X.shape[0]
     idx_train = np.arange(0, n_samples // 2)
@@ -73,17 +71,14 @@ for a Lasso using a held-out validation set.
 
     print("Starting path computation...")
     n_samples = len(y[idx_train])
-    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
-    alpha_max /= len(idx_train)
-    log_alpha0 = np.log(alpha_max / 10)
+    alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
+    log_alpha0 = np.log(alpha_max / 5)
 
     n_alphas = 10
-    p_alphas = np.geomspace(1, 0.0001, n_alphas)
-    alphas = alpha_max * p_alphas
+    alphas = np.geomspace(alpha_max, alpha_max/1_000, n_alphas)
     log_alphas = np.log(alphas)
 
     tol = 1e-7
-    max_iter = 1e3
 
 
 
@@ -100,7 +95,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:03, 111kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:16, 179kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<00:43, 313kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:23, 573kB/s]    file_sizes:   7%|#7                         | 909k/13.7M [00:01<00:11, 1.08MB/s]    file_sizes:  13%|###4                      | 1.83M/13.7M [00:01<00:05, 2.08MB/s]    file_sizes:  27%|######9                   | 3.66M/13.7M [00:01<00:02, 4.03MB/s]    file_sizes:  38%|#########9                | 5.23M/13.7M [00:01<00:01, 4.98MB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:01, 5.63MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:00, 6.08MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:00, 6.39MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 6.60MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 6.75MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.14MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:08, 107kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:08, 106kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:19, 171kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<00:45, 300kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:24, 549kB/s]    file_sizes:   7%|#7                         | 909k/13.7M [00:01<00:12, 1.04MB/s]    file_sizes:  13%|###4                      | 1.83M/13.7M [00:01<00:05, 1.99MB/s]    file_sizes:  27%|######9                   | 3.66M/13.7M [00:01<00:02, 3.86MB/s]    file_sizes:  38%|#########9                | 5.23M/13.7M [00:02<00:01, 4.77MB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:01, 5.39MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:00, 5.82MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:00, 6.12MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03<00:00, 6.32MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 6.47MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.23MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -109,20 +104,19 @@ for a Lasso using a held-out validation set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-69
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
-Grid-search with scikit-learn
+Grid search with scikit-learn
 -----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-89
+.. GENERATED FROM PYTHON SOURCE LINES 64-83
 
 .. code-block:: default
 
 
-    estimator = linear_model.Lasso(
-        fit_intercept=False, max_iter=max_iter, warm_start=True)
+    estimator = celer.Lasso(fit_intercept=False, warm_start=True)
 
-    print('scikit-learn started')
+    print('Grid search started')
 
     t0 = time.time()
     model = Lasso(estimator=estimator)
@@ -135,7 +129,7 @@ Grid-search with scikit-learn
     objs = np.array(monitor_grid_sk.objs)
     t_sk = time.time() - t0
 
-    print('scikit-learn finished')
+    print('Grid search finished')
 
 
 
@@ -148,36 +142,18 @@ Grid-search with scikit-learn
 
  .. code-block:: none
 
-    scikit-learn started
-    Iteration 1 / 10
-    Iteration 2 / 10
-    Iteration 3 / 10
-    Iteration 4 / 10
-    Iteration 5 / 10
-    Iteration 6 / 10
-    Iteration 7 / 10
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.06099701478785846, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    Iteration 8 / 10
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 2.0066418148676917, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    Iteration 9 / 10
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 3.17218713503172, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    Iteration 10 / 10
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 8.79327661352437, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    scikit-learn finished
+    Grid search started
+    Grid search finished
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-92
+.. GENERATED FROM PYTHON SOURCE LINES 84-86
 
 Grad-search with sparse-ho
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-108
+.. GENERATED FROM PYTHON SOURCE LINES 86-102
 
 .. code-block:: default
 
@@ -208,23 +184,17 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     sparse-ho started
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0024182277884392533, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.003088212831698911, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
-    /home/circleci/.local/lib/python3.8/site-packages/sklearn/linear_model/_coordinate_descent.py:513: ConvergenceWarning: Objective did not converge. You might want to increase the number of iterations. Duality gap: 0.0029684074490887724, tolerance: 0.0010121
-      model = cd_fast.sparse_enet_coordinate_descent(
     sparse-ho finished
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 103-105
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-142
+.. GENERATED FROM PYTHON SOURCE LINES 105-138
 
 .. code-block:: default
 
@@ -234,29 +204,31 @@ Plot results
     objs_grad = np.array(monitor_grad.objs)
 
     print('sparse-ho finished')
-    print("Time to compute CV for scikit-learn: %.2f" % t_sk)
-    print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
+    print(f"Time for grid search: {t_sk:.2f} s")
+    print(f"Time for grad search (sparse-ho): {t_grad_search:.2f} s")
 
-    print('Minimum objective grid-search %.5f' % objs.min())
-    print('Minimum objective grad-search %.5f' % objs_grad.min())
+    print(f'Minimum outer criterion value with grid search: {objs.min():.5f}')
+    print(f'Minimum outer criterion value with grad search: {objs_grad.min():.5f}')
 
 
     current_palette = sns.color_palette("colorblind")
+    cmap = discrete_cmap(len(objs_grad), 'Greens')
 
-    plt.figure(figsize=(5, 3))
-    plt.semilogx(
-        p_alphas, objs, color=current_palette[0])
-    plt.semilogx(
-        p_alphas, objs, 'bo', label='0-order method (grid-search)',
+
+    fig, ax = plt.subplots(1, 1, figsize=(5, 3))
+    ax.plot(alphas / alphas[0], objs, color=current_palette[0])
+    ax.plot(
+        alphas / alphas[0], objs, 'bo', label='0-th order method (grid search)',
         color=current_palette[1])
-    plt.semilogx(
-        p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-        color=current_palette[2])
-    plt.xlabel(r"$\lambda / \lambda_{\max}$")
-    plt.ylabel(
+    ax.scatter(
+        p_alphas_grad, objs_grad, label='1-st order method',  marker='X',
+        color=cmap(np.linspace(0, 1, len(objs_grad))), s=40, zorder=40)
+    ax.set_xlabel(r"$\lambda / \lambda_{\max}$")
+    ax.set_ylabel(
         r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$")
     plt.tick_params(width=5)
     plt.legend()
+    ax.set_xscale("log")
     plt.tight_layout()
     plt.show(block=False)
 
@@ -274,10 +246,10 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time to compute CV for scikit-learn: 12.07
-    Time to compute CV for sparse-ho: 21.13
-    Minimum objective grid-search 0.21316
-    Minimum objective grad-search 0.21211
+    Time for grid search: 5.88 s
+    Time for grad search (sparse-ho): 5.77 s
+    Minimum outer criterion value with grid search: 0.21316
+    Minimum outer criterion value with grad search: 0.21255
 
 
 
@@ -285,7 +257,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  44.937 seconds)
+   **Total running time of the script:** ( 0 minutes  22.847 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

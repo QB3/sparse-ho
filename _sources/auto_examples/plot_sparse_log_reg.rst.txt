@@ -25,7 +25,7 @@ Sparse logistic regression
 This example shows how to perform hyperparameter optimisation
 for sparse logistic regression using a held-out test set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-70
+.. GENERATED FROM PYTHON SOURCE LINES 10-67
 
 .. code-block:: default
 
@@ -49,11 +49,10 @@ for sparse logistic regression using a held-out test set.
     from sparse_ho.utils import Monitor
     from sparse_ho.models import SparseLogreg
     from sparse_ho.criterion import HeldOutLogistic
-    from sparse_ho import ImplicitForward
-    from sparse_ho import Forward
+    from sparse_ho import ImplicitForward, Forward
     from sparse_ho.grid_search import grid_search
-    from sparse_ho.optimizers import LineSearch
-
+    from sparse_ho.optimizers import GradientDescent
+    from sparse_ho.utils_plot import discrete_cmap
 
     print(__doc__)
 
@@ -81,12 +80,10 @@ for sparse logistic regression using a held-out test set.
     log_alpha_min = np.log(alpha_max / 100)
     max_iter = 100
 
-    log_alpha0 = np.log(0.1 * alpha_max)
     tol = 1e-8
 
-    n_alphas = 30
-    p_alphas = np.geomspace(1, 0.0001, n_alphas)
-    alphas = alpha_max * p_alphas
+    n_alphas = 20
+    alphas = np.geomspace(alpha_max,  alpha_max / 1_000, n_alphas)
     log_alphas = np.log(alphas)
 
 
@@ -106,17 +103,17 @@ for sparse logistic regression using a held-out test set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-73
+.. GENERATED FROM PYTHON SOURCE LINES 68-70
 
 Grid-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-94
+.. GENERATED FROM PYTHON SOURCE LINES 70-91
 
 .. code-block:: default
 
 
-    print('scikit started')
+    print('Grid search started')
     t0 = time.time()
 
     estimator = LogisticRegression(
@@ -130,10 +127,10 @@ Grid-search
         monitor_grid, log_alphas=log_alphas, tol=tol)
     objs = np.array(monitor_grid.objs)
 
-    t_sk = time.time() - t0
+    t_grid_search = time.time() - t0
 
     print('scikit finished')
-    print("Time to compute CV for scikit-learn: %.2f" % t_sk)
+    print(f"Time to compute grad search: {t_grid_search:.2f} s")
 
 
 
@@ -146,49 +143,19 @@ Grid-search
 
  .. code-block:: none
 
-    scikit started
-    Iteration 1 / 30
-    Iteration 2 / 30
-    Iteration 3 / 30
-    Iteration 4 / 30
-    Iteration 5 / 30
-    Iteration 6 / 30
-    Iteration 7 / 30
-    Iteration 8 / 30
-    Iteration 9 / 30
-    Iteration 10 / 30
-    Iteration 11 / 30
-    Iteration 12 / 30
-    Iteration 13 / 30
-    Iteration 14 / 30
-    Iteration 15 / 30
-    Iteration 16 / 30
-    Iteration 17 / 30
-    Iteration 18 / 30
-    Iteration 19 / 30
-    Iteration 20 / 30
-    Iteration 21 / 30
-    Iteration 22 / 30
-    Iteration 23 / 30
-    Iteration 24 / 30
-    Iteration 25 / 30
-    Iteration 26 / 30
-    Iteration 27 / 30
-    Iteration 28 / 30
-    Iteration 29 / 30
-    Iteration 30 / 30
+    Grid search started
     scikit finished
-    Time to compute CV for scikit-learn: 0.92
+    Time to compute grad search: 0.50 s
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 92-94
 
 Grad-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-147
+.. GENERATED FROM PYTHON SOURCE LINES 94-146
 
 .. code-block:: default
 
@@ -196,25 +163,26 @@ Grad-search
     print('sparse-ho started')
 
     t0 = time.time()
+    log_alpha0 = np.log(0.1 * alpha_max)  # initial point
+
     estimator = LogisticRegression(
-        penalty='l1', fit_intercept=False, solver='saga', tol=tol)
+        penalty='l1', fit_intercept=False, tol=tol)
     model = SparseLogreg(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
 
     monitor_grad = Monitor()
     algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 
-    optimizer = LineSearch(n_outer=10, tol=tol)
+    optimizer = GradientDescent(n_outer=10, tol=tol)
     grad_search(
         algo, criterion, model, optimizer, X, y, log_alpha0,
         monitor_grad)
-
     objs_grad = np.array(monitor_grad.objs)
 
     t_grad_search = time.time() - t0
 
     print('sparse-ho finished')
-    print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
+    print(f"Time to compute grad search: {t_grad_search:.2f} s")
 
 
     p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
@@ -224,22 +192,23 @@ Grad-search
     current_palette = sns.color_palette("colorblind")
 
     fig = plt.figure(figsize=(5, 3))
-    plt.semilogx(
-        p_alphas, objs, color=current_palette[0])
-    plt.semilogx(
-        p_alphas, objs, 'bo', label='0-order method (grid-search)',
-        color=current_palette[1])
-    plt.semilogx(
-        p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-        color=current_palette[2])
+    cmap = discrete_cmap(len(p_alphas_grad), "Greens")
+
+    plt.plot(alphas / alphas[0], objs, color=current_palette[0])
+    plt.plot(
+        alphas / alphas[0], objs, 'bo',
+        label='0-order method (grid-search)', color=current_palette[1])
+    plt.scatter(
+        p_alphas_grad, objs_grad, label='1-st order method',
+        marker='X', color=cmap(np.linspace(0, 1, len(objs_grad))), zorder=10)
     plt.xlabel(r"$\lambda / \lambda_{\max}$")
     plt.ylabel(
         r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
         r"\hat \beta^{(\lambda)} } \right ) $")
 
-    axes = plt.gca()
+    plt.xscale("log")
     plt.tick_params(width=5)
-    plt.legend(loc=1)
+    plt.legend()
     plt.tight_layout()
     plt.show(block=False)
 
@@ -258,7 +227,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute CV for sparse-ho: 1.16
+    Time to compute grad search: 1.24 s
 
 
 
@@ -266,7 +235,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.501 seconds)
+   **Total running time of the script:** ( 0 minutes  2.126 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

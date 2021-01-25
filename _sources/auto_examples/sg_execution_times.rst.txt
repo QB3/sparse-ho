@@ -5,20 +5,20 @@
 
 Computation times
 =================
-**01:12.471** total execution time for **auto_examples** files:
+**00:44.058** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``)         | 00:44.937 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_held_out_lasso.py` (``plot_held_out_lasso.py``)         | 00:22.847 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_lassoCV.py` (``plot_lassoCV.py``)                       | 00:10.285 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_lassoCV.py` (``plot_lassoCV.py``)                       | 00:10.463 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_wlasso.py` (``plot_wlasso.py``)                         | 00:09.134 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_wlasso.py` (``plot_wlasso.py``)                         | 00:03.750 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``)         | 00:02.501 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_sparse_log_reg.py` (``plot_sparse_log_reg.py``)         | 00:02.126 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_compare_optimizers.py` (``plot_compare_optimizers.py``) | 00:02.074 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_held_out_enet.py` (``plot_held_out_enet.py``)           | 00:01.959 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_held_out_enet.py` (``plot_held_out_enet.py``)           | 00:01.969 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_use_callback.py` (``plot_use_callback.py``)             | 00:01.642 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_use_callback.py` (``plot_use_callback.py``)             | 00:01.571 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_compare_optimizers.py` (``plot_compare_optimizers.py``) | 00:01.271 | 0.0 MB |
 +-------------------------------------------------------------------------------------------+-----------+--------+

@@ -34,25 +34,25 @@ In particular we compare the weighted Lasso to LassoCV on a toy example
     # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
     #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
     #          Kenan Sehic
+    #          Mathurin Massias
     # License: BSD (3-clause)
 
+    import pandas as pd
     import numpy as np
     import matplotlib.pyplot as plt
-    import pandas as pd
-    from numpy.linalg import norm
-    from scipy.linalg import toeplitz
 
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import mean_squared_error
-    from sklearn.utils import check_random_state
+    from sklearn.model_selection import KFold
     from celer import Lasso, LassoCV
+    from celer.datasets import make_correlated_data
 
     from sparse_ho.models import WeightedLasso
-    from sparse_ho.criterion import HeldOutMSE
+    from sparse_ho.criterion import HeldOutMSE, CrossVal
     from sparse_ho import ImplicitForward
     from sparse_ho.utils import Monitor
     from sparse_ho.ho import grad_search
-    from sparse_ho.optimizers import LineSearch
+    from sparse_ho.optimizers import GradientDescent
 
 
 
@@ -66,26 +66,12 @@ In particular we compare the weighted Lasso to LassoCV on a toy example
 
 Dataset creation
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-53
+.. GENERATED FROM PYTHON SOURCE LINES 37-40
 
 .. code-block:: default
 
-    n_samples = 900
-    n_features = 600
-    rng = check_random_state(0)
-    X = rng.multivariate_normal(
-        size=n_samples, mean=np.zeros(n_features),
-        cov=toeplitz(0.5 ** np.arange(n_features)))
-
-
-    # Create true regression coefficients of 5 non-zero values
-    w_true = np.zeros(n_features)
-    size_supp = 5
-    idx = rng.choice(X.shape[1], size_supp, replace=False)
-    w_true[idx] = (-1) ** np.arange(size_supp)
-    noise = rng.randn(n_samples)
-    y = X @ w_true
-    y += noise / norm(noise) * 0.5 * norm(y)
+    X, y, w_true = make_correlated_data(
+        n_samples=100, n_features=1000, random_state=0, snr=5)
 
 
 
@@ -93,7 +79,8 @@ Dataset creation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-59
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-46
 
 .. code-block:: default
 
@@ -109,18 +96,17 @@ Dataset creation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
 
 Max penalty value
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-67
+.. GENERATED FROM PYTHON SOURCE LINES 50-53
 
 .. code-block:: default
 
-    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
-    alpha_max /= len(idx_train)
+    alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
     n_alphas = 30
-    alphas = alpha_max * np.geomspace(1, 0.001, n_alphas)
+    alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 
 
@@ -128,18 +114,43 @@ Max penalty value
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
+.. GENERATED FROM PYTHON SOURCE LINES 54-56
+
+.. code-block:: default
+
+
+    # Create cross validation object
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 57-58
+
+.. code-block:: default
+
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 61-62
 
 Vanilla LassoCV
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-79
+.. GENERATED FROM PYTHON SOURCE LINES 62-70
 
 .. code-block:: default
 
     print("========== Celer's LassoCV started ===============")
     model_cv = LassoCV(
         verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
-        cv=2, n_jobs=2).fit(X, y)
+        cv=cv, n_jobs=2).fit(X, y)
 
     # Measure mse on test
     mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
@@ -155,29 +166,30 @@ Vanilla LassoCV
  .. code-block:: none
 
     ========== Celer's LassoCV started ===============
-    Vanilla LassoCV: Mean-squared error on test data 1.344718
+    Vanilla LassoCV: Mean-squared error on test data 164.404580
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 Weighted Lasso with sparse-ho.
 We use the vanilla lassoCV coefficients as a starting point
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-95
+.. GENERATED FROM PYTHON SOURCE LINES 76-87
 
 .. code-block:: default
 
-    log_alpha0 = np.log(model_cv.alpha_) * np.ones(n_features)
+    log_alpha0 = np.log(model_cv.alpha_) * np.ones(X.shape[1])
     # Weighted Lasso: Sparse-ho: 1 param per feature
-    estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
+    estimator = Lasso(fit_intercept=False, max_iter=100, warm_start=True)
     model = WeightedLasso(estimator=estimator)
-    criterion = HeldOutMSE(idx_train, idx_val)
+    sub_criterion = HeldOutMSE(idx_train, idx_val)
+    criterion = CrossVal(sub_criterion, cv=cv)
     algo = ImplicitForward()
     monitor = Monitor()
-    optimizer = LineSearch(n_outer=20, tol=1e-6, verbose=True)
-    results = grad_search(
+    optimizer = GradientDescent(n_outer=50, tol=1e-7, verbose=True, p_grad0=1.9)
+    log_alphaopt, _, _ = grad_search(
         algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 
 
@@ -189,59 +201,125 @@ We use the vanilla lassoCV coefficients as a starting point
 
  .. code-block:: none
 
-    Iteration 1/20 || Value outer criterion: 1.42e+00 || norm grad 1.59e-01
-    Iteration 2/20 || Value outer criterion: 1.28e+00 || norm grad 4.26e-02
-    Iteration 3/20 || Value outer criterion: 1.26e+00 || norm grad 5.16e-02
-    Iteration 4/20 || Value outer criterion: 1.25e+00 || norm grad 3.79e-02
-    Iteration 5/20 || Value outer criterion: 1.26e+00 || norm grad 1.72e-01
-    Iteration 6/20 || Value outer criterion: 1.24e+00 || norm grad 1.92e-02
-    Iteration 7/20 || Value outer criterion: 1.21e+00 || norm grad 7.24e-03
-    Iteration 8/20 || Value outer criterion: 1.20e+00 || norm grad 1.00e-02
-    !!step size rejected!! 1.9777454555983074 1.2034626976568177
-    Iteration 9/20 || Value outer criterion: 1.98e+00 || norm grad 1.90e-01
-    Iteration 10/20 || Value outer criterion: 1.98e+00 || norm grad 1.90e-01
-    Iteration 11/20 || Value outer criterion: 1.94e+00 || norm grad 7.69e-02
-    Iteration 12/20 || Value outer criterion: 1.91e+00 || norm grad 6.15e-02
-    Iteration 13/20 || Value outer criterion: 1.87e+00 || norm grad 4.40e-02
-    Iteration 14/20 || Value outer criterion: 1.86e+00 || norm grad 3.89e-02
-    Iteration 15/20 || Value outer criterion: 1.84e+00 || norm grad 5.98e-02
-    Iteration 16/20 || Value outer criterion: 1.80e+00 || norm grad 6.56e-02
-    Iteration 17/20 || Value outer criterion: 1.77e+00 || norm grad 3.99e-02
-    Iteration 18/20 || Value outer criterion: 1.75e+00 || norm grad 4.73e-02
-    Iteration 19/20 || Value outer criterion: 1.74e+00 || norm grad 8.56e-03
-    Iteration 20/20 || Value outer criterion: 1.75e+00 || norm grad 3.82e-02
+    Iteration 1/50 ||Value outer criterion: 2.24e+02 ||norm grad 1.23e+02
+    Iteration 2/50 ||Value outer criterion: 1.23e+02 ||norm grad 4.28e+01
+    Iteration 3/50 ||Value outer criterion: 9.70e+01 ||norm grad 2.73e+01
+    Iteration 4/50 ||Value outer criterion: 6.87e+01 ||norm grad 1.10e+01
+    Iteration 5/50 ||Value outer criterion: 5.88e+01 ||norm grad 4.58e+00
+    Iteration 6/50 ||Value outer criterion: 5.28e+01 ||norm grad 4.10e+00
+    Iteration 7/50 ||Value outer criterion: 5.09e+01 ||norm grad 2.01e+00
+    Iteration 8/50 ||Value outer criterion: 4.99e+01 ||norm grad 7.85e-01
+    Iteration 9/50 ||Value outer criterion: 4.93e+01 ||norm grad 3.86e-01
+    Iteration 10/50 ||Value outer criterion: 4.94e+01 ||norm grad 9.43e-01
+    Iteration 11/50 ||Value outer criterion: 4.93e+01 ||norm grad 4.25e-01
+    Iteration 12/50 ||Value outer criterion: 4.92e+01 ||norm grad 3.88e-01
+    Iteration 13/50 ||Value outer criterion: 4.92e+01 ||norm grad 3.65e-01
+    Iteration 14/50 ||Value outer criterion: 4.92e+01 ||norm grad 3.47e-01
+    Iteration 15/50 ||Value outer criterion: 4.92e+01 ||norm grad 3.30e-01
+    Iteration 16/50 ||Value outer criterion: 4.91e+01 ||norm grad 3.14e-01
+    Iteration 17/50 ||Value outer criterion: 4.91e+01 ||norm grad 2.98e-01
+    Iteration 18/50 ||Value outer criterion: 4.91e+01 ||norm grad 2.81e-01
+    Iteration 19/50 ||Value outer criterion: 4.91e+01 ||norm grad 2.64e-01
+    Iteration 20/50 ||Value outer criterion: 4.91e+01 ||norm grad 2.47e-01
+    Iteration 21/50 ||Value outer criterion: 4.91e+01 ||norm grad 2.30e-01
+    Iteration 22/50 ||Value outer criterion: 4.90e+01 ||norm grad 2.13e-01
+    Iteration 23/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.98e-01
+    Iteration 24/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.84e-01
+    Iteration 25/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.72e-01
+    Iteration 26/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.62e-01
+    Iteration 27/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.54e-01
+    Iteration 28/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.48e-01
+    Iteration 29/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.43e-01
+    Iteration 30/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.38e-01
+    Iteration 31/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.35e-01
+    Iteration 32/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.32e-01
+    Iteration 33/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.29e-01
+    Iteration 34/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.26e-01
+    Iteration 35/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.24e-01
+    Iteration 36/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.22e-01
+    Iteration 37/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.19e-01
+    Iteration 38/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.17e-01
+    Iteration 39/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.15e-01
+    Iteration 40/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.13e-01
+    Iteration 41/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.10e-01
+    Iteration 42/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.08e-01
+    Iteration 43/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.06e-01
+    Iteration 44/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.03e-01
+    Iteration 45/50 ||Value outer criterion: 4.90e+01 ||norm grad 1.01e-01
+    Iteration 46/50 ||Value outer criterion: 4.90e+01 ||norm grad 9.90e-02
+    Iteration 47/50 ||Value outer criterion: 4.90e+01 ||norm grad 9.68e-02
+    Iteration 48/50 ||Value outer criterion: 4.89e+01 ||norm grad 9.46e-02
+    Iteration 49/50 ||Value outer criterion: 4.89e+01 ||norm grad 9.25e-02
+    Iteration 50/50 ||Value outer criterion: 4.89e+01 ||norm grad 9.05e-02
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-99
-
-MSE on validation set
-
-.. GENERATED FROM PYTHON SOURCE LINES 99-119
+.. GENERATED FROM PYTHON SOURCE LINES 88-91
 
 .. code-block:: default
 
-    mse_sho_val = mean_squared_error(y[idx_val], estimator.predict(X[idx_val, :]))
+
+    estimator.weights = np.exp(log_alphaopt)
+    estimator.fit(X, y)
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    Lasso(fit_intercept=False, warm_start=True,
+          weights=array([2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.48987248, 0.23907301, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724...
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498,
+           2.78724498, 2.78724498, 2.78724498, 2.78724498, 2.78724498]))
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 92-93
+
+MSE on validation set
+
+.. GENERATED FROM PYTHON SOURCE LINES 93-115
+
+.. code-block:: default
+
+    mse_sho_val = mean_squared_error(y, estimator.predict(X))
 
     # MSE on test set, ie unseen data
     mse_sho_test = mean_squared_error(y_test, estimator.predict(X_test))
 
+    # Oracle MSE
+    mse_oracle = mean_squared_error(y_test, X_test @ w_true)
 
     print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
     print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
 
 
-    labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV']
+    labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV', 'Oracle']
 
     df = pd.DataFrame(
-        np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),
+        np.array([mse_sho_val, mse_sho_test, mse_cv, mse_oracle]).reshape((1, -1)),
         columns=labels)
     df.plot.bar(rot=0)
     plt.xlabel("Estimator")
-    plt.ylabel("Mean square error")
+    plt.ylabel("Mean squared error")
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
 
 
@@ -256,8 +334,8 @@ MSE on validation set
 
  .. code-block:: none
 
-    Sparse-ho: Mean-squared error on validation data 1.748914
-    Sparse-ho: Mean-squared error on test (unseen) data 2.207304
+    Sparse-ho: Mean-squared error on validation data 36.508267
+    Sparse-ho: Mean-squared error on test (unseen) data 175.489630
 
 
 
@@ -265,7 +343,7 @@ MSE on validation set
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.134 seconds)
+   **Total running time of the script:** ( 0 minutes  3.750 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_wlasso.py:

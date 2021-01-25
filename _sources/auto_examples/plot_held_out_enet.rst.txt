@@ -37,12 +37,12 @@ for an elastic-net using a held-out validation set.
 
     import time
     import numpy as np
-    from sklearn import linear_model
     import matplotlib.pyplot as plt
-
+    from sklearn import linear_model
     from libsvmdata.datasets import fetch_libsvm
-
     from sklearn.datasets import make_regression
+    from sklearn.metrics import mean_squared_error
+
     from sparse_ho import ImplicitForward
     from sparse_ho.criterion import HeldOutMSE
     from sparse_ho.models import ElasticNet
@@ -66,40 +66,35 @@ for an elastic-net using a held-out validation set.
 
 Load some data
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-76
+.. GENERATED FROM PYTHON SOURCE LINES 38-71
 
 .. code-block:: default
 
 
-    print("Started to load data")
     # dataset = 'rcv1'
     dataset = 'simu'
 
     if dataset == 'rcv1':
         X, y = fetch_libsvm('rcv1_train')
-        # X = X[:1000, :]
         y -= y.mean()
         y /= np.linalg.norm(y)
     else:
         X, y = make_regression(
             n_samples=20, n_features=100, noise=1, random_state=42)
 
-    print("Finished loading data")
 
     n_samples = X.shape[0]
     idx_train = np.arange(0, n_samples // 2)
     idx_val = np.arange(n_samples // 2, n_samples)
 
     print("Starting path computation...")
-    n_samples = len(y[idx_train])
-    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
-    alpha_max /= len(idx_train)
+    alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 
     alpha_min = 1e-4 * alpha_max
 
     n_grid = 10
-    alphas_1 = np.geomspace(alpha_max, alpha_min, n_grid)
-    alphas_2 = np.geomspace(alpha_max, alpha_min, n_grid)
+    alphas_l1 = np.geomspace(alpha_max, alpha_min, n_grid)
+    alphas_l2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
     results = np.zeros((n_grid, n_grid))
     tol = 1e-5
@@ -118,36 +113,34 @@ Load some data
 
  .. code-block:: none
 
-    Started to load data
-    Finished loading data
     Starting path computation...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-79
+.. GENERATED FROM PYTHON SOURCE LINES 72-74
 
-Grid-search with scikit-learn
+grid search with scikit-learn
 -----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-94
+.. GENERATED FROM PYTHON SOURCE LINES 74-89
 
 .. code-block:: default
 
 
-    print("Started grid-search")
+    print("Started grid search")
     t_grid_search = - time.time()
     for i in range(n_grid):
-        print("lambda %i / %i" % (i, n_grid * n_grid))
+        print("lambda %i / %i" % (i * n_grid, n_grid * n_grid))
         for j in range(n_grid):
-            estimator.alpha = (alphas_1[i] + alphas_2[j])
-            estimator.l1_ratio = alphas_1[i] / (alphas_1[i] + alphas_2[j])
+            estimator.alpha = (alphas_l1[i] + alphas_l2[j])
+            estimator.l1_ratio = alphas_l1[i] / (alphas_l1[i] + alphas_l2[j])
             estimator.fit(X[idx_train, :], y[idx_train])
-            results[i, j] = np.mean(
-                (y[idx_val] - X[idx_val, :] @ estimator.coef_) ** 2)
+            results[i, j] = mean_squared_error(
+                y[idx_val], estimator.predict(X[idx_val, :]))
     t_grid_search += time.time()
-    print("Finished grid-search")
-    print("Minimum grid search %0.3e" % results.min())
+    print("Finished grid search")
+    print("Minimum outer criterion value with grid search %0.3e" % results.min())
 
 
 
@@ -159,29 +152,29 @@ Grid-search with scikit-learn
 
  .. code-block:: none
 
-    Started grid-search
+    Started grid search
     lambda 0 / 100
-    lambda 1 / 100
-    lambda 2 / 100
-    lambda 3 / 100
-    lambda 4 / 100
-    lambda 5 / 100
-    lambda 6 / 100
-    lambda 7 / 100
-    lambda 8 / 100
-    lambda 9 / 100
-    Finished grid-search
-    Minimum grid search 1.561e+04
+    lambda 10 / 100
+    lambda 20 / 100
+    lambda 30 / 100
+    lambda 40 / 100
+    lambda 50 / 100
+    lambda 60 / 100
+    lambda 70 / 100
+    lambda 80 / 100
+    lambda 90 / 100
+    Finished grid search
+    Minimum outer criterion value with grid search 1.561e+04
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 90-92
 
 Grad-search with sparse-ho
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-120
+.. GENERATED FROM PYTHON SOURCE LINES 92-115
 
 .. code-block:: default
 
@@ -203,7 +196,7 @@ Grad-search with sparse-ho
     t_grad_search += time.time()
     monitor.log_alphas = np.array(monitor.log_alphas)
 
-    print("Time grid-search %f" % t_grid_search)
+    print("Time grid search %f" % t_grid_search)
     print("Time grad-search %f" % t_grad_search)
     print("Minimum grid search %0.3e" % results.min())
     print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
@@ -244,32 +237,31 @@ Grad-search with sparse-ho
     Iteration 23/25 ||Value outer criterion: 1.56e+04 ||norm grad 3.13e+02
     Iteration 24/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.03e+02
     Iteration 25/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.33e+02
-    Time grid-search 0.081764
-    Time grad-search 1.528991
+    Time grid search 0.094957
+    Time grad-search 1.365439
     Minimum grid search 1.561e+04
     Minimum grad search 1.559e+04
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-123
+.. GENERATED FROM PYTHON SOURCE LINES 116-118
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-145
+.. GENERATED FROM PYTHON SOURCE LINES 118-143
 
 .. code-block:: default
 
 
-    scaling_factor = results.max()
     cmap = discrete_cmap(n_outer, 'Greens')
     c = np.linspace(1, n_outer, n_outer)
-    X, Y = np.meshgrid(alphas_1 / alpha_max, alphas_2 / alpha_max)
+    X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
     fig, ax = plt.subplots(1, 1)
-    cp = ax.contourf(X, Y, results.T / scaling_factor)
+    cp = ax.contourf(X, Y, results.T)
     ax.scatter(
-        X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
+        X, Y, s=10, c="orange", marker="o", label="$0$th order (grid search)",
         clip_on=False, cmap="viridis")
     ax.scatter(
         np.exp(monitor.log_alphas[:, 0]) / alpha_max,
@@ -277,17 +269,21 @@ Plot results
         s=50, cmap=cmap, c=c,
         marker="X", label="$1$st order", clip_on=False)
     ax.set_xlim(X.min(), X.max())
+    ax.set_xlabel("L1 regularization")
+    ax.set_ylabel("L2 regularization")
     ax.set_ylim(Y.min(), Y.max())
+    ax.set_title("Elastic net held out prediction loss on test set")
     cb = fig.colorbar(cp)
     cb.set_label("Held-out loss")
     plt.xscale('log')
     plt.yscale('log')
+    plt.legend()
     plt.show(block=False)
 
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_held_out_enet_001.png
-    :alt: plot held out enet
+    :alt: Elastic net held out prediction loss on test set
     :class: sphx-glr-single-img
 
 
@@ -297,7 +293,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.969 seconds)
+   **Total running time of the script:** ( 0 minutes  1.959 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:

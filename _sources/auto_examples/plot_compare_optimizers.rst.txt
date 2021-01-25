@@ -25,31 +25,31 @@ Compare outer optimizers
 This example shows how to perform hyperparameter optimization
 for sparse logistic regression using a held-out test set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-69
+.. GENERATED FROM PYTHON SOURCE LINES 10-65
 
 .. code-block:: default
 
 
     # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
     #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+    #          Mathurin Massias
     #
     # License: BSD (3-clause)
 
 
-    from libsvmdata.datasets import fetch_libsvm
     import numpy as np
-    import matplotlib.pyplot as plt
     import seaborn as sns
-
+    import matplotlib.pyplot as plt
     from sklearn.datasets import make_classification
     from celer import LogisticRegression
+    from libsvmdata.datasets import fetch_libsvm
 
+    from sparse_ho import ImplicitForward, Forward
     from sparse_ho.ho import grad_search
     from sparse_ho.utils import Monitor
     from sparse_ho.models import SparseLogreg
     from sparse_ho.criterion import HeldOutLogistic
-    from sparse_ho import ImplicitForward
-    from sparse_ho import Forward
+    from sparse_ho.utils_plot import discrete_cmap
     from sparse_ho.grid_search import grid_search
     from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
@@ -71,22 +71,18 @@ for sparse logistic regression using a held-out test set.
     idx_train = np.arange(0, n_samples // 2)
     idx_val = np.arange(n_samples // 2, n_samples)
 
-    print("Starting path computation...")
     n_samples = len(y[idx_train])
-    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+    alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train]))
 
-    alpha_max /= 4 * len(idx_train)
+    alpha_max /= 2 * len(idx_train)
     log_alpha_max = np.log(alpha_max)
     log_alpha_min = np.log(alpha_max / 100)
     max_iter = 100
 
-    log_alpha0 = np.log(0.1 * alpha_max)
     tol = 1e-8
 
-    n_alphas = 30
-    p_alphas = np.geomspace(1, 0.0001, n_alphas)
-    alphas = alpha_max * p_alphas
-    log_alphas = np.log(alphas)
+    n_alphas = 20
+    alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 
 
@@ -100,17 +96,16 @@ for sparse logistic regression using a held-out test set.
 
 
     Dataset: rcv1_train
-    Starting path computation...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-72
+.. GENERATED FROM PYTHON SOURCE LINES 66-68
 
 Grid-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-85
+.. GENERATED FROM PYTHON SOURCE LINES 68-81
 
 .. code-block:: default
 
@@ -123,7 +118,7 @@ Grid-search
     monitor_grid = Monitor()
     grid_search(
         algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-        monitor_grid, log_alphas=log_alphas, tol=tol)
+        monitor_grid, log_alphas=np.log(alphas), tol=tol)
     objs = np.array(monitor_grid.objs)
 
 
@@ -131,52 +126,15 @@ Grid-search
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Iteration 1 / 30
-    Iteration 2 / 30
-    Iteration 3 / 30
-    Iteration 4 / 30
-    Iteration 5 / 30
-    Iteration 6 / 30
-    Iteration 7 / 30
-    Iteration 8 / 30
-    Iteration 9 / 30
-    Iteration 10 / 30
-    Iteration 11 / 30
-    Iteration 12 / 30
-    Iteration 13 / 30
-    Iteration 14 / 30
-    Iteration 15 / 30
-    Iteration 16 / 30
-    Iteration 17 / 30
-    Iteration 18 / 30
-    Iteration 19 / 30
-    Iteration 20 / 30
-    Iteration 21 / 30
-    Iteration 22 / 30
-    Iteration 23 / 30
-    Iteration 24 / 30
-    Iteration 25 / 30
-    Iteration 26 / 30
-    Iteration 27 / 30
-    Iteration 28 / 30
-    Iteration 29 / 30
-    Iteration 30 / 30
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 Grad-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-140
+.. GENERATED FROM PYTHON SOURCE LINES 84-141
 
 .. code-block:: default
 
@@ -184,9 +142,10 @@ Grad-search
     optimizers = {
         'line-search': LineSearch(n_outer=10, tol=tol),
         'gradient-descent': GradientDescent(n_outer=10, step_size=100),
-        'adam': Adam(n_outer=10, lr=0.11, verbose=True)}
+        'adam': Adam(n_outer=10, lr=0.11)}
 
     monitors = {}
+    log_alpha0 = np.log(0.1 * alpha_max)  # starting point
 
     for optimizer_name in optimizer_names:
         estimator = LogisticRegression(
@@ -206,30 +165,34 @@ Grad-search
 
     current_palette = sns.color_palette("colorblind")
     dict_colors = {
-        'line-search': current_palette[2],
-        'gradient-descent': current_palette[3],
-        'adam': current_palette[4]}
+        'line-search': 'Greens',
+        'gradient-descent': 'Purples',
+        'adam': 'Reds'}
 
-    plt.figure(figsize=(5, 3))
-    plt.semilogx(
-        p_alphas, objs, color=current_palette[0])
-    plt.semilogx(
-        p_alphas, objs, 'bo', label='0-order method (grid-search)',
-        color=current_palette[1])
+
+    fig, ax = plt.subplots(figsize=(8, 3))
+    ax.plot(alphas / alphas[0], objs, color=current_palette[0])
+    ax.plot(
+        alphas / alphas[0], objs, 'bo',
+        label='0-order method (grid-search)', color=current_palette[1])
+
     for optimizer_name in optimizer_names:
         monitor = monitors[optimizer_name]
         p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
         objs_grad = np.array(monitor.objs)
-        plt.semilogx(
-            p_alphas_grad, objs_grad, 'bX', label=optimizer_name,
-            color=dict_colors[optimizer_name], markersize=7)
-        plt.xlabel(r"$\lambda / \lambda_{\max}$")
-        plt.ylabel(
-            r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
-            r"\hat \beta^{(\lambda)} } \right ) $")
+        cmap = discrete_cmap(len(p_alphas_grad), dict_colors[optimizer_name])
+        ax.scatter(
+            p_alphas_grad, objs_grad, label=optimizer_name,
+            marker='X', color=cmap(np.linspace(0, 1, 10)), zorder=10)
 
+    ax.set_xlabel(r"$\lambda / \lambda_{\max}$")
+    ax.set_ylabel(
+        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+        r"\hat \beta^{(\lambda)} } \right ) $")
+
+    ax.set_xscale("log")
     plt.tick_params(width=5)
-    plt.legend(loc=1)
+    plt.legend()
     plt.tight_layout()
     plt.show(block=False)
 
@@ -240,30 +203,13 @@ Grad-search
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    Value outer criterion: 0.672261
-    Value outer criterion: 0.671893
-    Value outer criterion: 0.671518
-    Value outer criterion: 0.671129
-    Value outer criterion: 0.670811
-    Value outer criterion: 0.670555
-    Value outer criterion: 0.670379
-    Value outer criterion: 0.670225
-    Value outer criterion: 0.670111
-    Value outer criterion: 0.670033
-
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.074 seconds)
+   **Total running time of the script:** ( 0 minutes  1.271 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_compare_optimizers.py:
