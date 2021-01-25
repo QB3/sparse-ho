@@ -123,7 +123,7 @@ X, Y = np.meshgrid(alphas_L1 / alpha_max, alphas_L2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, results.T / scaling_factor)
 ax.scatter(
-    X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
+    X, Y, s=10, c="orange", marker="o", label="$0$th order (grid search)",
     clip_on=False, cmap="viridis")
 ax.scatter(
     np.exp(monitor.log_alphas[:, 0]) / alpha_max,
@@ -134,8 +134,10 @@ ax.set_xlim(X.min(), X.max())
 ax.set_xlabel("L1 regularization")
 ax.set_ylabel("L2 regularization")
 ax.set_ylim(Y.min(), Y.max())
+ax.set_title("Elastic net held out prediction loss on test set")
 cb = fig.colorbar(cp)
 cb.set_label("Held-out loss")
 plt.xscale('log')
 plt.yscale('log')
+plt.legend()
 plt.show(block=False)
