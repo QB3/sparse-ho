@@ -20,15 +20,16 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import KFold
 from celer import Lasso, LassoCV
 from celer.datasets import make_correlated_data
 
 from sparse_ho.models import WeightedLasso
-from sparse_ho.criterion import HeldOutMSE
+from sparse_ho.criterion import HeldOutMSE, CrossVal
 from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
-from sparse_ho.optimizers import LineSearch
+from sparse_ho.optimizers import GradientDescent
 
 
 ##############################################################################
@@ -51,12 +52,17 @@ n_alphas = 30
 alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 ##############################################################################
 
+# Create cross validation object
+##############################################################################
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+##############################################################################
+
 ##############################################################################
 # Vanilla LassoCV
 print("========== Celer's LassoCV started ===============")
 model_cv = LassoCV(
     verbose=False, fit_intercept=False, alphas=alphas, tol=1e-7, max_iter=100,
-    cv=2, n_jobs=2).fit(X, y)
+    cv=cv, n_jobs=2).fit(X, y)
 
 # Measure mse on test
 mse_cv = mean_squared_error(y_test, model_cv.predict(X_test))
@@ -69,19 +75,22 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 # We use the vanilla lassoCV coefficients as a starting point
 log_alpha0 = np.log(model_cv.alpha_) * np.ones(X.shape[1])
 # Weighted Lasso: Sparse-ho: 1 param per feature
-estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
+estimator = Lasso(fit_intercept=False, max_iter=100, warm_start=True)
 model = WeightedLasso(estimator=estimator)
-criterion = HeldOutMSE(idx_train, idx_val)
+sub_criterion = HeldOutMSE(idx_train, idx_val)
+criterion = CrossVal(sub_criterion, cv=cv)
 algo = ImplicitForward()
 monitor = Monitor()
-optimizer = LineSearch(n_outer=20, tol=1e-6, verbose=True)
-results = grad_search(
+optimizer = GradientDescent(n_outer=50, tol=1e-7, verbose=True, p_grad0=1.9)
+log_alphaopt, _, _ = grad_search(
     algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
 ##############################################################################
 
+estimator.weights = np.exp(log_alphaopt)
+estimator.fit(X, y)
 ##############################################################################
 # MSE on validation set
-mse_sho_val = mean_squared_error(y[idx_val], estimator.predict(X[idx_val, :]))
+mse_sho_val = mean_squared_error(y, estimator.predict(X))
 
 # MSE on test set, ie unseen data
 mse_sho_test = mean_squared_error(y_test, estimator.predict(X_test))
