@@ -112,15 +112,14 @@ print(f'Minimum outer criterion value with grad search: {objs_grad.min():.5f}')
 current_palette = sns.color_palette("colorblind")
 cmap = discrete_cmap(len(objs_grad), 'Greens')
 
-scaling_factor = objs.max()
 fig, ax = plt.subplots(figsize=(5, 3))
-ax.plot(alphas / alphas[0], objs / scaling_factor, color=current_palette[0])
+ax.plot(alphas / alphas[0], objs, color=current_palette[0])
 ax.plot(
-    alphas / alphas[0], objs / scaling_factor,
+    alphas / alphas[0], objs,
     'bo', label='0-th order method (grid search)',
     color=current_palette[1])
 ax.scatter(
-    p_alphas_grad, objs_grad / scaling_factor,
+    p_alphas_grad, objs_grad,
     label='1-st order method',  marker='X',
     color=cmap(np.linspace(0, 1, len(objs_grad))), s=40, zorder=40)
 plt.xlabel(r"$\lambda / \lambda_{\max}$")

@@ -122,17 +122,16 @@ p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 objs_grad = np.array(monitor_grad.objs)
 
 current_palette = sns.color_palette("colorblind")
-scaling_factor = objs.max()
 
 fig = plt.figure(figsize=(5, 3))
 cmap = discrete_cmap(len(p_alphas_grad), "Greens")
 
-plt.plot(alphas / alphas[0], objs / scaling_factor, color=current_palette[0])
+plt.plot(alphas / alphas[0], objs, color=current_palette[0])
 plt.plot(
-    alphas / alphas[0], objs / scaling_factor, 'bo',
+    alphas / alphas[0], objs, 'bo',
     label='0-order method (grid-search)', color=current_palette[1])
 plt.scatter(
-    p_alphas_grad, objs_grad / scaling_factor, label='1-st order method',
+    p_alphas_grad, objs_grad, label='1-st order method',
     marker='X', color=cmap(np.linspace(0, 1, len(objs_grad))), zorder=10)
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(

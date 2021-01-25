@@ -113,12 +113,10 @@ dict_colors = {
     'adam': 'Reds'}
 
 
-scaling_factor = objs.max()
-
 fig, ax = plt.subplots(figsize=(8, 3))
-ax.plot(alphas / alphas[0], objs / scaling_factor, color=current_palette[0])
+ax.plot(alphas / alphas[0], objs, color=current_palette[0])
 ax.plot(
-    alphas / alphas[0], objs / scaling_factor, 'bo',
+    alphas / alphas[0], objs, 'bo',
     label='0-order method (grid-search)', color=current_palette[1])
 
 for optimizer_name in optimizer_names:
@@ -127,7 +125,7 @@ for optimizer_name in optimizer_names:
     objs_grad = np.array(monitor.objs)
     cmap = discrete_cmap(len(p_alphas_grad), dict_colors[optimizer_name])
     ax.scatter(
-        p_alphas_grad, objs_grad / scaling_factor, label=optimizer_name,
+        p_alphas_grad, objs_grad, label=optimizer_name,
         marker='X', color=cmap(np.linspace(0, 1, 10)), zorder=10)
 
 ax.set_xlabel(r"$\lambda / \lambda_{\max}$")
