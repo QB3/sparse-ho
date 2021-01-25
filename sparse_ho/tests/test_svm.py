@@ -118,21 +118,23 @@ def test_grad_search(model):
     monitor1 = Monitor()
     algo = Forward()
     optimizer = LineSearch(n_outer=n_outer, tol=1e-13)
+
+    C0 = 1e-3
     grad_search(
-        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor1)
+        algo, criterion, model, optimizer, X, y, C0, monitor1)
 
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
     optimizer = LineSearch(n_outer=n_outer, tol=1e-13)
     grad_search(
-        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor2)
+        algo, criterion, model, optimizer, X, y, C0, monitor2)
 
     criterion = HeldOutSmoothedHinge(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-6, n_iter_jac=100)
     grad_search(
-        algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor3)
+        algo, criterion, model, optimizer, X, y, C0, monitor3)
 
     np.testing.assert_allclose(
         np.array(monitor1.alphas), np.array(monitor3.alphas))

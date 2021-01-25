@@ -127,7 +127,7 @@ def test_grid_search():
     monitor_random = Monitor()
     criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
     algo = Forward()
-    log_alpha_opt_random, _ = grid_search(
+    alpha_opt_random, _ = grid_search(
         algo, criterion, model, X, y, alpha_min, alpha_max,
         monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
