@@ -61,8 +61,8 @@ max_iter = 100
 log_alpha0 = np.log(0.1 * alpha_max)
 tol = 1e-8
 
-n_alphas = 30
-p_alphas = np.geomspace(1, 0.0001, n_alphas)
+n_alphas = 20
+p_alphas = np.geomspace(1, 0.001, n_alphas)
 alphas = alpha_max * p_alphas
 log_alphas = np.log(alphas)
 
@@ -89,7 +89,7 @@ optimizer_names = ['line-search', 'gradient-descent', 'adam']
 optimizers = {
     'line-search': LineSearch(n_outer=10, tol=tol),
     'gradient-descent': GradientDescent(n_outer=10, step_size=100),
-    'adam': Adam(n_outer=10, lr=0.11, verbose=True)}
+    'adam': Adam(n_outer=10, lr=0.11)}
 
 monitors = {}
 
@@ -115,7 +115,7 @@ dict_colors = {
     'gradient-descent': current_palette[3],
     'adam': current_palette[4]}
 
-plt.figure(figsize=(5, 3))
+plt.figure(figsize=(8, 3))
 plt.semilogx(
     p_alphas, objs, color=current_palette[0])
 plt.semilogx(
@@ -128,10 +128,11 @@ for optimizer_name in optimizer_names:
     plt.semilogx(
         p_alphas_grad, objs_grad, 'bX', label=optimizer_name,
         color=dict_colors[optimizer_name], markersize=7)
-    plt.xlabel(r"$\lambda / \lambda_{\max}$")
-    plt.ylabel(
-        r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
-        r"\hat \beta^{(\lambda)} } \right ) $")
+
+plt.xlabel(r"$\lambda / \lambda_{\max}$")
+plt.ylabel(
+    r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
+    r"\hat \beta^{(\lambda)} } \right ) $")
 
 plt.tick_params(width=5)
 plt.legend(loc=1)

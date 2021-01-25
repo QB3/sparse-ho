@@ -34,7 +34,7 @@ from sparse_ho.optimizers import LineSearch
 ##############################################################################
 # Dataset creation
 X, y, w_true = make_correlated_data(
-    n_samples=600, n_features=1000, random_state=0)
+    n_samples=600, n_features=1000, random_state=0, snr=5)
 
 ##############################################################################
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
@@ -86,19 +86,21 @@ mse_sho_val = mean_squared_error(y[idx_val], estimator.predict(X[idx_val, :]))
 # MSE on test set, ie unseen data
 mse_sho_test = mean_squared_error(y_test, estimator.predict(X_test))
 
+# Oracle MSE
+mse_oracle = mean_squared_error(y_test, X_test @ w_true)
 
 print("Sparse-ho: Mean-squared error on validation data %f" % mse_sho_val)
 print("Sparse-ho: Mean-squared error on test (unseen) data %f" % mse_sho_test)
 
 
-labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV']
+labels = ['WeightedLasso val', 'WeightedLasso test', 'Lasso CV', 'Oracle']
 
 df = pd.DataFrame(
-    np.array([mse_sho_val, mse_sho_test, mse_cv]).reshape((1, -1)),
+    np.array([mse_sho_val, mse_sho_test, mse_cv, mse_oracle]).reshape((1, -1)),
     columns=labels)
 df.plot.bar(rot=0)
 plt.xlabel("Estimator")
-plt.ylabel("Mean square error")
+plt.ylabel("Mean squared error")
 plt.tight_layout()
-plt.show()
+plt.show(block=False)
 ##############################################################################
