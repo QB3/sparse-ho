@@ -14,20 +14,19 @@ for sparse logistic regression using a held-out test set.
 # License: BSD (3-clause)
 
 
-from libsvmdata.datasets import fetch_libsvm
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
-
+import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
 from celer import LogisticRegression
+from libsvmdata.datasets import fetch_libsvm
 
+from sparse_ho import ImplicitForward, Forward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho import ImplicitForward
-from sparse_ho import Forward
+from sparse_ho.utils_plot import discrete_cmap
 from sparse_ho.grid_search import grid_search
 from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
@@ -111,29 +110,32 @@ for optimizer_name in optimizer_names:
 
 current_palette = sns.color_palette("colorblind")
 dict_colors = {
-    'line-search': current_palette[2],
-    'gradient-descent': current_palette[3],
-    'adam': current_palette[4]}
+    'line-search': 'Greens',
+    'gradient-descent': 'Purples',
+    'adam': 'Reds'}
 
-plt.figure(figsize=(8, 3))
-plt.semilogx(
-    p_alphas, objs, color=current_palette[0])
-plt.semilogx(
+
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.plot(p_alphas, objs, color=current_palette[0])
+ax.plot(
     p_alphas, objs, 'bo', label='0-order method (grid-search)',
     color=current_palette[1])
 for optimizer_name in optimizer_names:
+
     monitor = monitors[optimizer_name]
     p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
     objs_grad = np.array(monitor.objs)
-    plt.semilogx(
-        p_alphas_grad, objs_grad, 'bX', label=optimizer_name,
-        color=dict_colors[optimizer_name], markersize=7)
+    cmap = discrete_cmap(len(p_alphas_grad), dict_colors[optimizer_name])
+    ax.scatter(
+        p_alphas_grad, objs_grad, label=optimizer_name, marker='X',
+        color=cmap(np.linspace(0, 1, 10)), zorder=10)
 
-plt.xlabel(r"$\lambda / \lambda_{\max}$")
-plt.ylabel(
+ax.set_xlabel(r"$\lambda / \lambda_{\max}$")
+ax.set_ylabel(
     r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
     r"\hat \beta^{(\lambda)} } \right ) $")
 
+ax.set_xscale("log")
 plt.tick_params(width=5)
 plt.legend(loc=1)
 plt.tight_layout()

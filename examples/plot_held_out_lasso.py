@@ -122,9 +122,9 @@ c = np.arange(len(objs_grad)) + 3
 
 fig, ax = plt.subplots(1, 1, figsize=(5, 3))
 ax.plot(alphas / alphas[0], objs, color=current_palette[0])
-# ax.plot(
-#     alphas / alphas[0], objs, 'bo', label='0-order method (grid search)',
-#     color=current_palette[1])
+ax.plot(
+    alphas / alphas[0], objs, 'bo', label='0-th order method (grid search)',
+    color=current_palette[1])
 ax.scatter(
     p_alphas_grad, objs_grad, label='1-st order method',
     cmap=cmap, c=c, marker='X', s=40, clip_on=False)
