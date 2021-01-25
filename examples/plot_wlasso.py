@@ -14,10 +14,9 @@ In particular we compare the weighted Lasso to LassoCV on a toy example
 #          Mathurin Massias
 # License: BSD (3-clause)
 
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from numpy.linalg import norm
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
