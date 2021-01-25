@@ -9,9 +9,9 @@ except Exception:
 
 def grid_search(
         algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
-        max_evals=50, tol=1e-5, nb_hyperparam=1,
-        beta_star=None, random_state=42, samp="grid", log_alphas=None,
-        t_max=100_000, reverse=True):
+        max_evals=50, tol=1e-5, nb_hyperparam=1, beta_star=None,
+        random_state=42, samp="grid", log_alphas=None, t_max=100_000,
+        reverse=True, verbose=False):
     if log_alphas is None and samp == "grid":
         if reverse:
             log_alphas = np.linspace(log_alpha_max, log_alpha_min, max_evals)
@@ -55,7 +55,8 @@ def grid_search(
     #     n_try = log_alphas.shape[0]
 
     for i, log_alpha in enumerate(log_alphas):
-        print("Iteration %i / %i" % (i+1, len(log_alphas)))
+        if verbose:
+            print("Iteration %i / %i" % (i+1, len(log_alphas)))
         # try:
         #     log_alpha = log_alphas[i, :]
         # except Exception:

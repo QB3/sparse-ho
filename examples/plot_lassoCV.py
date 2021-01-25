@@ -9,6 +9,7 @@ for a Lasso using a full cross-validation score.
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#          Mathurin Massias
 
 # License: BSD (3-clause)
 
@@ -23,12 +24,12 @@ from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
 
-from sparse_ho import ImplicitForward
-from sparse_ho import grad_search
+from sparse_ho import ImplicitForward, grad_search
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
 from sparse_ho.optimizers import LineSearch
 from sparse_ho.utils import Monitor
+from sparse_ho.utils_plot import discrete_cmap
 
 print(__doc__)
 
@@ -49,11 +50,9 @@ n_samples = len(y)
 alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 
 n_alphas = 10
-p_alphas = np.geomspace(1, 0.001, n_alphas)
-alphas = alpha_max * p_alphas
+alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 tol = 1e-8
-
 max_iter = 1e5
 
 #############################################################################
@@ -104,27 +103,28 @@ p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
 objs_grad = np.array(monitor_grad.objs)
 
 
-print("Time to compute CV for scikit-learn: %.2f" % t_sk)
-print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
+print(f"Time for grid search: {t_sk:.2f} s")
+print(f"Time for grad search (sparse-ho): {t_grad_search:.2f} s")
 
-print('Minimum objective grid-search %.5f' % objs.min())
-print('Minimum objective grad-search %.5f' % objs_grad.min())
-
+print(f'Minimum outer criterion value with grid search: {objs.min():.5f}')
+print(f'Minimum outer criterion value with grad search: {objs_grad.min():.5f}')
 
 current_palette = sns.color_palette("colorblind")
+cmap = discrete_cmap(len(objs_grad), 'Greens')
 
-fig = plt.figure(figsize=(5, 3))
-plt.semilogx(
-    p_alphas, objs, color=current_palette[0])
-plt.semilogx(
-    p_alphas, objs, 'bo', label='0-order method (grid-search)',
+fig, ax = plt.subplots(figsize=(5, 3))
+ax.plot(alphas / alphas[0], objs, color=current_palette[0])
+ax.plot(
+    alphas / alphas[0], objs,
+    'bo', label='0-th order method (grid search)',
     color=current_palette[1])
-plt.semilogx(
-    p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-    color=current_palette[2])
+ax.scatter(
+    p_alphas_grad, objs_grad,
+    label='1-st order method',  marker='X',
+    color=cmap(np.linspace(0, 1, len(objs_grad))), s=40, zorder=40)
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
-plt.ylabel("Cross-validation loss")
-axes = plt.gca()
+plt.ylabel("(Normalized) Cross-validation loss")
+ax.set_xscale("log")
 plt.tick_params(width=5)
 plt.legend()
 plt.tight_layout()
