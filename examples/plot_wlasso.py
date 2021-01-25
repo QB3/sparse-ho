@@ -35,7 +35,7 @@ from sparse_ho.optimizers import GradientDescent
 ##############################################################################
 # Dataset creation
 X, y, w_true = make_correlated_data(
-    n_samples=600, n_features=1000, random_state=0, snr=5)
+    n_samples=100, n_features=1000, random_state=0, snr=5)
 
 ##############################################################################
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
