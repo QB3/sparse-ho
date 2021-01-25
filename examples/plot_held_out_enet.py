@@ -58,8 +58,8 @@ alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 alpha_min = 1e-4 * alpha_max
 
 n_grid = 10
-alphas_L1 = np.geomspace(alpha_max, alpha_min, n_grid)
-alphas_L2 = np.geomspace(alpha_max, alpha_min, n_grid)
+alphas_l1 = np.geomspace(alpha_max, alpha_min, n_grid)
+alphas_l2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
 results = np.zeros((n_grid, n_grid))
 tol = 1e-5
@@ -77,8 +77,8 @@ t_grid_search = - time.time()
 for i in range(n_grid):
     print("lambda %i / %i" % (i * n_grid, n_grid * n_grid))
     for j in range(n_grid):
-        estimator.alpha = (alphas_L1[i] + alphas_L2[j])
-        estimator.l1_ratio = alphas_L1[i] / (alphas_L1[i] + alphas_L2[j])
+        estimator.alpha = (alphas_l1[i] + alphas_l2[j])
+        estimator.l1_ratio = alphas_l1[i] / (alphas_l1[i] + alphas_l2[j])
         estimator.fit(X[idx_train, :], y[idx_train])
         results[i, j] = mean_squared_error(
             y[idx_val], estimator.predict(X[idx_val, :]))
@@ -119,7 +119,7 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 scaling_factor = results.max()
 cmap = discrete_cmap(n_outer, 'Greens')
 c = np.linspace(1, n_outer, n_outer)
-X, Y = np.meshgrid(alphas_L1 / alpha_max, alphas_L2 / alpha_max)
+X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, results.T / scaling_factor)
 ax.scatter(
