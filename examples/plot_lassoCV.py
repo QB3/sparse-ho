@@ -21,7 +21,7 @@ import sklearn
 
 from libsvmdata import fetch_libsvm
 from sklearn.datasets import make_regression
-from sklearn.linear_model import Lasso, LassoCV
+from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
 
 from sparse_ho import ImplicitForward, grad_search
