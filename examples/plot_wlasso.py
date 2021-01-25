@@ -82,7 +82,7 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 ##############################################################################
 # Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
-log_alpha0 = np.log(model_cv.alpha_) * np.ones(n_features)
+alpha0 = model_cv.alpha_ * np.ones(n_features)
 # Weighted Lasso: Sparse-ho: 1 param per feature
 estimator = Lasso(fit_intercept=False, max_iter=10, warm_start=True)
 model = WeightedLasso(estimator=estimator)
@@ -91,7 +91,7 @@ algo = ImplicitForward()
 monitor = Monitor()
 optimizer = LineSearch(n_outer=20, tol=1e-6, verbose=True)
 results = grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
+    algo, criterion, model, optimizer, X, y, alpha0, monitor)
 ##############################################################################
 
 ##############################################################################

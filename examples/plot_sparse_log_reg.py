@@ -55,17 +55,16 @@ n_samples = len(y[idx_train])
 alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
 
 alpha_max /= 4 * len(idx_train)
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 100)
+alpha_max = alpha_max
+alpha_min = alpha_max / 100
 max_iter = 100
 
-log_alpha0 = np.log(0.1 * alpha_max)
+alpha0 = 0.1 * alpha_max
 tol = 1e-8
 
 n_alphas = 30
 p_alphas = np.geomspace(1, 0.0001, n_alphas)
 alphas = alpha_max * p_alphas
-log_alphas = np.log(alphas)
 
 ##############################################################################
 # Grid-search
@@ -81,8 +80,8 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=log_alphas, tol=tol)
+    algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+    monitor_grid, alphas=alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
 t_sk = time.time() - t0
@@ -108,7 +107,7 @@ algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 
 optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0,
+    algo, criterion, model, optimizer, X, y, alpha0,
     monitor_grad)
 
 objs_grad = np.array(monitor_grad.objs)
@@ -119,7 +118,7 @@ print('sparse-ho finished')
 print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
 
 
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
 

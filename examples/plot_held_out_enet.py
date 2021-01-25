@@ -100,17 +100,17 @@ print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
 n_outer = 25
-log_alpha0 = np.array([np.log(alpha_max * 0.3), np.log(alpha_max / 10)])
+alpha0 = np.array([alpha_max * 0.3, alpha_max / 10])
 model = ElasticNet(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
 optimizer = GradientDescent(
     n_outer=n_outer, tol=tol, p_grad0=1.5, verbose=True)
 grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0=log_alpha0,
+    algo, criterion, model, optimizer, X, y, alpha0=alpha0,
     monitor=monitor)
 t_grad_search += time.time()
-monitor.log_alphas = np.array(monitor.log_alphas)
+monitor.alphas = np.array(monitor.alphas)
 
 print("Time grid-search %f" % t_grid_search)
 print("Time grad-search %f" % t_grad_search)
@@ -131,13 +131,13 @@ ax.scatter(
     X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
     clip_on=False, cmap="viridis")
 ax.scatter(
-    np.exp(monitor.log_alphas[:, 0]) / alpha_max,
-    np.exp(monitor.log_alphas[:, 1]) / alpha_max,
+    monitor.alphas[:, 0]) / alpha_max,
+    monitor.alphas[:, 1]) / alpha_max,
     s=50, cmap=cmap, c=c,
     marker="X", label="$1$st order", clip_on=False)
 ax.set_xlim(X.min(), X.max())
 ax.set_ylim(Y.min(), Y.max())
-cb = fig.colorbar(cp)
+cb=fig.colorbar(cp)
 cb.set_label("Held-out loss")
 plt.xscale('log')
 plt.yscale('log')
