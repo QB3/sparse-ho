@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.linalg import norm
 
 from sparse_ho.optimizers.base import BaseOptimizer
