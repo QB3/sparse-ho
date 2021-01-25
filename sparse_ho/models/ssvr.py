@@ -1,7 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
-from scipy.sparse import issparse
 
 from numba import njit
 
@@ -10,11 +9,21 @@ from sparse_ho.utils import proj_box_svm, ind_box
 
 
 class SSVR(BaseModel):
-    """
+    """The simplex support vector regression without bias
+    The optimization problem is solved in the dual.
+    It solves the SVR with probability vector constraints:
+    sum_i beta_i = 1
+    beta_i >= 0. 
+
     Parameters
     ----------
-
-    TODO: other parameters should be remove
+    log_C : float
+        logarithm of the hyperparameter C
+    max_iter : int
+        maximum number of epochs for the coordinate descent
+        algorithm
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
     """
 
     def __init__(self, max_iter=100, estimator=None):
@@ -32,18 +41,10 @@ class SSVR(BaseModel):
             dbeta = np.zeros((n_features, 2))
         else:
             dr = self.dr
-            if issparse(X):
-                dbeta = (X.T).multiply(
-                    dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
-                dbeta = np.sum(dbeta, axis=1)
-                dbeta = np.squeeze(np.array(dbeta))
-                dbeta += dr[(2 * n_samples):(2 * n_samples + n_features)]
-                dbeta += dr[-1] * np.ones((n_features, 2))
-            else:
-                dbeta = X.T @ (
-                    dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
-                dbeta += dr[(2 * n_samples):(2 * n_samples + n_features)]
-                dbeta += dr[-1] * np.ones((n_features, 2))
+            dbeta = X.T @ (
+                dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
+            dbeta += dr[(2 * n_samples):(2 * n_samples + n_features), :]
+            dbeta += dr[-1, :]
         return dbeta, dr
 
     def _init_beta_r(self, X, y, mask0, dense0):
@@ -53,16 +54,9 @@ class SSVR(BaseModel):
             beta = np.zeros(n_features)
         else:
             r = self.r
-            if issparse(X):
-                beta = np.sum(X.T.multiply(r[0:n_samples]
-                              - r[n_samples:(2 * n_samples)]), axis=1)
-                beta = np.squeeze(np.array(beta))
-                beta += r[(2 * n_samples):(2 * n_samples + n_features)]
-                beta += r[-1] * np.ones(n_features)
-            else:
-                beta = X.T @ (r[0:n_samples] - r[n_samples:(2 * n_samples)])
-                beta += r[(2 * n_samples):(2 * n_samples + n_features)]
-                beta += r[-1] * np.ones(n_features)
+            beta = X.T @ (r[0:n_samples] - r[n_samples:(2 * n_samples)])
+            beta += r[(2 * n_samples):(2 * n_samples + n_features)]
+            beta += r[-1]
         return beta, r
 
     @staticmethod
@@ -95,7 +89,7 @@ class SSVR(BaseModel):
                     dr[j, 1] -= ind_box(zj, C) * epsilon / L[j]
                     dbeta[:, 0] += (dr[j, 0] - dr_old[0]) * X[j, :]
                     dbeta[:, 1] += (dr[j, 1] - dr_old[1]) * X[j, :]
-            if j >= n_samples and j < (2 * n_samples):
+            elif j >= n_samples and j < (2 * n_samples):
                 F = - np.sum(beta * X[j - n_samples, :]) + \
                     epsilon + y[j - n_samples]
                 r_old = r[j]
@@ -116,7 +110,7 @@ class SSVR(BaseModel):
                         X[j - n_samples, :]
                     dbeta[:, 1] -= (dr[j, 1] - dr_old[1]) * \
                         X[j - n_samples, :]
-            if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
+            elif j >= (2 * n_samples) and j < (2 * n_samples + n_features):
                 F = beta[j - (2 * n_samples)]
                 r_old = r[j]
                 zj = r[j] - F
@@ -132,21 +126,19 @@ class SSVR(BaseModel):
                         dr[j, :] = np.repeat(0.0, 2)
                     dbeta[j - (2 * n_samples), 0] -= (dr_old[0] - dr[j, 0])
                     dbeta[j - (2 * n_samples), 1] -= (dr_old[1] - dr[j, 1])
-            if j == (2 * n_samples + n_features):
+            elif j == (2 * n_samples + n_features):
                 F = np.sum(beta) - 1
                 r_old = r[-1]
                 zj = r[j] - F / n_features
                 r[j] = zj
-                beta -= np.ones(n_features) * (r_old - r[-1])
+                beta -= (r_old - r[-1])
                 if compute_jac:
                     dF = np.sum(dbeta, axis=0)
                     dr_old = dr[-1, :].copy()
                     dzj = dr[j] - dF / n_features
                     dr[j, :] = dzj
-                    dbeta[:, 0] -= np.ones(n_features) * \
-                        (dr_old[0] - dr[-1, 0])
-                    dbeta[:, 1] -= np.ones(n_features) * \
-                        (dr_old[1] - dr[-1, 1])
+                    dbeta[:, 0] -= (dr_old[0] - dr[-1, 0])
+                    dbeta[:, 1] -= (dr_old[1] - dr[-1, 1])
 
     @staticmethod
     @njit
@@ -175,7 +167,7 @@ class SSVR(BaseModel):
                     dr[j, 1] -= ind_box(zj, C) * epsilon / L[j]
                     dbeta[idx_nz, 0] += (dr[j, 0] - dr_old[0]) * Xis
                     dbeta[idx_nz, 1] += (dr[j, 1] - dr_old[1]) * Xis
-            if j >= n_samples and j < (2 * n_samples):
+            elif j >= n_samples and j < (2 * n_samples):
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
                 # get the non zero indices
                 idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -193,12 +185,12 @@ class SSVR(BaseModel):
                     dzj = dr[j, :] - dF / L[j - n_samples]
                     dr[j, :] = ind_box(zj, C) * dzj
                     dr[j, 0] += C * (C <= zj)
-                    dr[j, 1] -= ind_box(zj, C) * epsilon / L[j]
+                    dr[j, 1] -= ind_box(zj, C) * epsilon / L[j - n_samples]
                     dbeta[idx_nz, 0] -= (dr[j, 0] - dr_old[0]) * \
                         Xis
                     dbeta[idx_nz, 1] -= (dr[j, 1] - dr_old[1]) * \
                         Xis
-            if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
+            elif j >= (2 * n_samples) and j < (2 * n_samples + n_features):
                 F = beta[j - (2 * n_samples)]
                 r_old = r[j]
                 zj = r[j] - F
@@ -214,36 +206,35 @@ class SSVR(BaseModel):
                         dr[j, :] = 0
                     dbeta[j - (2 * n_samples), 0] -= (dr_old[0] - dr[j, 0])
                     dbeta[j - (2 * n_samples), 1] -= (dr_old[1] - dr[j, 1])
-            if j == (2 * n_samples + n_features):
+            elif j == (2 * n_samples + n_features):
                 F = np.sum(beta) - 1
                 r_old = r[-1]
                 zj = r[j] - F / n_features
                 r[j] = zj
-                beta -= np.ones(n_features) * (r_old - r[-1])
+                beta -= (r_old - r[-1])
                 if compute_jac:
                     dF = np.sum(dbeta, axis=0)
                     dr_old = dr[-1, :].copy()
                     dzj = dr[j, :] - dF / n_features
                     dr[j, :] = dzj
-                    dbeta[:, 0] -= np.ones(n_features) * \
-                        (dr_old[0] - dr[-1, 0])
-                    dbeta[:, 1] -= np.ones(n_features) * \
-                        (dr_old[1] - dr[-1, 1])
+                    dbeta[:, 0] -= (dr_old[0] - dr[-1, 0])
+                    dbeta[:, 1] -= (dr_old[1] - dr[-1, 1])
 
     def _get_pobj0(self, r, beta, hyperparam, y):
         n_samples = len(y)
         obj_prim = hyperparam[0] * np.sum(np.maximum(
-            np.abs(y) - hyperparam[1], np.zeros(n_samples)))
+            np.abs(y) - hyperparam[1], 0))
         return obj_prim
 
     def _get_pobj(self, r, X, beta, hyperparam, y):
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] * np.sum(np.maximum(
-            np.abs(X @ beta - y) - hyperparam[1], np.zeros(n_samples)))
+            np.abs(X @ beta - y) - hyperparam[1], 0))
         obj_dual = 0.5 * beta.T @ beta + hyperparam[1] * np.sum(r)
         obj_dual -= np.sum(y * (r[0:n_samples] -
                                 r[n_samples:(2 * n_samples)]))
         obj_dual -= 1
+        
         return (obj_dual + obj_prim)
 
     @staticmethod
@@ -293,7 +284,7 @@ class SSVR(BaseModel):
         self.dbeta = X.T @ (
             dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
         self.dbeta += dr[(2 * n_samples):(2 * n_samples + n_features), :]
-        self.dbeta += dr[-1, :] * np.ones((n_features, 2))
+        self.dbeta += dr[-1, :]
         return dr
 
     @staticmethod
@@ -317,7 +308,7 @@ class SSVR(BaseModel):
                 dr[j, 1] -= epsilon / L[j]
                 dbeta[:, 0] += (dr[j, 0] - dr_old[0]) * X[j, :]
                 dbeta[:, 1] += (dr[j, 1] - dr_old[1]) * X[j, :]
-            if j >= n_samples and j < (2 * n_samples):
+            elif j >= n_samples and j < (2 * n_samples):
                 dF = np.array([- np.sum(dbeta[:, 0].T * X[j - n_samples, :]),
                                - np.sum(dbeta[:, 1].T * X[j - n_samples, :])])
                 dr_old = dr[j, :].copy()
@@ -328,20 +319,20 @@ class SSVR(BaseModel):
                     X[j - n_samples, :]
                 dbeta[:, 1] -= (dr[j, 1] - dr_old[1]) * \
                     X[j - n_samples, :]
-            if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
+            elif j >= (2 * n_samples) and j < (2 * n_samples + n_features):
                 dF = dbeta[j - (2 * n_samples)]
                 dr_old = dr[j, :].copy()
                 dzj = dr[j, :] - dF
                 dr[j, :] = dzj
                 dbeta[j - (2 * n_samples), 0] -= (dr_old[0] - dr[j, 0])
                 dbeta[j - (2 * n_samples), 1] -= (dr_old[1] - dr[j, 1])
-            if j == (2 * n_samples + n_features):
+            elif j == (2 * n_samples + n_features):
                 dF = np.sum(dbeta, axis=0)
                 dr_old = dr[-1, :].copy()
                 dzj = dr[j, :] - dF / n_features
                 dr[j, :] = dzj
-                dbeta[:, 0] -= np.ones(n_features) * (dr_old[0] - dr[-1, 0])
-                dbeta[:, 1] -= np.ones(n_features) * (dr_old[1] - dr[-1, 1])
+                dbeta[:, 0] -= (dr_old[0] - dr[-1, 0])
+                dbeta[:, 1] -= (dr_old[1] - dr[-1, 1])
 
     @staticmethod
     @njit
@@ -369,7 +360,7 @@ class SSVR(BaseModel):
                 dr[j, 1] -= epsilon / L[j]
                 dbeta[idx_nz, 0] += (dr[j, 0] - dr_old[0]) * Xis
                 dbeta[idx_nz, 1] += (dr[j, 1] - dr_old[1]) * Xis
-            if j >= n_samples and j < (2 * n_samples):
+            elif j >= n_samples and j < (2 * n_samples):
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
                 # get the non zero indices
                 idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -383,20 +374,20 @@ class SSVR(BaseModel):
                     Xis
                 dbeta[idx_nz, 1] -= (dr[j, 1] - dr_old[1]) * \
                     Xis
-            if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
+            elif j >= (2 * n_samples) and j < (2 * n_samples + n_features):
                 dF = dbeta[j - (2 * n_samples)]
                 dr_old = dr[j, :].copy()
                 dzj = dr[j, :] - dF
                 dr[j, :] = dzj
                 dbeta[j - (2 * n_samples), 0] -= (dr_old[0] - dr[j, 0])
                 dbeta[j - (2 * n_samples), 1] -= (dr_old[1] - dr[j, 1])
-            if j == (2 * n_samples + n_features):
+            elif j == (2 * n_samples + n_features):
                 dF = np.sum(dbeta, axis=0)
                 dr_old = dr[-1, :].copy()
                 dzj = dr[j, :] - dF / n_features
                 dr[j, :] = dzj
-                dbeta[:, 0] -= np.ones(n_features) * (dr_old[0] - dr[-1, 0])
-                dbeta[:, 1] -= np.ones(n_features) * (dr_old[1] - dr[-1, 1])
+                dbeta[:, 0] -= (dr_old[0] - dr[-1, 0])
+                dbeta[:, 1] -= (dr_old[1] - dr[-1, 1])
 
     @staticmethod
     @njit
@@ -425,7 +416,7 @@ class SSVR(BaseModel):
         return sign
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
-        return jac[mask].T @ v(mask, dense)
+        return jac.T @ v(mask, dense)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
@@ -471,7 +462,7 @@ class SSVR(BaseModel):
             jac[0:full_supp.sum()]
         return np.array([jac_t_v, jac_t_v2])
 
-    def restrict_full_supp(self, X, v, log_hyperparam):
+    def generalized_supp(self, X, v, log_hyperparam):
         n_samples, n_features = X.shape
         C = np.exp(log_hyperparam[0])
         alpha = self.r[0:n_samples] - self.r[n_samples:(2 * n_samples)]

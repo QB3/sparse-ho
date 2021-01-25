@@ -66,7 +66,7 @@ def get_beta_jac_t_v_implicit(
         sol0 = np.zeros(size_mat)
     try:
         sol = cg(
-            mat_to_inv, - model.restrict_full_supp(X_train, v, log_alpha),
+            mat_to_inv, - model.generalized_supp(X_train, v, log_alpha),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -85,7 +85,7 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - model.restrict_full_supp(X_train, v, log_alpha),
+            - model.generalized_supp(X_train, v, log_alpha),
             x0=sol0, atol=1e-3)
 
     sol_lin_sys = sol[0]

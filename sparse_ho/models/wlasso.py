@@ -35,30 +35,30 @@ class WeightedLasso(BaseModel):
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
 
-    def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
+    def _init_dbeta_dresiduals(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros((n_features, n_features))
-        dr = np.zeros((n_samples, n_features))
+        dresiduals = np.zeros((n_samples, n_features))
         if jac0 is not None:
             dbeta[np.ix_(mask0, mask0)] = jac0.copy()
-            dr[:, mask0] = - X[:, mask0] @ jac0
-        return dbeta, dr
+            dresiduals[:, mask0] = - X[:, mask0] @ jac0
+        return dbeta, dresiduals
 
-    def _init_beta_r(self, X, y, mask0=None, dense0=None):
+    def _init_beta_residuals(self, X, y, mask0=None, dense0=None):
         beta = np.zeros(X.shape[1])
         if dense0 is None or len(dense0) == 0:
-            r = y.copy()
-            r = r.astype(np.float)
+            residuals = y.copy()
+            residuals = residuals.astype(np.float)
         else:
             beta[mask0] = dense0.copy()
-            r = y - X[:, mask0] @ dense0
-        return beta, r
+            residuals = y - X[:, mask0] @ dense0
+        return beta, residuals
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, r, dr, alpha, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals, alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
         non_zeros = np.where(L != 0)[0]
 
@@ -66,21 +66,21 @@ class WeightedLasso(BaseModel):
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
-            zj = beta[j] + r @ X[:, j] / (L[j] * n_samples)
+            zj = beta[j] + residuals @ X[:, j] / (L[j] * n_samples)
             beta[j:j+1] = ST(zj, alpha[j] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + X[:, j] @ dr / (L[j] * n_samples)
+                dzj = dbeta[j, :] + X[:, j] @ dresiduals / (L[j] * n_samples)
                 dbeta[j:j+1, :] = np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, j] -= alpha[j] * np.sign(beta[j]) / L[j]
                 # update residuals
-                dr -= np.outer(X[:, j], (dbeta[j, :] - dbeta_old))
-            r -= X[:, j] * (beta[j] - beta_old)
+                dresiduals -= np.outer(X[:, j], (dbeta[j, :] - dbeta_old))
+            residuals -= X[:, j] * (beta[j] - beta_old)
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
-            dbeta, r, dr, alphas, L, compute_jac=True):
+            dbeta, residuals, dresiduals, alphas, L, compute_jac=True):
         non_zeros = np.where(L != 0)[0]
 
         for j in non_zeros:
@@ -92,15 +92,15 @@ class WeightedLasso(BaseModel):
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
-            zj = beta[j] + r[idx_nz] @ Xjs / (L[j] * n_samples)
+            zj = beta[j] + residuals[idx_nz] @ Xjs / (L[j] * n_samples)
             beta[j:j+1] = ST(zj, alphas[j] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + Xjs @ dr[idx_nz, :] / (L[j] * n_samples)
+                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / (L[j] * n_samples)
                 dbeta[j:j+1, :] = np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, j] -= alphas[j] * np.sign(beta[j]) / L[j]
                 # update residuals
-                dr[idx_nz, :] -= np.outer(Xjs, (dbeta[j, :] - dbeta_old))
-            r[idx_nz] -= Xjs * (beta[j] - beta_old)
+                dresiduals[idx_nz, :] -= np.outer(Xjs, (dbeta[j, :] - dbeta_old))
+            residuals[idx_nz] -= Xjs * (beta[j] - beta_old)
 
     @staticmethod
     @njit
@@ -115,14 +115,14 @@ class WeightedLasso(BaseModel):
         return jac_t_v
 
     @staticmethod
-    def _get_pobj(r, X, beta, alphas, y=None):
-        n_samples = r.shape[0]
+    def _get_pobj(residuals, X, beta, alphas, y=None):
+        n_samples = residuals.shape[0]
         return (
-            norm(r) ** 2 / (2 * n_samples) + norm(alphas * beta, 1))
+            norm(residuals) ** 2 / (2 * n_samples) + norm(alphas * beta, 1))
 
     @staticmethod
-    def _get_pobj0(r, beta, alphas, y=None):
-        n_samples = r.shape[0]
+    def _get_pobj0(residuals, beta, alphas, y=None):
+        n_samples = residuals.shape[0]
         return norm(y) ** 2 / (2 * n_samples)
 
     @staticmethod
@@ -144,7 +144,7 @@ class WeightedLasso(BaseModel):
         return dbeta
 
     @staticmethod
-    def _init_dr(dbeta, X, y, sign_beta, alpha):
+    def _init_dresiduals(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
     @staticmethod
@@ -156,20 +156,20 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, r, dbeta, dr, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             dbeta_old = dbeta[j, :].copy()
-            dbeta[j:j+1, :] = dbeta[j, :] + Xs[:, j] @ dr / (L[j] * n_samples)
+            dbeta[j:j+1, :] = dbeta[j, :] + Xs[:, j] @ dresiduals / (L[j] * n_samples)
             dbeta[j:j+1, j] -= alpha[j] * sign_beta[j] / L[j]
             # update residuals
-            dr -= np.outer(Xs[:, j], (dbeta[j, :] - dbeta_old))
+            dresiduals -= np.outer(Xs[:, j], (dbeta[j, :] - dbeta_old))
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
-            data, indptr, indices, y, n_samples, n_features, dbeta, r, dr, L,
-            alpha, sign_beta):
+            data, indptr, indices, y, n_samples, n_features, dbeta, residuals,
+            dresiduals, L, alpha, sign_beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
@@ -178,9 +178,9 @@ class WeightedLasso(BaseModel):
             # store old beta j for fast update
             dbeta_old = dbeta[j, :].copy()
 
-            dbeta[j:j+1, :] += Xjs @ dr[idx_nz] / (L[j] * n_samples)
+            dbeta[j:j+1, :] += Xjs @ dresiduals[idx_nz] / (L[j] * n_samples)
             dbeta[j, j] -= alpha[j] * sign_beta[j] / L[j]
-            dr[idx_nz] -= np.outer(Xjs, (dbeta[j] - dbeta_old))
+            dresiduals[idx_nz] -= np.outer(Xjs, (dbeta[j] - dbeta_old))
 
     # @njit
     @staticmethod
@@ -256,9 +256,10 @@ class WeightedLasso(BaseModel):
     def get_jac_v(self, X, y, mask, dense, jac, v):
         return jac.T @ v(mask, dense)
 
-    def restrict_full_supp(self, X, v, log_alpha):
+    def generalized_supp(self, X, v, log_alpha):
         return v
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, r, dr, alpha):
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals, 
+                    dresiduals, alpha):
         return(
-            norm(dr.T @ dr + n_samples * alpha * sign_beta @ dbeta))
+            norm(dresiduals.T @ dresiduals + n_samples * alpha * sign_beta @ dbeta))

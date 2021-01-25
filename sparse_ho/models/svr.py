@@ -9,53 +9,58 @@ from sparse_ho.utils import proj_box_svm, ind_box
 
 
 class SVR(BaseModel):
-    """
-    TODO
+    """The support vector regression without bias
+    The optimization problem is solved in the dual.
 
     Parameters
     ----------
-
-    TODO: other parameters should be remove
+    log_C : float
+        logarithm of the hyperparameter C
+    max_iter : int
+        maximum number of epochs for the coordinate descent
+        algorithm
+    estimator: instance of ``sklearn.base.BaseEstimator``
+        An estimator that follows the scikit-learn API.
     """
 
     def __init__(self, max_iter=100, estimator=None):
         self.max_iter = max_iter
         self.estimator = estimator
         self.dual = True
-        self.r = None
-        self.dr = None
+        self.residuals = None
+        self.dresiduals = None
 
-    def _init_dbeta_dr(self, X, y, dense0=None,
+    def _init_dbeta_dresiduals(self, X, y, dense0=None,
                        mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
-        dr = np.zeros((2 * n_samples, 2))
-        if jac0 is None or not compute_jac or self.dr is None:
+        dresiduals = np.zeros((2 * n_samples, 2))
+        if jac0 is None or not compute_jac or self.dresiduals is None:
             dbeta = np.zeros((n_features, 2))
         else:
-            dr = self.dr
+            dresiduals = self.dresiduals.copy()
             dbeta = X.T @ (
-                dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
-        return dbeta, dr
+                dresiduals[0:n_samples, :] - dresiduals[n_samples:(2 * n_samples), :])
+        return dbeta, dresiduals
 
-    def _init_beta_r(self, X, y, mask0, dense0):
+    def _init_beta_residuals(self, X, y, mask0, dense0):
         n_samples, n_features = X.shape
-        r = np.zeros(2 * n_samples)
-        if mask0 is None or self.r is None:
+        residuals = np.zeros(2 * n_samples)
+        if mask0 is None or self.residuals is None:
             beta = np.zeros(n_features)
         else:
-            r = self.r
-            beta = X.T @ (r[0:n_samples] - r[n_samples:(2 * n_samples)])
-        return beta, r
+            residuals = self.residuals
+            beta = X.T @ (residuals[0:n_samples] - residuals[n_samples:(2 * n_samples)])
+        return beta, residuals
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, r, dr, hyperparam, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals, hyperparam, L, compute_jac=True):
         """
             beta : primal variable of the svr
-            r : dual used for cheap updates
+            residuals : dual used for cheap updates
             dbeta : jacobian of the primal variables
-            dr : jacobian of the dual variables
+            dresiduals : jacobian of the dual variables
         """
         C = hyperparam[0]
         epsilon = hyperparam[1]
@@ -64,72 +69,72 @@ class SVR(BaseModel):
         for j in range(2 * n_samples):
             if j < n_samples:
                 F = np.sum(beta * X[j, :]) + epsilon - y[j]
-                r_old = r[j]
-                zj = r[j] - F / L[j]
-                r[j] = proj_box_svm(zj, C)
-                beta += (r[j] - r_old) * X[j, :]
+                residuals_old = residuals[j]
+                zj = residuals[j] - F / L[j]
+                residuals[j] = proj_box_svm(zj, C)
+                beta += (residuals[j] - residuals_old) * X[j, :]
                 if compute_jac:
                     dF = np.array([np.sum(dbeta[:, 0].T * X[j, :]),
                                    np.sum(dbeta[:, 1].T * X[j, :])])
-                    dr_old = dr[j, :].copy()
-                    dzj = dr[j, :] - dF / L[j]
-                    dr[j, :] = ind_box(zj, C) * dzj
-                    dr[j, 0] += C * (C <= zj)
-                    dr[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[:, 0] += (dr[j, 0] - dr_old[0]) * X[j, :]
-                    dbeta[:, 1] += (dr[j, 1] - dr_old[1]) * X[j, :]
+                    dresiduals_old = dresiduals[j, :].copy()
+                    dzj = dresiduals[j, :] - dF / L[j]
+                    dresiduals[j, :] = ind_box(zj, C) * dzj
+                    dresiduals[j, 0] += C * (C <= zj)
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j]
+                    dbeta[:, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * X[j, :]
+                    dbeta[:, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * X[j, :]
             if j >= n_samples:
                 F = - np.sum(beta * X[j - n_samples, :]) + \
                     epsilon + y[j - n_samples]
-                r_old = r[j]
-                zj = r[j] - F / L[j - n_samples]
-                r[j] = proj_box_svm(zj, C)
-                beta -= (r[j] - r_old) * X[j - n_samples, :]
+                residuals_old = residuals[j]
+                zj = residuals[j] - F / L[j - n_samples]
+                residuals[j] = proj_box_svm(zj, C)
+                beta -= (residuals[j] - residuals_old) * X[j - n_samples, :]
+
                 if compute_jac:
                     dF = np.array([- np.sum(dbeta[:, 0].T *
                                    X[j - n_samples, :]),
                                    - np.sum(dbeta[:, 1].T *
                                    X[j - n_samples, :])])
-                    dr_old = dr[j, :].copy()
-                    dzj = dr[j, :] - dF / L[j - n_samples]
-                    dr[j, :] = ind_box(zj, C) * dzj
-                    dr[j, 0] += C * (C <= zj)
-                    dr[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
-                    dbeta[:, 0] -= (dr[j, 0] - dr_old[0]) * \
+                    dresiduals_old = dresiduals[j, :].copy()
+                    dzj = dresiduals[j, :] - dF / L[j - n_samples]
+                    dresiduals[j, :] = ind_box(zj, C) * dzj
+                    dresiduals[j, 0] += C * (C <= zj)
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
+                    dbeta[:, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
                         X[j - n_samples, :]
-                    dbeta[:, 1] -= (dr[j, 1] - dr_old[1]) * \
+                    dbeta[:, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
                         X[j - n_samples, :]
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
-            dbeta, r, dr, hyperparam, L, compute_jac=True):
+            dbeta, residuals, dresiduals, hyperparam, L, compute_jac=True):
         C = hyperparam[0]
         epsilon = hyperparam[1]
-        non_zeros = np.where(L != 0)[0]
-        for j in non_zeros:
-
+        for j in range(2 * n_samples):
             if j < n_samples:
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j]:indptr[j+1]]
                 # get the non zero indices
                 idx_nz = indices[indptr[j]:indptr[j+1]]
                 F = np.sum(beta[idx_nz] * Xis) + epsilon - y[j]
-                r_old = r[j]
-                zj = r[j] - F / L[j]
-                r[j] = proj_box_svm(zj, C)
-                beta[idx_nz] += (r[j] - r_old) * Xis
+                residuals_old = residuals[j]
+                zj = residuals[j] - F / L[j]
+                residuals[j] = proj_box_svm(zj, C)
+                beta[idx_nz] += (residuals[j] - residuals_old) * Xis
+
                 if compute_jac:
                     dF = np.array([np.sum(dbeta[idx_nz, 0].T * Xis),
                                    np.sum(dbeta[idx_nz, 1].T * Xis)])
-                    dr_old = dr[j, :].copy()
-                    dzj = dr[j, :] - dF / L[j]
-                    dr[j, :] = ind_box(zj, C) * dzj
-                    dr[j, 0] += C * (C <= zj)
-                    dr[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[idx_nz, 0] += (dr[j, 0] - dr_old[0]) * Xis
-                    dbeta[idx_nz, 1] += (dr[j, 1] - dr_old[1]) * Xis
+                    dresiduals_old = dresiduals[j, :].copy()
+                    dzj = dresiduals[j, :] - dF / L[j]
+                    dresiduals[j, :] = ind_box(zj, C) * dzj
+                    dresiduals[j, 0] += C * (C <= zj)
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j]
+                    dbeta[idx_nz, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * Xis
+                    dbeta[idx_nz, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * Xis
             if j >= n_samples:
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -137,36 +142,37 @@ class SVR(BaseModel):
                 idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
                 F = - np.sum(beta[idx_nz] * Xis) + \
                     epsilon + y[j - n_samples]
-                r_old = r[j]
-                zj = r[j] - F / L[j - n_samples]
-                r[j] = proj_box_svm(zj, C)
-                beta[idx_nz] -= (r[j] - r_old) * Xis
+                residuals_old = residuals[j]
+                zj = residuals[j] - F / L[j - n_samples]
+                residuals[j] = proj_box_svm(zj, C)
+                beta[idx_nz] -= (residuals[j] - residuals_old) * Xis
+
                 if compute_jac:
                     dF = np.array([- np.sum(dbeta[idx_nz, 0].T * Xis),
                                    - np.sum(dbeta[idx_nz, 1].T * Xis)])
-                    dr_old = dr[j, :].copy()
-                    dzj = dr[j, :] - dF / L[j - n_samples]
-                    dr[j, :] = ind_box(zj, C) * dzj
-                    dr[j, 0] += C * (C <= zj)
-                    dr[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
-                    dbeta[idx_nz, 0] -= (dr[j, 0] - dr_old[0]) * \
+                    dresiduals_old = dresiduals[j, :].copy()
+                    dzj = dresiduals[j, :] - dF / L[j - n_samples]
+                    dresiduals[j, :] = ind_box(zj, C) * dzj
+                    dresiduals[j, 0] += C * (C <= zj)
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
+                    dbeta[idx_nz, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
                         Xis
-                    dbeta[idx_nz, 1] -= (dr[j, 1] - dr_old[1]) * \
+                    dbeta[idx_nz, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
                         Xis
 
-    def _get_pobj0(self, r, beta, hyperparam, y):
+    def _get_pobj0(self, residuals, beta, hyperparam, y):
         n_samples = len(y)
         obj_prim = hyperparam[0] * np.sum(np.maximum(
             np.abs(y) - hyperparam[1], np.zeros(n_samples)))
         return obj_prim
 
-    def _get_pobj(self, r, X, beta, hyperparam, y):
+    def _get_pobj(self, residuals, X, beta, hyperparam, y):
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(X @ beta - y) - hyperparam[1], np.zeros(n_samples)))
-        obj_dual = 0.5 * beta.T @ beta + hyperparam[1] * np.sum(r)
-        obj_dual -= np.sum(y * (r[0:n_samples] -
-                                r[n_samples:(2 * n_samples)]))
+        obj_dual = 0.5 * beta.T @ beta + hyperparam[1] * np.sum(residuals)
+        obj_dual -= np.sum(y * (residuals[0:n_samples] -
+                                residuals[n_samples:(2 * n_samples)]))
         return (obj_dual + obj_prim)
 
     @staticmethod
@@ -200,65 +206,65 @@ class SVR(BaseModel):
         else:
             return np.zeros((n_features, 2))
 
-    def _init_dr(self, dbeta, X, y, sign_beta, hyperparam):
-        r = self.r
+    def _init_dresiduals(self, dbeta, X, y, sign_beta, hyperparam):
+        residuals = self.residuals
         C = hyperparam[0]
         n_samples = X.shape[0]
-        sign = np.zeros(r.shape[0])
-        sign[r == 0.0] = -1.0
-        sign[r == C] = 1.0
-        dr = np.zeros((2 * X.shape[0], 2))
+        sign = np.zeros(residuals.shape[0])
+        sign[residuals == 0.0] = -1.0
+        sign[residuals == C] = 1.0
+        dresiduals = np.zeros((2 * X.shape[0], 2))
         if np.sum(sign == 1.0) != 0:
-            dr[sign == 1.0, 0] = np.repeat(C, (sign == 1).sum())
-            dr[sign == 1.0, 1] = np.repeat(0, (sign == 1).sum())
-        self.dr = dr
+            dresiduals[sign == 1.0, 0] = np.repeat(C, (sign == 1).sum())
+            dresiduals[sign == 1.0, 1] = np.repeat(0, (sign == 1).sum())
+        self.dresiduals = dresiduals
         self.dbeta = X.T @ (
-            dr[0:n_samples, :] - dr[n_samples:(2 * n_samples), :])
-        return dr
+            dresiduals[0:n_samples, :] - dresiduals[n_samples:(2 * n_samples), :])
+        return dresiduals
 
     @staticmethod
     @njit
-    def _update_only_jac(X, y, r, dbeta, dr, L, hyperparam, sign_beta):
+    def _update_only_jac(X, y, residuals, dbeta, dresiduals, L, hyperparam, sign_beta):
         n_samples = L.shape[0]
         C = hyperparam[0]
         epsilon = hyperparam[1]
-        sign = np.zeros(r.shape[0])
-        sign[r == 0.0] = -1.0
-        sign[r == C] = 1.0
+        sign = np.zeros(residuals.shape[0])
+        sign[residuals == 0.0] = -1.0
+        sign[residuals == C] = 1.0
         for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
             if j < n_samples:
                 dF = np.array([np.sum(dbeta[:, 0].T * X[j, :]),
                               np.sum(dbeta[:, 1].T * X[j, :])])
-                dr_old = dr[j, :].copy()
-                dzj = dr[j, :] - dF / L[j]
-                dr[j, :] = dzj
-                dr[j, 1] -= epsilon / L[j]
-                dbeta[:, 0] += (dr[j, 0] - dr_old[0]) * X[j, :]
-                dbeta[:, 1] += (dr[j, 1] - dr_old[1]) * X[j, :]
+                dresiduals_old = dresiduals[j, :].copy()
+                dzj = dresiduals[j, :] - dF / L[j]
+                dresiduals[j, :] = dzj
+                dresiduals[j, 1] -= epsilon / L[j]
+                dbeta[:, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * X[j, :]
+                dbeta[:, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * X[j, :]
             if j >= n_samples:
                 dF = np.array([- np.sum(dbeta[:, 0].T * X[j - n_samples, :]),
                                - np.sum(dbeta[:, 1].T * X[j - n_samples, :])])
-                dr_old = dr[j, :].copy()
-                dzj = dr[j, :] - dF / L[j - n_samples]
-                dr[j, :] = dzj
-                dr[j, 1] -= epsilon / L[j - n_samples]
-                dbeta[:, 0] -= (dr[j, 0] - dr_old[0]) * \
+                dresiduals_old = dresiduals[j, :].copy()
+                dzj = dresiduals[j, :] - dF / L[j - n_samples]
+                dresiduals[j, :] = dzj
+                dresiduals[j, 1] -= epsilon / L[j - n_samples]
+                dbeta[:, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
                     X[j - n_samples, :]
-                dbeta[:, 1] -= (dr[j, 1] - dr_old[1]) * \
+                dbeta[:, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
                     X[j - n_samples, :]
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, r, dr, L, hyperparam, sign_beta):
+            dbeta, residuals, dresiduals, L, hyperparam, sign_beta):
         n_samples = L.shape[0]
         C = hyperparam[0]
         epsilon = hyperparam[1]
         # non_zeros = np.where(L != 0)[0]
-        sign = np.zeros(r.shape[0])
-        sign[r == 0.0] = -1.0
-        sign[r == C] = 1.0
+        sign = np.zeros(residuals.shape[0])
+        sign[residuals == 0.0] = -1.0
+        sign[residuals == C] = 1.0
 
         for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
             if j < n_samples:
@@ -268,12 +274,12 @@ class SVR(BaseModel):
                 idx_nz = indices[indptr[j]:indptr[j+1]]
                 dF = np.array([np.sum(dbeta[idx_nz, 0].T * Xis),
                                np.sum(dbeta[idx_nz, 1].T * Xis)])
-                dr_old = dr[j, :].copy()
-                dzj = dr[j, :] - dF / L[j]
-                dr[j, :] = dzj
-                dr[j, 1] -= epsilon / L[j]
-                dbeta[idx_nz, 0] += (dr[j, 0] - dr_old[0]) * Xis
-                dbeta[idx_nz, 1] += (dr[j, 1] - dr_old[1]) * Xis
+                dresiduals_old = dresiduals[j, :].copy()
+                dzj = dresiduals[j, :] - dF / L[j]
+                dresiduals[j, :] = dzj
+                dresiduals[j, 1] -= epsilon / L[j]
+                dbeta[idx_nz, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * Xis
+                dbeta[idx_nz, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * Xis
             if j >= n_samples:
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -281,13 +287,13 @@ class SVR(BaseModel):
                 idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
                 dF = np.array([- np.sum(dbeta[idx_nz, 0].T * Xis),
                                - np.sum(dbeta[idx_nz, 1].T * Xis)])
-                dr_old = dr[j, :].copy()
-                dzj = dr[j, :] - dF / L[j - n_samples]
-                dr[j, :] = dzj
-                dr[j, 1] -= epsilon / L[j - n_samples]
-                dbeta[idx_nz, 0] -= (dr[j, 0] - dr_old[0]) * \
+                dresiduals_old = dresiduals[j, :].copy()
+                dzj = dresiduals[j, :] - dF / L[j - n_samples]
+                dresiduals[j, :] = dzj
+                dresiduals[j, 1] -= epsilon / L[j - n_samples]
+                dbeta[idx_nz, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
                     Xis
-                dbeta[idx_nz, 1] -= (dr[j, 1] - dr_old[1]) * \
+                dbeta[idx_nz, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
                     Xis
 
     @staticmethod
@@ -326,7 +332,7 @@ class SVR(BaseModel):
     def get_hessian(self, X, y, mask, dense, log_hyperparam):
         C = np.exp(log_hyperparam[0])
         n_samples = X.shape[0]
-        alpha = self.r[0:n_samples] - self.r[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
 
         return X[full_supp, :] @ X[full_supp, :].T
@@ -340,7 +346,7 @@ class SVR(BaseModel):
     def _get_jac_t_v(self, X, y, jac, mask, dense, hyperparam, v, n_samples):
         C = hyperparam[0]
         epsilon = hyperparam[1]
-        alpha = self.r[0:n_samples] - self.r[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
         maskC = np.abs(alpha) == C
         hessian = X[full_supp, :] @ X[maskC, :].T
@@ -350,10 +356,10 @@ class SVR(BaseModel):
         jac_t_v2 = epsilon * np.sign(alpha[full_supp]) @ jac
         return np.array([jac_t_v, jac_t_v2])
 
-    def restrict_full_supp(self, X, v, log_hyperparam):
-        n_samples = int(self.r.shape[0] / 2)
+    def generalized_supp(self, X, v, log_hyperparam):
+        n_samples = int(self.residuals.shape[0] / 2)
         C = np.exp(log_hyperparam[0])
-        alpha = self.r[0:n_samples] - self.r[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
         return v[full_supp]
 
@@ -371,10 +377,10 @@ class SVR(BaseModel):
         return log_hyperparam
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
-                    dbeta, r, dr, hyperparam):
+                    dbeta, residuals, dresiduals, hyperparam):
         C = hyperparam[0]
-        alpha = r[0:n_samples] - r[n_samples:(2 * n_samples)]
-        dalpha = dr[0:n_samples, 0] - dr[n_samples:(2 * n_samples), 0]
+        alpha = residuals[0:n_samples] - residuals[n_samples:(2 * n_samples)]
+        dalpha = dresiduals[0:n_samples, 0] - dresiduals[n_samples:(2 * n_samples), 0]
 
         maskC = np.abs(alpha) == C
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)

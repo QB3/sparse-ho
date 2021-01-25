@@ -36,7 +36,7 @@ X_c = X_s
 @pytest.mark.parametrize('key', list(models.keys()))
 def test_beta_jac(key):
     """Tests that algorithms computing the Jacobian return the same Jacobian"""
-    if key == "svm" or key == "svr":
+    if key == "svm" or key == "svr" or key == "ssvr":
         X_s = X_r
     else:
         X_s = X_c
@@ -70,7 +70,7 @@ def test_beta_jac(key):
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
 def test_beta_jac_custom(model_name):
     """Check that using sk or celer yields the same solution as sparse ho"""
-    if model_name == "svm" or model_name == "svr":
+    if model_name == "svm" or model_name == "svr" or model_name == "ssvr":
         X_s = X_r
     else:
         X_s = X_c
@@ -107,7 +107,6 @@ def test_val_grad(model_name, criterion_name, algo):
 
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
-
     np.testing.assert_allclose(
         dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5)
     np.testing.assert_allclose(
@@ -171,6 +170,6 @@ if __name__ == "__main__":
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        # test_val_grad("lasso", "SURE", algo)
-        # test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        test_check_grad_sparse_ho('svr', 'MSE', algo)
+        test_val_grad("lasso", "SURE", algo)
+        test_check_grad_sparse_ho('logreg', 'MSE', algo)
+        test_beta_jac('svr')
