@@ -131,13 +131,13 @@ ax.scatter(
     X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)",
     clip_on=False, cmap="viridis")
 ax.scatter(
-    monitor.alphas[:, 0]) / alpha_max,
-    monitor.alphas[:, 1]) / alpha_max,
+    monitor.alphas[:, 0] / alpha_max,
+    monitor.alphas[:, 1] / alpha_max,
     s=50, cmap=cmap, c=c,
     marker="X", label="$1$st order", clip_on=False)
 ax.set_xlim(X.min(), X.max())
 ax.set_ylim(Y.min(), Y.max())
-cb=fig.colorbar(cp)
+cb = fig.colorbar(cp)
 cb.set_label("Held-out loss")
 plt.xscale('log')
 plt.yscale('log')
