@@ -93,11 +93,8 @@ def hyperopt_wrapper(
 
     # TODO, also size_space = n_hyperparam ?
     space = [
-        hp.uniform(str(dim), log_alpha_min, log_alpha_max) for dim in range(
-            size_space)]
-
-    # space = hp.uniform(
-    #     'log_alpha', log_alpha_min, log_alpha_max)
+        hp.uniform(str(dim), np.log(alpha_min), np.log(alpha_max)) for
+        dim in range(size_space)]
 
     rng = check_random_state(random_state)
 

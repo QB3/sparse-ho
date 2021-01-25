@@ -59,7 +59,7 @@ estimator = linear_model.Lasso(
 objs_test = []
 
 
-def callback(val, grad, mask, dense, log_alpha):
+def callback(val, grad, mask, dense, alpha):
     # The custom quantity is added at each outer iteration:
     # here the prediction MSE on test data
     objs_test.append(mean_squared_error(X_test[:, mask] @ dense, y_test))

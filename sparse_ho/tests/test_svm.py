@@ -135,7 +135,7 @@ def test_grad_search(model):
         algo, criterion, model, optimizer, X, y, np.log(1e-3), monitor3)
 
     np.testing.assert_allclose(
-        np.array(monitor1.log_alphas), np.array(monitor3.log_alphas))
+        np.array(monitor1.alphas), np.array(monitor3.alphas))
     np.testing.assert_allclose(
         np.array(monitor1.grads), np.array(monitor3.grads), atol=1e-8)
     np.testing.assert_allclose(

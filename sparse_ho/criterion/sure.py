@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.linalg import norm
 from sklearn.utils import check_random_state
 
@@ -74,7 +75,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
         val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         if monitor is not None:
-            monitor(val, None, mask, dense, log_alpha)
+            monitor(val, None, mask, dense, alpha=np.exp(log_alpha))
         return val
 
     def _init_delta_epsilon(self, X):
@@ -132,6 +133,6 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         else:
             grad = None
         if monitor is not None:
-            monitor(val, grad, mask, dense, log_alpha)
+            monitor(val, grad, mask, dense, alpha=np.exp(log_alpha))
 
         return val, grad

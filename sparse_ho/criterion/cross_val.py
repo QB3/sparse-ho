@@ -57,7 +57,7 @@ class CrossVal(BaseCriterion):
             self.dict_crits[i].get_val(
                 self.dict_models[i], X, y, log_alpha, tol=tol) for i in range(
                     self.n_splits)])
-        monitor(val, None, log_alpha=log_alpha)
+        monitor(val, None, alpha=np.exp(log_alpha))
         return val
 
     def get_val_grad(
@@ -81,7 +81,7 @@ class CrossVal(BaseCriterion):
         else:
             grad = None
         if monitor is not None:
-            monitor(val, grad, log_alpha=log_alpha)
+            monitor(val, grad, alpha=np.exp(log_alpha))
         return val, grad
 
     def get_val_outer(cls, *args, **kwargs):
