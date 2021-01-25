@@ -10,6 +10,7 @@ for sparse logistic regression using a held-out test set.
 
 # Authors: Quentin Bertrand <quentin.bertrand@inria.fr>
 #          Quentin Klopfenstein <quentin.klopfenstein@u-bourgogne.fr>
+#          Mathurin Massias
 #
 # License: BSD (3-clause)
 
@@ -48,22 +49,18 @@ n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
-print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train]))
 
-alpha_max /= 4 * len(idx_train)
+alpha_max /= 2 * len(idx_train)
 log_alpha_max = np.log(alpha_max)
 log_alpha_min = np.log(alpha_max / 100)
 max_iter = 100
 
-log_alpha0 = np.log(0.1 * alpha_max)
 tol = 1e-8
 
 n_alphas = 20
-p_alphas = np.geomspace(1, 0.001, n_alphas)
-alphas = alpha_max * p_alphas
-log_alphas = np.log(alphas)
+alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 ##############################################################################
 # Grid-search
@@ -77,7 +74,7 @@ algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
     algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=log_alphas, tol=tol)
+    monitor_grid, log_alphas=np.log(alphas), tol=tol)
 objs = np.array(monitor_grid.objs)
 
 
@@ -91,6 +88,7 @@ optimizers = {
     'adam': Adam(n_outer=10, lr=0.11)}
 
 monitors = {}
+log_alpha0 = np.log(0.1 * alpha_max)  # starting point
 
 for optimizer_name in optimizer_names:
     estimator = LogisticRegression(
@@ -116,12 +114,12 @@ dict_colors = {
 
 
 fig, ax = plt.subplots(figsize=(8, 3))
-ax.plot(p_alphas, objs, color=current_palette[0])
+ax.plot(alphas / alphas[0], objs, color=current_palette[0])
 ax.plot(
-    p_alphas, objs, 'bo', label='0-order method (grid-search)',
+    alphas / alphas[0], objs, 'bo', label='0-order method (grid-search)',
     color=current_palette[1])
-for optimizer_name in optimizer_names:
 
+for optimizer_name in optimizer_names:
     monitor = monitors[optimizer_name]
     p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
     objs_grad = np.array(monitor.objs)
@@ -137,6 +135,6 @@ ax.set_ylabel(
 
 ax.set_xscale("log")
 plt.tick_params(width=5)
-plt.legend(loc=1)
+plt.legend()
 plt.tight_layout()
 plt.show(block=False)
