@@ -95,7 +95,6 @@ print(f"Time to compute grad search: {t_grid_search:.2f} s")
 print('sparse-ho started')
 
 t0 = time.time()
-log_alpha0 = np.log(0.1 * alpha_max)  # initial point
 
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, tol=tol)
