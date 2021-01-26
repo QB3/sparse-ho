@@ -53,14 +53,15 @@ n_samples = len(y[idx_train])
 alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train]))
 
 alpha_max /= 2 * len(idx_train)
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 100)
+alpha_max = alpha_max
+alpha_min = alpha_max / 100
 max_iter = 100
 
 tol = 1e-8
 
-n_alphas = 20
-alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
+n_alphas = 30
+p_alphas = np.geomspace(1, 0.0001, n_alphas)
+alphas = alpha_max * p_alphas
 
 ##############################################################################
 # Grid-search
@@ -73,8 +74,8 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=np.log(alphas), tol=tol)
+    algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+    monitor_grid, alphas=alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
 
@@ -88,7 +89,7 @@ optimizers = {
     'adam': Adam(n_outer=10, lr=0.11)}
 
 monitors = {}
-log_alpha0 = np.log(0.1 * alpha_max)  # starting point
+alpha0 = alpha_max / 10  # starting point
 
 for optimizer_name in optimizer_names:
     estimator = LogisticRegression(
@@ -101,7 +102,7 @@ for optimizer_name in optimizer_names:
 
     optimizer = optimizers[optimizer_name]
     grad_search(
-        algo, criterion, model, optimizer, X, y, log_alpha0,
+        algo, criterion, model, optimizer, X, y, alpha0,
         monitor_grad)
     monitors[optimizer_name] = monitor_grad
 
@@ -121,7 +122,7 @@ ax.plot(
 
 for optimizer_name in optimizer_names:
     monitor = monitors[optimizer_name]
-    p_alphas_grad = np.exp(np.array(monitor.log_alphas)) / alpha_max
+    p_alphas_grad = np.array(monitor.alphas) / alpha_max
     objs_grad = np.array(monitor.objs)
     cmap = discrete_cmap(len(p_alphas_grad), dict_colors[optimizer_name])
     ax.scatter(

@@ -81,13 +81,13 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso()
 criterion = HeldOutMSE(None, None)
-log_alpha0 = np.log(alpha_max / 10)
+alpha0 = alpha_max / 10
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
 algo = ImplicitForward()
 optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, cross_val_criterion, model, optimizer, X, y, log_alpha0,
+    algo, cross_val_criterion, model, optimizer, X, y, alpha0,
     monitor_grad)
 
 t_grad_search = time.time() - t0
@@ -99,7 +99,7 @@ print('sparse-ho finished')
 # ------------
 objs = reg.mse_path_.mean(axis=1)
 
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 objs_grad = np.array(monitor_grad.objs)
 
 

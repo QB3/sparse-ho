@@ -54,15 +54,15 @@ n_samples = len(y[idx_train])
 alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
 
 alpha_max /= 4 * len(idx_train)
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 100)
+alpha_max = alpha_max
+alpha_min = alpha_max / 100
 max_iter = 100
 
+alpha0 = 0.1 * alpha_max
 tol = 1e-8
 
 n_alphas = 20
 alphas = np.geomspace(alpha_max,  alpha_max / 1_000, n_alphas)
-log_alphas = np.log(alphas)
 
 ##############################################################################
 # Grid-search
@@ -78,8 +78,8 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=log_alphas, tol=tol)
+    algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+    monitor_grid, alphas=alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
 t_grid_search = time.time() - t0
@@ -95,7 +95,6 @@ print(f"Time to compute grad search: {t_grid_search:.2f} s")
 print('sparse-ho started')
 
 t0 = time.time()
-log_alpha0 = np.log(0.1 * alpha_max)  # initial point
 
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, tol=tol)
@@ -107,7 +106,7 @@ algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 
 optimizer = GradientDescent(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0,
+    algo, criterion, model, optimizer, X, y, alpha0,
     monitor_grad)
 objs_grad = np.array(monitor_grad.objs)
 
@@ -117,7 +116,7 @@ print('sparse-ho finished')
 print(f"Time to compute grad search: {t_grad_search:.2f} s")
 
 
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
 

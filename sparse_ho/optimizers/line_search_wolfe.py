@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.linalg import norm
 
 from sparse_ho.optimizers.base import BaseOptimizer
@@ -40,7 +41,7 @@ class LineSearchWolfe(BaseOptimizer):
         for _ in range(self.n_outer):
             val, grad = _get_val_grad(log_alphak)
 
-            monitor(val.copy(), criterion.val_test, log_alphak,
+            monitor(val.copy(), criterion.val_test, np.exp(log_alphak),
                     grad, criterion.rmse)
 
             step_size = self.wolfe(

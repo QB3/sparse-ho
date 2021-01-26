@@ -40,7 +40,7 @@ X, y, w_true = make_correlated_data(
 ##############################################################################
 X, X_test, y, y_test = train_test_split(X, y, test_size=0.333, random_state=0)
 
-n_samples = X.shape[0]
+n_samples, n_features = X.shape
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 ##############################################################################
@@ -73,7 +73,7 @@ print("Vanilla LassoCV: Mean-squared error on test data %f" % mse_cv)
 ##############################################################################
 # Weighted Lasso with sparse-ho.
 # We use the vanilla lassoCV coefficients as a starting point
-log_alpha0 = np.log(model_cv.alpha_) * np.ones(X.shape[1])
+alpha0 = model_cv.alpha_ * np.ones(n_features)
 # Weighted Lasso: Sparse-ho: 1 param per feature
 estimator = Lasso(fit_intercept=False, max_iter=100, warm_start=True)
 model = WeightedLasso(estimator=estimator)
@@ -81,12 +81,12 @@ sub_criterion = HeldOutMSE(idx_train, idx_val)
 criterion = CrossVal(sub_criterion, cv=cv)
 algo = ImplicitForward()
 monitor = Monitor()
-optimizer = GradientDescent(n_outer=50, tol=1e-7, verbose=True, p_grad0=1.9)
-log_alphaopt, _, _ = grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
+optimizer = GradientDescent(n_outer=100, tol=1e-7, verbose=True, p_grad0=1.9)
+results = grad_search(
+    algo, criterion, model, optimizer, X, y, alpha0, monitor)
 ##############################################################################
 
-estimator.weights = np.exp(log_alphaopt)
+estimator.weights = monitor.alphas[-1]
 estimator.fit(X, y)
 ##############################################################################
 # MSE on validation set
