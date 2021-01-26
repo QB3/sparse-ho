@@ -57,7 +57,6 @@ alpha_max = alpha_max
 alpha_min = alpha_max / 100
 max_iter = 100
 
-alpha0 = alpha_max / 10
 tol = 1e-8
 
 n_alphas = 30
@@ -90,7 +89,7 @@ optimizers = {
     'adam': Adam(n_outer=10, lr=0.11)}
 
 monitors = {}
-log_alpha0 = np.log(0.1 * alpha_max)  # starting point
+alpha0 = alpha_max / 10  # starting point
 
 for optimizer_name in optimizer_names:
     estimator = LogisticRegression(
