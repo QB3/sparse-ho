@@ -70,7 +70,7 @@ model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 monitor_grid_sk = Monitor()
 grid_search(
-    algo, criterion, model, X, y, None, None, monitor_grid_sk,
+    criterion, model, X, y, None, None, monitor_grid_sk,
     alphas=alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
