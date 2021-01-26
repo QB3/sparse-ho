@@ -22,7 +22,7 @@ from sklearn.datasets import make_classification
 from celer import LogisticRegression
 from libsvmdata.datasets import fetch_libsvm
 
-from sparse_ho import ImplicitForward, Forward
+from sparse_ho import ImplicitForward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
@@ -71,10 +71,9 @@ estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, max_iter=max_iter)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
-algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+    criterion, model, X, y, alpha_min, alpha_max,
     monitor_grid, alphas=alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
