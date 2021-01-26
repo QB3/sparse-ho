@@ -128,7 +128,8 @@ def get_beta_jac_iterdiff(
         if is_sparse:
             model._update_beta_jac_bcd_sparse(
                 X.data, X.indptr, X.indices, y, n_samples, n_features, beta,
-                dbeta, residuals, dresiduals, alphas, L, compute_jac=compute_jac)
+                dbeta, residuals, dresiduals, alphas, L,
+                compute_jac=compute_jac)
         else:
             model._update_beta_jac_bcd(
                 X, y, beta, dbeta, residuals, dresiduals, alphas,

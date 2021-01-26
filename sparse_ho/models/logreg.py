@@ -30,7 +30,7 @@ class SparseLogreg(BaseModel):
         self.estimator = estimator
 
     def _init_dbeta_dresiduals(self, X, y, dense0=None,
-                       mask0=None, jac0=None, compute_jac=True):
+                               mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_features)
         if jac0 is None or not compute_jac:
@@ -52,7 +52,8 @@ class SparseLogreg(BaseModel):
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, alpha, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals,
+            alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
         for j in range(n_features):
             beta_old = beta[j]
@@ -107,7 +108,8 @@ class SparseLogreg(BaseModel):
                     dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
                     dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
                     # update residuals
-                    dresiduals[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
+                    dresiduals[idx_nz] += y[idx_nz] * Xjs * \
+                        (dbeta[j] - dbeta_old)
                 residuals[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
 
     @staticmethod
@@ -130,7 +132,8 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     def _get_pobj(residuals, X, beta, alphas, y):
-        pobj = np.log1p(np.exp(- residuals)).mean() + np.abs(alphas * beta).sum()
+        pobj = (np.log1p(np.exp(- residuals)).mean() +
+                np.abs(alphas * beta).sum())
         return pobj
 
     @staticmethod
@@ -188,7 +191,8 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals,
+                         L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             sigmar = sigma(residuals)
@@ -294,7 +298,8 @@ class SparseLogreg(BaseModel):
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals,
                     dresiduals, alpha):
         return(
-            norm(dresiduals.T @ dresiduals + n_samples * alpha * sign_beta @ dbeta))
+            norm(dresiduals.T @ dresiduals +
+                 n_samples * alpha * sign_beta @ dbeta))
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):
         n_samples = X.shape[0]

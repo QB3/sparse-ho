@@ -33,18 +33,23 @@ class SVM(BaseModel):
         self.dual = True
         self.dresiduals = None
 
-    def _init_dbeta_dresiduals(self, X, y, dense0=None,
-                       mask0=None, jac0=None, compute_jac=True):
+    def _init_dbeta_dresiduals(
+            self, X, y, dense0=None, mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
-        dresiduals = np.ones(n_samples)
-        if self.dresiduals is not None and self.dresiduals.shape[0] == n_samples:
-            dresiduals = self.dresiduals.copy()
-        if issparse(X):
-            dbeta = (X.T).multiply(y * dresiduals)
-            dbeta = np.sum(dbeta, axis=1)
-            dbeta = np.squeeze(np.array(dbeta))
+        dresiduals = np.zeros(n_samples)
+        if self.dresiduals is None:
+            dbeta = np.zeros(n_features)
         else:
-            dbeta = np.sum(y * dresiduals * X.T, axis=1)
+            if self.residuals.shape[0] != n_samples:
+                dbeta = np.zeros(n_features)
+            else:
+                dresiduals = self.dresiduals.copy()
+                if issparse(X):
+                    dbeta = (X.T).multiply(y * dresiduals)
+                    dbeta = np.sum(dbeta, axis=1)
+                    dbeta = np.squeeze(np.array(dbeta))
+                else:
+                    dbeta = np.sum(y * dresiduals * X.T, axis=1)
         return dbeta, dresiduals
 
     def _init_beta_residuals(self, X, y, mask0, dense0):
@@ -53,13 +58,16 @@ class SVM(BaseModel):
         if mask0 is None or self.residuals is None:
             beta = np.zeros(n_features)
         else:
-            residuals = self.residuals
-            if issparse(X):
-                beta = (X.T).multiply(y * residuals)
-                beta = np.sum(beta, axis=1)
-                beta = np.squeeze(np.array(beta))
+            if self.residuals.shape[0] != n_samples:
+                beta = np.zeros(n_features)
             else:
-                beta = np.sum(y * residuals * X.T, axis=1)
+                residuals = self.residuals
+                if issparse(X):
+                    beta = (X.T).multiply(y * residuals)
+                    beta = np.sum(beta, axis=1)
+                    beta = np.squeeze(np.array(beta))
+                else:
+                    beta = np.sum(y * residuals * X.T, axis=1)
         return beta, residuals
 
     @staticmethod
@@ -167,7 +175,8 @@ class SVM(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, ys, residuals, dbeta, dresiduals, L, C, sign_beta):
+    def _update_only_jac(Xs, ys, residuals, dbeta, dresiduals,
+                         L, C, sign_beta):
         sign = np.zeros(residuals.shape[0])
         sign[residuals == 0.0] = -1.0
         sign[residuals == C] = 1.0
@@ -263,7 +272,8 @@ class SVM(BaseModel):
         return jac_t_v
 
     def generalized_supp(self, X, v, log_C):
-        full_supp = np.logical_and(self.residuals != 0, self.residuals != np.exp(log_C))
+        full_supp = np.logical_and(
+            self.residuals != 0, self.residuals != np.exp(log_C))
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -279,16 +289,18 @@ class SVM(BaseModel):
         full_supp = np.logical_and(residuals != 0, residuals != C)
         if issparse(Xs):
             dryX = dresiduals[full_supp].T @ \
-                (Xs[full_supp, :].T).multiply(ys[full_supp]).T
+                    (Xs[full_supp, :].T).multiply(ys[full_supp]).T
         else:
-            dryX = dresiduals[full_supp].T @ (ys[full_supp] * Xs[full_supp, :].T).T
+            dryX = dresiduals[full_supp].T @ (ys[full_supp] *
+                                              Xs[full_supp, :].T).T
         quadratic_term = dryX.T @ dryX
         if maskC.sum() != 0:
             if issparse(Xs):
                 linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ \
                     residuals[maskC]
             else:
-                linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ residuals[maskC]
+                linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ \
+                    residuals[maskC]
         else:
             linear_term = 0
         res = quadratic_term + linear_term

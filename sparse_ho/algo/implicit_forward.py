@@ -71,17 +71,17 @@ def get_beta_jac_fast_iterdiff(
 
     _, residuals = model._init_beta_residuals(X, y, mask, dense)
     jac = get_only_jac(
-        model.reduce_X(X, mask), model.reduce_y(y, mask), residuals, reduce_alpha,
-        model.sign(dense, log_alpha), dbeta=dbeta0_new, niter_jac=niter_jac,
-        tol_jac=tol_jac, model=model, mask=mask, dense=dense, verbose=verbose,
-        use_stop_crit=use_stop_crit)
+        model.reduce_X(X, mask), model.reduce_y(y, mask), residuals,
+        reduce_alpha, model.sign(dense, log_alpha), dbeta=dbeta0_new,
+        niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask,
+        dense=dense, verbose=verbose, use_stop_crit=use_stop_crit)
 
     return mask, dense, jac
 
 
 def get_only_jac(
-        Xs, y, residuals, alpha, sign_beta, dbeta=None, niter_jac=100, tol_jac=1e-4,
-        model="lasso", mask=None, dense=None, verbose=False,
+        Xs, y, residuals, alpha, sign_beta, dbeta=None, niter_jac=100,
+        tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False,
         use_stop_crit=True):
     n_samples, n_features = Xs.shape
 
@@ -110,7 +110,7 @@ def get_only_jac(
                 Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta)
         objs.append(
             model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, residuals,
-            dresiduals, alpha))
+                              dresiduals, alpha))
         if use_stop_crit and i > 1:
             if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
                 break

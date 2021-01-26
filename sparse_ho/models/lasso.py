@@ -33,7 +33,7 @@ class Lasso(BaseModel):
         self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dresiduals(self, X, y, mask0=None, jac0=None,
-                       dense0=None, compute_jac=True):
+                               dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_features)
         if jac0 is None or not compute_jac:
@@ -56,7 +56,8 @@ class Lasso(BaseModel):
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, alpha, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals,
+            alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
         non_zeros = np.where(L != 0)[0]
 
@@ -144,7 +145,8 @@ class Lasso(BaseModel):
     def _get_pobj(residuals, X, beta, alphas, y=None):
         n_samples = residuals.shape[0]
         return (
-            norm(residuals) ** 2 / (2 * n_samples) + np.abs(alphas * beta).sum())
+            norm(residuals) ** 2 / (2 * n_samples) +
+            np.abs(alphas * beta).sum())
 
     @staticmethod
     def _get_dobj(residuals, X, beta, alpha, y=None):
@@ -197,7 +199,8 @@ class Lasso(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals,
+                         L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             # dbeta_old = dbeta[j].copy()
@@ -294,5 +297,7 @@ class Lasso(BaseModel):
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals, dresiduals, alpha):
-        return norm(dresiduals.T @ dresiduals + n_samples * alpha * sign_beta @ dbeta)
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta,
+                    residuals, dresiduals, alpha):
+        return norm(dresiduals.T @ dresiduals +
+                    n_samples * alpha * sign_beta @ dbeta)

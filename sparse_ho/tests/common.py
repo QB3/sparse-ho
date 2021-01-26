@@ -44,7 +44,6 @@ dict_log_alpha["wLasso"] = log_alpha + np.log(tab / tab.max())
 dict_log_alpha["logreg"] = (log_alpha - np.log(2))
 dict_log_alpha["svm"] = 1e-4
 dict_log_alpha["svr"] = np.array([1e-2, 1e-2])
-
 # Set models to be tested
 models = {}
 models["lasso"] = Lasso(estimator=None)

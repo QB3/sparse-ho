@@ -16,7 +16,7 @@ class ElasticNet(BaseModel):
         self.estimator = estimator
 
     def _init_dbeta_dresiduals(self, X, y, mask0=None, jac0=None,
-                       dense0=None, compute_jac=True):
+                               dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros((n_features, 2))
         if jac0 is None or not compute_jac:
@@ -83,7 +83,8 @@ class ElasticNet(BaseModel):
             beta[j:j+1] = prox_elasticnet(zj,
                                           alphas[0] / L[j], alphas[1] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / (L[j] * n_samples)
+                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / \
+                    (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * \
                     np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, 0] -= alphas[0] * \
@@ -115,7 +116,8 @@ class ElasticNet(BaseModel):
     @staticmethod
     def _get_pobj(residuals, X, beta, alphas, y=None):
         n_samples = residuals.shape[0]
-        pobj = norm(residuals) ** 2 / (2 * n_samples) + np.abs(alphas[0] * beta).sum()
+        pobj = norm(residuals) ** 2 / (2 * n_samples) + \
+            np.abs(alphas[0] * beta).sum()
         pobj += 0.5 * alphas[1] * norm(beta) ** 2
         return pobj
 
@@ -206,7 +208,8 @@ class ElasticNet(BaseModel):
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
             dbeta_old = dbeta[j, :].copy()
-            dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / (L[j] * n_samples)
+            dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / \
+                (L[j] * n_samples)
             dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
 
             dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
@@ -295,10 +298,12 @@ class ElasticNet(BaseModel):
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, residuals, dresiduals, alpha):
-        res1 = (1 / n_samples) * dresiduals[:, 0].T @ dresiduals[:, 0] + alpha[1] * \
-            dbeta[:, 0].T @ dbeta[:, 0] + \
-            alpha[0] * np.sign(beta) @ dbeta[:, 0]
-        res2 = (1 / n_samples) * dresiduals[:, 1].T @ dresiduals[:, 1] + alpha[1] * \
-            dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * beta @ dbeta[:, 1]
+    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, residuals,
+                    dresiduals, alpha):
+        res1 = (1 / n_samples) * dresiduals[:, 0].T @ dresiduals[:, 0] + \
+            alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * \
+            np.sign(beta) @ dbeta[:, 0]
+        res2 = (1 / n_samples) * dresiduals[:, 1].T @ dresiduals[:, 1] + \
+            alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * \
+            beta @ dbeta[:, 1]
         return(norm(res2) + norm(res1))

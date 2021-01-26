@@ -3,7 +3,6 @@ import numpy as np
 import torch
 from cvxpylayers.torch import CvxpyLayer
 from sklearn.utils import check_random_state
-from celer.datasets import make_correlated_data
 
 torch.set_default_dtype(torch.double)
 
@@ -222,6 +221,7 @@ def svm_cvxpy(X, y, C, idx_train, idx_val):
     grad = np.array(C_th.grad)
     return val, grad
 
+
 def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     Xtrain, Xtest, ytrain, ytest = map(
         torch.from_numpy, [
@@ -240,19 +240,61 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     loss = cp.sum_squares(beta_cp) / 2
     reg = C_cp * cp.sum(xi_cp + xi_star_cp)
     objective = loss + reg
-    #define constraints
+    # define constraints
     constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
-        Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
-        xi_cp >= 0.0, xi_star_cp >= 0.0]
+                   Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
+                   xi_cp >= 0.0, xi_star_cp >= 0.0]
     # define problem
     problem = cp.Problem(cp.Minimize(objective), constraints)
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp], variables=[beta_cp])
+    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp],
+                       variables=[beta_cp])
     hyperparam_th = torch.tensor(hyperparam, requires_grad=True)
     beta_, = layer(hyperparam_th[0], hyperparam_th[1])
 
+    # get test loss and it's gradient
+    test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
+    test_loss.backward()
+
+    val = test_loss.detach().numpy()
+    grad = np.array(hyperparam_th.grad)
+    return val, grad
+
+
+def ssvr_cvxpy(X, y, hyperparam, idx_train, idx_val):
+    Xtrain, Xtest, ytrain, ytest = map(
+        torch.from_numpy, [
+            X[idx_train, :], X[idx_val], y[idx_train], y[idx_val]])
+
+    n_samples_train, n_features = Xtrain.shape
+
+    # set up variables and parameters
+    beta_cp = cp.Variable(n_features)
+    xi_cp = cp.Variable(n_samples_train)
+    xi_star_cp = cp.Variable(n_samples_train)
+    C_cp = cp.Parameter(nonneg=True)
+    epsilon_cp = cp.Parameter(nonneg=True)
+
+    # set up objective
+    loss = cp.sum_squares(beta_cp) / 2
+    reg = C_cp * cp.sum(xi_cp + xi_star_cp)
+    objective = loss + reg
+    # define constraints
+    constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
+                   Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
+                   xi_cp >= 0.0, xi_star_cp >= 0.0,
+                   cp.sum(beta_cp) == 1, beta_cp >= 0.0]
+    # define problem
+    problem = cp.Problem(cp.Minimize(objective), constraints)
+    assert problem.is_dpp()
+
+    # solve problem
+    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp],
+                       variables=[beta_cp])
+    hyperparam_th = torch.tensor(hyperparam, requires_grad=True)
+    beta_, = layer(hyperparam_th[0], hyperparam_th[1])
     # get test loss and it's gradient
     test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()

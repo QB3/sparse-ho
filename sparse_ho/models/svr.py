@@ -30,16 +30,20 @@ class SVR(BaseModel):
         self.residuals = None
         self.dresiduals = None
 
-    def _init_dbeta_dresiduals(self, X, y, dense0=None,
-                       mask0=None, jac0=None, compute_jac=True):
+    def _init_dbeta_dresiduals(
+            self, X, y, dense0=None, mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dresiduals = np.zeros((2 * n_samples, 2))
         if jac0 is None or not compute_jac or self.dresiduals is None:
             dbeta = np.zeros((n_features, 2))
         else:
-            dresiduals = self.dresiduals.copy()
-            dbeta = X.T @ (
-                dresiduals[0:n_samples, :] - dresiduals[n_samples:(2 * n_samples), :])
+            if self.dresiduals.shape[0] != (2 * n_samples):
+                dbeta = np.zeros((n_features, 2))
+            else:
+                dresiduals = self.dresiduals.copy()
+                dbeta = X.T @ (
+                    dresiduals[0:n_samples, :] -
+                    dresiduals[n_samples:(2 * n_samples), :])
         return dbeta, dresiduals
 
     def _init_beta_residuals(self, X, y, mask0, dense0):
@@ -48,14 +52,19 @@ class SVR(BaseModel):
         if mask0 is None or self.residuals is None:
             beta = np.zeros(n_features)
         else:
-            residuals = self.residuals
-            beta = X.T @ (residuals[0:n_samples] - residuals[n_samples:(2 * n_samples)])
+            if self.residuals.shape[0] != (2 * n_samples):
+                beta = np.zeros(n_features)
+            else:
+                residuals = self.residuals
+                beta = X.T @ (residuals[0:n_samples] -
+                              residuals[n_samples:(2 * n_samples)])
         return beta, residuals
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, hyperparam, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals,
+            hyperparam, L, compute_jac=True):
         """
             beta : primal variable of the svr
             residuals : dual used for cheap updates
@@ -81,8 +90,10 @@ class SVR(BaseModel):
                     dresiduals[j, :] = ind_box(zj, C) * dzj
                     dresiduals[j, 0] += C * (C <= zj)
                     dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[:, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * X[j, :]
-                    dbeta[:, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * X[j, :]
+                    dbeta[:, 0] += (dresiduals[j, 0] -
+                                    dresiduals_old[0]) * X[j, :]
+                    dbeta[:, 1] += (dresiduals[j, 1] -
+                                    dresiduals_old[1]) * X[j, :]
             if j >= n_samples:
                 F = - np.sum(beta * X[j - n_samples, :]) + \
                     epsilon + y[j - n_samples]
@@ -100,7 +111,8 @@ class SVR(BaseModel):
                     dzj = dresiduals[j, :] - dF / L[j - n_samples]
                     dresiduals[j, :] = ind_box(zj, C) * dzj
                     dresiduals[j, 0] += C * (C <= zj)
-                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / \
+                        L[j - n_samples]
                     dbeta[:, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
                         X[j - n_samples, :]
                     dbeta[:, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
@@ -133,8 +145,10 @@ class SVR(BaseModel):
                     dresiduals[j, :] = ind_box(zj, C) * dzj
                     dresiduals[j, 0] += C * (C <= zj)
                     dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[idx_nz, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * Xis
-                    dbeta[idx_nz, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * Xis
+                    dbeta[idx_nz, 0] += (dresiduals[j, 0] -
+                                         dresiduals_old[0]) * Xis
+                    dbeta[idx_nz, 1] += (dresiduals[j, 1] -
+                                         dresiduals_old[1]) * Xis
             if j >= n_samples:
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -154,11 +168,12 @@ class SVR(BaseModel):
                     dzj = dresiduals[j, :] - dF / L[j - n_samples]
                     dresiduals[j, :] = ind_box(zj, C) * dzj
                     dresiduals[j, 0] += C * (C <= zj)
-                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / L[j - n_samples]
-                    dbeta[idx_nz, 0] -= (dresiduals[j, 0] - dresiduals_old[0]) * \
-                        Xis
-                    dbeta[idx_nz, 1] -= (dresiduals[j, 1] - dresiduals_old[1]) * \
-                        Xis
+                    dresiduals[j, 1] -= epsilon * ind_box(zj, C) / \
+                        L[j - n_samples]
+                    dbeta[idx_nz, 0] -= (dresiduals[j, 0] -
+                                         dresiduals_old[0]) * Xis
+                    dbeta[idx_nz, 1] -= (dresiduals[j, 1] -
+                                         dresiduals_old[1]) * Xis
 
     def _get_pobj0(self, residuals, beta, hyperparam, y):
         n_samples = len(y)
@@ -219,12 +234,14 @@ class SVR(BaseModel):
             dresiduals[sign == 1.0, 1] = np.repeat(0, (sign == 1).sum())
         self.dresiduals = dresiduals
         self.dbeta = X.T @ (
-            dresiduals[0:n_samples, :] - dresiduals[n_samples:(2 * n_samples), :])
+            dresiduals[0:n_samples, :] -
+            dresiduals[n_samples:(2 * n_samples), :])
         return dresiduals
 
     @staticmethod
     @njit
-    def _update_only_jac(X, y, residuals, dbeta, dresiduals, L, hyperparam, sign_beta):
+    def _update_only_jac(X, y, residuals, dbeta, dresiduals,
+                         L, hyperparam, sign_beta):
         n_samples = L.shape[0]
         C = hyperparam[0]
         epsilon = hyperparam[1]
@@ -278,8 +295,10 @@ class SVR(BaseModel):
                 dzj = dresiduals[j, :] - dF / L[j]
                 dresiduals[j, :] = dzj
                 dresiduals[j, 1] -= epsilon / L[j]
-                dbeta[idx_nz, 0] += (dresiduals[j, 0] - dresiduals_old[0]) * Xis
-                dbeta[idx_nz, 1] += (dresiduals[j, 1] - dresiduals_old[1]) * Xis
+                dbeta[idx_nz, 0] += (dresiduals[j, 0] -
+                                     dresiduals_old[0]) * Xis
+                dbeta[idx_nz, 1] += (dresiduals[j, 1] -
+                                     dresiduals_old[1]) * Xis
             if j >= n_samples:
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
@@ -332,7 +351,8 @@ class SVR(BaseModel):
     def get_hessian(self, X, y, mask, dense, log_hyperparam):
         C = np.exp(log_hyperparam[0])
         n_samples = X.shape[0]
-        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - \
+            self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
 
         return X[full_supp, :] @ X[full_supp, :].T
@@ -346,7 +366,8 @@ class SVR(BaseModel):
     def _get_jac_t_v(self, X, y, jac, mask, dense, hyperparam, v, n_samples):
         C = hyperparam[0]
         epsilon = hyperparam[1]
-        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - \
+            self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
         maskC = np.abs(alpha) == C
         hessian = X[full_supp, :] @ X[maskC, :].T
@@ -359,7 +380,8 @@ class SVR(BaseModel):
     def generalized_supp(self, X, v, log_hyperparam):
         n_samples = int(self.residuals.shape[0] / 2)
         C = np.exp(log_hyperparam[0])
-        alpha = self.residuals[0:n_samples] - self.residuals[n_samples:(2 * n_samples)]
+        alpha = self.residuals[0:n_samples] - \
+            self.residuals[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
         return v[full_supp]
 
@@ -380,7 +402,8 @@ class SVR(BaseModel):
                     dbeta, residuals, dresiduals, hyperparam):
         C = hyperparam[0]
         alpha = residuals[0:n_samples] - residuals[n_samples:(2 * n_samples)]
-        dalpha = dresiduals[0:n_samples, 0] - dresiduals[n_samples:(2 * n_samples), 0]
+        dalpha = dresiduals[0:n_samples, 0] - \
+            dresiduals[n_samples:(2 * n_samples), 0]
 
         maskC = np.abs(alpha) == C
         full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)

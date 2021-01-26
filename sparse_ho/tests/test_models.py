@@ -104,11 +104,10 @@ def test_val_grad(model_name, criterion_name, algo):
 
     log_alpha = dict_log_alpha[model_name]
     model = models[model_name]
-
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
     np.testing.assert_allclose(
-        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5)
+        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5, atol=1e-5)
     np.testing.assert_allclose(
         dict_grads_cvxpy[model_name, criterion_name], grad,
         rtol=1e-5, atol=1e-5)
@@ -166,10 +165,10 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    # test_beta_jac_custom("logreg")
+    test_beta_jac_custom("logreg")
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("lasso", "SURE", algo)
-        test_check_grad_sparse_ho('logreg', 'MSE', algo)
-        test_beta_jac('svr')
+        test_val_grad("svr", "MSE", algo)
+        test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        test_beta_jac('lasso')

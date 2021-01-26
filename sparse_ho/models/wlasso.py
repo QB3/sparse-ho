@@ -36,7 +36,7 @@ class WeightedLasso(BaseModel):
         self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_dresiduals(self, X, y, mask0=None, jac0=None,
-                       dense0=None, compute_jac=True):
+                               dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros((n_features, n_features))
         dresiduals = np.zeros((n_samples, n_features))
@@ -58,7 +58,8 @@ class WeightedLasso(BaseModel):
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, alpha, L, compute_jac=True):
+            X, y, beta, dbeta, residuals, dresiduals,
+            alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
         non_zeros = np.where(L != 0)[0]
 
@@ -95,11 +96,13 @@ class WeightedLasso(BaseModel):
             zj = beta[j] + residuals[idx_nz] @ Xjs / (L[j] * n_samples)
             beta[j:j+1] = ST(zj, alphas[j] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / (L[j] * n_samples)
+                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / \
+                    (L[j] * n_samples)
                 dbeta[j:j+1, :] = np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, j] -= alphas[j] * np.sign(beta[j]) / L[j]
                 # update residuals
-                dresiduals[idx_nz, :] -= np.outer(Xjs, (dbeta[j, :] - dbeta_old))
+                dresiduals[idx_nz, :] -= np.outer(
+                    Xjs, (dbeta[j, :] - dbeta_old))
             residuals[idx_nz] -= Xjs * (beta[j] - beta_old)
 
     @staticmethod
@@ -156,11 +159,13 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta):
+    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L,
+                         alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             dbeta_old = dbeta[j, :].copy()
-            dbeta[j:j+1, :] = dbeta[j, :] + Xs[:, j] @ dresiduals / (L[j] * n_samples)
+            dbeta[j:j+1, :] = dbeta[j, :] + Xs[:, j] @ dresiduals / \
+                (L[j] * n_samples)
             dbeta[j:j+1, j] -= alpha[j] * sign_beta[j] / L[j]
             # update residuals
             dresiduals -= np.outer(Xs[:, j], (dbeta[j, :] - dbeta_old))
@@ -259,7 +264,8 @@ class WeightedLasso(BaseModel):
     def generalized_supp(self, X, v, log_alpha):
         return v
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals, 
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals,
                     dresiduals, alpha):
         return(
-            norm(dresiduals.T @ dresiduals + n_samples * alpha * sign_beta @ dbeta))
+            norm(dresiduals.T @ dresiduals +
+                 n_samples * alpha * sign_beta @ dbeta))
