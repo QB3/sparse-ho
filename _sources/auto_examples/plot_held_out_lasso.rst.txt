@@ -25,7 +25,7 @@ Lasso with held-out test set
 This example shows how to perform hyperparameter optimization
 for a Lasso using a held-out validation set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-61
+.. GENERATED FROM PYTHON SOURCE LINES 10-60
 
 .. code-block:: default
 
@@ -71,13 +71,12 @@ for a Lasso using a held-out validation set.
 
     print("Starting path computation...")
     n_samples = len(y[idx_train])
-    alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
-    log_alpha0 = np.log(alpha_max / 5)
+    alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+    alpha_max /= len(idx_train)
+    alpha0 = alpha_max / 5
 
     n_alphas = 10
     alphas = np.geomspace(alpha_max, alpha_max/1_000, n_alphas)
-    log_alphas = np.log(alphas)
-
     tol = 1e-7
 
 
@@ -95,7 +94,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:08, 107kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:08, 106kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:19, 171kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<00:45, 300kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:24, 549kB/s]    file_sizes:   7%|#7                         | 909k/13.7M [00:01<00:12, 1.04MB/s]    file_sizes:  13%|###4                      | 1.83M/13.7M [00:01<00:05, 1.99MB/s]    file_sizes:  27%|######9                   | 3.66M/13.7M [00:01<00:02, 3.86MB/s]    file_sizes:  38%|#########9                | 5.23M/13.7M [00:02<00:01, 4.77MB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:01, 5.39MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:00, 5.82MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:00, 6.12MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03<00:00, 6.32MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 6.47MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.23MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:02, 112kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:15, 180kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<00:43, 314kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:23, 576kB/s]    file_sizes:   7%|#7                         | 909k/13.7M [00:01<00:11, 1.09MB/s]    file_sizes:  13%|###4                      | 1.83M/13.7M [00:01<00:05, 2.09MB/s]    file_sizes:  27%|######9                   | 3.66M/13.7M [00:01<00:02, 4.05MB/s]    file_sizes:  38%|#########9                | 5.23M/13.7M [00:01<00:01, 5.01MB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:01, 5.65MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:00, 6.10MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:00, 6.41MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02<00:00, 6.62MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 6.77MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.43MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -104,12 +103,12 @@ for a Lasso using a held-out validation set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 61-63
 
 Grid search with scikit-learn
 -----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-83
+.. GENERATED FROM PYTHON SOURCE LINES 63-82
 
 .. code-block:: default
 
@@ -125,7 +124,7 @@ Grid search with scikit-learn
     monitor_grid_sk = Monitor()
     grid_search(
         algo, criterion, model, X, y, None, None, monitor_grid_sk,
-        log_alphas=log_alphas, tol=tol)
+        alphas=alphas, tol=tol)
     objs = np.array(monitor_grid_sk.objs)
     t_sk = time.time() - t0
 
@@ -143,17 +142,27 @@ Grid search with scikit-learn
  .. code-block:: none
 
     Grid search started
+    Iteration 1 / 10
+    Iteration 2 / 10
+    Iteration 3 / 10
+    Iteration 4 / 10
+    Iteration 5 / 10
+    Iteration 6 / 10
+    Iteration 7 / 10
+    Iteration 8 / 10
+    Iteration 9 / 10
+    Iteration 10 / 10
     Grid search finished
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 Grad-search with sparse-ho
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-102
+.. GENERATED FROM PYTHON SOURCE LINES 85-101
 
 .. code-block:: default
 
@@ -167,7 +176,7 @@ Grad-search with sparse-ho
     monitor_grad = Monitor()
     optimizer = LineSearch(n_outer=10, tol=tol)
     grad_search(
-        algo, criterion, model, optimizer, X, y, log_alpha0, monitor_grad)
+        algo, criterion, model, optimizer, X, y, alpha0, monitor_grad)
 
     t_grad_search = time.time() - t0
 
@@ -189,17 +198,17 @@ Grad-search with sparse-ho
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-105
+.. GENERATED FROM PYTHON SOURCE LINES 102-104
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-138
+.. GENERATED FROM PYTHON SOURCE LINES 104-137
 
 .. code-block:: default
 
 
-    p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+    p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
     objs_grad = np.array(monitor_grad.objs)
 
@@ -246,8 +255,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time for grid search: 5.88 s
-    Time for grad search (sparse-ho): 5.77 s
+    Time for grid search: 8.99 s
+    Time for grad search (sparse-ho): 6.83 s
     Minimum outer criterion value with grid search: 0.21316
     Minimum outer criterion value with grad search: 0.21255
 
@@ -257,7 +266,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  22.847 seconds)
+   **Total running time of the script:** ( 0 minutes  27.529 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

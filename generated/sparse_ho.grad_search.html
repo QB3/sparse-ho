@@ -97,7 +97,7 @@
 <h1>sparse_ho.grad_search<a class="headerlink" href="#sparse-ho-grad-search" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="sparse_ho.grad_search">
-<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algo</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">log_alpha0</span></em>, <em class="sig-param"><span class="n">monitor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">sparse_ho.</code><code class="sig-name descname">grad_search</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">algo</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">X</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">alpha0</span></em>, <em class="sig-param"><span class="n">monitor</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -113,7 +113,7 @@
 </dd>
 <dt><strong>y: array like of shape (n_samples,)</strong></dt><dd><p>Target.</p>
 </dd>
-<dt><strong>log_alpha0: float</strong></dt><dd><p>initial value of the logarithm of the regularization coefficient alpha.</p>
+<dt><strong>alpha0: float</strong></dt><dd><p>initial value of the hyperparameter alpha.</p>
 </dd>
 <dt><strong>monitor: instance of Monitor</strong></dt><dd><p>used to store the value of the cross-validation function.</p>
 </dd>

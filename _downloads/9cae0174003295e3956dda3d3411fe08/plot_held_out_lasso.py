@@ -49,13 +49,12 @@ idx_val = np.arange(n_samples // 2, n_samples)
 
 print("Starting path computation...")
 n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
-log_alpha0 = np.log(alpha_max / 5)
+alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
+alpha_max /= len(idx_train)
+alpha0 = alpha_max / 5
 
 n_alphas = 10
 alphas = np.geomspace(alpha_max, alpha_max/1_000, n_alphas)
-log_alphas = np.log(alphas)
-
 tol = 1e-7
 
 ##############################################################################
@@ -73,7 +72,7 @@ algo = Forward()
 monitor_grid_sk = Monitor()
 grid_search(
     algo, criterion, model, X, y, None, None, monitor_grid_sk,
-    log_alphas=log_alphas, tol=tol)
+    alphas=alphas, tol=tol)
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
@@ -93,7 +92,7 @@ algo = ImplicitForward()
 monitor_grad = Monitor()
 optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0, monitor_grad)
+    algo, criterion, model, optimizer, X, y, alpha0, monitor_grad)
 
 t_grad_search = time.time() - t0
 
@@ -103,7 +102,7 @@ print('sparse-ho finished')
 # Plot results
 # ------------
 
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
 

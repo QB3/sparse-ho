@@ -145,14 +145,15 @@ for sparse logistic regression using a held-out test set.</p>
 <span class="n">alpha_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">[</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_train</span></a><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">[</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_train</span></a><span class="p">]))</span>
 
 <span class="n">alpha_max</span> <span class="o">/=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_train</span></a><span class="p">)</span>
-<span class="n">log_alpha_max</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span><span class="p">)</span>
-<span class="n">log_alpha_min</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">alpha_max</span> <span class="o">=</span> <span class="n">alpha_max</span>
+<span class="n">alpha_min</span> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">100</span>
 <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-8</span>
 
-<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">20</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">alpha_max</span><span class="p">,</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">1_000</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
+<span class="n">n_alphas</span> <span class="o">=</span> <span class="mi">30</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas</span></a>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -168,9 +169,42 @@ for sparse logistic regression using a held-out test set.</p>
 <span class="n">algo_grid</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
 <span class="n">monitor_grid</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
 <span class="n">grid_search</span><span class="p">(</span>
-    <span class="n">algo_grid</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">log_alpha_min</span><span class="p">,</span> <span class="n">log_alpha_max</span><span class="p">,</span>
-    <span class="n">monitor_grid</span><span class="p">,</span> <span class="n">log_alphas</span><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">),</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+    <span class="n">algo_grid</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">alpha_min</span><span class="p">,</span> <span class="n">alpha_max</span><span class="p">,</span>
+    <span class="n">monitor_grid</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
 <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grid</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Iteration 1 / 30
+Iteration 2 / 30
+Iteration 3 / 30
+Iteration 4 / 30
+Iteration 5 / 30
+Iteration 6 / 30
+Iteration 7 / 30
+Iteration 8 / 30
+Iteration 9 / 30
+Iteration 10 / 30
+Iteration 11 / 30
+Iteration 12 / 30
+Iteration 13 / 30
+Iteration 14 / 30
+Iteration 15 / 30
+Iteration 16 / 30
+Iteration 17 / 30
+Iteration 18 / 30
+Iteration 19 / 30
+Iteration 20 / 30
+Iteration 21 / 30
+Iteration 22 / 30
+Iteration 23 / 30
+Iteration 24 / 30
+Iteration 25 / 30
+Iteration 26 / 30
+Iteration 27 / 30
+Iteration 28 / 30
+Iteration 29 / 30
+Iteration 30 / 30
 </pre></div>
 </div>
 </div>
@@ -183,7 +217,7 @@ for sparse logistic regression using a held-out test set.</p>
     <span class="s1">&#39;adam&#39;</span><span class="p">:</span> <span class="n">Adam</span><span class="p">(</span><span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.11</span><span class="p">)}</span>
 
 <span class="n">monitors</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">log_alpha0</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.log" title="numpy.log" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">log</span></a><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">alpha_max</span><span class="p">)</span>  <span class="c1"># starting point</span>
+<span class="n">alpha0</span> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span>  <span class="c1"># starting point</span>
 
 <span class="k">for</span> <span class="n">optimizer_name</span> <span class="ow">in</span> <span class="n">optimizer_names</span><span class="p">:</span>
     <span class="n">estimator</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span>
@@ -196,7 +230,7 @@ for sparse logistic regression using a held-out test set.</p>
 
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizers</span><span class="p">[</span><span class="n">optimizer_name</span><span class="p">]</span>
     <span class="n">grad_search</span><span class="p">(</span>
-        <span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">log_alpha0</span><span class="p">,</span>
+        <span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">alpha0</span><span class="p">,</span>
         <span class="n">monitor_grad</span><span class="p">)</span>
     <span class="n">monitors</span><span class="p">[</span><span class="n">optimizer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">monitor_grad</span>
 
@@ -216,7 +250,7 @@ for sparse logistic regression using a held-out test set.</p>
 
 <span class="k">for</span> <span class="n">optimizer_name</span> <span class="ow">in</span> <span class="n">optimizer_names</span><span class="p">:</span>
     <span class="n">monitor</span> <span class="o">=</span> <span class="n">monitors</span><span class="p">[</span><span class="n">optimizer_name</span><span class="p">]</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.exp" title="numpy.exp" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">exp</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor</span><span class="o">.</span><span class="n">log_alphas</span><span class="p">))</span> <span class="o">/</span> <span class="n">alpha_max</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">)</span> <span class="o">/</span> <span class="n">alpha_max</span>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="n">discrete_cmap</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a><span class="p">),</span> <span class="n">dict_colors</span><span class="p">[</span><span class="n">optimizer_name</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
@@ -236,7 +270,7 @@ for sparse logistic regression using a held-out test set.</p>
 </pre></div>
 </div>
 <img alt="plot compare optimizers" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_compare_optimizers_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.271 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.136 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-compare-optimizers-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/4cae4a5a4ec6d88338b47b45af2f20e6/plot_compare_optimizers.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_compare_optimizers.py</span></code></a></p>

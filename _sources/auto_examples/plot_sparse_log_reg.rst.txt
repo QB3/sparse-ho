@@ -76,15 +76,15 @@ for sparse logistic regression using a held-out test set.
     alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
 
     alpha_max /= 4 * len(idx_train)
-    log_alpha_max = np.log(alpha_max)
-    log_alpha_min = np.log(alpha_max / 100)
+    alpha_max = alpha_max
+    alpha_min = alpha_max / 100
     max_iter = 100
 
+    alpha0 = 0.1 * alpha_max
     tol = 1e-8
 
     n_alphas = 20
     alphas = np.geomspace(alpha_max,  alpha_max / 1_000, n_alphas)
-    log_alphas = np.log(alphas)
 
 
 
@@ -123,8 +123,8 @@ Grid-search
     algo_grid = Forward()
     monitor_grid = Monitor()
     grid_search(
-        algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-        monitor_grid, log_alphas=log_alphas, tol=tol)
+        algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+        monitor_grid, alphas=alphas, tol=tol)
     objs = np.array(monitor_grid.objs)
 
     t_grid_search = time.time() - t0
@@ -144,8 +144,28 @@ Grid-search
  .. code-block:: none
 
     Grid search started
+    Iteration 1 / 20
+    Iteration 2 / 20
+    Iteration 3 / 20
+    Iteration 4 / 20
+    Iteration 5 / 20
+    Iteration 6 / 20
+    Iteration 7 / 20
+    Iteration 8 / 20
+    Iteration 9 / 20
+    Iteration 10 / 20
+    Iteration 11 / 20
+    Iteration 12 / 20
+    Iteration 13 / 20
+    Iteration 14 / 20
+    Iteration 15 / 20
+    Iteration 16 / 20
+    Iteration 17 / 20
+    Iteration 18 / 20
+    Iteration 19 / 20
+    Iteration 20 / 20
     scikit finished
-    Time to compute grad search: 0.50 s
+    Time to compute grad search: 0.54 s
 
 
 
@@ -155,7 +175,7 @@ Grid-search
 Grad-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-146
+.. GENERATED FROM PYTHON SOURCE LINES 94-145
 
 .. code-block:: default
 
@@ -163,7 +183,6 @@ Grad-search
     print('sparse-ho started')
 
     t0 = time.time()
-    log_alpha0 = np.log(0.1 * alpha_max)  # initial point
 
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, tol=tol)
@@ -175,7 +194,7 @@ Grad-search
 
     optimizer = GradientDescent(n_outer=10, tol=tol)
     grad_search(
-        algo, criterion, model, optimizer, X, y, log_alpha0,
+        algo, criterion, model, optimizer, X, y, alpha0,
         monitor_grad)
     objs_grad = np.array(monitor_grad.objs)
 
@@ -185,7 +204,7 @@ Grad-search
     print(f"Time to compute grad search: {t_grad_search:.2f} s")
 
 
-    p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+    p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
     objs_grad = np.array(monitor_grad.objs)
 
@@ -227,7 +246,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 1.24 s
+    Time to compute grad search: 1.33 s
 
 
 
@@ -235,7 +254,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.126 seconds)
+   **Total running time of the script:** ( 0 minutes  2.270 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
