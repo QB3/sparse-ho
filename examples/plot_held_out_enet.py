@@ -127,7 +127,7 @@ ax.scatter(
 ax.scatter(
     monitor.alphas[:, 0] / alpha_max,
     monitor.alphas[:, 1] / alpha_max,
-    s=50, cmap=cmap, c=c,
+    s=50, color=cmap(c),  zorder=len(c),
     marker="X", label="$1$st order", clip_on=False)
 ax.set_xlim(X.min(), X.max())
 ax.set_xlabel("L1 regularization")
