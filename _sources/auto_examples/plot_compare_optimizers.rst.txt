@@ -44,7 +44,7 @@ for sparse logistic regression using a held-out test set.
     from celer import LogisticRegression
     from libsvmdata.datasets import fetch_libsvm
 
-    from sparse_ho import ImplicitForward, Forward
+    from sparse_ho import ImplicitForward
     from sparse_ho.ho import grad_search
     from sparse_ho.utils import Monitor
     from sparse_ho.models import SparseLogreg
@@ -106,7 +106,7 @@ for sparse logistic regression using a held-out test set.
 Grid-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-82
+.. GENERATED FROM PYTHON SOURCE LINES 69-81
 
 .. code-block:: default
 
@@ -115,10 +115,9 @@ Grid-search
         penalty='l1', fit_intercept=False, max_iter=max_iter)
     model = SparseLogreg(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
-    algo_grid = Forward()
     monitor_grid = Monitor()
     grid_search(
-        algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, alphas=alphas, tol=tol)
     objs = np.array(monitor_grid.objs)
 
@@ -167,12 +166,12 @@ Grid-search
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 Grad-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-142
+.. GENERATED FROM PYTHON SOURCE LINES 84-141
 
 .. code-block:: default
 
@@ -247,7 +246,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.136 seconds)
+   **Total running time of the script:** ( 0 minutes  2.100 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_compare_optimizers.py:

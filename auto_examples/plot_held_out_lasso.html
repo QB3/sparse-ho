@@ -116,7 +116,7 @@ for a Lasso using a held-out validation set.</p>
 
 <span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">Lasso</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.criterion</span> <span class="kn">import</span> <span class="n">HeldOutMSE</span>
-<span class="kn">from</span> <span class="nn">sparse_ho</span> <span class="kn">import</span> <span class="n">Forward</span><span class="p">,</span> <span class="n">ImplicitForward</span>
+<span class="kn">from</span> <span class="nn">sparse_ho</span> <span class="kn">import</span> <span class="n">ImplicitForward</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils_plot</span> <span class="kn">import</span> <span class="n">discrete_cmap</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.ho</span> <span class="kn">import</span> <span class="n">grad_search</span>
@@ -160,19 +160,19 @@ Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/bi
 file_sizes:   0%|                                   | 0.00/13.7M [00:00&lt;?, ?B/s]
 file_sizes:   0%|                           | 24.6k/13.7M [00:00&lt;02:02, 112kB/s]
 file_sizes:   0%|                           | 49.2k/13.7M [00:00&lt;02:02, 112kB/s]
-file_sizes:   1%|2                           | 106k/13.7M [00:00&lt;01:15, 180kB/s]
-file_sizes:   2%|4                           | 221k/13.7M [00:00&lt;00:43, 314kB/s]
-file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;00:23, 576kB/s]
+file_sizes:   1%|2                           | 106k/13.7M [00:00&lt;01:16, 179kB/s]
+file_sizes:   2%|4                           | 221k/13.7M [00:00&lt;00:43, 313kB/s]
+file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;00:23, 575kB/s]
 file_sizes:   7%|#7                         | 909k/13.7M [00:01&lt;00:11, 1.09MB/s]
 file_sizes:  13%|###4                      | 1.83M/13.7M [00:01&lt;00:05, 2.09MB/s]
-file_sizes:  27%|######9                   | 3.66M/13.7M [00:01&lt;00:02, 4.05MB/s]
-file_sizes:  38%|#########9                | 5.23M/13.7M [00:01&lt;00:01, 5.01MB/s]
+file_sizes:  27%|######9                   | 3.66M/13.7M [00:01&lt;00:02, 4.04MB/s]
+file_sizes:  38%|#########9                | 5.23M/13.7M [00:01&lt;00:01, 4.99MB/s]
 file_sizes:  50%|############8             | 6.81M/13.7M [00:02&lt;00:01, 5.65MB/s]
-file_sizes:  61%|###############8          | 8.38M/13.7M [00:02&lt;00:00, 6.10MB/s]
-file_sizes:  72%|##################8       | 9.95M/13.7M [00:02&lt;00:00, 6.41MB/s]
-file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02&lt;00:00, 6.62MB/s]
-file_sizes:  95%|########################8 | 13.1M/13.7M [00:03&lt;00:00, 6.77MB/s]
-file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.43MB/s]
+file_sizes:  61%|###############8          | 8.38M/13.7M [00:02&lt;00:00, 6.09MB/s]
+file_sizes:  72%|##################8       | 9.95M/13.7M [00:02&lt;00:00, 6.40MB/s]
+file_sizes:  84%|#####################8    | 11.5M/13.7M [00:02&lt;00:00, 6.61MB/s]
+file_sizes:  95%|########################8 | 13.1M/13.7M [00:03&lt;00:00, 6.76MB/s]
+file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.42MB/s]
 Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
 Decompressing...
 Loading svmlight file...
@@ -188,10 +188,9 @@ Starting path computation...
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">HeldOutMSE</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_val</span></a><span class="p">)</span>
-<span class="n">algo</span> <span class="o">=</span> <span class="n">Forward</span><span class="p">()</span>
 <span class="n">monitor_grid_sk</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
 <span class="n">grid_search</span><span class="p">(</span>
-    <span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">monitor_grid_sk</span><span class="p">,</span>
+    <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.sparse.html#scipy.sparse.csc_matrix" title="scipy.sparse.csc_matrix" class="sphx-glr-backref-module-scipy-sparse sphx-glr-backref-type-scipy-optimize-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">monitor_grid_sk</span><span class="p">,</span>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
 <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grid_sk</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a><span class="p">)</span>
 <span class="n">t_sk</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
@@ -278,13 +277,13 @@ sparse-ho finished
 <img alt="plot held out lasso" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_lasso_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho finished
-Time for grid search: 8.99 s
-Time for grad search (sparse-ho): 6.83 s
+Time for grid search: 6.39 s
+Time for grad search (sparse-ho): 6.38 s
 Minimum outer criterion value with grid search: 0.21316
 Minimum outer criterion value with grad search: 0.21255
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  27.529 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  24.546 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-lasso-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9cae0174003295e3956dda3d3411fe08/plot_held_out_lasso.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_lasso.py</span></code></a></p>

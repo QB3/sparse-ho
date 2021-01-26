@@ -49,7 +49,7 @@ for sparse logistic regression using a held-out test set.
     from sparse_ho.utils import Monitor
     from sparse_ho.models import SparseLogreg
     from sparse_ho.criterion import HeldOutLogistic
-    from sparse_ho import ImplicitForward, Forward
+    from sparse_ho import ImplicitForward
     from sparse_ho.grid_search import grid_search
     from sparse_ho.optimizers import GradientDescent
     from sparse_ho.utils_plot import discrete_cmap
@@ -108,7 +108,7 @@ for sparse logistic regression using a held-out test set.
 Grid-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-91
+.. GENERATED FROM PYTHON SOURCE LINES 70-90
 
 .. code-block:: default
 
@@ -120,10 +120,9 @@ Grid-search
         penalty='l1', fit_intercept=False, max_iter=max_iter)
     model = SparseLogreg(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
-    algo_grid = Forward()
     monitor_grid = Monitor()
     grid_search(
-        algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, alphas=alphas, tol=tol)
     objs = np.array(monitor_grid.objs)
 
@@ -170,12 +169,12 @@ Grid-search
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-94
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 Grad-search
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-145
+.. GENERATED FROM PYTHON SOURCE LINES 93-144
 
 .. code-block:: default
 
@@ -246,7 +245,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 1.33 s
+    Time to compute grad search: 1.31 s
 
 
 
@@ -254,7 +253,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.270 seconds)
+   **Total running time of the script:** ( 0 minutes  2.277 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
