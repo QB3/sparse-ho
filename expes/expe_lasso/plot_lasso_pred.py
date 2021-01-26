@@ -6,11 +6,8 @@ Expe Lasso
 File to play with expes for the Lasso
 """
 
-import time
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-import sklearn
 from numpy.linalg import norm
 
 from sklearn.datasets import make_regression
@@ -22,7 +19,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho import grad_search, hyperopt_wrapper
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
-from sparse_ho.optimizers import LineSearch, GradientDescent
+from sparse_ho.optimizers import GradientDescent
 from sparse_ho.utils import Monitor
 from sparse_ho.utils_plot import configure_plt
 from sparse_ho.grid_search import grid_search
@@ -46,13 +43,9 @@ else:
 n_samples = len(y)
 alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 alpha_min = alpha_max / 10_000
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_min)
 
 
-tol = 1e-3
-
-max_iter = 1e5
+tol = 1e-8
 
 estimator = celer.Lasso(
     fit_intercept=False, max_iter=100, warm_start=True, tol=tol)
@@ -67,25 +60,25 @@ all_algo_name = ['implicit_forward', 'grid_search']
 for algo_name in all_algo_name:
     model = Lasso(estimator=estimator)
     sub_criterion = HeldOutMSE(None, None)
-    log_alpha0 = np.log(alpha_max / 10)
+    alpha0 = alpha_max / 10
     monitor = Monitor()
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     criterion = CrossVal(sub_criterion, cv=kf)
     algo = ImplicitForward(tol_jac=1e-3)
     # optimizer = LineSearch(n_outer=10, tol=tol)
     optimizer = GradientDescent(
-        n_outer=60, p_grad0=1., verbose=True, tol=tol)
+        n_outer=30, p_grad0=1., verbose=True, tol=tol)
     if algo_name == 'implicit_forward':
         grad_search(
-            algo, criterion, model, optimizer, X, y, log_alpha0,
+            algo, criterion, model, optimizer, X, y, alpha0,
             monitor)
     elif algo_name == 'grid_search':
         grid_search(
-            algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+            algo, criterion, model, X, y, alpha_min, alpha_max,
             monitor, max_evals=20, tol=tol)
     elif algo_name == 'random_search':
         hyperopt_wrapper(
-            algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+            algo, criterion, model, X, y, alpha_min, alpha_max,
             monitor, max_evals=20, tol=tol, method='random', size_space=1)
     dict_monitor[algo_name] = monitor
 
@@ -112,11 +105,12 @@ plt.show(block=False)
 
 plt.figure()
 monitor_grid = dict_monitor['grid_search']
-plt.plot(
-    monitor_grid.log_alphas - log_alpha_max,
+plt.semilogx(
+    monitor_grid.alphas / alpha_max,
     monitor_grid.objs / scaling_factor)
 for monitor in dict_monitor.values():
-    plt.scatter(monitor.log_alphas - log_alpha_max, monitor.objs / scaling_factor, marker='X')
+    plt.scatter(
+        monitor.alphas / alpha_max, monitor.objs / scaling_factor, marker='X')
 plt.xlabel('alpha')
 plt.ylabel('Objective')
 plt.show(block=False)

@@ -21,7 +21,6 @@ from sparse_ho.utils import Monitor
 from sparse_ho.optimizers import GradientDescent
 
 from sparse_ho import ImplicitForward
-from sparse_ho.algo import Implicit
 from sparse_ho.grid_search import grid_search
 from sparse_ho.ho import hyperopt_wrapper
 # from sparse_ho.bayesian import hyperopt_lasso
@@ -96,8 +95,6 @@ def parallel_function(
     if model_name == "logreg":
         alpha_max /= 2
     alpha_min = alpha_max / 10_000
-    log_alpha_max = np.log(alpha_max)
-    log_alpha_min = np.log(alpha_min)
 
     if model_name == "lasso":
         estimator = celer.Lasso(
@@ -127,20 +124,20 @@ def parallel_function(
         t_max = dict_t_max[dataset_name]
         if method == 'grid_search':
             grid_search(
-                algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+                algo, criterion, model, X, y, alpha_min, alpha_max,
                 monitor, max_evals=100, tol=tol, t_max=t_max)
         elif method == 'random' or method == 'bayesian':
             hyperopt_wrapper(
-                algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+                algo, criterion, model, X, y, alpha_min, alpha_max,
                 monitor, max_evals=30, tol=tol, method=method, size_space=1,
                 t_max=t_max)
         elif method == "implicit_forward":
             # do gradient descent to find the optimal lambda
-            log_alpha0 = np.log(alpha_max / 30)
+            alpha0 = alpha_max / 30
             optimizer = GradientDescent(
                 n_outer=30, p_grad0=1, verbose=True, tol=tol, t_max=t_max)
             grad_search(
-                algo, criterion, model, optimizer, X, y, log_alpha0,
+                algo, criterion, model, optimizer, X, y, alpha0,
                 monitor)
         else:
             1 / 0
@@ -148,10 +145,10 @@ def parallel_function(
     monitor.times = np.array(monitor.times)
     monitor.objs = np.array(monitor.objs)
     monitor.objs_test = 0  # TODO
-    monitor.log_alphas = np.array(monitor.log_alphas)
+    monitor.alphas = np.array(monitor.log_alphas)
     return (dataset_name, method, tol, n_outer, tolerance_decrease,
             monitor.times, monitor.objs, monitor.objs_test,
-            monitor.log_alphas, log_alpha_max,
+            monitor.alphas, alpha_max,
             model_name)
 
 
