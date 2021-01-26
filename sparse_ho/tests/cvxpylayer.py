@@ -241,16 +241,17 @@ def svr_cvxpy(X, y, hyperparam, idx_train, idx_val):
     reg = C_cp * cp.sum(xi_cp + xi_star_cp)
     objective = loss + reg
     # define constraints
-    constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
-                   Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
-                   xi_cp >= 0.0, xi_star_cp >= 0.0]
+    constraints = [
+        ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,
+        Xtrain @ beta_cp - ytrain <= epsilon_cp + xi_star_cp,
+        xi_cp >= 0.0, xi_star_cp >= 0.0]
     # define problem
     problem = cp.Problem(cp.Minimize(objective), constraints)
     assert problem.is_dpp()
 
     # solve problem
-    layer = CvxpyLayer(problem, parameters=[C_cp, epsilon_cp],
-                       variables=[beta_cp])
+    layer = CvxpyLayer(
+        problem, parameters=[C_cp, epsilon_cp], variables=[beta_cp])
     hyperparam_th = torch.tensor(hyperparam, requires_grad=True)
     beta_, = layer(hyperparam_th[0], hyperparam_th[1])
 
