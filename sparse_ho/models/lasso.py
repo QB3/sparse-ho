@@ -3,34 +3,44 @@ from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from numba import njit
 
-from sparse_ho.utils import init_dbeta0_new, ST
-from sparse_ho.utils import sparse_scalar_product
+
+from sparse_ho.ho import grad_search
+from sparse_ho.utils import (init_dbeta0_new, ST, sparse_scalar_product,
+                             Monitor)
 from sparse_ho.models.base import BaseModel
 
 
-class Lasso(BaseModel):
+# TODO converge on name
+class LassoSearch(BaseModel):
     """Linear Model trained with L1 prior as regularizer (aka the Lasso)
     The optimization objective for Lasso is:
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
 
     Parameters
     ----------
-    log_alpha : float
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
     estimator: instance of ``sklearn.base.BaseEstimator``
-        An estimator that follows the scikit-learn API.
+        A Lasso estimator that follows the scikit-learn API.
     log_alpha_max: float
         logarithm of alpha_max if already precomputed
     """
 
     def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, algo, criterion, max_iter=1000, estimator=None, log_alpha_max=None):
+        # TODO log_alpha_max > alpha_max
+        self.algo = algo
+        self.criterion = criterion
         self.max_iter = max_iter
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
+
+    def fit(self, X, y):
+        monitor = Monitor()
+        grad_search(self.algo, self.criterion, self, self.optimizer, X, y,
+                    self.alpha0, monitor)
+        self.monitor_ = monitor
+
+    def predict(self, X):
+        return self.estimator.predict(X)
 
     def _init_dbeta_dr(self, X, y, mask0=None, jac0=None,
                        dense0=None, compute_jac=True):
