@@ -22,7 +22,7 @@ from sklearn.datasets import make_classification
 from celer import LogisticRegression
 from libsvmdata.datasets import fetch_libsvm
 
-from sparse_ho import ImplicitForward, Forward
+from sparse_ho import ImplicitForward
 from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
