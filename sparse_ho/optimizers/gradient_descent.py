@@ -3,7 +3,6 @@ import numpy as np
 from numpy.linalg import norm
 
 from sparse_ho.optimizers.base import BaseOptimizer
-from sparse_ho.optimizers.winn_extrapol import wynnepsilon
 
 
 class GradientDescent(BaseOptimizer):

@@ -27,11 +27,10 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho import ImplicitForward
-from sparse_ho import Forward
+from sparse_ho import ImplicitForward, Forward
 from sparse_ho.grid_search import grid_search
-from sparse_ho.optimizers import LineSearch
-
+from sparse_ho.optimizers import GradientDescent
+from sparse_ho.utils_plot import discrete_cmap
 
 print(__doc__)
 
@@ -55,23 +54,21 @@ n_samples = len(y[idx_train])
 alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
 
 alpha_max /= 4 * len(idx_train)
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(alpha_max / 100)
+alpha_max = alpha_max
+alpha_min = alpha_max / 100
 max_iter = 100
 
-log_alpha0 = np.log(0.1 * alpha_max)
+alpha0 = 0.1 * alpha_max
 tol = 1e-8
 
-n_alphas = 30
-p_alphas = np.geomspace(1, 0.0001, n_alphas)
-alphas = alpha_max * p_alphas
-log_alphas = np.log(alphas)
+n_alphas = 20
+alphas = np.geomspace(alpha_max,  alpha_max / 1_000, n_alphas)
 
 ##############################################################################
 # Grid-search
 # -----------
 
-print('scikit started')
+print('Grid search started')
 t0 = time.time()
 
 estimator = LogisticRegression(
@@ -81,14 +78,14 @@ criterion = HeldOutLogistic(idx_train, idx_val)
 algo_grid = Forward()
 monitor_grid = Monitor()
 grid_search(
-    algo_grid, criterion, model, X, y, log_alpha_min, log_alpha_max,
-    monitor_grid, log_alphas=log_alphas, tol=tol)
+    algo_grid, criterion, model, X, y, alpha_min, alpha_max,
+    monitor_grid, alphas=alphas, tol=tol)
 objs = np.array(monitor_grid.objs)
 
-t_sk = time.time() - t0
+t_grid_search = time.time() - t0
 
 print('scikit finished')
-print("Time to compute CV for scikit-learn: %.2f" % t_sk)
+print(f"Time to compute grad search: {t_grid_search:.2f} s")
 
 
 ##############################################################################
@@ -98,49 +95,50 @@ print("Time to compute CV for scikit-learn: %.2f" % t_sk)
 print('sparse-ho started')
 
 t0 = time.time()
+
 estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, solver='saga', tol=tol)
+    penalty='l1', fit_intercept=False, tol=tol)
 model = SparseLogreg(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 
 monitor_grad = Monitor()
 algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
 
-optimizer = LineSearch(n_outer=10, tol=tol)
+optimizer = GradientDescent(n_outer=10, tol=tol)
 grad_search(
-    algo, criterion, model, optimizer, X, y, log_alpha0,
+    algo, criterion, model, optimizer, X, y, alpha0,
     monitor_grad)
-
 objs_grad = np.array(monitor_grad.objs)
 
 t_grad_search = time.time() - t0
 
 print('sparse-ho finished')
-print("Time to compute CV for sparse-ho: %.2f" % t_grad_search)
+print(f"Time to compute grad search: {t_grad_search:.2f} s")
 
 
-p_alphas_grad = np.exp(np.array(monitor_grad.log_alphas)) / alpha_max
+p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
 
 objs_grad = np.array(monitor_grad.objs)
 
 current_palette = sns.color_palette("colorblind")
 
 fig = plt.figure(figsize=(5, 3))
-plt.semilogx(
-    p_alphas, objs, color=current_palette[0])
-plt.semilogx(
-    p_alphas, objs, 'bo', label='0-order method (grid-search)',
-    color=current_palette[1])
-plt.semilogx(
-    p_alphas_grad, objs_grad, 'bX', label='1-st order method',
-    color=current_palette[2])
+cmap = discrete_cmap(len(p_alphas_grad), "Greens")
+
+plt.plot(alphas / alphas[0], objs, color=current_palette[0])
+plt.plot(
+    alphas / alphas[0], objs, 'bo',
+    label='0-order method (grid-search)', color=current_palette[1])
+plt.scatter(
+    p_alphas_grad, objs_grad, label='1-st order method',
+    marker='X', color=cmap(np.linspace(0, 1, len(objs_grad))), zorder=10)
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
 plt.ylabel(
     r"$ \sum_i^n \log \left ( 1 + e^{-y_i^{\rm{val}} X_i^{\rm{val}} "
     r"\hat \beta^{(\lambda)} } \right ) $")
 
-axes = plt.gca()
+plt.xscale("log")
 plt.tick_params(width=5)
-plt.legend(loc=1)
+plt.legend()
 plt.tight_layout()
 plt.show(block=False)

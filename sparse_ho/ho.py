@@ -15,7 +15,7 @@ from sklearn.utils import check_random_state
 
 
 def grad_search(
-        algo, criterion, model, optimizer, X, y, log_alpha0, monitor):
+        algo, criterion, model, optimizer, X, y, alpha0, monitor):
     """
     Parameters
     ----------
@@ -31,8 +31,8 @@ def grad_search(
         Design matrix.
     y: array like of shape (n_samples,)
         Target.
-    log_alpha0: float
-        initial value of the logarithm of the regularization coefficient alpha.
+    alpha0: float
+        initial value of the hyperparameter alpha.
     monitor: instance of Monitor
         used to store the value of the cross-validation function.
     """
@@ -46,11 +46,11 @@ def grad_search(
         return criterion.proj_hyperparam(model, X, y, log_alpha)
 
     return optimizer._grad_search(
-        _get_val_grad, _proj_hyperparam, log_alpha0, monitor)
+        _get_val_grad, _proj_hyperparam, np.log(alpha0), monitor)
 
 
 def hyperopt_wrapper(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
+        algo, criterion, model, X, y, alpha_min, alpha_max, monitor,
         max_evals=50, tol=1e-5, random_state=42, t_max=100_000,
         method='bayesian', size_space=1):
     """
@@ -68,9 +68,9 @@ def hyperopt_wrapper(
         Design matrix.
     y: array like of shape (n_samples,)
         Target.
-    log_alpha_min: float
+    alpha_min: float
         minimum value for the regularization coefficient alpha.
-    log_alpha_max: float
+    alpha_max: float
         maximum value for the regularization coefficient alpha.
     monitor: instance of Monitor
         used to store the value of the cross-validation function.
@@ -91,12 +91,10 @@ def hyperopt_wrapper(
             model, X, y, log_alpha, monitor, tol=tol)
         return val_func
 
+    # TODO, also size_space = n_hyperparam ?
     space = [
-        hp.uniform(str(dim), log_alpha_min, log_alpha_max) for dim in range(
-            size_space)]
-
-    # space = hp.uniform(
-    #     'log_alpha', log_alpha_min, log_alpha_max)
+        hp.uniform(str(dim), np.log(alpha_min), np.log(alpha_max)) for
+        dim in range(size_space)]
 
     rng = check_random_state(random_state)
 

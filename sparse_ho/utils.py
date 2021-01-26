@@ -227,24 +227,24 @@ class Monitor():
         self.t0 = time.time()
         self.objs = []   # TODO rename, use self.value_outer?
         self.times = []
-        self.log_alphas = []
+        self.alphas = []
         self.grads = []
         self.callback = callback
         self.acc_vals = []
         self.all_betas = []
 
     def __call__(
-            self, obj, grad, mask=None, dense=None, log_alpha=None,
+            self, obj, grad, mask=None, dense=None, alpha=None,
             acc_val=None, acc_test=None):
         self.objs.append(obj)
         try:
-            self.log_alphas.append(log_alpha.copy())
+            self.alphas.append(alpha.copy())
         except Exception:
-            self.log_alphas.append(log_alpha)
+            self.alphas.append(alpha)
         self.times.append(time.time() - self.t0)
         self.grads.append(grad)
         if self.callback is not None:
-            self.callback(obj, grad, mask, dense, log_alpha)
+            self.callback(obj, grad, mask, dense, alpha)
         if acc_val is not None:
             self.acc_vals.append(acc_val)
         if acc_test is not None:
