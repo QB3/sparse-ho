@@ -15,31 +15,31 @@ class ElasticNet(BaseModel):
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
 
-    def _init_dbeta_dresiduals(self, X, y, mask0=None, jac0=None,
-                               dense0=None, compute_jac=True):
+    def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
+                              dense0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros((n_features, 2))
         if jac0 is None or not compute_jac:
-            dresiduals = np.zeros((n_samples, 2))
+            ddual_var = np.zeros((n_samples, 2))
         else:
             dbeta[mask0, :] = jac0.copy()
-            dresiduals = - X[:, mask0] @ jac0.copy()
-        return dbeta, dresiduals
+            ddual_var = - X[:, mask0] @ jac0.copy()
+        return dbeta, ddual_var
 
-    def _init_beta_residuals(self, X, y, mask0=None, dense0=None):
+    def _init_beta_dual_var(self, X, y, mask0=None, dense0=None):
         beta = np.zeros(X.shape[1])
         if dense0 is None or len(dense0) == 0:
-            residuals = y.copy()
-            residuals = residuals.astype(np.float)
+            dual_var = y.copy()
+            dual_var = dual_var.astype(np.float)
         else:
             beta[mask0] = dense0.copy()
-            residuals = y - X[:, mask0] @ dense0
-        return beta, residuals
+            dual_var = y - X[:, mask0] @ dense0
+        return beta, dual_var
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, alpha,
+            X, y, beta, dbeta, dual_var, ddual_var, alpha,
             L, compute_jac=True):
         n_samples, n_features = X.shape
         non_zeros = np.where(L != 0)[0]
@@ -48,10 +48,10 @@ class ElasticNet(BaseModel):
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
                 # compute derivatives
-            zj = beta[j] + residuals @ X[:, j] / (L[j] * n_samples)
+            zj = beta[j] + dual_var @ X[:, j] / (L[j] * n_samples)
             beta[j] = prox_elasticnet(zj, alpha[0] / L[j], alpha[1] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + X[:, j] @ dresiduals / (L[j] * n_samples)
+                dzj = dbeta[j, :] + X[:, j] @ ddual_var / (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * \
                     np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
@@ -59,15 +59,15 @@ class ElasticNet(BaseModel):
                 dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
                                     ) / (1 + alpha[1] / L[j])
                 # update residuals
-                dresiduals[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
-                dresiduals[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
-            residuals -= X[:, j] * (beta[j] - beta_old)
+                ddual_var[:, 0] -= X[:, j] * (dbeta[j, 0] - dbeta_old[0])
+                ddual_var[:, 1] -= X[:, j] * (dbeta[j, 1] - dbeta_old[1])
+            dual_var -= X[:, j] * (beta[j] - beta_old)
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
-            dbeta, residuals, dresiduals, alphas, L, compute_jac=True):
+            dbeta, dual_var, ddual_var, alphas, L, compute_jac=True):
 
         non_zeros = np.where(L != 0)[0]
 
@@ -79,11 +79,11 @@ class ElasticNet(BaseModel):
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j, :].copy()
-            zj = beta[j] + residuals[idx_nz] @ Xjs / (L[j] * n_samples)
+            zj = beta[j] + dual_var[idx_nz] @ Xjs / (L[j] * n_samples)
             beta[j:j+1] = prox_elasticnet(zj,
                                           alphas[0] / L[j], alphas[1] / L[j])
             if compute_jac:
-                dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / \
+                dzj = dbeta[j, :] + Xjs @ ddual_var[idx_nz, :] / \
                     (L[j] * n_samples)
                 dbeta[j:j+1, :] = (1 / (1 + alphas[1] / L[j])) * \
                     np.abs(np.sign(beta[j])) * dzj
@@ -92,9 +92,9 @@ class ElasticNet(BaseModel):
                 dbeta[j:j+1, 1] -= (alphas[1] / L[j] * beta[j]
                                     ) / (1 + (alphas[1] / L[j]))
                 # update residuals
-                dresiduals[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
-                dresiduals[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
-            residuals[idx_nz] -= Xjs * (beta[j] - beta_old)
+                ddual_var[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
+                ddual_var[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
+            dual_var[idx_nz] -= Xjs * (beta[j] - beta_old)
 
     @staticmethod
     @njit
@@ -109,23 +109,23 @@ class ElasticNet(BaseModel):
         return grad
 
     @staticmethod
-    def _get_pobj0(residuals, beta, alphas, y=None):
-        n_samples = residuals.shape[0]
+    def _get_pobj0(dual_var, beta, alphas, y=None):
+        n_samples = dual_var.shape[0]
         return norm(y) ** 2 / (2 * n_samples)
 
     @staticmethod
-    def _get_pobj(residuals, X, beta, alphas, y=None):
-        n_samples = residuals.shape[0]
-        pobj = norm(residuals) ** 2 / (2 * n_samples) + \
+    def _get_pobj(dual_var, X, beta, alphas, y=None):
+        n_samples = dual_var.shape[0]
+        pobj = norm(dual_var) ** 2 / (2 * n_samples) + \
             np.abs(alphas[0] * beta).sum()
         pobj += 0.5 * alphas[1] * norm(beta) ** 2
         return pobj
 
     @staticmethod
-    def _get_dobj(residuals, X, beta, alpha, y=None):
+    def _get_dobj(dual_var, X, beta, alpha, y=None):
         # the dual variable is theta = (y - X beta) / (alpha[0] * n_samples)
         n_samples = X.shape[0]
-        theta = residuals / (alpha[0] * n_samples)
+        theta = dual_var / (alpha[0] * n_samples)
         dobj = alpha[0] * y @ theta
         dobj -= alpha[0] ** 2 * n_samples / 2 * np.dot(theta, theta)
         dobj -= alpha[0] ** 2 / alpha[1] / 2 * (ST(X.T @ theta, 1) ** 2).sum()
@@ -170,7 +170,7 @@ class ElasticNet(BaseModel):
         return dbeta
 
     @staticmethod
-    def _init_dresiduals(dbeta, X, y, sign_beta, alpha):
+    def _init_ddual_var(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
     def _init_g_backward(self, jac_v0):
@@ -181,11 +181,11 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals, L, alpha, beta):
+    def _update_only_jac(Xs, y, dual_var, dbeta, ddual_var, L, alpha, beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
             dbeta_old = dbeta[j, :].copy()
-            dzj = dbeta[j, :] + Xs[:, j] @ dresiduals / (L[j] * n_samples)
+            dzj = dbeta[j, :] + Xs[:, j] @ ddual_var / (L[j] * n_samples)
             dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
 
             dbeta[j:j+1, 0] -= (alpha[0] * np.sign(beta[j])
@@ -193,14 +193,14 @@ class ElasticNet(BaseModel):
             dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
                                 ) / (1 + alpha[1] / L[j])
             # update residuals
-            dresiduals[:, 0] -= Xs[:, j] * (dbeta[j, 0] - dbeta_old[0])
-            dresiduals[:, 1] -= Xs[:, j] * (dbeta[j, 1] - dbeta_old[1])
+            ddual_var[:, 0] -= Xs[:, j] * (dbeta[j, 0] - dbeta_old[0])
+            ddual_var[:, 1] -= Xs[:, j] * (dbeta[j, 1] - dbeta_old[1])
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, residuals, dresiduals, L, alpha, beta):
+            dbeta, dual_var, ddual_var, L, alpha, beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
@@ -208,7 +208,7 @@ class ElasticNet(BaseModel):
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
             dbeta_old = dbeta[j, :].copy()
-            dzj = dbeta[j, :] + Xjs @ dresiduals[idx_nz, :] / \
+            dzj = dbeta[j, :] + Xjs @ ddual_var[idx_nz, :] / \
                 (L[j] * n_samples)
             dbeta[j:j+1, :] = (1 / (1 + alpha[1] / L[j])) * dzj
 
@@ -217,8 +217,8 @@ class ElasticNet(BaseModel):
             dbeta[j:j+1, 1] -= (alpha[1] / L[j] * beta[j]
                                 ) / (1 + alpha[1] / L[j])
             # update residuals
-            dresiduals[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
-            dresiduals[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
+            ddual_var[idx_nz, 0] -= Xjs * (dbeta[j, 0] - dbeta_old[0])
+            ddual_var[idx_nz, 1] -= Xjs * (dbeta[j, 1] - dbeta_old[1])
 
     @staticmethod
     @njit
@@ -298,12 +298,12 @@ class ElasticNet(BaseModel):
             self.log_alpha_max = np.log(alpha_max)
         return self.log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, residuals,
-                    dresiduals, alpha):
-        res1 = (1 / n_samples) * dresiduals[:, 0].T @ dresiduals[:, 0] + \
+    def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, dual_var,
+                    ddual_var, alpha):
+        res1 = (1 / n_samples) * ddual_var[:, 0].T @ ddual_var[:, 0] + \
             alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * \
             np.sign(beta) @ dbeta[:, 0]
-        res2 = (1 / n_samples) * dresiduals[:, 1].T @ dresiduals[:, 1] + \
+        res2 = (1 / n_samples) * ddual_var[:, 1].T @ ddual_var[:, 1] + \
             alpha[1] * dbeta[:, 1].T @ dbeta[:, 1] + alpha[1] * \
             beta @ dbeta[:, 1]
         return(norm(res2) + norm(res1))

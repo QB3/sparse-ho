@@ -25,55 +25,61 @@ class SVM(BaseModel):
         algorithm
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
+    dual: bool
+        True if the problem is solved in the dual
+    dual_var: np.array
+        save the last dual_var variable to enable warm_start
+    ddual_var: np.array
+        save the last jacobian of the dual_var to enable warm_start
     """
 
     def __init__(self, estimator=None, max_iter=100):
         self.estimator = estimator
         self.max_iter = max_iter
         self.dual = True
-        self.dresiduals = None
+        self.ddual_var = None
 
-    def _init_dbeta_dresiduals(
+    def _init_dbeta_ddual_var(
             self, X, y, dense0=None, mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
-        dresiduals = np.zeros(n_samples)
-        if self.dresiduals is None:
+        ddual_var = np.zeros(n_samples)
+        if self.ddual_var is None:
             dbeta = np.zeros(n_features)
         else:
-            if self.residuals.shape[0] != n_samples:
+            if self.dual_var.shape[0] != n_samples:
                 dbeta = np.zeros(n_features)
             else:
-                dresiduals = self.dresiduals.copy()
+                ddual_var = self.ddual_var.copy()
                 if issparse(X):
-                    dbeta = (X.T).multiply(y * dresiduals)
+                    dbeta = (X.T).multiply(y * ddual_var)
                     dbeta = np.sum(dbeta, axis=1)
                     dbeta = np.squeeze(np.array(dbeta))
                 else:
-                    dbeta = np.sum(y * dresiduals * X.T, axis=1)
-        return dbeta, dresiduals
+                    dbeta = np.sum(y * ddual_var * X.T, axis=1)
+        return dbeta, ddual_var
 
-    def _init_beta_residuals(self, X, y, mask0, dense0):
+    def _init_beta_dual_var(self, X, y, mask0, dense0):
         n_samples, n_features = X.shape
-        residuals = np.zeros(n_samples)
-        if mask0 is None or self.residuals is None:
+        dual_var = np.zeros(n_samples)
+        if mask0 is None or self.dual_var is None:
             beta = np.zeros(n_features)
         else:
-            if self.residuals.shape[0] != n_samples:
+            if self.dual_var.shape[0] != n_samples:
                 beta = np.zeros(n_features)
             else:
-                residuals = self.residuals
+                dual_var = self.dual_var
                 if issparse(X):
-                    beta = (X.T).multiply(y * residuals)
+                    beta = (X.T).multiply(y * dual_var)
                     beta = np.sum(beta, axis=1)
                     beta = np.squeeze(np.array(beta))
                 else:
-                    beta = np.sum(y * residuals * X.T, axis=1)
-        return beta, residuals
+                    beta = np.sum(y * dual_var * X.T, axis=1)
+        return beta, dual_var
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals, C, L, compute_jac=True):
+            X, y, beta, dbeta, dual_var, ddual_var, C, L, compute_jac=True):
         """
             beta : dual variable of the svm
             r : primal used for cheap updates
@@ -84,23 +90,23 @@ class SVM(BaseModel):
         n_samples = X.shape[0]
         for j in range(n_samples):
             F = y[j] * np.sum(beta * X[j, :]) - 1.0
-            residuals_old = residuals[j]
-            zj = residuals[j] - F / L[j]
-            residuals[j] = proj_box_svm(zj, C)
-            beta += (residuals[j] - residuals_old) * y[j] * X[j, :]
+            dual_var_old = dual_var[j]
+            zj = dual_var[j] - F / L[j]
+            dual_var[j] = proj_box_svm(zj, C)
+            beta += (dual_var[j] - dual_var_old) * y[j] * X[j, :]
             if compute_jac:
                 dF = y[j] * np.sum(dbeta * X[j, :])
-                dresiduals_old = dresiduals[j]
-                dzj = dresiduals[j] - dF / L[j]
-                dresiduals[j] = ind_box(zj, C) * dzj
-                dresiduals[j] += C * (C <= zj)
-                dbeta += (dresiduals[j] - dresiduals_old) * y[j] * X[j, :]
+                ddual_var_old = ddual_var[j]
+                dzj = ddual_var[j] - dF / L[j]
+                ddual_var[j] = ind_box(zj, C) * dzj
+                ddual_var[j] += C * (C <= zj)
+                dbeta += (ddual_var[j] - ddual_var_old) * y[j] * X[j, :]
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
-            dbeta, residuals, dresiduals, C, L, compute_jac=True):
+            dbeta, dual_var, ddual_var, C, L, compute_jac=True):
         # data needs to be a row sparse matrix
         C = C[0]
         for j in range(n_samples):
@@ -110,33 +116,33 @@ class SVM(BaseModel):
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # Compute the gradient
             F = y[j] * np.sum(beta[idx_nz] * Xis) - 1.0
-            residuals_old = residuals[j]
-            zj = residuals[j] - F / L[j]
-            residuals[j] = proj_box_svm(zj, C)
-            beta[idx_nz] += (residuals[j] - residuals_old) * y[j] * Xis
+            dual_var_old = dual_var[j]
+            zj = dual_var[j] - F / L[j]
+            dual_var[j] = proj_box_svm(zj, C)
+            beta[idx_nz] += (dual_var[j] - dual_var_old) * y[j] * Xis
             if compute_jac:
                 dF = y[j] * np.sum(dbeta[idx_nz] * Xis)
-                dresiduals_old = dresiduals[j]
-                dzj = dresiduals[j] - dF / L[j]
-                dresiduals[j] = ind_box(zj, C) * dzj
-                dresiduals[j] += C * (C <= zj)
-                dbeta[idx_nz] += (dresiduals[j] - dresiduals_old) * y[j] * Xis
+                ddual_var_old = ddual_var[j]
+                dzj = ddual_var[j] - dF / L[j]
+                ddual_var[j] = ind_box(zj, C) * dzj
+                ddual_var[j] += C * (C <= zj)
+                dbeta[idx_nz] += (ddual_var[j] - ddual_var_old) * y[j] * Xis
 
     @staticmethod
-    def _get_pobj0(residuals, beta, C, y):
+    def _get_pobj0(dual_var, beta, C, y):
         C = C[0]
-        n_samples = residuals.shape[0]
+        n_samples = dual_var.shape[0]
         obj_prim = C * np.sum(np.maximum(
             np.ones(n_samples), np.zeros(n_samples)))
         return obj_prim
 
     @staticmethod
-    def _get_pobj(residuals, X, beta, C, y):
+    def _get_pobj(dual_var, X, beta, C, y):
         C = C[0]
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + C * np.sum(np.maximum(
             np.ones(n_samples) - (X @ beta) * y, np.zeros(n_samples)))
-        obj_dual = 0.5 * beta.T @ beta - np.sum(residuals)
+        obj_dual = 0.5 * beta.T @ beta - np.sum(dual_var)
         return (obj_dual + obj_prim)
 
     @staticmethod
@@ -158,43 +164,43 @@ class SVM(BaseModel):
         else:
             return np.zeros(n_features)
 
-    def _init_dresiduals(self, dbeta, X, y, sign_beta, C):
+    def _init_ddual_var(self, dbeta, X, y, sign_beta, C):
         is_sparse = issparse(X)
-        sign = np.zeros(self.residuals.shape[0])
-        sign[self.residuals == 0.0] = -1.0
-        sign[self.residuals == C] = 1.0
-        dresiduals = np.zeros(X.shape[0])
-        self.dresiduals = dresiduals
+        sign = np.zeros(self.dual_var.shape[0])
+        sign[self.dual_var == 0.0] = -1.0
+        sign[self.dual_var == C] = 1.0
+        ddual_var = np.zeros(X.shape[0])
+        self.ddual_var = ddual_var
         if np.sum(sign == 1.0) != 0:
-            dresiduals[sign == 1.0] = np.repeat(C, (sign == 1).sum())
+            ddual_var[sign == 1.0] = np.repeat(C, (sign == 1).sum())
         if is_sparse:
-            self.dbeta = np.array(np.sum(X.T.multiply(y * dresiduals), axis=1))
+            self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))
         else:
-            self.dbeta = np.sum(y * dresiduals * X.T, axis=1)
-        return dresiduals
+            self.dbeta = np.sum(y * ddual_var * X.T, axis=1)
+        return ddual_var
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, ys, residuals, dbeta, dresiduals,
+    def _update_only_jac(Xs, ys, dual_var, dbeta, ddual_var,
                          L, C, sign_beta):
-        sign = np.zeros(residuals.shape[0])
-        sign[residuals == 0.0] = -1.0
-        sign[residuals == C] = 1.0
+        sign = np.zeros(dual_var.shape[0])
+        sign[dual_var == 0.0] = -1.0
+        sign[dual_var == C] = 1.0
         for j in np.arange(0, Xs.shape[0])[sign == 0.0]:
             dF = ys[j] * np.sum(dbeta * Xs[j, :])
-            dresiduals_old = dresiduals[j]
-            dzj = dresiduals[j] - (dF / L[j])
-            dresiduals[j] = dzj
-            dbeta += (dresiduals[j] - dresiduals_old) * ys[j] * Xs[j, :]
+            ddual_var_old = ddual_var[j]
+            dzj = ddual_var[j] - (dF / L[j])
+            ddual_var[j] = dzj
+            dbeta += (ddual_var[j] - ddual_var_old) * ys[j] * Xs[j, :]
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, residuals, dresiduals, L, C, sign_beta):
-        sign = np.zeros(residuals.shape[0])
-        sign[residuals == 0.0] = -1.0
-        sign[residuals == C] = 1.0
+            dbeta, dual_var, ddual_var, L, C, sign_beta):
+        sign = np.zeros(dual_var.shape[0])
+        sign[dual_var == 0.0] = -1.0
+        sign[dual_var == C] = 1.0
         for j in np.arange(0, n_samples)[sign == 0.0]:
             # get the i-st row of X in sparse format
             Xis = data[indptr[j]:indptr[j+1]]
@@ -202,10 +208,10 @@ class SVM(BaseModel):
             idx_nz = indices[indptr[j]:indptr[j+1]]
             # store old beta j for fast update
             dF = y[j] * np.sum(dbeta[idx_nz] * Xis)
-            dresiduals_old = dresiduals[j]
-            dzj = dresiduals[j] - (dF / L[j])
-            dresiduals[j] = dzj
-            dbeta[idx_nz] += ((dresiduals[j] - dresiduals_old) * y[j] * Xis)
+            ddual_var_old = ddual_var[j]
+            dzj = ddual_var[j] - (dF / L[j])
+            ddual_var[j] = dzj
+            dbeta[idx_nz] += ((ddual_var[j] - ddual_var_old) * y[j] * Xis)
 
     @staticmethod
     @njit
@@ -252,7 +258,7 @@ class SVM(BaseModel):
 
     def get_hessian(self, X, y, mask, dense, log_C):
         C = np.exp(log_C)
-        full_supp = np.logical_and(self.residuals != 0, self.residuals != C)
+        full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         if issparse(X):
             Xy = X[full_supp, :].multiply(y[full_supp, np.newaxis])
             return Xy @ Xy.T
@@ -262,8 +268,8 @@ class SVM(BaseModel):
 
     def _get_jac_t_v(self, X, y, jac, mask, dense, C, v, n_samples):
         C = C[0]
-        full_supp = np.logical_and(self.residuals != 0, self.residuals != C)
-        maskC = self.residuals == C
+        full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
+        maskC = self.dual_var == C
         hessian = (y[full_supp] * X[full_supp, :].T).T @ \
             (y[maskC] * X[maskC, :].T)
         hessian_vec = hessian @ np.repeat(C, maskC.sum())
@@ -273,7 +279,7 @@ class SVM(BaseModel):
 
     def generalized_supp(self, X, v, log_C):
         full_supp = np.logical_and(
-            self.residuals != 0, self.residuals != np.exp(log_C))
+            self.dual_var != 0, self.dual_var != np.exp(log_C))
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -283,24 +289,24 @@ class SVM(BaseModel):
             log_alpha = 4
         return log_alpha
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals,
-                    dresiduals, C):
-        maskC = residuals == C
-        full_supp = np.logical_and(residuals != 0, residuals != C)
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
+                    ddual_var, C):
+        maskC = dual_var == C
+        full_supp = np.logical_and(dual_var != 0, dual_var != C)
         if issparse(Xs):
-            dryX = dresiduals[full_supp].T @ \
+            dryX = ddual_var[full_supp].T @ \
                     (Xs[full_supp, :].T).multiply(ys[full_supp]).T
         else:
-            dryX = dresiduals[full_supp].T @ (ys[full_supp] *
-                                              Xs[full_supp, :].T).T
+            dryX = ddual_var[full_supp].T @ (ys[full_supp] *
+                                             Xs[full_supp, :].T).T
         quadratic_term = dryX.T @ dryX
         if maskC.sum() != 0:
             if issparse(Xs):
                 linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ \
-                    residuals[maskC]
+                    dual_var[maskC]
             else:
                 linear_term = dryX.T @ (ys[maskC] * Xs[maskC, :].T) @ \
-                    residuals[maskC]
+                    dual_var[maskC]
         else:
             linear_term = 0
         res = quadratic_term + linear_term

@@ -29,30 +29,30 @@ class SparseLogreg(BaseModel):
         self.log_alpha_max = log_alpha_max
         self.estimator = estimator
 
-    def _init_dbeta_dresiduals(self, X, y, dense0=None,
-                               mask0=None, jac0=None, compute_jac=True):
+    def _init_dbeta_ddual_var(self, X, y, dense0=None,
+                              mask0=None, jac0=None, compute_jac=True):
         n_samples, n_features = X.shape
         dbeta = np.zeros(n_features)
         if jac0 is None or not compute_jac:
-            dresiduals = np.zeros(n_samples)
+            ddual_var = np.zeros(n_samples)
         else:
             dbeta[mask0] = jac0.copy()
-            dresiduals = y * (X[:, mask0] @ jac0.copy())
-        return dbeta, dresiduals
+            ddual_var = y * (X[:, mask0] @ jac0.copy())
+        return dbeta, ddual_var
 
-    def _init_beta_residuals(self, X, y, mask0, dense0):
+    def _init_beta_dual_var(self, X, y, mask0, dense0):
         beta = np.zeros(X.shape[1])
         if dense0 is None:
-            residuals = np.zeros(X.shape[0])
+            dual_var = np.zeros(X.shape[0])
         else:
             beta[mask0] = dense0
-            residuals = y * (X[:, mask0] @ dense0)
-        return beta, residuals
+            dual_var = y * (X[:, mask0] @ dense0)
+        return beta, dual_var
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd(
-            X, y, beta, dbeta, residuals, dresiduals,
+            X, y, beta, dbeta, dual_var, ddual_var,
             alpha, L, compute_jac=True):
         n_samples, n_features = X.shape
         for j in range(n_features):
@@ -60,27 +60,27 @@ class SparseLogreg(BaseModel):
             if compute_jac:
                 dbeta_old = dbeta[j]
                 # compute derivatives
-            sigmar = sigma(residuals)
+            sigmar = sigma(dual_var)
             grad_j = X[:, j] @ (y * (sigmar - 1))
             L_temp = np.sum(X[:, j] ** 2 * sigmar * (1 - sigmar))
             L_temp /= n_samples
             zj = beta[j] - grad_j / (L_temp * n_samples)
             beta[j] = ST(zj, alpha[j] / L_temp)
-            residuals += y * X[:, j] * (beta[j] - beta_old)
+            dual_var += y * X[:, j] * (beta[j] - beta_old)
             if compute_jac:
-                dsigmar = sigmar * (1 - sigmar) * dresiduals
+                dsigmar = sigmar * (1 - sigmar) * ddual_var
                 hess_fj = X[:, j] @ (y * dsigmar)
                 dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
                 dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
                 dbeta[j:j+1] -= alpha[j] * np.sign(beta[j]) / L_temp
                 # update residuals
-                dresiduals += y * X[:, j] * (dbeta[j] - dbeta_old)
+                ddual_var += y * X[:, j] * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
     def _update_beta_jac_bcd_sparse(
             data, indptr, indices, y, n_samples, n_features, beta,
-            dbeta, residuals, dresiduals, alphas, L, compute_jac=True):
+            dbeta, dual_var, ddual_var, alphas, L, compute_jac=True):
 
         for j in range(n_features):
             # get the j-st column of X in sparse format
@@ -90,7 +90,7 @@ class SparseLogreg(BaseModel):
             beta_old = beta[j]
             if compute_jac:
                 dbeta_old = dbeta[j]
-            sigmar = sigma(residuals[idx_nz])
+            sigmar = sigma(dual_var[idx_nz])
             grad_j = Xjs @ (y[idx_nz] * (sigmar - 1))
             L_temp = (Xjs ** 2 * sigmar * (1 - sigmar)).sum()
             # Xjs2 = (Xjs ** 2 * sigmar * (1 - sigmar)).sum()
@@ -102,15 +102,15 @@ class SparseLogreg(BaseModel):
                 zj = beta[j] - grad_j / (L_temp * n_samples)
                 beta[j:j+1] = ST(zj, alphas[j] / L_temp)
                 if compute_jac:
-                    dsigmar = sigmar * (1 - sigmar) * dresiduals[idx_nz]
+                    dsigmar = sigmar * (1 - sigmar) * ddual_var[idx_nz]
                     hess_fj = Xjs @ (y[idx_nz] * dsigmar)
                     dzj = dbeta[j] - hess_fj / (L_temp * n_samples)
                     dbeta[j:j+1] = np.abs(np.sign(beta[j])) * dzj
                     dbeta[j:j+1] -= alphas[j] * np.sign(beta[j]) / L_temp
                     # update residuals
-                    dresiduals[idx_nz] += y[idx_nz] * Xjs * \
+                    ddual_var[idx_nz] += y[idx_nz] * Xjs * \
                         (dbeta[j] - dbeta_old)
-                residuals[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
+                dual_var[idx_nz] += y[idx_nz] * Xjs * (beta[j] - beta_old)
 
     @staticmethod
     @njit
@@ -131,15 +131,15 @@ class SparseLogreg(BaseModel):
         return grad
 
     @staticmethod
-    def _get_pobj(residuals, X, beta, alphas, y):
-        pobj = (np.log1p(np.exp(- residuals)).mean() +
+    def _get_pobj(dual_var, X, beta, alphas, y):
+        pobj = (np.log1p(np.exp(- dual_var)).mean() +
                 np.abs(alphas * beta).sum())
         return pobj
 
     @staticmethod
-    def _get_dobj(residuals, X, beta, alpha, y):
+    def _get_dobj(dual_var, X, beta, alpha, y):
         n_samples = len(y)
-        theta = y * sigma(- residuals) / (alpha * n_samples)
+        theta = y * sigma(- dual_var) / (alpha * n_samples)
 
         d_norm_theta = np.max(np.abs(X.T @ theta))
         if d_norm_theta > 1:
@@ -180,7 +180,7 @@ class SparseLogreg(BaseModel):
         return dbeta
 
     @staticmethod
-    def _init_dresiduals(dbeta, X, y, sign_beta, alpha):
+    def _init_ddual_var(dbeta, X, y, sign_beta, alpha):
         return y * (X @ dbeta)
 
     def _init_g_backward(self, jac_v0):
@@ -191,45 +191,45 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     @njit
-    def _update_only_jac(Xs, y, residuals, dbeta, dresiduals,
+    def _update_only_jac(Xs, y, dual_var, dbeta, ddual_var,
                          L, alpha, sign_beta):
         n_samples, n_features = Xs.shape
         for j in range(n_features):
-            sigmar = sigma(residuals)
+            sigmar = sigma(dual_var)
             L_temp = np.sum(Xs[:, j] ** 2 * sigmar * (1 - sigmar))
             L_temp /= n_samples
 
             dbeta_old = dbeta[j]
-            dsigmar = sigmar * (1 - sigmar) * dresiduals
+            dsigmar = sigmar * (1 - sigmar) * ddual_var
             hess_fj = Xs[:, j] @ (y * dsigmar)
             dbeta[j:j+1] += - hess_fj / (L_temp * n_samples)
             dbeta[j:j+1] -= alpha * sign_beta[j] / L_temp
             # update residuals
-            dresiduals += y * Xs[:, j] * (dbeta[j] - dbeta_old)
+            ddual_var += y * Xs[:, j] * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
-            dbeta, residuals, dresiduals, L, alpha, sign_beta):
+            dbeta, dual_var, ddual_var, L, alpha, sign_beta):
         for j in range(n_features):
             # get the j-st column of X in sparse format
             Xjs = data[indptr[j]:indptr[j+1]]
             # get the non zero idices
             idx_nz = indices[indptr[j]:indptr[j+1]]
-            sigmar = sigma(residuals[idx_nz])
+            sigmar = sigma(dual_var[idx_nz])
             L_temp = np.sum(Xjs ** 2 * sigmar * (1 - sigmar))
             L_temp /= n_samples
             if L_temp != 0:
                 # store old beta j for fast update
                 dbeta_old = dbeta[j]
-                dsigmar = sigmar * (1 - sigmar) * dresiduals[idx_nz]
+                dsigmar = sigmar * (1 - sigmar) * ddual_var[idx_nz]
 
                 hess_fj = Xjs @ (y[idx_nz] * dsigmar)
                 # update of the Jacobian dbeta
                 dbeta[j] -= hess_fj / (L_temp * n_samples)
                 dbeta[j] -= alpha * sign_beta[j] / L_temp
-                dresiduals[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
+                ddual_var[idx_nz] += y[idx_nz] * Xjs * (dbeta[j] - dbeta_old)
 
     @staticmethod
     @njit
@@ -295,10 +295,10 @@ class SparseLogreg(BaseModel):
         log_alpha_max = np.log(alpha_max)
         return log_alpha_max
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, residuals,
-                    dresiduals, alpha):
+    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
+                    ddual_var, alpha):
         return(
-            norm(dresiduals.T @ dresiduals +
+            norm(ddual_var.T @ ddual_var +
                  n_samples * alpha * sign_beta @ dbeta))
 
     def _use_estimator(self, X, y, alpha, tol, max_iter):

@@ -69,9 +69,9 @@ def get_beta_jac_fast_iterdiff(
     dbeta0_new = model._init_dbeta0(mask, mask0, jac0)
     reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
-    _, residuals = model._init_beta_residuals(X, y, mask, dense)
+    _, dual_var = model._init_beta_dual_var(X, y, mask, dense)
     jac = get_only_jac(
-        model.reduce_X(X, mask), model.reduce_y(y, mask), residuals,
+        model.reduce_X(X, mask), model.reduce_y(y, mask), dual_var,
         reduce_alpha, model.sign(dense, log_alpha), dbeta=dbeta0_new,
         niter_jac=niter_jac, tol_jac=tol_jac, model=model, mask=mask,
         dense=dense, verbose=verbose, use_stop_crit=use_stop_crit)
@@ -80,7 +80,7 @@ def get_beta_jac_fast_iterdiff(
 
 
 def get_only_jac(
-        Xs, y, residuals, alpha, sign_beta, dbeta=None, niter_jac=100,
+        Xs, y, dual_var, alpha, sign_beta, dbeta=None, niter_jac=100,
         tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False,
         use_stop_crit=True):
     n_samples, n_features = Xs.shape
@@ -91,12 +91,12 @@ def get_only_jac(
     objs = []
 
     if hasattr(model, 'dual'):
-        dresiduals = model._init_dresiduals(dbeta, Xs, y, sign_beta, alpha)
+        ddual_var = model._init_ddual_var(dbeta, Xs, y, sign_beta, alpha)
         dbeta = model.dbeta
     else:
         if dbeta is None:
             dbeta = model._init_dbeta(n_features)
-        dresiduals = model._init_dresiduals(dbeta, Xs, y, sign_beta, alpha)
+        ddual_var = model._init_ddual_var(dbeta, Xs, y, sign_beta, alpha)
 
     for i in range(niter_jac):
         if verbose:
@@ -104,13 +104,13 @@ def get_only_jac(
         if is_sparse:
             model._update_only_jac_sparse(
                 Xs.data, Xs.indptr, Xs.indices, y, n_samples,
-                n_features, dbeta, residuals, dresiduals, L, alpha, sign_beta)
+                n_features, dbeta, dual_var, ddual_var, L, alpha, sign_beta)
         else:
             model._update_only_jac(
-                Xs, y, residuals, dbeta, dresiduals, L, alpha, sign_beta)
+                Xs, y, dual_var, dbeta, ddual_var, L, alpha, sign_beta)
         objs.append(
-            model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, residuals,
-                              dresiduals, alpha))
+            model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, dual_var,
+                              ddual_var, alpha))
         if use_stop_crit and i > 1:
             if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
                 break
