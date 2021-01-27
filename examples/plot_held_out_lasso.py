@@ -22,14 +22,12 @@ import matplotlib.pyplot as plt
 from celer.datasets import make_correlated_data
 from libsvmdata.datasets import fetch_libsvm
 
-from sparse_ho.models import Lasso
+from sparse_ho.models import LassoSearch
 from sparse_ho.criterion import HeldOutMSE
 from sparse_ho import Forward, ImplicitForward
-from sparse_ho.utils import Monitor
 from sparse_ho.utils_plot import discrete_cmap
-from sparse_ho.ho import grad_search
 from sparse_ho.grid_search import grid_search
-from sparse_ho.optimizers import LineSearch
+from sparse_ho.optimizers import GradientDescent
 
 
 print(__doc__)
@@ -47,10 +45,7 @@ n_samples = X.shape[0]
 idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
-print("Starting path computation...")
-n_samples = len(y[idx_train])
-alpha_max = np.max(np.abs(X[idx_train, :].T.dot(y[idx_train])))
-alpha_max /= len(idx_train)
+alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 alpha0 = alpha_max / 5
 
 n_alphas = 10
@@ -58,21 +53,17 @@ alphas = np.geomspace(alpha_max, alpha_max/1_000, n_alphas)
 tol = 1e-7
 
 ##############################################################################
-# Grid search with scikit-learn
-# -----------------------------
-
-estimator = celer.Lasso(fit_intercept=False, warm_start=True)
+# Grid search
+# -----------
 
 print('Grid search started')
 
 t0 = time.time()
-model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = Forward()
-monitor_grid_sk = Monitor()
-grid_search(
-    algo, criterion, model, X, y, None, None, monitor_grid_sk,
-    alphas=alphas, tol=tol)
+optimizer = GridSearch(alphas=alphas)  # or searcher or something else
+lasso_grid = LassoSearch(criterion, optimizer).fit(X, y)
+
+monitor_grid_sk = lasso_grid.monitor_
 objs = np.array(monitor_grid_sk.objs)
 t_sk = time.time() - t0
 
@@ -86,13 +77,12 @@ print('Grid search finished')
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward()
-monitor_grad = Monitor()
-optimizer = LineSearch(n_outer=10, tol=tol)
-grad_search(
-    algo, criterion, model, optimizer, X, y, alpha0, monitor_grad)
+optimizer = GradientDescent(n_outer=10, tol=tol)
+lasso_search = LassoSearch(criterion, optimizer, algo).fit(X, y)
+monitor_grad = lasso_search.monitor_
+# IMO alphas_ and objs_ should be directly attributes of lasso_search
 
 t_grad_search = time.time() - t0
 
@@ -103,7 +93,6 @@ print('sparse-ho finished')
 # ------------
 
 p_alphas_grad = np.array(monitor_grad.alphas) / alpha_max
-
 objs_grad = np.array(monitor_grad.objs)
 
 print('sparse-ho finished')
