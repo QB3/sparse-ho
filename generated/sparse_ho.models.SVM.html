@@ -97,23 +97,33 @@
 <h1>sparse_ho.models.SVM<a class="headerlink" href="#sparse-ho-models-svm" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.models.SVM">
-<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">SVM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logC</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">0.001</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Support vector machines.
-The optimization objective for the SVM is:
-TODO</p>
+<em class="property">class </em><code class="sig-prename descclassname">sparse_ho.models.</code><code class="sig-name descname">SVM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM" title="Permalink to this definition">¶</a></dt>
+<dd><p>The support vector Machine classifier without bias
+The optimization problem is solved in the dual:
+1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
+s.t 0 &lt;= r_i &lt;= C</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>logC</strong></dt><dd></dd>
-<dt><strong>max_iter</strong></dt><dd></dd>
-<dt><strong>tol</strong></dt><dd></dd>
-<dt><strong>TODO</strong></dt><dd></dd>
+<dt><strong>log_C</strong><span class="classifier">float</span></dt><dd><p>logarithm of the hyperparameter C</p>
+</dd>
+<dt><strong>max_iter</strong><span class="classifier">int</span></dt><dd><p>maximum number of epochs for the coordinate descent
+algorithm</p>
+</dd>
+<dt><strong>estimator: instance of ``sklearn.base.BaseEstimator``</strong></dt><dd><p>An estimator that follows the scikit-learn API.</p>
+</dd>
+<dt><strong>dual: bool</strong></dt><dd><p>True if the problem is solved in the dual</p>
+</dd>
+<dt><strong>dual_var: np.array</strong></dt><dd><p>save the last dual_var variable to enable warm_start</p>
+</dd>
+<dt><strong>ddual_var: np.array</strong></dt><dd><p>save the last jacobian of the dual_var to enable warm_start</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.models.SVM.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logC</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">tol</span><span class="o">=</span><span class="default_value">0.001</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">estimator</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_iter</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -124,37 +134,37 @@ TODO</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.SVM.__init__" title="sparse_ho.models.SVM.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(logC[, max_iter, tol])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.SVM.__init__" title="sparse_ho.models.SVM.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([estimator, max_iter])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">generalized_supp</span></code>(X, v, log_C)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_beta</span></code>(X, y, mask, dense)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dual_v</span></code>(X, y, v, log_C)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(X_train, y_train, mask, dense, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, n_samples, sign_beta, …)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(X, y, mask, dense, log_C)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(X, y, mask, dense, jac, v)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, n_samples, sign_beta, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(X, y, log_alpha)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(X, y, mask, dense, jac, v)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_X</span></code>(X, mask)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(X, y, log_alpha)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_y</span></code>(y, mask)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_X</span></code>(X, mask)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restrict_full_supp</span></code>(X, y, mask, dense, v, …)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_y</span></code>(y, mask)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sign</span></code>(x, log_C)</p></td>

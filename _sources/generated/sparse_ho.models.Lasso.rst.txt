@@ -15,6 +15,7 @@
    
       ~Lasso.__init__
       ~Lasso.compute_alpha_max
+      ~Lasso.generalized_supp
       ~Lasso.get_L
       ~Lasso.get_beta
       ~Lasso.get_full_jac_v
@@ -25,7 +26,6 @@
       ~Lasso.proj_hyperparam
       ~Lasso.reduce_X
       ~Lasso.reduce_y
-      ~Lasso.restrict_full_supp
       ~Lasso.sign
    
    

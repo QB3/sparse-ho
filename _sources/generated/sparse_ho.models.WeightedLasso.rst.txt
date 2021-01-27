@@ -14,6 +14,7 @@
    .. autosummary::
    
       ~WeightedLasso.__init__
+      ~WeightedLasso.generalized_supp
       ~WeightedLasso.get_L
       ~WeightedLasso.get_beta
       ~WeightedLasso.get_full_jac_v
@@ -24,7 +25,6 @@
       ~WeightedLasso.proj_hyperparam
       ~WeightedLasso.reduce_X
       ~WeightedLasso.reduce_y
-      ~WeightedLasso.restrict_full_supp
       ~WeightedLasso.sign
    
    

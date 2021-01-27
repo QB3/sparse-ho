@@ -14,8 +14,9 @@
    .. autosummary::
    
       ~SVM.__init__
+      ~SVM.generalized_supp
       ~SVM.get_L
-      ~SVM.get_beta
+      ~SVM.get_dual_v
       ~SVM.get_full_jac_v
       ~SVM.get_hessian
       ~SVM.get_jac_obj
@@ -23,7 +24,6 @@
       ~SVM.proj_hyperparam
       ~SVM.reduce_X
       ~SVM.reduce_y
-      ~SVM.restrict_full_supp
       ~SVM.sign
    
    
