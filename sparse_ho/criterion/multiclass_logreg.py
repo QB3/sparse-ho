@@ -22,6 +22,7 @@ class LogisticMulticlass():
     ----------
         TODO
     """
+
     def __init__(self, idx_train, idx_val, algo, idx_test=None):
         self.idx_train = idx_train
         self.idx_val = idx_val
@@ -84,7 +85,7 @@ class LogisticMulticlass():
                   (val, acc_val))
 
         monitor(
-            val, log_alpha=log_alpha.copy(), grad=grad.copy(), acc_val=acc_val,
+            val, alpha=np.exp(log_alpha), grad=grad.copy(), acc_val=acc_val,
             acc_test=acc_test)
 
         self.all_betas = all_betas
@@ -113,7 +114,7 @@ class LogisticMulticlass():
         val = cross_entropy(
             all_betas, X[self.idx_val, :], self.one_hot_code[self.idx_val, :])
         monitor(
-            val, log_alpha=log_alpha.copy(), grad=None, acc_val=acc_val,
+            val, alpha=np.exp(log_alpha), grad=None, acc_val=acc_val,
             acc_test=acc_test)
         print("Value outer %f || Accuracy validation %f || Accuracy test %f" %
               (val, acc_val, acc_test))

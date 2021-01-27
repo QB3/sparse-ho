@@ -12,7 +12,6 @@ as in scipy.optimize.
 # License: BSD (3-clause)
 
 import numpy as np
-from numpy.linalg import norm
 import matplotlib.pyplot as plt
 
 from sklearn import linear_model
@@ -50,7 +49,7 @@ idx_train = np.arange(0, n_samples // 2)
 idx_val = np.arange(n_samples // 2, n_samples)
 
 alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
-log_alpha0 = np.log(alpha_max / 10)
+alpha0 = alpha_max / 10
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1e5, warm_start=True)
@@ -60,7 +59,7 @@ estimator = linear_model.Lasso(
 objs_test = []
 
 
-def callback(val, grad, mask, dense, log_alpha):
+def callback(val, grad, mask, dense, alpha):
     # The custom quantity is added at each outer iteration:
     # here the prediction MSE on test data
     objs_test.append(mean_squared_error(X_test[:, mask] @ dense, y_test))
@@ -76,7 +75,7 @@ algo = ImplicitForward()
 monitor = Monitor(callback=callback)
 optimizer = LineSearch(n_outer=30)
 
-grad_search(algo, criterion, model, optimizer, X, y, log_alpha0, monitor)
+grad_search(algo, criterion, model, optimizer, X, y, alpha0, monitor)
 
 ##############################################################################
 # Plot results

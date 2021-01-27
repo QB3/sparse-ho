@@ -48,7 +48,7 @@ class HeldOutMSE(BaseCriterion):
         value_outer = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
         if monitor is not None:
-            monitor(value_outer, None, log_alpha=log_alpha)
+            monitor(value_outer, None, alpha=np.exp(log_alpha))
         return value_outer
 
     def get_val_grad(
@@ -75,7 +75,7 @@ class HeldOutMSE(BaseCriterion):
         self.quantity_to_warm_start = quantity_to_warm_start
         val = self.get_val_outer(X_val, y_val, mask, dense)
         if monitor is not None:
-            monitor(val, grad, mask, dense, log_alpha)
+            monitor(val, grad, mask, dense, alpha=np.exp(log_alpha))
         return val, grad
 
     def proj_hyperparam(self, model, X, y, log_alpha):
@@ -116,7 +116,7 @@ class HeldOutLogistic(BaseCriterion):
         val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
         if monitor is not None:
-            monitor(val, None, mask, dense, log_alpha)
+            monitor(val, None, mask, dense, alpha=np.exp(log_alpha))
         return val
 
     def get_val_grad(
@@ -145,7 +145,7 @@ class HeldOutLogistic(BaseCriterion):
         self.quantity_to_warm_start = quantity_to_warm_start
         val = self.get_val_outer(X_val, y_val, mask, dense)
         if monitor is not None:
-            monitor(val, grad, mask, dense, log_alpha)
+            monitor(val, grad, mask, dense, alpha=np.exp(log_alpha))
 
         return val, grad
 
@@ -223,7 +223,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         val = self.get_val_outer(X_val, y_val, mask, dense)
 
         if monitor is not None:
-            monitor(val, grad, mask, dense, log_alpha)
+            monitor(val, grad, mask, dense, alpha=np.exp(log_alpha))
 
         return val, grad
 

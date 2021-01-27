@@ -8,7 +8,6 @@ from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
 from sparse_ho.models import Lasso
-from sparse_ho import Forward
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, CrossVal, HeldOutLogistic)
 from sparse_ho.grid_search import grid_search
@@ -30,9 +29,8 @@ idx_val = np.arange(50, 100)
 
 alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 
-log_alphas = np.log(alpha_max * np.geomspace(1, 0.1))
-log_alpha_max = np.log(alpha_max)
-log_alpha_min = np.log(0.0001 * alpha_max)
+alphas = alpha_max * np.geomspace(1, 0.1)
+alpha_min = 0.0001 * alpha_max
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=10000, warm_start=True)
@@ -53,8 +51,6 @@ models["lasso_custom"] = Lasso(estimator=celer.Lasso(
 def test_cross_val_criterion(model_name, XX):
     model = models[model_name]
     alpha_min = alpha_max / 10
-    log_alpha_max = np.log(alpha_max)
-    log_alpha_min = np.log(alpha_min)
     max_iter = 10000
     n_alphas = 10
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
@@ -65,9 +61,8 @@ def test_cross_val_criterion(model_name, XX):
     else:
         sub_crit = HeldOutLogistic(None, None)
     criterion = CrossVal(sub_crit, cv=kf)
-    algo = Forward()
     grid_search(
-        algo, criterion, model, XX, y, log_alpha_min, log_alpha_max,
+        criterion, model, XX, y, alpha_min, alpha_max,
         monitor_grid, max_evals=n_alphas, tol=tol)
 
     if model_name.startswith("lasso"):
@@ -98,47 +93,43 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(estimator=estimator)
     criterion = HeldOutMSE(idx_train, idx_train)
-    algo = Forward()
-    log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+    alpha_opt_grid, _ = grid_search(
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = HeldOutMSE(idx_train, idx_val)
-    algo = Forward()
-    log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+    alpha_opt_random, _ = grid_search(
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
-    np.testing.assert_allclose(monitor_random.log_alphas[
-        np.argmin(monitor_random.objs)], log_alpha_opt_random)
-    np.testing.assert_allclose(monitor_grid.log_alphas[
-        np.argmin(monitor_grid.objs)], log_alpha_opt_grid)
+    np.testing.assert_allclose(monitor_random.alphas[
+        np.argmin(monitor_random.objs)], alpha_opt_random)
+    np.testing.assert_allclose(monitor_grid.alphas[
+        np.argmin(monitor_grid.objs)], alpha_opt_grid)
 
     monitor_grid = Monitor()
     model = Lasso(estimator=estimator)
 
     criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
-    algo = Forward()
-    log_alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+    alpha_opt_grid, _ = grid_search(
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
-    algo = Forward()
-    log_alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max,
+    alpha_opt_random, _ = grid_search(
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
-    np.testing.assert_allclose(monitor_random.log_alphas[
-        np.argmin(monitor_random.objs)], log_alpha_opt_random)
-    np.testing.assert_allclose(monitor_grid.log_alphas[
-        np.argmin(monitor_grid.objs)], log_alpha_opt_grid)
+    np.testing.assert_allclose(monitor_random.alphas[
+        np.argmin(monitor_random.objs)], alpha_opt_random)
+    np.testing.assert_allclose(monitor_grid.alphas[
+        np.argmin(monitor_grid.objs)], alpha_opt_grid)
 
 
 if __name__ == '__main__':

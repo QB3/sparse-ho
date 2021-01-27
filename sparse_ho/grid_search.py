@@ -8,67 +8,58 @@ except Exception:
 
 
 def grid_search(
-        algo, criterion, model, X, y, log_alpha_min, log_alpha_max, monitor,
+        criterion, model, X, y, alpha_min, alpha_max, monitor,
         max_evals=50, tol=1e-5, nb_hyperparam=1,
-        beta_star=None, random_state=42, samp="grid", log_alphas=None,
+        beta_star=None, random_state=42, samp="grid", alphas=None,
         t_max=100_000, reverse=True):
-    if log_alphas is None and samp == "grid":
+    if alphas is None and samp == "grid":
         if reverse:
-            log_alphas = np.linspace(log_alpha_max, log_alpha_min, max_evals)
+            alphas = np.geomspace(alpha_max, alpha_min, max_evals)
         else:
-            log_alphas = np.linspace(log_alpha_min, log_alpha_max, max_evals)
+            alphas = np.linspace(alpha_min, alpha_max, max_evals)
         if nb_hyperparam == 2:
-            log_alphas = np.array(np.meshgrid(
-                log_alphas, log_alphas)).T.reshape(-1, 2)
+            alphas = np.array(np.meshgrid(
+                alphas, alphas)).T.reshape(-1, 2)
 
     elif samp == "random":
         rng = np.random.RandomState(random_state)
-        log_alphas = rng.uniform(
-            log_alpha_min, log_alpha_max, size=max_evals)
+        # sample uniformly on log scale
+        alphas = np.exp(rng.uniform(
+            np.log(alpha_min), np.log(alpha_max), size=max_evals))
         if reverse:
-            log_alphas = -np.sort(-log_alphas)
+            alphas = np.sort(alphas)[::-1]
         else:
-            log_alphas = np.sort(log_alphas)
+            alphas = np.sort(alphas)
         if nb_hyperparam == 2:
-            log_alphas2 = rng.uniform(
-                log_alpha_min, log_alpha_max, size=max_evals)
+            alphas2 = np.exp(rng.uniform(
+                np.log(alpha_min), np.log(alpha_max), size=max_evals))
             if reverse:
-                log_alphas2 = -np.sort(-log_alphas2)
+                alphas2 = np.sort(alphas2)[::-1]
             else:
-                log_alphas2 = np.sort(log_alphas2)
-            log_alphas = np.array(np.meshgrid(
-                log_alphas, log_alphas2)).T.reshape(-1, 2)
+                alphas2 = np.sort(alphas2)
+            alphas = np.array(np.meshgrid(
+                alphas, alphas2)).T.reshape(-1, 2)
 
     elif samp == "lhs":
-        xlimits = np.array([[log_alpha_min, log_alpha_max]])
+        xlimits = np.array([[np.log(alpha_min), np.log(alpha_max)]])
         sampling = LHS(xlimits=xlimits)
         num = max_evals
-        log_alphas = sampling(num)
-        log_alphas[log_alphas < log_alpha_min] = log_alpha_min
-        log_alphas[log_alphas > log_alpha_max] = log_alpha_max
+        alphas = np.exp(sampling(num))
+        alphas = np.clip(alphas, alpha_min, alpha_max)
     min_g_func = np.inf
-    log_alpha_opt = log_alphas[0]
+    alpha_opt = alphas[0]
 
-    # if nb_hyperparam == 2:
-    #     n_try = max_evals ** 2
-    # else:
-    #     n_try = log_alphas.shape[0]
-
-    for i, log_alpha in enumerate(log_alphas):
-        print("Iteration %i / %i" % (i+1, len(log_alphas)))
-        # try:
-        #     log_alpha = log_alphas[i, :]
-        # except Exception:
-        #     log_alpha = log_alphas[i]
+    for i, alpha in enumerate(alphas):
+        print("Iteration %i / %i" % (i+1, len(alphas)))
         if samp == "lhs":
-            log_alpha = log_alpha[0]
+            alpha = alpha[0]
         g_func = criterion.get_val(
-            model, X, y, log_alpha, monitor, tol=tol)
+            model, X, y, np.log(alpha), monitor, tol=tol)
 
         if g_func < min_g_func:
             min_g_func = g_func
-            log_alpha_opt = log_alpha
+            alpha_opt = alpha
 
         if monitor.times[-1] > t_max:
             break
-    return log_alpha_opt, min_g_func
+    return alpha_opt, min_g_func
