@@ -171,7 +171,7 @@ class SVM(BaseModel):
         sign[self.dual_var == C] = 1.0
         ddual_var = np.zeros(X.shape[0])
         self.ddual_var = ddual_var
-        if np.sum(sign == 1.0) != 0:
+        if np.any(sign == 1.0):
             ddual_var[sign == 1.0] = np.repeat(C, (sign == 1).sum())
         if is_sparse:
             self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))
@@ -296,7 +296,7 @@ class SVM(BaseModel):
             dryX = ddual_var[full_supp].T @ (ys[full_supp] *
                                              Xs[full_supp, :].T).T
         quadratic_term = dryX.T @ dryX
-        if maskC.sum() != 0:
+        if np.any(maskC):
             if issparse(Xs):
                 linear_term = dryX.T @ (Xs[maskC, :].T).multiply(ys[maskC]) @ \
                     dual_var[maskC]
