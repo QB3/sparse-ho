@@ -232,7 +232,7 @@ class SVR(BaseModel):
         sign[dual_var == 0.0] = -1.0
         sign[dual_var == C] = 1.0
         ddual_var = np.zeros((2 * X.shape[0], 2))
-        if np.sum(sign == 1.0) != 0:
+        if np.any(sign == 1.0):
             ddual_var[sign == 1.0, 0] = C
             ddual_var[sign == 1.0, 1] = 0
         self.ddual_var = ddual_var
@@ -354,8 +354,7 @@ class SVR(BaseModel):
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_hyperparam):
-        return np.array([np.clip(log_hyperparam[0], -16, 5),
-                        np.clip(log_hyperparam[1], -16, 2)])
+        return np.clip(log_hyperparam, -16, [5, 2])
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
                     dbeta, dual_var, ddual_var, hyperparam):
