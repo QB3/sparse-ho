@@ -8,6 +8,33 @@ from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import proj_box_svm, ind_box
 
 
+@njit
+def _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign):
+    dF = sign * np.array([np.sum(dbeta[:, 0].T * X[j1, :]),
+                          np.sum(dbeta[:, 1].T * X[j1, :])])
+    ddual_var_old = ddual_var[j2, :].copy()
+    dzj = ddual_var[j2, :] - dF / L[j1]
+    ddual_var[j2, :] = ind_box(zj, C) * dzj
+    ddual_var[j2, 0] += C * (C <= zj)
+    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
+    dbeta[:, 0] += sign * (ddual_var[j2, 0] -
+                           ddual_var_old[0]) * X[j1, :]
+    dbeta[:, 1] += sign * (ddual_var[j2, 1] -
+                           ddual_var_old[1]) * X[j1, :]
+
+
+@njit
+def _update_beta_jac_bcd_aux(X, y, epsilon, beta, dbeta, dual_var, ddual_var,
+                             L, C, j1, j2, sign, compute_jac):
+    F = sign * np.sum(beta * X[j1, :]) + epsilon - sign * y[j1]
+    dual_var_old = dual_var[j2]
+    zj = dual_var[j2] - F / L[j1]
+    dual_var[j2] = proj_box_svm(zj, C)
+    beta += sign * ((dual_var[j2] - dual_var_old) * X[j1, :])
+    if compute_jac:
+        _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign)
+
+
 class SVR(BaseModel):
     """The support vector regression without bias
     The optimization problem is solved in the dual.
@@ -83,46 +110,13 @@ class SVR(BaseModel):
 
         for j in range(2 * n_samples):
             if j < n_samples:
-                F = np.sum(beta * X[j, :]) + epsilon - y[j]
-                dual_var_old = dual_var[j]
-                zj = dual_var[j] - F / L[j]
-                dual_var[j] = proj_box_svm(zj, C)
-                beta += (dual_var[j] - dual_var_old) * X[j, :]
-                if compute_jac:
-                    dF = np.array([np.sum(dbeta[:, 0].T * X[j, :]),
-                                   np.sum(dbeta[:, 1].T * X[j, :])])
-                    ddual_var_old = ddual_var[j, :].copy()
-                    dzj = ddual_var[j, :] - dF / L[j]
-                    ddual_var[j, :] = ind_box(zj, C) * dzj
-                    ddual_var[j, 0] += C * (C <= zj)
-                    ddual_var[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[:, 0] += (ddual_var[j, 0] -
-                                    ddual_var_old[0]) * X[j, :]
-                    dbeta[:, 1] += (ddual_var[j, 1] -
-                                    ddual_var_old[1]) * X[j, :]
-            if j >= n_samples:
-                F = - np.sum(beta * X[j - n_samples, :]) + \
-                    epsilon + y[j - n_samples]
-                dual_var_old = dual_var[j]
-                zj = dual_var[j] - F / L[j - n_samples]
-                dual_var[j] = proj_box_svm(zj, C)
-                beta -= (dual_var[j] - dual_var_old) * X[j - n_samples, :]
+                j1, j2, sign = j, j, 1
+            else:  # j >= n_samples
+                j1, j2, sign = j - n_samples, j, -1
 
-                if compute_jac:
-                    dF = np.array([- np.sum(dbeta[:, 0].T *
-                                   X[j - n_samples, :]),
-                                   - np.sum(dbeta[:, 1].T *
-                                   X[j - n_samples, :])])
-                    ddual_var_old = ddual_var[j, :].copy()
-                    dzj = ddual_var[j, :] - dF / L[j - n_samples]
-                    ddual_var[j, :] = ind_box(zj, C) * dzj
-                    ddual_var[j, 0] += C * (C <= zj)
-                    ddual_var[j, 1] -= epsilon * ind_box(zj, C) / \
-                        L[j - n_samples]
-                    dbeta[:, 0] -= (ddual_var[j, 0] - ddual_var_old[0]) * \
-                        X[j - n_samples, :]
-                    dbeta[:, 1] -= (ddual_var[j, 1] - ddual_var_old[1]) * \
-                        X[j - n_samples, :]
+            _update_beta_jac_bcd_aux(X, y, epsilon, beta, dbeta, dual_var,
+                                     ddual_var, L, C, j1, j2, sign,
+                                     compute_jac)
 
     @staticmethod
     @njit
@@ -133,6 +127,7 @@ class SVR(BaseModel):
         epsilon = hyperparam[1]
         for j in range(2 * n_samples):
             if j < n_samples:
+                # XXX : use an aux function
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j]:indptr[j+1]]
                 # get the non zero indices
@@ -236,8 +231,8 @@ class SVR(BaseModel):
         sign[dual_var == C] = 1.0
         ddual_var = np.zeros((2 * X.shape[0], 2))
         if np.sum(sign == 1.0) != 0:
-            ddual_var[sign == 1.0, 0] = np.repeat(C, (sign == 1).sum())
-            ddual_var[sign == 1.0, 1] = np.repeat(0, (sign == 1).sum())
+            ddual_var[sign == 1.0, 0] = C
+            ddual_var[sign == 1.0, 1] = 0
         self.ddual_var = ddual_var
         self.dbeta = X.T @ (
             ddual_var[0:n_samples, :] -
@@ -256,6 +251,7 @@ class SVR(BaseModel):
         sign[dual_var == C] = 1.0
         for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
             if j < n_samples:
+                # XXX reuse _compute_jac_aux function
                 dF = np.array([np.sum(dbeta[:, 0].T * X[j, :]),
                               np.sum(dbeta[:, 1].T * X[j, :])])
                 ddual_var_old = ddual_var[j, :].copy()
@@ -291,6 +287,7 @@ class SVR(BaseModel):
 
         for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
             if j < n_samples:
+                # XXX use aux function
                 # get the i-st row of X in sparse format
                 Xis = data[indptr[j]:indptr[j+1]]
                 # get the non zero indices
@@ -392,6 +389,8 @@ class SVR(BaseModel):
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_hyperparam):
+        # XXX this function operates inplace while returning the
+        # update value. It's confusing
         if log_hyperparam[0] < -16.0:
             log_hyperparam[0] = -16.0
         elif log_hyperparam[0] > 2:
