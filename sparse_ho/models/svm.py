@@ -283,11 +283,7 @@ class SVM(BaseModel):
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
-        if log_alpha < -16.0:
-            log_alpha = -16.0
-        elif log_alpha > 4:
-            log_alpha = 4
-        return log_alpha
+        return np.clip(log_alpha, -16, 4)
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
                     ddual_var, C):

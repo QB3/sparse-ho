@@ -35,6 +35,49 @@ def _update_beta_jac_bcd_aux(X, y, epsilon, beta, dbeta, dual_var, ddual_var,
         _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign)
 
 
+@njit
+def _compute_jac_aux_sparse(
+        data, indptr, indices, epsilon, dbeta, ddual_var, zj, L, C,
+        j1, j2, sign):
+    # get the i-st row of X in sparse format
+    Xjs = data[indptr[j1]:indptr[j1+1]]
+    # get the non zero indices
+    idx_nz = indices[indptr[j1]:indptr[j1+1]]
+
+    dF = sign * np.array([np.sum(dbeta[idx_nz, 0].T * Xjs),
+                          np.sum(dbeta[idx_nz, 1].T * Xjs)])
+    ddual_var_old = ddual_var[j2, :].copy()
+    dzj = ddual_var[j2, :] - dF / L[j1]
+    ddual_var[j2, :] = ind_box(zj, C) * dzj
+    ddual_var[j2, 0] += C * (C <= zj)
+    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
+    dbeta[idx_nz, 0] += sign * (ddual_var[j2, 0] -
+                                ddual_var_old[0]) * Xjs
+    dbeta[idx_nz, 1] += sign * (ddual_var[j2, 1] -
+                                ddual_var_old[1]) * Xjs
+
+
+@njit
+def _update_beta_jac_bcd_aux_sparse(data, indptr, indices, y, epsilon, beta,
+                                    dbeta, dual_var, ddual_var,
+                                    L, C, j1, j2, sign, compute_jac):
+
+    # get the i-st row of X in sparse format
+    Xjs = data[indptr[j1]:indptr[j1+1]]
+    # get the non zero indices
+    idx_nz = indices[indptr[j1]:indptr[j1+1]]
+
+    F = sign * np.sum(beta[idx_nz] * Xjs) + epsilon - sign * y[j1]
+    dual_var_old = dual_var[j2]
+    zj = dual_var[j2] - F / L[j1]
+    dual_var[j2] = proj_box_svm(zj, C)
+    beta[idx_nz] += sign * (dual_var[j2] - dual_var_old) * Xjs
+    if compute_jac:
+        _compute_jac_aux_sparse(
+            data, indptr, indices, epsilon, dbeta, ddual_var, zj,
+            L, C, j1, j2, sign)
+
+
 class SVR(BaseModel):
     """The support vector regression without bias
     The optimization problem is solved in the dual.
@@ -127,54 +170,13 @@ class SVR(BaseModel):
         epsilon = hyperparam[1]
         for j in range(2 * n_samples):
             if j < n_samples:
-                # XXX : use an aux function
-                # get the i-st row of X in sparse format
-                Xis = data[indptr[j]:indptr[j+1]]
-                # get the non zero indices
-                idx_nz = indices[indptr[j]:indptr[j+1]]
-                F = np.sum(beta[idx_nz] * Xis) + epsilon - y[j]
-                dual_var_old = dual_var[j]
-                zj = dual_var[j] - F / L[j]
-                dual_var[j] = proj_box_svm(zj, C)
-                beta[idx_nz] += (dual_var[j] - dual_var_old) * Xis
+                j1, j2, sign = j, j, 1
+            else:
+                j1, j2, sign = j - n_samples, j, -1
 
-                if compute_jac:
-                    dF = np.array([np.sum(dbeta[idx_nz, 0].T * Xis),
-                                   np.sum(dbeta[idx_nz, 1].T * Xis)])
-                    ddual_var_old = ddual_var[j, :].copy()
-                    dzj = ddual_var[j, :] - dF / L[j]
-                    ddual_var[j, :] = ind_box(zj, C) * dzj
-                    ddual_var[j, 0] += C * (C <= zj)
-                    ddual_var[j, 1] -= epsilon * ind_box(zj, C) / L[j]
-                    dbeta[idx_nz, 0] += (ddual_var[j, 0] -
-                                         ddual_var_old[0]) * Xis
-                    dbeta[idx_nz, 1] += (ddual_var[j, 1] -
-                                         ddual_var_old[1]) * Xis
-            if j >= n_samples:
-                # get the i-st row of X in sparse format
-                Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
-                # get the non zero indices
-                idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
-                F = - np.sum(beta[idx_nz] * Xis) + \
-                    epsilon + y[j - n_samples]
-                dual_var_old = dual_var[j]
-                zj = dual_var[j] - F / L[j - n_samples]
-                dual_var[j] = proj_box_svm(zj, C)
-                beta[idx_nz] -= (dual_var[j] - dual_var_old) * Xis
-
-                if compute_jac:
-                    dF = np.array([- np.sum(dbeta[idx_nz, 0].T * Xis),
-                                   - np.sum(dbeta[idx_nz, 1].T * Xis)])
-                    ddual_var_old = ddual_var[j, :].copy()
-                    dzj = ddual_var[j, :] - dF / L[j - n_samples]
-                    ddual_var[j, :] = ind_box(zj, C) * dzj
-                    ddual_var[j, 0] += C * (C <= zj)
-                    ddual_var[j, 1] -= epsilon * ind_box(zj, C) / \
-                        L[j - n_samples]
-                    dbeta[idx_nz, 0] -= (ddual_var[j, 0] -
-                                         ddual_var_old[0]) * Xis
-                    dbeta[idx_nz, 1] -= (ddual_var[j, 1] -
-                                         ddual_var_old[1]) * Xis
+            _update_beta_jac_bcd_aux_sparse(data, indptr, indices, y, epsilon,
+                                            beta, dbeta, dual_var, ddual_var,
+                                            L, C, j1, j2, sign, compute_jac)
 
     def _get_pobj0(self, dual_var, beta, hyperparam, y):
         n_samples = len(y)
@@ -246,31 +248,17 @@ class SVR(BaseModel):
         n_samples = L.shape[0]
         C = hyperparam[0]
         epsilon = hyperparam[1]
-        sign = np.zeros(dual_var.shape[0])
-        sign[dual_var == 0.0] = -1.0
-        sign[dual_var == C] = 1.0
-        for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
+        gen_supp = np.zeros(dual_var.shape[0])
+        gen_supp[dual_var == 0.0] = -1.0
+        gen_supp[dual_var == C] = 1.0
+        for j in np.arange(0, (2 * n_samples))[gen_supp == 0.0]:
             if j < n_samples:
-                # XXX reuse _compute_jac_aux function
-                dF = np.array([np.sum(dbeta[:, 0].T * X[j, :]),
-                              np.sum(dbeta[:, 1].T * X[j, :])])
-                ddual_var_old = ddual_var[j, :].copy()
-                dzj = ddual_var[j, :] - dF / L[j]
-                ddual_var[j, :] = dzj
-                ddual_var[j, 1] -= epsilon / L[j]
-                dbeta[:, 0] += (ddual_var[j, 0] - ddual_var_old[0]) * X[j, :]
-                dbeta[:, 1] += (ddual_var[j, 1] - ddual_var_old[1]) * X[j, :]
-            if j >= n_samples:
-                dF = np.array([- np.sum(dbeta[:, 0].T * X[j - n_samples, :]),
-                               - np.sum(dbeta[:, 1].T * X[j - n_samples, :])])
-                ddual_var_old = ddual_var[j, :].copy()
-                dzj = ddual_var[j, :] - dF / L[j - n_samples]
-                ddual_var[j, :] = dzj
-                ddual_var[j, 1] -= epsilon / L[j - n_samples]
-                dbeta[:, 0] -= (ddual_var[j, 0] - ddual_var_old[0]) * \
-                    X[j - n_samples, :]
-                dbeta[:, 1] -= (ddual_var[j, 1] - ddual_var_old[1]) * \
-                    X[j - n_samples, :]
+                j1, j2, sign = j, j, 1
+            else:
+                j1, j2, sign = j - n_samples, j, -1
+
+            _compute_jac_aux(
+                X, epsilon, dbeta, ddual_var, dual_var[j2], L, C, j1, j2, sign)
 
     @staticmethod
     @njit
@@ -281,42 +269,19 @@ class SVR(BaseModel):
         C = hyperparam[0]
         epsilon = hyperparam[1]
         # non_zeros = np.where(L != 0)[0]
-        sign = np.zeros(dual_var.shape[0])
-        sign[dual_var == 0.0] = -1.0
-        sign[dual_var == C] = 1.0
+        gen_supp = np.zeros(dual_var.shape[0])
+        gen_supp[dual_var == 0.0] = -1.0
+        gen_supp[dual_var == C] = 1.0
 
-        for j in np.arange(0, (2 * n_samples))[sign == 0.0]:
+        for j in np.arange(0, (2 * n_samples))[gen_supp == 0.0]:
             if j < n_samples:
-                # XXX use aux function
-                # get the i-st row of X in sparse format
-                Xis = data[indptr[j]:indptr[j+1]]
-                # get the non zero indices
-                idx_nz = indices[indptr[j]:indptr[j+1]]
-                dF = np.array([np.sum(dbeta[idx_nz, 0].T * Xis),
-                               np.sum(dbeta[idx_nz, 1].T * Xis)])
-                ddual_var_old = ddual_var[j, :].copy()
-                dzj = ddual_var[j, :] - dF / L[j]
-                ddual_var[j, :] = dzj
-                ddual_var[j, 1] -= epsilon / L[j]
-                dbeta[idx_nz, 0] += (ddual_var[j, 0] -
-                                     ddual_var_old[0]) * Xis
-                dbeta[idx_nz, 1] += (ddual_var[j, 1] -
-                                     ddual_var_old[1]) * Xis
-            if j >= n_samples:
-                # get the i-st row of X in sparse format
-                Xis = data[indptr[j-n_samples]:indptr[j-n_samples+1]]
-                # get the non zero indices
-                idx_nz = indices[indptr[j-n_samples]:indptr[j-n_samples+1]]
-                dF = np.array([- np.sum(dbeta[idx_nz, 0].T * Xis),
-                               - np.sum(dbeta[idx_nz, 1].T * Xis)])
-                ddual_var_old = ddual_var[j, :].copy()
-                dzj = ddual_var[j, :] - dF / L[j - n_samples]
-                ddual_var[j, :] = dzj
-                ddual_var[j, 1] -= epsilon / L[j - n_samples]
-                dbeta[idx_nz, 0] -= (ddual_var[j, 0] - ddual_var_old[0]) * \
-                    Xis
-                dbeta[idx_nz, 1] -= (ddual_var[j, 1] - ddual_var_old[1]) * \
-                    Xis
+                j1, j2, sign = j, j, 1
+            else:
+                j1, j2, sign = j - n_samples, j, -1
+
+            _compute_jac_aux_sparse(
+                data, indptr, indices, epsilon, dbeta, ddual_var, dual_var[j2],
+                L, C, j1, j2, sign)
 
     @staticmethod
     @njit
@@ -389,19 +354,8 @@ class SVR(BaseModel):
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_hyperparam):
-        # XXX this function operates inplace while returning the
-        # update value. It's confusing
-        if log_hyperparam[0] < -16.0:
-            log_hyperparam[0] = -16.0
-        elif log_hyperparam[0] > 2:
-            log_hyperparam[0] = 5
-
-        if log_hyperparam[1] < -16.0:
-            log_hyperparam[1] = -16.0
-        elif log_hyperparam[1] > 2:
-            log_hyperparam[1] = 2
-
-        return log_hyperparam
+        return np.array([np.clip(log_hyperparam[0], -16, 5),
+                        np.clip(log_hyperparam[1], -16, 2)])
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
                     dbeta, dual_var, ddual_var, hyperparam):
