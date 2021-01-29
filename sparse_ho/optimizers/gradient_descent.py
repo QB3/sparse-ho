@@ -22,8 +22,7 @@ class GradientDescent(BaseOptimizer):
     """
     def __init__(
             self, n_outer=100, step_size=None, p_grad0=1,
-            verbose=False, tol=1e-5,
-            t_max=10_000):
+            verbose=False, tol=1e-5, tol_decrease=None, t_max=10_000):
         self.n_outer = n_outer
         self.step_size = step_size
         self.verbose = verbose
@@ -31,6 +30,7 @@ class GradientDescent(BaseOptimizer):
         self.t_max = t_max
         self.p_grad0 = p_grad0
         self.has_gone_up = False
+        self.tol_decrease = tol_decrease
 
     def _grad_search(
             self, _get_val_grad, proj_hyperparam, log_alpha0, monitor):
@@ -40,9 +40,14 @@ class GradientDescent(BaseOptimizer):
         else:
             log_alphak = log_alpha0
 
-        for i in range(self.n_outer):
+        if self.tol_decrease is not None:
+            tols = np.geomspace(1e-2, self.tol, num=self.n_outer)
+        else:
+            tols = np.ones(self.n_outer) * self.tol
+
+        for i, tol in enumerate(tols):
             value_outer, grad_outer = _get_val_grad(
-                log_alphak, self.tol, monitor)
+                log_alphak, tol, monitor)
             if (self.step_size is None or i < 20) and not self.has_gone_up:
                 self.step_size = self.p_grad0 / (
                     np.linalg.norm(grad_outer) + 1e-12)

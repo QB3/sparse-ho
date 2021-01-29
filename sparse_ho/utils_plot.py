@@ -46,6 +46,20 @@ def discrete_cmap(N, base_cmap=None):
     return base.from_list(cmap_name, color_list, N)
 
 
+def discrete_color(N, base_cmap=None):
+    """Create an N-bin discrete colormap from the specified input map"""
+
+    # Note that if base_cmap is a string or None, you can simply do
+    #    return plt.cm.get_cmap(base_cmap, N)
+    # The following works for string, None, or a colormap instance:
+
+    base = plt.cm.get_cmap(base_cmap)
+    color_list = base(np.linspace(1/3, 1, N))
+    cmap_name = base.name + str(N)
+    cmap = base.from_list(cmap_name, color_list, N)
+    return cmap(np.linspace(0, 1, N))
+
+
 def round_down(n, decimals=0):
     multiplier = 10 ** decimals
     return np.floor(n * multiplier) / multiplier

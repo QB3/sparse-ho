@@ -75,8 +75,8 @@ cba2.set_label(r"$\mathcal{C}(\beta^{(\lambda)})$")
 axarr[0].set_ylabel(r"$\mathcal{C}(\beta^{(\lambda)})$")
 axarr[0].set_ylabel("$\lambda_2 - \lambda_{\max}$")
 
-save_fig = True
-# save_fig = False
+# save_fig = True
+save_fig = False
 
 if save_fig:
     fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
