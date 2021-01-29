@@ -100,8 +100,12 @@ class ElasticNet(BaseModel):
         sign_beta = np.sign(beta)
         n_samples, n_features = X.shape
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
-            grad -= (v_t_jac[j]) * alpha * sign_beta[j] / L[j]
-            v_t_jac[j] *= np.abs(sign_beta[j])
+            grad[0] -= (v_t_jac[j]) * alphas[0] * \
+                    sign_beta[j] / L[j] / (1 + (alphas[1] / L[j]))
+            grad[1] -= (v_t_jac[j]) * (alphas[1] / L[j] * beta[j]
+                    ) / (1 + (alphas[1] / L[j]))
+            v_t_jac[j] *= (1 / (1 + alphas[1] / L[j])) * \
+                    np.abs(np.sign(beta[j]))
             v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X[:, j] @ X
 
         return grad
@@ -162,7 +166,7 @@ class ElasticNet(BaseModel):
 
     def _init_g_backward(self, jac_v0):
         if jac_v0 is None:
-            return 0.0
+            return [0.0, 0.0]
         else:
             return jac_v0
 
