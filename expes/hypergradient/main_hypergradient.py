@@ -19,8 +19,7 @@ tol = 1e-12
 methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
-# dataset_names = ["real-sim", "rcv1_train", "news20"]
-dataset_names = ["colon"]
+dataset_names = ["real-sim", "rcv1_train", "news20"]
 rep = 10
 
 dict_maxits = {}
