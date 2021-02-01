@@ -31,6 +31,7 @@ class Forward():
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:
             jac_v = None
+
         return mask, dense, jac_v, jac
 
 
@@ -103,15 +104,14 @@ def get_beta_jac_iterdiff(
         alphas = np.ones(n_features) * alpha
     ############################################
     # warm start for beta
-    beta, r = model._init_beta_r(X, y, mask0, dense0)
-
+    beta, dual_var = model._init_beta_dual_var(X, y, mask0, dense0)
     ############################################
     # warm start for dbeta
-    dbeta, dr = model._init_dbeta_dr(
+    dbeta, ddual_var = model._init_dbeta_ddual_var(
         X, y, mask0=mask0, dense0=dense0, jac0=jac0, compute_jac=compute_jac)
 
     # store the values of the objective
-    pobj0 = model._get_pobj0(r, np.zeros(X.shape[1]), alphas, y)
+    pobj0 = model._get_pobj0(dual_var, np.zeros(X.shape[1]), alphas, y)
     pobj = []
 
     ############################################
@@ -128,13 +128,14 @@ def get_beta_jac_iterdiff(
         if is_sparse:
             model._update_beta_jac_bcd_sparse(
                 X.data, X.indptr, X.indices, y, n_samples, n_features, beta,
-                dbeta, r, dr, alphas, L, compute_jac=compute_jac)
+                dbeta, dual_var, ddual_var, alphas, L,
+                compute_jac=compute_jac)
         else:
             model._update_beta_jac_bcd(
-                X, y, beta, dbeta, r, dr, alphas, L, compute_jac=compute_jac)
+                X, y, beta, dbeta, dual_var, ddual_var, alphas,
+                L, compute_jac=compute_jac)
 
-        pobj.append(model._get_pobj(r, X, beta, alphas, y))
-        assert pobj[-1] >= 0
+        pobj.append(model._get_pobj(dual_var, X, beta, alphas, y))
 
         if i > 1:
             if verbose:
@@ -142,7 +143,7 @@ def get_beta_jac_iterdiff(
 
         if use_stop_crit and i % gap_freq == 0 and i > 0:
             if hasattr(model, "_get_dobj"):
-                dobj = model._get_dobj(r, X, beta, alpha, y)
+                dobj = model._get_dobj(dual_var, X, beta, alpha, y)
                 dual_gap = pobj[-1] - dobj
                 if verbose:
                     print("dual gap %.2e" % dual_gap)
@@ -162,12 +163,13 @@ def get_beta_jac_iterdiff(
     else:
         if verbose:
             print('did not converge !')
-
     mask = beta != 0
     dense = beta[mask]
-
     jac = model._get_jac(dbeta, mask)
-
+    if hasattr(model, 'dual'):
+        model.dual_var = dual_var
+        if compute_jac:
+            model.ddual_var = ddual_var
     if save_iterates:
         return np.array(list_beta), np.array(list_jac)
     if return_all:

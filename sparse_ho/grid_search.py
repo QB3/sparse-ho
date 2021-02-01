@@ -8,7 +8,7 @@ except Exception:
 
 
 def grid_search(
-        algo, criterion, model, X, y, alpha_min, alpha_max, monitor,
+        criterion, model, X, y, alpha_min, alpha_max, monitor,
         max_evals=50, tol=1e-5, nb_hyperparam=1,
         beta_star=None, random_state=42, samp="grid", alphas=None,
         t_max=100_000, reverse=True):

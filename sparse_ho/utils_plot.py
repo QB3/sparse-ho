@@ -64,6 +64,9 @@ def round_down(n, decimals=0):
     multiplier = 10 ** decimals
     return np.floor(n * multiplier) / multiplier
 
+def round_up(n, decimals=0):
+  multiplier = 10 ** decimals
+  return np.ceil(n * multiplier) / multiplier
 
 dict_color_2Dplot = {
     'implicit_forward': 'Greens',
@@ -96,7 +99,6 @@ dict_method['hyperopt'] = 'Random-search'
 dict_method['backward'] = 'B. Iterdiff.'
 
 dict_markers = {}
-# dict_markers["forward"] = 'o'
 dict_markers["implicit_forward"] = 'X'
 dict_markers["implicit_forward_approx"] = 'x'
 dict_markers['implicit'] = 'v'

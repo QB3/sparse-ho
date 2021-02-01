@@ -35,6 +35,11 @@ def grad_search(
         initial value of the hyperparameter alpha.
     monitor: instance of Monitor
         used to store the value of the cross-validation function.
+
+
+    Returns
+    -------
+    XXX missing
     """
 
     def _get_val_grad(log_alpha, tol, monitor):
@@ -83,6 +88,10 @@ def hyperopt_wrapper(
         method for hyperopt, 'random' or 'bayesian'
     size_space: int (default=1)
         size of the hyperparameter space
+
+    Returns
+    -------
+    XXX missing
     """
 
     def objective(log_alpha):

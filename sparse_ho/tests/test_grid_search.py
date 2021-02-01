@@ -8,7 +8,6 @@ from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
 from sparse_ho.models import Lasso
-from sparse_ho import Forward
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, CrossVal, HeldOutLogistic)
 from sparse_ho.grid_search import grid_search
@@ -62,9 +61,8 @@ def test_cross_val_criterion(model_name, XX):
     else:
         sub_crit = HeldOutLogistic(None, None)
     criterion = CrossVal(sub_crit, cv=kf)
-    algo = Forward()
     grid_search(
-        algo, criterion, model, XX, y, alpha_min, alpha_max,
+        criterion, model, XX, y, alpha_min, alpha_max,
         monitor_grid, max_evals=n_alphas, tol=tol)
 
     if model_name.startswith("lasso"):
@@ -95,17 +93,15 @@ def test_grid_search():
     monitor_grid = Monitor()
     model = Lasso(estimator=estimator)
     criterion = HeldOutMSE(idx_train, idx_train)
-    algo = Forward()
     alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = HeldOutMSE(idx_train, idx_val)
-    algo = Forward()
     alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 
@@ -118,17 +114,15 @@ def test_grid_search():
     model = Lasso(estimator=estimator)
 
     criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
-    algo = Forward()
     alpha_opt_grid, _ = grid_search(
-        algo, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_grid, max_evals=max_evals,
         tol=1e-5, samp="grid")
 
     monitor_random = Monitor()
     criterion = FiniteDiffMonteCarloSure(sigma=sigma_star)
-    algo = Forward()
     alpha_opt_random, _ = grid_search(
-        algo, criterion, model, X, y, alpha_min, alpha_max,
+        criterion, model, X, y, alpha_min, alpha_max,
         monitor_random,
         max_evals=max_evals, tol=1e-5, samp="random")
 

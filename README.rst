@@ -112,7 +112,7 @@ ArXiv links:
 
 - https://arxiv.org/pdf/2002.08943.pdf
 
-.. |image0| image:: https://github.com/QB3/sparse-ho/workflows/build/badge.svg
-   :target: https://github.com/QB3/sparse-so/actions?query=workflow%3Abuild
+.. |image0| image:: https://github.com/QB3/sparse-ho/workflows/build/badge.svg?branch=master
+   :target: https://github.com/QB3/sparse-ho/actions?query=workflow%3Abuild
 .. |image1| image:: https://codecov.io/gh/QB3/sparse-ho/branch/master/graphs/badge.svg?branch=master
    :target: https://codecov.io/gh/mathurinm/QB3/sparse-ho

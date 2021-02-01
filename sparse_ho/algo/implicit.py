@@ -47,12 +47,11 @@ def get_beta_jac_t_v_implicit(
     mask, dense, _ = get_beta_jac_iterdiff(
         X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
-
     mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
-
-    maskp, densep = model.get_beta(X_train, y_train, mask, dense)
-    v = get_v(maskp, densep)
+    v = get_v(mask, dense)
+    if hasattr(model, 'dual'):
+        v = model.get_dual_v(X_train, y_train, v, log_alpha)
     # TODO: to clean
     is_sparse = issparse(X_train)
     if not alpha.shape:
@@ -60,15 +59,14 @@ def get_beta_jac_t_v_implicit(
     else:
         alphas = alpha.copy()
 
-    if sol_lin_sys is not None:
+    if sol_lin_sys is not None and not hasattr(model, 'dual'):
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
     else:
         size_mat = mat_to_inv.shape[0]
         sol0 = np.zeros(size_mat)
     try:
         sol = cg(
-            mat_to_inv, - model.restrict_full_supp(
-                X_train, y_train, mask, dense, v, log_alpha),
+            mat_to_inv, - model.generalized_supp(X_train, v, log_alpha),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -87,8 +85,7 @@ def get_beta_jac_t_v_implicit(
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - model.restrict_full_supp(
-                X_train, y_train, mask, dense, v, log_alpha),
+            - model.generalized_supp(X_train, v, log_alpha),
             x0=sol0, atol=1e-3)
 
     sol_lin_sys = sol[0]
