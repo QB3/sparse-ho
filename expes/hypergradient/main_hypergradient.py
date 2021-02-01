@@ -19,12 +19,11 @@ tol = 1e-12
 methods = ["forward", "implicit_forward", "celer", "ground_truth"]
 # methods = ["ground_truth"]
 div_alphas = [10, 100]
-dataset_names = ["real-sim", "rcv1_train", "news20"]
+# dataset_names = ["real-sim", "rcv1_train", "news20"]
+dataset_names = ["real-sim"]
 rep = 10
 
 dict_maxits = {}
-dict_maxits[("colon", 10)] = np.linspace(5, 500, rep, dtype=np.int)
-dict_maxits[("colon", 100)] = np.linspace(5, 10000, rep, dtype=np.int)
 dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
 dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
 dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
@@ -49,7 +48,6 @@ def parallel_function(
         if method == "celer":
             clf = Lasso_celer(
                 alpha=np.exp(log_alpha), fit_intercept=False,
-                # TODO maybe change this tol
                 tol=tol, max_iter=maxit)
             model = Lasso(estimator=clf, max_iter=maxit)
             criterion = HeldOutMSE(None, None)
