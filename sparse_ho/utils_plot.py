@@ -64,9 +64,11 @@ def round_down(n, decimals=0):
     multiplier = 10 ** decimals
     return np.floor(n * multiplier) / multiplier
 
+
 def round_up(n, decimals=0):
-  multiplier = 10 ** decimals
-  return np.ceil(n * multiplier) / multiplier
+    multiplier = 10 ** decimals
+    return np.ceil(n * multiplier) / multiplier
+
 
 dict_color_2Dplot = {
     'implicit_forward': 'Greens',
