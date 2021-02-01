@@ -98,16 +98,16 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     @njit
-    def _update_bcd_jac_backward(X, alpha, grad, beta, v_t_jac, L):
+    def _update_bcd_jac_backward(X, alphas, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         n_samples, n_features = X.shape
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
             grad[0] -= (v_t_jac[j]) * alphas[0] * \
                     sign_beta[j] / L[j] / (1 + (alphas[1] / L[j]))
-            grad[1] -= (v_t_jac[j]) * (alphas[1] / L[j] * beta[j]
-                    ) / (1 + (alphas[1] / L[j]))
+            grad[1] -= (v_t_jac[j]) * (alphas[1] / L[j] * beta[j]) / \
+                (1 + (alphas[1] / L[j]))
             v_t_jac[j] *= (1 / (1 + alphas[1] / L[j])) * \
-                    np.abs(np.sign(beta[j]))
+                np.abs(np.sign(beta[j]))
             v_t_jac -= v_t_jac[j] / (L[j] * n_samples) * X[:, j] @ X
 
         return grad

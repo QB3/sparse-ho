@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 from joblib import Parallel, delayed, parallel_backend
 import pandas
-from sklearn.model_selection import StratifiedShuffleSplit, KFold
+from sklearn.model_selection import KFold
 
 from celer import Lasso as Lasso_celer
 from libsvmdata import fetch_libsvm
@@ -83,7 +83,8 @@ def parallel_function(
                 algo = Forward(use_stop_crit=False)
             elif method == "implicit_forward":
                 algo = ImplicitForward(use_stop_crit=False,
-                    tol_jac=1e-8, n_iter_jac=maxit, max_iter=1000)
+                                       tol_jac=1e-8, n_iter_jac=maxit,
+                                       max_iter=1000)
             elif method == "implicit":
                 algo = Implicit(use_stop_crit=False, max_iter=1000)
             elif method == "backward":

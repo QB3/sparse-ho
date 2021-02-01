@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -18,6 +17,7 @@ def configure_plt():
     sns.set_palette("colorblind")
     sns.set_context("poster")
     sns.set_style("ticks")
+
 
 def plot_legend_apart(ax, figname, ncol=None):
     """Do all your plots with fig, ax = plt.subplots(),

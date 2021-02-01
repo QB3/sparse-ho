@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from sklearn.model_selection import StratifiedShuffleSplit
 

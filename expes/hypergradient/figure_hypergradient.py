@@ -97,9 +97,9 @@ for i in range(len(files)):
         df_data = pandas.read_pickle("results/" + files[i])
     else:
         print(files[i])
-        df_temp = pandas.read_pickle("results/" +  files[i])
+        df_temp = pandas.read_pickle("results/" + files[i])
         df_data = pandas.concat([df_data, df_temp])
-    
+
 
 methods = df_data['method'].unique()
 methods = np.delete(methods, np.where(methods == "ground_truth"))
@@ -109,15 +109,18 @@ div_alphas = np.sort(div_alphas)
 
 
 fig, axarr = plt.subplots(
-    len(div_alphas), len(list_datasets), sharex=False, sharey=False, figsize=[14, 10],)
+    len(div_alphas), len(list_datasets), sharex=False, sharey=False,
+    figsize=[14, 10],)
 fig2, axarr2 = plt.subplots(
-    len(div_alphas), len(list_datasets), sharex=False, sharey=False, figsize=[14, 10],)
+    len(div_alphas), len(list_datasets), sharex=False, sharey=False,
+    figsize=[14, 10],)
 # for n_features in list_n_features:
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
     for idx2, div_alpha in enumerate(div_alphas):
         df_div = df_dataset[df_dataset['div_alpha'] == div_alpha]
-        grad = np.float(df_div['grad'][df_div['method'] == "ground_truth"].unique())
+        grad = np.float(
+            df_div['grad'][df_div['method'] == "ground_truth"].unique())
         lines = []
         # plt.figure()
         for method in methods:
@@ -125,13 +128,13 @@ for idx1, dataset in enumerate(list_datasets):
             marker = dict_markers[method]
             df_method = df_div[df_div['method'] == method]
             df_method = df_method.sort_values('maxit')
-            lines.append(axarr2.flat[idx2 * len(list_datasets) + idx1].semilogy(
-                df_method['maxit'], np.abs(df_method['grad'] - grad),
-                label=dict_method[method], color=dict_color[method],
-                marker=""))
+            lines.append(
+                axarr2.flat[idx2 * len(list_datasets) + idx1].semilogy(
+                    df_method['maxit'], np.abs(df_method['grad'] - grad),
+                    label=dict_method[method], color=dict_color[method],
+                    marker=""))
             axarr.flat[idx2 * len(list_datasets) + idx1].loglog(
                 df_method['time'], np.abs(df_method['grad'] - grad),
-                # df_method['maxit'], np.abs(df_method['criterion grad'] - grad),
                 label=dict_method[method], color=dict_color[method],
                 marker="")
             # fig.legend()
@@ -144,24 +147,35 @@ for idx1, dataset in enumerate(list_datasets):
             # plt.tight_layout()
             # plt.show(block=False)
 
-        # axarr2.flat[idx2 * len(list_datasets) + idx1].set_xlabel(r"$\#$ epochs", fontsize=18)
-        axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(y_lims[dataset, div_alpha])
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(y_lims[dataset, div_alpha])
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(time_lims[dataset, div_alpha])
+        # axarr2.flat[idx2 * len(list_datasets) + idx1].set_xlabel(
+        #        r"$\#$ epochs", fontsize=18)
+        axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(
+                y_lims[dataset, div_alpha])
+        axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(
+                y_lims[dataset, div_alpha])
+        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
+                time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
                 r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
                 + "\n"
                 + "\n"
-                +r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+                + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
+                + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
+                + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
         axarr.flat[idx1].set_title(dict_title[dataset])
         axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
                 r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
                 + "\n"
                 + "\n"
-                +r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+                + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
+                + r'$|- \hat{\mathcal{J}}^\top\nabla|$'
+                + r'$| \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
         axarr2.flat[idx1].set_title(dict_title[dataset])
-  
-        # axarr.flat[1].set_ylabel(r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)}) - \hat{\mathcal{J}}^\top\nabla \mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
+
+        # axarr.flat[1].set_ylabel(
+        #        r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
+        #        + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
+        #        + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
 for i in np.arange(len(list_datasets)):
     axarr.flat[-(i + 1)].set_xlabel("Times (s)", size=fontsize)
     axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", size=fontsize)
@@ -170,9 +184,10 @@ fig.tight_layout()
 fig2.tight_layout()
 if save_fig:
     fig.savefig(fig_dir + "hypergradient_computation.pdf", bbox_inches="tight")
-    fig.savefig(fig_dir_svg + "hypergradient_computation.svg", bbox_inches="tight")
-            #
-        # axarr.flat[1].set_title(dataset)
+    fig.savefig(fig_dir_svg + "hypergradient_computation.svg",
+                bbox_inches="tight")
+
+# axarr.flat[1].set_title(dataset)
 plot_legend_apart(
     axarr[0][0],
     fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
