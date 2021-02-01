@@ -1,3 +1,5 @@
+import os
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
@@ -9,7 +11,7 @@ def configure_plt():
               'legend.fontsize': 12,
               'xtick.labelsize': 10,
               'ytick.labelsize': 10,
-              # 'text.usetex': True,
+              'text.usetex': True,
               'figure.figsize': (8, 6)}
     plt.rcParams.update(params)
 
@@ -23,9 +25,32 @@ def plot_legend_apart(ax, figname, ncol=None):
     if ncol is None:
         ncol = len(ax.lines)
     fig = plt.figure(figsize=(30, 4), constrained_layout=True)
-    fig.legend(ax.lines, [l.get_label() for l in ax.lines], ncol=ncol,
+    fig.legend(ax.lines, [line.get_label() for line in ax.lines], ncol=ncol,
                loc="upper center")
     fig.tight_layout()
     fig.savefig(figname)
     os.system("pdfcrop %s %s" % (figname, figname))
     return fig
+
+
+def discrete_cmap(N, base_cmap=None):
+    """Create an N-bin discrete colormap from the specified input map"""
+
+    # Note that if base_cmap is a string or None, you can simply do
+    #    return plt.cm.get_cmap(base_cmap, N)
+    # The following works for string, None, or a colormap instance:
+
+    base = plt.cm.get_cmap(base_cmap)
+    color_list = base(np.linspace(1/3, 1, N))
+    cmap_name = base.name + str(N)
+    return base.from_list(cmap_name, color_list, N)
+
+
+def round_down(n, decimals=0):
+    multiplier = 10 ** decimals
+    return np.floor(n * multiplier) / multiplier
+
+
+def round_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return np.ceil(n * multiplier) / multiplier

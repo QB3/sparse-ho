@@ -44,7 +44,7 @@ Criterion
    :toctree: generated/
 
    HeldOutMSE
-   SmoothedSURE
+   FiniteDiffMonteCarloSure
    HeldOutLogistic
 
 
@@ -73,24 +73,6 @@ Functions
    :toctree: generated/
 
    grad_search
-
-
-Datasets
-========
-
-:py:mod:`sparse_ho.datasets`:
-
-.. currentmodule:: sparse_ho.datasets
-
-.. automodule:: sparse_ho.datasets
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   get_synt_data
-   get_data
 
 
 Utils

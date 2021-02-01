@@ -8,7 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 25
 
-save_fig = True
+save_fig = False
 n_iter_crop = 180
 
 fig_dir = "results/"

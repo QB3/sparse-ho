@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 
 from sparse_ho.optimizers.base import BaseOptimizer
 
@@ -19,7 +20,7 @@ class Adam(BaseOptimizer):
         optimization process is printed or not.
     tol : float, optional (default=1e-5)
         Tolerance for the inner optimization solver.
-    t_max: float, optional (default=10000)
+    t_max: float, optional (default=10_000)
         Maximum running time threshold in seconds.
     """
 
@@ -49,7 +50,10 @@ class Adam(BaseOptimizer):
             value_outer, grad = _get_val_grad(log_alpha, self.tol, monitor)
 
             if self.verbose:
-                print("Value outer criterion: %f" % value_outer)
+                print(
+                    "Iteration %i/%i || " % (i+1, self.n_outer) +
+                    "Value outer criterion: %.2e || " % value_outer +
+                    "norm grad %.2e" % norm(grad))
 
             if (i > 1) and (monitor.objs[-1] > monitor.objs[-2]):
                 break
