@@ -1,44 +1,18 @@
 import numpy as np
 import pandas
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
-from sparse_ho.utils_plot import configure_plt, plot_legend_apart
+from sparse_ho.utils_plot import (
+    configure_plt, plot_legend_apart, dict_color, dict_method)
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 configure_plt()
 
 fontsize = 16
-
-current_palette = sns.color_palette("colorblind")
-dict_color = {}
-dict_color["grid_search"] = current_palette[3]
-dict_color["random"] = current_palette[5]
-dict_color["bayesian"] = current_palette[0]
-dict_color["implicit_forward"] = current_palette[2]
-dict_color["implicit_forward_cdls"] = current_palette[2]
-dict_color["implicit_forward_scipy"] = current_palette[2]
-dict_color["fast_iterdiff"] = current_palette[2]
-dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
-dict_color["lhs"] = current_palette[6]
-
-dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
-dict_method["implicit_forward_cdls"] = 'Imp. F. Iterdiff. CD LS'
-dict_method["implicit_forward_scipy"] = 'Imp. F. Iterdiff. LS'
-dict_method["fast_iterdiff"] = 'Imp. F. Iterdiff. (ours)'
-dict_method['implicit'] = 'Implicit'
-dict_method['grid_search'] = 'Grid-search'
-dict_method['bayesian'] = 'Bayesian'
-dict_method['random'] = 'Random-search'
-dict_method['hyperopt'] = 'Random-search'
-dict_method['backward'] = 'B. Iterdiff.'
-dict_method['lhs'] = 'Lattice Hyp.'
 
 
 dict_markers = {}
