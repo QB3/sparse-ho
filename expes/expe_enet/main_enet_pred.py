@@ -35,7 +35,7 @@ dict_t_max = {}
 dict_t_max["rcv1_train"] = 1000
 dict_t_max["real-sim"] = 1000
 dict_t_max["leukemia"] = 10
-dict_t_max["news20"] = 3_600
+dict_t_max["news20"] = 10_000
 
 dict_point_grid_search = {}
 dict_point_grid_search["rcv1_train"] = 10
@@ -91,7 +91,7 @@ n_jobs = min(n_jobs, 10)
 dict_palphamin = {}
 dict_palphamin["rcv1_train"] = 1 / 100_000
 dict_palphamin["real-sim"] = 1 / 100_000
-dict_palphamin["news20"] = 1 / 100_000
+dict_palphamin["news20"] = 1 / 1_000_000
 
 
 def parallel_function(
@@ -151,7 +151,7 @@ def parallel_function(
         elif method.startswith("implicit_forward"):
             # do gradient descent to find the optimal lambda
             alpha0 = np.array([alpha_max / 100, alpha_max / 100])
-            n_outer = 20
+            n_outer = 30
             if method == 'implicit_forward':
                 optimizer = GradientDescent(
                     n_outer=n_outer, p_grad0=1, verbose=True, tol=tol,

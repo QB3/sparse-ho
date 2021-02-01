@@ -31,13 +31,13 @@ model_name = "lasso"
 # model_name = "logreg"
 
 dict_t_max = {}
-dict_t_max["rcv1"] = 50
-dict_t_max["real-sim"] = 100
+dict_t_max["rcv1_train"] = 100
+dict_t_max["real-sim"] = 200
 dict_t_max["leukemia"] = 10
 dict_t_max["news20"] = 10_000
 
 #######################################################################
-# dataset_names = ["rcv1_train"]
+# dataset_names = ["real-sim"]
 dataset_names = ["news20"]
 # dataset_names = ["news20"]
 # dataset_names = ["leukemia"]
@@ -45,7 +45,8 @@ dataset_names = ["news20"]
 # datasets:
 # dataset_names = ["rcv1", "news20", "finance"]
 methods = [
-    "implicit_forward", 'grid_search', 'random', 'bayesian']
+    "implicit_forward", "implicit_forward_approx", 'grid_search',
+    'random', 'bayesian']
 # tolerance_decreases = ["exponential"]
 tolerance_decreases = ["constant"]
 # tols = [1e-8]
@@ -88,7 +89,6 @@ def parallel_function(
     # load data
     X, y = fetch_libsvm(dataset_name)
     y -= y.mean()
-    y /= norm(y)
     # compute alpha_max
     alpha_max = np.abs(X.T @ y).max() / len(y)
 
@@ -125,17 +125,25 @@ def parallel_function(
         if method == 'grid_search':
             grid_search(
                 algo, criterion, model, X, y, alpha_min, alpha_max,
-                monitor, max_evals=100, tol=tol, t_max=t_max)
+                monitor, max_evals=100, tol=tol)
         elif method == 'random' or method == 'bayesian':
             hyperopt_wrapper(
                 algo, criterion, model, X, y, alpha_min, alpha_max,
                 monitor, max_evals=30, tol=tol, method=method, size_space=1,
                 t_max=t_max)
-        elif method == "implicit_forward":
+        elif method.startswith("implicit_forward"):
             # do gradient descent to find the optimal lambda
-            alpha0 = alpha_max / 30
-            optimizer = GradientDescent(
-                n_outer=30, p_grad0=1, verbose=True, tol=tol, t_max=t_max)
+            alpha0 = alpha_max / 100
+            n_outer = 30
+            if method == 'implicit_forward':
+                optimizer = GradientDescent(
+                    n_outer=n_outer, p_grad0=1, verbose=True, tol=tol,
+                    t_max=t_max)
+            else:
+                optimizer = GradientDescent(
+                    n_outer=n_outer, p_grad0=1, verbose=True, tol=tol,
+                    t_max=t_max,
+                    tol_decrease="geom")
             grad_search(
                 algo, criterion, model, optimizer, X, y, alpha0,
                 monitor)

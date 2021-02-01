@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 
-from sparse_ho.utils_plot import configure_plt
+from sparse_ho.utils_plot import (
+    configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
+    dict_method, dict_title)
 
-# save_fig = False
-save_fig = True
+save_fig = False
+# save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -15,48 +16,11 @@ configure_plt()
 
 fontsize = 16
 
-current_palette = sns.color_palette("colorblind")
-dict_color = {}
-dict_color["grid_search"] = current_palette[3]
-dict_color["random"] = current_palette[5]
-dict_color["bayesian"] = current_palette[0]
-dict_color["implicit_forward"] = current_palette[2]
-dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
-
-dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
-dict_method['implicit'] = 'Implicit'
-dict_method['grid_search'] = 'Grid-search'
-dict_method['bayesian'] = 'Bayesian'
-dict_method['random'] = 'Random-search'
-dict_method['hyperopt'] = 'Random-search'
-dict_method['backward'] = 'B. Iterdiff.'
-
-
-dict_markers = {}
-dict_markers["forward"] = 'o'
-dict_markers["implicit_forward"] = 'X'
-dict_markers['implicit'] = 'v'
-dict_markers['grid_search'] = 'd'
-dict_markers['bayesian'] = 'P'
-dict_markers['random'] = '*'
-
-dict_title = {}
-dict_title["rcv1_train"] = "rcv1"
-dict_title["news20"] = "news20"
-dict_title["finance"] = "finance"
-dict_title["kdda_train"] = "kdda"
-dict_title["climate"] = "climate"
-dict_title["leukemia"] = "leukemia"
-dict_title["real-sim"] = "real-sim"
-
 dict_markevery = {}
-dict_markevery["news20"] = 5
+dict_markevery["news20"] = 1
 dict_markevery["finance"] = 10
 dict_markevery["rcv1_train"] = 1
-dict_markevery["real-sim"] = 10
+dict_markevery["real-sim"] = 1
 dict_markevery["leukemia"] = 10
 
 dict_marker_size = {}
@@ -68,6 +32,14 @@ dict_marker_size['grid_search'] = 1
 dict_marker_size['bayesian'] = 10
 dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
+
+dict_s = {}
+dict_s["implicit_forward"] = 100
+dict_s["implicit_forward_approx"] = 40
+dict_s['grid_search'] = 5
+dict_s['bayesian'] = 20
+dict_s['random'] = 5
+dict_s['lhs'] = 4
 
 dict_n_feature = {}
 dict_n_feature["rcv1_train"] = r"($p=19,959$)"
@@ -119,7 +91,6 @@ fig_grad, axarr_grad = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
 
 model_name = "lasso"
-# model_name = "logreg"
 
 for idx, dataset in enumerate(dataset_names):
     df_data = pd.read_pickle("results/%s_%s.pkl" % (model_name, dataset))
@@ -132,9 +103,9 @@ for idx, dataset in enumerate(dataset_names):
     times = df_data['times']
     objs = df_data['objs']
     # objs_tests = df_data['objs_test']
-    log_alphas = df_data['log_alphas']
+    alphas = df_data['alphas']
     # log_alpha_max = df_data['log_alpha_max'][0]
-    log_alpha_max = df_data['log_alpha_max'].to_numpy()[0]
+    log_alpha_max = np.log(df_data['alpha_max'].to_numpy()[0])
     tols = df_data['tolerance_decrease']
     # norm_y_vals = df_data['norm y_val']
     norm_val = 0
@@ -147,22 +118,6 @@ for idx, dataset in enumerate(dataset_names):
 
     lines = []
 
-    # plot for performance on test set
-    plt.figure()
-    for i, (time, obj, method, tol) in enumerate(
-            zip(times, objs, methods, tols)):
-            # zip(times, objs, objs_tests, methods, tols)):
-        # assert not np.allclose(obj, objs_test)
-        marker = dict_markers[method]
-        # objs_test = [np.min(
-        #     objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
-        # axarr_test.flat[idx].semilogy(
-        # axarr_test.flat[idx].plot(
-        #     time, objs_test, color=dict_color[method],
-        #     label="%s" % (dict_method[method]),
-        #     marker=marker, markersize=markersize,
-        #     markevery=dict_markevery[dataset])
-
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
     # axarr_test.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
@@ -173,30 +128,23 @@ for idx, dataset in enumerate(dataset_names):
     axarr_val.flat[idx].tick_params(labelsize=fontsize)
 
     E0 = df_data.objs[1][0]
-    for i, (time, obj, log_alpha, method, tol) in enumerate(
-            zip(times, objs, log_alphas, methods, tols)):
+    for _, (time, obj, alpha, method, _) in enumerate(
+            zip(times, objs, alphas, methods, tols)):
+        log_alpha = np.log(alpha)
         marker = dict_markers[method]
-        # if method.startswith(('grid_search', "implicit_forward", "random")):
-        if method.startswith(('grid_search', "implicit_forward", "bayesian")):
-            if method.startswith(('grid_search', "random", "bayesian")):
-                markevery = dict_markevery[dataset]
-                color = dict_color[method]
-                s = dict_marker_size[method]
-            else:
-                markevery = 1
-                color = [plt.cm.Greens((
-                    i+len(obj)/1.1) / len(
-                        obj) / 2) for i in np.arange(len(obj))]
-                s = 100
+        if method != "random":
+            # markevery = dict_markevery[dataset]
+            s = dict_s[method]
             # axarr_grad.flat[idx].plot(
             axarr_grad.flat[idx].scatter(
-                np.array(log_alpha) - log_alpha_max, obj / E0, color=color,
+                np.array(log_alpha) - log_alpha_max, obj / E0,
+                color=discrete_color(len(obj), dict_color_2Dplot[method]),
                 label="%s" % (dict_method[method]),
                 marker=marker, s=s)
             axarr_grad.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
     # plot for objective minus optimum on validation set
-    for i, (time, obj, method, tol) in enumerate(
+    for _, (time, obj, method, _) in enumerate(
             zip(times, objs, methods, tols)):
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
@@ -249,15 +197,9 @@ for method in methods:
 fig_legend = plt.figure(figsize=[18, 4])
 fig_legend.legend(
     [l[0] for l in lines], labels,
-    ncol=4, loc='upper center', fontsize=fontsize - 4)
+    ncol=5, loc='upper center', fontsize=fontsize - 4)
 fig_legend.tight_layout()
 if save_fig:
     fig_legend.savefig(
         fig_dir + "lasso_pred_legend.pdf", bbox_inches="tight")
 fig_legend.show()
-
-# fig5 = plt.figure(figsize=[18, 4])
-# fig5.legend([l[0] for l in lines], labels,
-#             ncol=4, loc='upper center', fontsize=fontsize - 4)
-# fig5.tight_layout()
-# fig5.show()

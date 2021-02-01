@@ -63,3 +63,52 @@ def discrete_color(N, base_cmap=None):
 def round_down(n, decimals=0):
     multiplier = 10 ** decimals
     return np.floor(n * multiplier) / multiplier
+
+
+dict_color_2Dplot = {
+    'implicit_forward': 'Greens',
+    'implicit_forward_approx': 'Greens',
+    'grid_search': 'Oranges',
+    'random': 'Purples',
+    'bayesian': 'Blues'
+    }
+
+
+current_palette = sns.color_palette("colorblind")
+dict_color = {}
+dict_color["grid_search"] = current_palette[3]
+dict_color["random"] = current_palette[5]
+dict_color["bayesian"] = current_palette[0]
+dict_color["implicit_forward"] = current_palette[2]
+dict_color["implicit_forward_approx"] = current_palette[2]
+dict_color["forward"] = current_palette[4]
+dict_color["implicit"] = current_palette[1]
+
+dict_method = {}
+dict_method["forward"] = 'F. Iterdiff.'
+dict_method["implicit_forward"] = '1st order'
+dict_method["implicit_forward_approx"] = '1st order approx'
+dict_method['implicit'] = 'Implicit'
+dict_method['grid_search'] = 'Grid-search'
+dict_method['bayesian'] = 'Bayesian'
+dict_method['random'] = 'Random-search'
+dict_method['hyperopt'] = 'Random-search'
+dict_method['backward'] = 'B. Iterdiff.'
+
+dict_markers = {}
+# dict_markers["forward"] = 'o'
+dict_markers["implicit_forward"] = 'X'
+dict_markers["implicit_forward_approx"] = 'x'
+dict_markers['implicit'] = 'v'
+dict_markers['grid_search'] = 'o'
+dict_markers['bayesian'] = 'P'
+dict_markers['random'] = '*'
+
+dict_title = {}
+dict_title["rcv1_train"] = "rcv1"
+dict_title["news20"] = "news20"
+dict_title["finance"] = "finance"
+dict_title["kdda_train"] = "kdda"
+dict_title["climate"] = "climate"
+dict_title["leukemia"] = "leukemia"
+dict_title["real-sim"] = "real-sim"
