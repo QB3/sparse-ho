@@ -14,7 +14,7 @@ fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 configure_plt()
 
-fontsize = 16
+fontsize = 22
 
 dict_markevery = {}
 dict_markevery["news20"] = 1
@@ -36,10 +36,10 @@ dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
 
 dict_s = {}
-dict_s["implicit_forward"] = 30
-dict_s["implicit_forward_approx"] = 30
-dict_s['grid_search'] = 5
-dict_s['bayesian'] = 30
+dict_s["implicit_forward"] = 50
+dict_s["implicit_forward_approx"] = 50
+dict_s['grid_search'] = 20
+dict_s['bayesian'] = 50
 dict_s['random'] = 5
 dict_s['lhs'] = 4
 
@@ -84,8 +84,13 @@ fig_val, axarr_val = plt.subplots(
 fig_test, axarr_test = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
 
-fig_grad, axarr_grad = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+fig_grad_grid, axarr_grad_grid = plt.subplots(
+    3, len(dataset_names), sharex=False, sharey=False, figsize=[14, 14],
+    )
+
+dict_axarr_grad = {}
+dict_axarr_grad['grid_search'] = axarr_grad_grid
+
 
 model_name = "enet"
 
@@ -108,8 +113,8 @@ for idx, dataset in enumerate(dataset_names):
 
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
 
-    axarr_grad.flat[idx].set_xlabel(
-        r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
+    # axarr_grad_grid.flat[idx].set_xlabel(
+    #     r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
     axarr_test.flat[idx].tick_params(labelsize=fontsize)
     axarr_val.flat[idx].tick_params(labelsize=fontsize)
@@ -123,13 +128,16 @@ for idx, dataset in enumerate(dataset_names):
             alpha1D = np.log(np.flip(alpha1D) / alpha_max)
             X, Y = np.meshgrid(alpha1D, alpha1D)
             results = obj.reshape(len(alpha1D), -1)
-            scaling_factor = results.max()
-            levels = np.geomspace(min_objs / scaling_factor, 1, num=20)
+            # levels = (1.02 ** np.arange(20) - 1)
+            levels = np.geomspace(5 * 1e-3, 1, num=20) * (
+                results.max() - min_objs) / min_objs
 
-            axarr_grad.flat[idx].contourf(
-                X, Y, results.T / scaling_factor, levels=levels,
-                # colors='black')
-                cmap='viridis')
+            cmap = 'Greys_r'
+            # for axarr in dict_axarr_grad.values():
+            for i in range(3):
+                axarr_grad_grid[i, idx].contour(
+                    X, Y, (results.T - min_objs) / min_objs, levels=levels,
+                    cmap=cmap, linewidths=0.5)
 
     for _, (time, obj, alphas, method, _) in enumerate(
             zip(times, objs, all_alphas, methods, tols)):
@@ -137,14 +145,39 @@ for idx, dataset in enumerate(dataset_names):
         n_outer = len(obj)
         s = dict_s[method]
         color = discrete_color(n_outer, dict_color_2Dplot[method])
-        axarr_grad.flat[idx].scatter(
-            np.log(alphas[:, 0] / alpha_max),
-            np.log(alphas[:, 1] / alpha_max),
-            s=s, color=color,
-            marker=dict_markers[method], label="todo", clip_on=False)
-        # import ipdb; ipdb.set_trace()
-    axarr_grad.flat[idx].set_xlim((alpha1D.min(), alpha1D.max()))
-    axarr_grad.flat[idx].set_ylim((alpha1D.min(), alpha1D.max()))
+        # for i in range(3):
+        if method == 'grid_search':
+            i = 0
+            axarr_grad_grid[i, idx].scatter(
+                np.log(alphas[:, 0] / alpha_max),
+                np.log(alphas[:, 1] / alpha_max),
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        elif method == 'bayesian':
+            i = 1
+            axarr_grad_grid[i, idx].scatter(
+                np.log(alphas[:, 0] / alpha_max),
+                np.log(alphas[:, 1] / alpha_max),
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        elif method == 'implicit_forward_approx':
+            i = 2
+            axarr_grad_grid[i, idx].scatter(
+                np.log(alphas[:, 0] / alpha_max),
+                np.log(alphas[:, 1] / alpha_max),
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        # for i in range(3):
+        else:
+            pass
+        axarr_grad_grid[i, 0].set_ylabel(
+            "%s \n" % dict_method[method] + r"$\lambda_2 - \lambda_{\max}$",
+            fontsize=fontsize)
+
+    for axarr in dict_axarr_grad.values():
+        for i in range(3):
+            axarr[i, idx].set_xlim((alpha1D.min(), alpha1D.max()))
+            axarr[i, idx].set_ylim((alpha1D.min(), alpha1D.max()))
 
     for _, (time, obj, method, _) in enumerate(
             zip(times, objs, methods, tols)):
@@ -158,19 +191,29 @@ for idx, dataset in enumerate(dataset_names):
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
     axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    axarr_val.flat[idx].set_xlabel("Time (s)")
+    axarr_val.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
-    axarr_grad.flat[idx].set_title("%s %s" % (
+    axarr_grad_grid.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
-axarr_grad.flat[0].set_ylabel(
-    r"$\lambda_2 - \lambda_{\max}$", fontsize=fontsize)
+
+for i in range(len(dataset_names)):
+    axarr_grad_grid[2, i].set_xlabel(
+        r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
+    for j in range(len(dataset_names)):
+        axarr_grad_grid[i, j].set_aspect('equal', adjustable='box')
+# for ax in axarr_grad_grid:
+# axarr_grad_grid.set_aspect('equal', adjustable='box')
+
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
+
 fig_val.tight_layout()
 fig_test.tight_layout()
-fig_grad.tight_layout()
+fig_grad_grid.tight_layout()
+
+
 if save_fig:
     fig_val.savefig(
         fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
@@ -180,15 +223,19 @@ if save_fig:
         fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
     fig_test.savefig(
         fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
-    fig_grad.savefig(
+    fig_grad_grid.savefig(
         fig_dir + "%s_val_grad.pdf" % model_name, bbox_inches="tight")
-    fig_grad.savefig(
+    fig_grad_grid.savefig(
+        fig_dir + "%s_val_grad_grid.pdf" % model_name, bbox_inches="tight")
+    fig_grad_grid.savefig(
         fig_dir_svg + "%s_val_grad.svg" % model_name,
         bbox_inches="tight")
 
 
 fig_val.show()
-fig_grad.show()
+fig_grad_grid.show()
+# fig_grad_bayesian.show()
+# fig_grad_sparseho.show()
 
 #################################################################
 # plot legend

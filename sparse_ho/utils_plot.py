@@ -54,7 +54,7 @@ def discrete_color(N, base_cmap=None):
     # The following works for string, None, or a colormap instance:
 
     base = plt.cm.get_cmap(base_cmap)
-    color_list = base(np.linspace(1/3, 1, N))
+    color_list = base(np.linspace(1/2, 1, N))
     cmap_name = base.name + str(N)
     cmap = base.from_list(cmap_name, color_list, N)
     return cmap(np.linspace(0, 1, N))
