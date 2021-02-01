@@ -202,8 +202,6 @@ for i in range(len(dataset_names)):
         r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     for j in range(len(dataset_names)):
         axarr_grad_grid[i, j].set_aspect('equal', adjustable='box')
-# for ax in axarr_grad_grid:
-# axarr_grad_grid.set_aspect('equal', adjustable='box')
 
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
@@ -211,7 +209,6 @@ axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 fig_val.tight_layout()
 fig_test.tight_layout()
-fig_grad_grid.tight_layout()
 
 
 if save_fig:
