@@ -97,7 +97,7 @@ class ElasticNet(BaseModel):
             dual_var[idx_nz] -= Xjs * (beta[j] - beta_old)
 
     @staticmethod
-    @njit
+    # @njit
     def _update_bcd_jac_backward(X, alphas, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         n_samples, n_features = X.shape
@@ -177,9 +177,10 @@ class ElasticNet(BaseModel):
     def _init_ddual_var(dbeta, X, y, sign_beta, alpha):
         return - X @ dbeta
 
-    def _init_g_backward(self, jac_v0):
+    @staticmethod
+    def _init_g_backward(jac_v0, n_features):
         if jac_v0 is None:
-            return [0.0, 0.0]
+            return np.array([0.0, 0.0])
         else:
             return jac_v0
 
