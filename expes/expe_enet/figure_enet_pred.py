@@ -1,20 +1,38 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sparse_ho.utils_plot import (
     configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
-# save_fig = False
+save_fig = False
 save_fig = True
+# fig_dir = "./"
+# fig_dir_svg = "./"
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 
-configure_plt()
+# configure_plt()
 
-fontsize = 22
+fontsize = 18
+params = {
+    'axes.labelsize': 14,
+    'font.size': 14,
+    'legend.fontsize': 14,
+    'xtick.labelsize': 14,
+    'ytick.labelsize': 14,
+    'text.usetex': True,
+    # 'figure.figsize': (8, 6)
+}
+plt.rcParams.update(params)
+
+sns.set_palette("colorblind")
+# sns.set_context("paper")
+sns.set_style("ticks")
+
 
 dict_markevery = {}
 dict_markevery["news20"] = 1
@@ -79,13 +97,13 @@ dataset_names = ["rcv1_train", "real-sim", "news20"]
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_test, axarr_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad_grid, axarr_grad_grid = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=False, figsize=[14, 14],
+    3, len(dataset_names), sharex=False, sharey=False, figsize=[11, 10],
     )
 
 dict_axarr_grad = {}
@@ -116,8 +134,8 @@ for idx, dataset in enumerate(dataset_names):
     # axarr_grad_grid.flat[idx].set_xlabel(
     #     r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-    axarr_test.flat[idx].tick_params(labelsize=fontsize)
-    axarr_val.flat[idx].tick_params(labelsize=fontsize)
+    # axarr_test.flat[idx].tick_params(labelsize=fontsize-2)
+    # axarr_val.flat[idx].tick_params(labelsize=fontsize-2)
 
     E0 = df_data.objs.to_numpy()[0][0]
     for _, (time, obj, alphas, method, _) in enumerate(
@@ -128,8 +146,7 @@ for idx, dataset in enumerate(dataset_names):
             alpha1D = np.log(np.flip(alpha1D) / alpha_max)
             X, Y = np.meshgrid(alpha1D, alpha1D)
             results = obj.reshape(len(alpha1D), -1)
-            # levels = (1.02 ** np.arange(20) - 1)
-            levels = np.geomspace(5 * 1e-3, 1, num=20) * (
+            levels = np.geomspace(5 * 1e-3, 1, num=30) * (
                 results.max() - min_objs) / min_objs
 
             cmap = 'Greys_r'
@@ -203,12 +220,13 @@ for i in range(len(dataset_names)):
     for j in range(len(dataset_names)):
         axarr_grad_grid[i, j].set_aspect('equal', adjustable='box')
 
-axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel("\nCross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 
 fig_val.tight_layout()
 fig_test.tight_layout()
+fig_grad_grid.tight_layout()
 
 
 if save_fig:
@@ -240,7 +258,7 @@ labels = []
 for method in methods:
     labels.append(dict_method[method])
 
-fig_legend = plt.figure(figsize=[18, 4])
+fig_legend = plt.figure(figsize=[9, 2])
 fig_legend.legend(
     [l[0] for l in lines], labels,
     ncol=4, loc='upper center', fontsize=fontsize - 4)
