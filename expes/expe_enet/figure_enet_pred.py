@@ -7,15 +7,13 @@ from sparse_ho.utils_plot import (
     configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
-# save_fig = False
-save_fig = True
+save_fig = False
+# save_fig = True
 # fig_dir = "./"
 # fig_dir_svg = "./"
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
-
-# configure_plt()
 
 fontsize = 18
 params = {
@@ -25,12 +23,10 @@ params = {
     'xtick.labelsize': 14,
     'ytick.labelsize': 14,
     'text.usetex': True,
-    # 'figure.figsize': (8, 6)
 }
 plt.rcParams.update(params)
 
 sns.set_palette("colorblind")
-# sns.set_context("paper")
 sns.set_style("ticks")
 
 
@@ -102,12 +98,9 @@ fig_val, axarr_val = plt.subplots(
 fig_test, axarr_test = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
-fig_grad_grid, axarr_grad_grid = plt.subplots(
+fig_grad_grid, axarr_grad = plt.subplots(
     3, len(dataset_names), sharex=False, sharey=False, figsize=[11, 10],
     )
-
-dict_axarr_grad = {}
-dict_axarr_grad['grid_search'] = axarr_grad_grid
 
 
 model_name = "enet"
@@ -130,12 +123,7 @@ for idx, dataset in enumerate(dataset_names):
     lines = []
 
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-
-    # axarr_grad_grid.flat[idx].set_xlabel(
-    #     r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-    # axarr_test.flat[idx].tick_params(labelsize=fontsize-2)
-    # axarr_val.flat[idx].tick_params(labelsize=fontsize-2)
 
     E0 = df_data.objs.to_numpy()[0][0]
     for _, (time, obj, alphas, method, _) in enumerate(
@@ -150,9 +138,8 @@ for idx, dataset in enumerate(dataset_names):
                 results.max() - min_objs) / min_objs
 
             cmap = 'Greys_r'
-            # for axarr in dict_axarr_grad.values():
             for i in range(3):
-                axarr_grad_grid[i, idx].contour(
+                axarr_grad[i, idx].contour(
                     X, Y, (results.T - min_objs) / min_objs, levels=levels,
                     cmap=cmap, linewidths=0.5)
 
@@ -162,39 +149,36 @@ for idx, dataset in enumerate(dataset_names):
         n_outer = len(obj)
         s = dict_s[method]
         color = discrete_color(n_outer, dict_color_2Dplot[method])
-        # for i in range(3):
         if method == 'grid_search':
             i = 0
-            axarr_grad_grid[i, idx].scatter(
+            axarr_grad[i, idx].scatter(
                 np.log(alphas[:, 0] / alpha_max),
                 np.log(alphas[:, 1] / alpha_max),
                 s=s, color=color,
                 marker=dict_markers[method], label="todo", clip_on=False)
         elif method == 'bayesian':
             i = 1
-            axarr_grad_grid[i, idx].scatter(
+            axarr_grad[i, idx].scatter(
                 np.log(alphas[:, 0] / alpha_max),
                 np.log(alphas[:, 1] / alpha_max),
                 s=s, color=color,
                 marker=dict_markers[method], label="todo", clip_on=False)
         elif method == 'implicit_forward_approx':
             i = 2
-            axarr_grad_grid[i, idx].scatter(
+            axarr_grad[i, idx].scatter(
                 np.log(alphas[:, 0] / alpha_max),
                 np.log(alphas[:, 1] / alpha_max),
                 s=s, color=color,
                 marker=dict_markers[method], label="todo", clip_on=False)
-        # for i in range(3):
         else:
             pass
-        axarr_grad_grid[i, 0].set_ylabel(
+        axarr_grad[i, 0].set_ylabel(
             "%s \n" % dict_method[method] + r"$\lambda_2 - \lambda_{\max}$",
             fontsize=fontsize)
 
-    for axarr in dict_axarr_grad.values():
-        for i in range(3):
-            axarr[i, idx].set_xlim((alpha1D.min(), alpha1D.max()))
-            axarr[i, idx].set_ylim((alpha1D.min(), alpha1D.max()))
+    for i in range(3):
+        axarr_grad[i, idx].set_xlim((alpha1D.min(), alpha1D.max()))
+        axarr_grad[i, idx].set_ylim((alpha1D.min(), alpha1D.max()))
 
     for _, (time, obj, method, _) in enumerate(
             zip(times, objs, methods, tols)):
@@ -210,15 +194,15 @@ for idx, dataset in enumerate(dataset_names):
     axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
     axarr_val.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
-    axarr_grad_grid.flat[idx].set_title("%s %s" % (
+    axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
 
 for i in range(len(dataset_names)):
-    axarr_grad_grid[2, i].set_xlabel(
+    axarr_grad[2, i].set_xlabel(
         r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     for j in range(len(dataset_names)):
-        axarr_grad_grid[i, j].set_aspect('equal', adjustable='box')
+        axarr_grad[i, j].set_aspect('equal', adjustable='box')
 
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
