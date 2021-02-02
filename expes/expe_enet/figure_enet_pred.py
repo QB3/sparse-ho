@@ -7,7 +7,7 @@ from sparse_ho.utils_plot import (
     configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
-save_fig = False
+# save_fig = False
 save_fig = True
 # fig_dir = "./"
 # fig_dir_svg = "./"
@@ -220,7 +220,7 @@ for i in range(len(dataset_names)):
     for j in range(len(dataset_names)):
         axarr_grad_grid[i, j].set_aspect('equal', adjustable='box')
 
-axarr_val.flat[0].set_ylabel("\nCross validation loss", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 
