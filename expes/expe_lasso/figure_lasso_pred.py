@@ -1,9 +1,10 @@
+import seaborn as sns
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import (
-    configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
+    discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
 save_fig = False
@@ -12,9 +13,19 @@ fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 
-configure_plt()
+fontsize = 18
+params = {
+    'axes.labelsize': 14,
+    'font.size': 14,
+    'legend.fontsize': 14,
+    'xtick.labelsize': 14,
+    'ytick.labelsize': 14,
+    'text.usetex': True,
+}
+plt.rcParams.update(params)
+sns.set_palette("colorblind")
+sns.set_style("ticks")
 
-fontsize = 16
 
 dict_markevery = {}
 dict_markevery["news20"] = 1
@@ -82,35 +93,26 @@ dataset_names = ["rcv1_train", "real-sim", "news20"]
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_test, axarr_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+    3, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 model_name = "lasso"
 
 for idx, dataset in enumerate(dataset_names):
     df_data = pd.read_pickle("results/%s_%s.pkl" % (model_name, dataset))
-    # df_data = pd.read_pickle("%s.pkl" % dataset)
-
-    # df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
     df_data = df_data[df_data['tolerance_decrease'] == 'constant']
 
     methods = df_data['method']
     times = df_data['times']
     objs = df_data['objs']
-    # objs_tests = df_data['objs_test']
     alphas = df_data['alphas']
-    # log_alpha_max = df_data['log_alpha_max'][0]
     log_alpha_max = np.log(df_data['alpha_max'].to_numpy()[0])
     tols = df_data['tolerance_decrease']
-    # norm_y_vals = df_data['norm y_val']
-    norm_val = 0
-    # for norm_y_valss in norm_y_vals:
-    #     norm_val = norm_y_valss
 
     min_objs = np.infty
     for obj in objs:
@@ -119,7 +121,6 @@ for idx, dataset in enumerate(dataset_names):
     lines = []
 
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    # axarr_test.flat[idx].set_xticks(dict_xticks[model_name, dataset])
 
     axarr_grad.flat[idx].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
@@ -155,7 +156,7 @@ for idx, dataset in enumerate(dataset_names):
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
     axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    axarr_val.flat[idx].set_xlabel("Time (s)")
+    axarr_val.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
@@ -163,6 +164,8 @@ for idx, dataset in enumerate(dataset_names):
 axarr_grad.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
+# for ax in axarr_val:
+#     ax.set_aspect('equal', adjustable='box')
 
 fig_val.tight_layout()
 fig_test.tight_layout()
@@ -194,7 +197,7 @@ labels = []
 for method in methods:
     labels.append(dict_method[method])
 
-fig_legend = plt.figure(figsize=[18, 4])
+fig_legend = plt.figure(figsize=[9, 2])
 fig_legend.legend(
     [l[0] for l in lines], labels,
     ncol=5, loc='upper center', fontsize=fontsize - 4)
