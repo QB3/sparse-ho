@@ -7,8 +7,8 @@ from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -46,9 +46,9 @@ dict_marker_size['lhs'] = 4
 
 dict_s = {}
 dict_s["implicit_forward"] = 100
-dict_s["implicit_forward_approx"] = 40
-dict_s['grid_search'] = 5
-dict_s['bayesian'] = 20
+dict_s["implicit_forward_approx"] = 60
+dict_s['grid_search'] = 60
+dict_s['bayesian'] = 60
 dict_s['random'] = 5
 dict_s['lhs'] = 4
 
@@ -99,7 +99,8 @@ fig_test, axarr_test = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
+    3, len(dataset_names), sharex=False, sharey=False, figsize=[11, 10],
+    )
 
 model_name = "lasso"
 
@@ -111,7 +112,8 @@ for idx, dataset in enumerate(dataset_names):
     times = df_data['times']
     objs = df_data['objs']
     alphas = df_data['alphas']
-    log_alpha_max = np.log(df_data['alpha_max'].to_numpy()[0])
+    alpha_max = df_data['alpha_max'].to_numpy()[0]
+    log_alpha_max = np.log(alpha_max)
     tols = df_data['tolerance_decrease']
 
     min_objs = np.infty
@@ -122,8 +124,7 @@ for idx, dataset in enumerate(dataset_names):
 
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
 
-    axarr_grad.flat[idx].set_xlabel(
-        r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
+
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
     axarr_test.flat[idx].tick_params(labelsize=fontsize)
     axarr_val.flat[idx].tick_params(labelsize=fontsize)
@@ -132,17 +133,43 @@ for idx, dataset in enumerate(dataset_names):
     for _, (time, obj, alpha, method, _) in enumerate(
             zip(times, objs, alphas, methods, tols)):
         log_alpha = np.log(alpha)
+        if method == 'grid_search':
+            for i in range(3):
+                axarr_grad[i, idx].plot(
+                    np.array(log_alpha) - log_alpha_max, obj / E0,
+                    color='black')
+
+    for _, (time, obj, alpha, method, _) in enumerate(
+            zip(times, objs, alphas, methods, tols)):
+        log_alpha = np.log(alpha)
         marker = dict_markers[method]
-        if method != "random":
-            # markevery = dict_markevery[dataset]
-            s = dict_s[method]
-            # axarr_grad.flat[idx].plot(
-            axarr_grad.flat[idx].scatter(
+        n_outer = len(obj)
+        s = dict_s[method]
+        color = discrete_color(n_outer, dict_color_2Dplot[method])
+        if method == 'grid_search':
+            i = 0
+            axarr_grad[i, idx].scatter(
                 np.array(log_alpha) - log_alpha_max, obj / E0,
-                color=discrete_color(len(obj), dict_color_2Dplot[method]),
-                label="%s" % (dict_method[method]),
-                marker=marker, s=s)
-            axarr_grad.flat[idx].set_xticks(dict_xticks[model_name, dataset])
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        elif method == 'bayesian':
+            i = 1
+            axarr_grad[i, idx].scatter(
+                np.array(log_alpha) - log_alpha_max, obj / E0,
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        elif method == 'implicit_forward_approx':
+            i = 2
+            axarr_grad[i, idx].scatter(
+                np.array(log_alpha) - log_alpha_max, obj / E0,
+                s=s, color=color,
+                marker=dict_markers[method], label="todo", clip_on=False)
+        else:
+            pass
+        if method != 'random':
+            axarr_grad[i, 0].set_ylabel(
+                "%s \n" % dict_method[method] + "Cross validation loss",
+                fontsize=fontsize)
 
     # plot for objective minus optimum on validation set
     for _, (time, obj, method, _) in enumerate(
@@ -161,7 +188,10 @@ for idx, dataset in enumerate(dataset_names):
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
-axarr_grad.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
+
+for j in range(len(dataset_names)):
+    axarr_grad[2, j].set_xlabel(
+        r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 # for ax in axarr_val:

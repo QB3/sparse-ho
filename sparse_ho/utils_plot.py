@@ -104,7 +104,8 @@ dict_markers = {}
 dict_markers["implicit_forward"] = 'X'
 dict_markers["implicit_forward_approx"] = 'x'
 dict_markers['implicit'] = 'v'
-dict_markers['grid_search'] = 'o'
+dict_markers['grid_search'] = '3'
+# dict_markers['grid_search'] = 'o'
 dict_markers['bayesian'] = 'P'
 dict_markers['random'] = '*'
 

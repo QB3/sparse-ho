@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from sparse_ho.utils_plot import (
-    configure_plt, discrete_color, dict_color, dict_color_2Dplot, dict_markers,
+    discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
 save_fig = False
@@ -98,7 +98,7 @@ fig_val, axarr_val = plt.subplots(
 fig_test, axarr_test = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
-fig_grad_grid, axarr_grad = plt.subplots(
+fig_grad, axarr_grad = plt.subplots(
     3, len(dataset_names), sharex=False, sharey=False, figsize=[11, 10],
     )
 
@@ -210,7 +210,7 @@ axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 fig_val.tight_layout()
 fig_test.tight_layout()
-fig_grad_grid.tight_layout()
+fig_grad.tight_layout()
 
 
 if save_fig:
@@ -222,17 +222,17 @@ if save_fig:
         fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
     fig_test.savefig(
         fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
-    fig_grad_grid.savefig(
+    fig_grad.savefig(
         fig_dir + "%s_val_grad.pdf" % model_name, bbox_inches="tight")
-    fig_grad_grid.savefig(
+    fig_grad.savefig(
         fig_dir + "%s_val_grad_grid.pdf" % model_name, bbox_inches="tight")
-    fig_grad_grid.savefig(
+    fig_grad.savefig(
         fig_dir_svg + "%s_val_grad.svg" % model_name,
         bbox_inches="tight")
 
 
 fig_val.show()
-fig_grad_grid.show()
+fig_grad.show()
 # fig_grad_bayesian.show()
 # fig_grad_sparseho.show()
 
