@@ -7,8 +7,8 @@ from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title)
 
-# save_fig = False
 save_fig = True
+# save_fig = False
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -95,11 +95,11 @@ plt.close('all')
 fig_val, axarr_val = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
-fig_test, axarr_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
+# fig_test, axarr_test = plt.subplots(
+#     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=False, figsize=[11, 10],
+    3, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 7],
     )
 
 model_name = "lasso"
@@ -122,12 +122,11 @@ for idx, dataset in enumerate(dataset_names):
 
     lines = []
 
-    axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
+    # axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
+    # axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
+    # axarr_test.flat[idx].tick_params(labelsize=fontsize)
 
-
-    axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-    axarr_test.flat[idx].tick_params(labelsize=fontsize)
-    axarr_val.flat[idx].tick_params(labelsize=fontsize)
+    # axarr_val.flat[idx].tick_params(labelsize=fontsize)
 
     E0 = df_data.objs[1][0]
     for _, (time, obj, alpha, method, _) in enumerate(
@@ -137,7 +136,7 @@ for idx, dataset in enumerate(dataset_names):
             for i in range(3):
                 axarr_grad[i, idx].plot(
                     np.array(log_alpha) - log_alpha_max, obj / E0,
-                    color='black')
+                    color='grey', zorder=-10)
 
     for _, (time, obj, alpha, method, _) in enumerate(
             zip(times, objs, alphas, methods, tols)):
@@ -148,27 +147,19 @@ for idx, dataset in enumerate(dataset_names):
         color = discrete_color(n_outer, dict_color_2Dplot[method])
         if method == 'grid_search':
             i = 0
-            axarr_grad[i, idx].scatter(
-                np.array(log_alpha) - log_alpha_max, obj / E0,
-                s=s, color=color,
-                marker=dict_markers[method], label="todo", clip_on=False)
         elif method == 'bayesian':
             i = 1
-            axarr_grad[i, idx].scatter(
-                np.array(log_alpha) - log_alpha_max, obj / E0,
-                s=s, color=color,
-                marker=dict_markers[method], label="todo", clip_on=False)
         elif method == 'implicit_forward_approx':
             i = 2
-            axarr_grad[i, idx].scatter(
-                np.array(log_alpha) - log_alpha_max, obj / E0,
-                s=s, color=color,
-                marker=dict_markers[method], label="todo", clip_on=False)
         else:
-            pass
+            continue
+        axarr_grad[i, idx].scatter(
+            np.array(log_alpha) - log_alpha_max, obj / E0,
+            s=s, color=color,
+            marker=marker, label="todo", clip_on=False)
         if method != 'random':
             axarr_grad[i, 0].set_ylabel(
-                "%s \n" % dict_method[method] + "Cross validation loss",
+                "%s \n" % dict_method[method] + "CV loss",
                 fontsize=fontsize)
 
     # plot for objective minus optimum on validation set
@@ -192,23 +183,23 @@ for idx, dataset in enumerate(dataset_names):
 for j in range(len(dataset_names)):
     axarr_grad[2, j].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
-axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
-axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel("\nCV loss", fontsize=fontsize)
+# axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 # for ax in axarr_val:
 #     ax.set_aspect('equal', adjustable='box')
 
 fig_val.tight_layout()
-fig_test.tight_layout()
+# fig_test.tight_layout()
 fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
         fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
     fig_val.savefig(
         fig_dir_svg + "%s_val.svg" % model_name, bbox_inches="tight")
-    fig_test.savefig(
-        fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
-    fig_test.savefig(
-        fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
+    # fig_test.savefig(
+    #     fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
+    # fig_test.savefig(
+    #     fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
     fig_grad.savefig(
         fig_dir + "%s_val_grad.pdf" % model_name, bbox_inches="tight")
     fig_grad.savefig(
@@ -217,7 +208,7 @@ if save_fig:
 
 
 fig_val.show()
-fig_test.show()
+# fig_test.show()
 fig_grad.show()
 
 
