@@ -11,7 +11,7 @@ from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
 
-maxits = [5, 10, 100, 500, 1000]
+maxits = [5, 10, 25, 50, 75, 100]
 methods = ["forward", "implicit_forward", "celer"]
 
 dict_label = {}
@@ -19,9 +19,9 @@ dict_label["forward"] = "forward"
 dict_label["implicit_forward"] = "Implicit"
 dict_label["celer"] = "Implicit + celer"
 
-dataset_name = "rcv1_train"
+dataset_name = "real-sim"
 
-p_alpha_max = 0.001
+p_alpha_max = 0.1
 
 
 tol = 1e-32
@@ -60,10 +60,11 @@ for maxit in maxits:
                 model = Lasso(max_iter=maxit)
                 criterion = HeldOutMSE(idx_train, idx_val)
                 if method == "forward":
-                    algo = Forward()
+                    algo = Forward(use_stop_crit=False)
                 elif method == "implicit_forward":
                     algo = ImplicitForward(
-                        tol_jac=1e-8, n_iter_jac=maxit, max_iter=1000)
+                        tol_jac=1e-8, n_iter_jac=maxit, max_iter=maxit,
+                        use_stop_crit=False)
                 elif method == "implicit":
                     algo = Implicit(max_iter=1000)
                 elif method == "backward":

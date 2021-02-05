@@ -8,7 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 25
 
-save_fig = False
+save_fig = True
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -56,31 +56,37 @@ dict_markers["backward"] = ">"
 
 ##############################################
 y_lims = {}
-y_lims["colon", 10] = 1e-10
-y_lims["colon", 100] = 1e-10
+y_lims["news20", 10] = 1e-10
+y_lims["news20", 100] = 1e-10
 y_lims["real-sim", 10] = 1e-10
+y_lims["real-sim", 5] = 1e-10
+y_lims["real-sim", 50] = 1e-10
 y_lims["real-sim", 100] = 1e-10
+
 y_lims["rcv1_train", 10] = 1e-10
+y_lims["rcv1_train", 5] = 1e-10
+y_lims["rcv1_train", 50] = 1e-10
 y_lims["rcv1_train", 100] = 1e-10
+
 ##############################################
 
 epoch_lims = {}
-epoch_lims["colon", 10] = 250
-epoch_lims["colon", 100] = 500
+epoch_lims["news20", 10] = 250
+epoch_lims["news20", 5] = 500
 epoch_lims["real-sim", 10] = 45
-epoch_lims["real-sim", 100] = 195
+epoch_lims["real-sim", 25] = 195
 epoch_lims["rcv1_train", 10] = 145
-epoch_lims["rcv1_train", 100] = 990
+epoch_lims["rcv1_train", 5] = 990
 ##############################################
 time_lims = {}
 time_lims["real-sim", 10] = (1e0, 100)
-time_lims["real-sim", 100] = (1e0, 100)
+time_lims["real-sim", 5] = (1e0, 100)
 time_lims["rcv1_train", 10] = (1e0, 500)
-time_lims["rcv1_train", 100] = (1e0, 500)
+time_lims["rcv1_train", 5] = (1e0, 500)
 time_lims["news20", 10] = (1e0, 1000)
-time_lims["news20", 100] = (1e0, 10000)
+time_lims["news20", 25] = (1e0, 10000)
 time_lims["colon", 10] = (1e-1, 50)
-time_lims["colon", 100] = (1e-1, 100)
+time_lims["colon", 25] = (1e-1, 100)
 ##############################################
 
 dict_title = {}
@@ -103,17 +109,17 @@ for i in range(len(files)):
 
 methods = df_data['method'].unique()
 methods = np.delete(methods, np.where(methods == "ground_truth"))
-list_datasets = df_data['dataset'].unique()
+list_datasets = ["rcv1_train", "real-sim", "news20"]
 div_alphas = df_data['div_alpha'].unique()
 div_alphas = np.sort(div_alphas)
 
 
 fig, axarr = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[14, 10],)
+    figsize=[18, 10])
 fig2, axarr2 = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[14, 10],)
+    figsize=[20, 10])
 # for n_features in list_n_features:
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
@@ -133,10 +139,12 @@ for idx1, dataset in enumerate(list_datasets):
                     df_method['maxit'], np.abs(df_method['grad'] - grad),
                     label=dict_method[method], color=dict_color[method],
                     marker=""))
-            axarr.flat[idx2 * len(list_datasets) + idx1].loglog(
+            diff_grad = np.abs(df_method['grad'] - grad)
+            diff_grad[diff_grad < 1e-9] = 1e-9
+            axarr.flat[idx2 * len(list_datasets) + idx1].semilogy(
                 df_method['time'], np.abs(df_method['grad'] - grad),
                 label=dict_method[method], color=dict_color[method],
-                marker="")
+                marker="o")
             # fig.legend()
             # plt.xlim(6, 60)
             # axarr.flat[0].set_xlim(6, 60)
@@ -153,23 +161,18 @@ for idx1, dataset in enumerate(list_datasets):
                 y_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(
                 y_lims[dataset, div_alpha])
-        axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
-                time_lims[dataset, div_alpha])
+        # axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
+        #         time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
-                + "\n"
-                + "\n"
-                + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
-                + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
-                + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha), size=fontsize)
         axarr.flat[idx1].set_title(dict_title[dataset])
-        axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
-                + "\n"
-                + "\n"
-                + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
-                + r'$|- \hat{\mathcal{J}}^\top\nabla|$'
-                + r'$| \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+        # axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
+        #       r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
+        #       + "\n"
+        #       + "\n"
+        #       + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
+        #       + r'$|- \hat{\mathcal{J}}^\top\nabla|$'
+        #       + r'$| \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
         axarr2.flat[idx1].set_title(dict_title[dataset])
 
         # axarr.flat[1].set_ylabel(
@@ -177,11 +180,14 @@ for idx1, dataset in enumerate(list_datasets):
         #        + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
         #        + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
 for i in np.arange(len(list_datasets)):
-    axarr.flat[-(i + 1)].set_xlabel("Times (s)", size=fontsize)
+    axarr.flat[-(i + 1)].set_xlabel("Time (s)", size=fontsize)
     axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", size=fontsize)
 
 fig.tight_layout()
 fig2.tight_layout()
+
+fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 if save_fig:
     fig.savefig(fig_dir + "hypergradient_computation.pdf", bbox_inches="tight")
     fig.savefig(fig_dir_svg + "hypergradient_computation.svg",

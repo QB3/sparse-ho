@@ -163,6 +163,7 @@ def get_beta_jac_iterdiff(
     else:
         if verbose:
             print('did not converge !')
+
     mask = beta != 0
     dense = beta[mask]
     jac = model._get_jac(dbeta, mask)
