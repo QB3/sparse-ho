@@ -36,7 +36,8 @@ for i, model_name in enumerate(model_names):
     axarr[i].set_title(dict_title[model_name], fontsize=fontsize)
     axarr[i].set_xlabel(r"$\lambda_{\max} - \lambda$", fontsize=fontsize)
 
-axarr[0].set_ylabel("Coefficients value", fontsize=fontsize)
+axarr[0].set_ylabel("Coefficient " + r"$\hat{\beta}^{(\lambda)}$",
+                    fontsize=fontsize)
 save_fig = True
 
 if save_fig:
