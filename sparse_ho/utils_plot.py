@@ -17,6 +17,7 @@ def configure_plt():
     sns.set_palette("colorblind")
     sns.set_style("ticks")
 
+
 def plot_legend_apart(ax, figname, ncol=None):
     """Do all your plots with fig, ax = plt.subplots(),
     don't call plt.legend() at the end but this instead"""
