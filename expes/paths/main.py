@@ -1,6 +1,8 @@
 # License: BSD 3 clause
 
 # from itertools import cycle
+
+import os
 import numpy as np
 
 from sklearn.linear_model import Lasso, ElasticNet, LogisticRegression
@@ -44,6 +46,8 @@ dict_alpha_max["enet"] = dict_alpha_max["lasso"]
 n_alphas = 1000
 p_alpha_min = 1e-5
 p_alphas = np.geomspace(1, p_alpha_min, n_alphas)
+
+os.makedirs('./results', exist_ok=True)
 
 for name_model in name_models:
     alphas = dict_alpha_max[name_model] * p_alphas
