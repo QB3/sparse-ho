@@ -5,26 +5,15 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
-    dict_method, dict_title)
+    dict_method, dict_title, configure_plt)
 
 save_fig = True
 # save_fig = False
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
-
+configure_plt()
 fontsize = 18
-params = {
-    'axes.labelsize': 14,
-    'font.size': 14,
-    'legend.fontsize': 14,
-    'xtick.labelsize': 14,
-    'ytick.labelsize': 14,
-    'text.usetex': True,
-}
-plt.rcParams.update(params)
-sns.set_palette("colorblind")
-sns.set_style("ticks")
 
 
 dict_markevery = {}
@@ -183,7 +172,7 @@ for idx, dataset in enumerate(dataset_names):
 for j in range(len(dataset_names)):
     axarr_grad[2, j].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
-axarr_val.flat[0].set_ylabel("\nCV loss", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel("CV loss", fontsize=fontsize)
 # axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 # for ax in axarr_val:
 #     ax.set_aspect('equal', adjustable='box')

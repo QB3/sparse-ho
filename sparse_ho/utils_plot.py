@@ -5,17 +5,16 @@ import seaborn as sns
 
 
 def configure_plt():
-    params = {'axes.labelsize': 12,
-              'font.size': 12,
-              'legend.fontsize': 12,
-              'xtick.labelsize': 10,
-              'ytick.labelsize': 10,
-              'text.usetex': True,
-              'figure.figsize': (8, 6)}
+    params = {
+        'axes.labelsize': 14,
+        'font.size': 14,
+        'legend.fontsize': 14,
+        'xtick.labelsize': 14,
+        'ytick.labelsize': 14,
+        'text.usetex': True,
+    }
     plt.rcParams.update(params)
-
     sns.set_palette("colorblind")
-    sns.set_context("poster")
     sns.set_style("ticks")
 
 
