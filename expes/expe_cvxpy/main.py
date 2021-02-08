@@ -25,14 +25,14 @@ dict_cvxpy["lasso"] = lasso_cvxpy
 dict_cvxpy["enet"] = enet_cvxpy
 
 dict_ncols = {}
-dict_ncols[10] = np.geomspace(100, n_features//10, num=10, dtype=int)
-dict_ncols[100] = np.geomspace(100, n_features//10, num=10, dtype=int)
+dict_ncols[10] = np.geomspace(100, n_features, num=10, dtype=int)
+dict_ncols[100] = np.geomspace(100, 600, num=10, dtype=int)
 
 
 tol = 1e-6
 l1_ratio = 0.8
 repeat = 10
-div_alphas = [10, 100]
+div_alphas = [10]
 
 
 def parallel_function(name_model, div_alpha):

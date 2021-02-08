@@ -116,10 +116,10 @@ div_alphas = np.sort(div_alphas)
 
 fig, axarr = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[10.67, 3.5])
+    figsize=[10.67, 5])
 fig2, axarr2 = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[10.67, 3.5])
+    figsize=[10.67, 5])
 # for n_features in list_n_features:
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
@@ -164,8 +164,8 @@ for idx1, dataset in enumerate(list_datasets):
         # axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
         #         time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha), size=fontsize)
-        axarr.flat[idx1].set_title(dict_title[dataset])
+                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha), fontsize=fontsize)
+        axarr.flat[idx1].set_title(dict_title[dataset], fontsize=fontsize )
         # axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
         #       r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
         #       + "\n"
@@ -180,8 +180,8 @@ for idx1, dataset in enumerate(list_datasets):
         #        + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
         #        + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
 for i in np.arange(len(list_datasets)):
-    axarr.flat[-(i + 1)].set_xlabel("Time (s)", size=fontsize)
-    axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", size=fontsize)
+    axarr.flat[-(i + 1)].set_xlabel("Time (s)", fontsize=fontsize)
+    axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", fontsize=fontsize)
 
 fig.tight_layout()
 fig2.tight_layout()
@@ -194,11 +194,11 @@ if save_fig:
                 bbox_inches="tight")
 
 # axarr.flat[1].set_title(dataset)
-plot_legend_apart(
-    axarr[0][0],
-    fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
-fig.show()
-fig2.show()
+    plot_legend_apart(
+        axarr[0][0],
+        fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
+    fig.show()
+    fig2.show()
 
 
 # labels = []

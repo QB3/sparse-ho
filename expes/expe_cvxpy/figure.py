@@ -4,9 +4,9 @@ import seaborn as sns
 
 from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
-fontsize = 25
+fontsize = 18
 
-save_fig = True
+save_fig = False
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -42,7 +42,7 @@ models = ["lasso", "enet"]
 div_alphas = [10, 100]
 
 fig, axarr = plt.subplots(
-    len(div_alphas), len(models), sharex=False, sharey=False, figsize=[20, 10])
+    len(div_alphas), len(models), sharex=False, sharey=False, figsize=[10.67, 5])
 for idx, div_alpha in enumerate(div_alphas):
     for idx2, model in enumerate(models):
         times_fwd = np.load(
@@ -69,12 +69,13 @@ for idx, div_alpha in enumerate(div_alphas):
             n_features, times_cvxpy, color=dict_color["cvxpy"],
             marker=dict_markers["cvxpy"], label=dict_method["cvxpy"])
 
-        axarr[idx, idx2].set_xlabel('Number of features')
+        axarr[idx, idx2].set_xlabel('Number of features', fontsize=fontsize)
+        axarr[idx, idx2].set_yticks([1e-2, 1e0, 1e2])
         axarr.flat[idx2].set_title(dict_title[model])
         axarr.flat[idx * len(div_alphas)].set_ylabel(
                 r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
                 + "\n"
-                + " Time (s)")
+                + " Time (s)", fontsize=fontsize)
 fig.tight_layout()
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"

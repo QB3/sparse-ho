@@ -15,7 +15,7 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-32
-methods = ["forward", "implicit_forward", "celer", "ground_truth"]
+methods = ["forward", "implicit_forward", "celer"]
 # methods = ["ground_truth"]
 div_alphas = [100]
 # dataset_names = ["real-sim", "rcv1_train", "news20"]
