@@ -1,4 +1,3 @@
-import seaborn as sns
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -82,13 +81,13 @@ dataset_names = ["rcv1_train", "real-sim", "news20"]
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
+    1, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 3.5],)
 
 # fig_test, axarr_test = plt.subplots(
 #     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 7],
+    3, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 7],
     )
 
 model_name = "lasso"
@@ -117,7 +116,7 @@ for idx, dataset in enumerate(dataset_names):
 
     # axarr_val.flat[idx].tick_params(labelsize=fontsize)
 
-    E0 = df_data.objs[1][0]
+    E0 = df_data.objs[2][0]
     for _, (time, obj, alpha, method, _) in enumerate(
             zip(times, objs, alphas, methods, tols)):
         log_alpha = np.log(alpha)
@@ -172,14 +171,16 @@ for idx, dataset in enumerate(dataset_names):
 for j in range(len(dataset_names)):
     axarr_grad[2, j].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
-axarr_val.flat[0].set_ylabel("CV loss", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel(
+    "$-----------$" "\n" "CV loss", fontsize=fontsize)
+axarr_grad.flat[0].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
 # axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 # for ax in axarr_val:
 #     ax.set_aspect('equal', adjustable='box')
 
 fig_val.tight_layout()
 # fig_test.tight_layout()
-fig_grad.tight_layout()
+# fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
         fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")

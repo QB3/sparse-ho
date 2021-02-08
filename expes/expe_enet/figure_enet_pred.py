@@ -6,8 +6,8 @@ from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title, configure_plt)
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 # fig_dir = "./"
 # fig_dir_svg = "./"
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
@@ -79,7 +79,7 @@ dataset_names = ["rcv1_train", "real-sim", "news20"]
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
+    1, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 3.5],)
 
 fig_test, axarr_test = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
@@ -111,7 +111,7 @@ for idx, dataset in enumerate(dataset_names):
     axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
     axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
-    E0 = df_data.objs.to_numpy()[0][0]
+    E0 = df_data.objs.to_numpy()[2][0]
     for _, (time, obj, alphas, method, _) in enumerate(
             zip(times, objs, all_alphas, methods, tols)):
         if method == 'grid_search':
@@ -189,14 +189,17 @@ for i in range(len(dataset_names)):
         r"$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     for j in range(len(dataset_names)):
         axarr_grad[i, j].set_aspect('equal', adjustable='box')
+        axarr_grad[i, j].set_xticks([-10, -5, 0])
+        axarr_grad[i, j].set_yticks([-10, -5, 0])
 
-axarr_val.flat[0].set_ylabel("Cross validation loss", fontsize=fontsize)
+axarr_val.flat[0].set_ylabel(
+    "$-----------$" "\n" "CV loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 
 fig_val.tight_layout()
-fig_test.tight_layout()
-fig_grad.tight_layout()
+# fig_test.tight_layout()
+# fig_grad.tight_layout()
 
 
 if save_fig:

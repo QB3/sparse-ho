@@ -12,7 +12,7 @@ fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 configure_plt()
 
-fontsize = 16
+fontsize = 18
 
 
 dict_markers = {}
@@ -99,14 +99,14 @@ methods = ["random", "bayesian", "implicit_forward"]
 
 plt.close('all')
 fig_acc_val, axarr_acc_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 fig_acc_test, axarr_acc_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 # figure for cross entropy
 fig_ce, axarr_ce = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 all_figs = [fig_acc_val, fig_acc_test, fig_ce]
 all_axarr = [axarr_acc_val, axarr_acc_test, axarr_ce]
@@ -148,10 +148,11 @@ for idx, dataset_name in enumerate(dataset_names):
         except Exception:
             print("No dataset found")
 
-    for axarr in all_axarr:
-        axarr.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-        axarr.flat[idx].set_title("%s (K=%i)" % (
-            dict_title[dataset_name], dict_n_classes[dataset_name]))
+for i in range(len(dataset_names)):
+    axarr_ce[i].set_title("%s (K=%i)" % (
+        dict_title[dataset_name], dict_n_classes[dataset_name]))
+    axarr_acc_test[i].set_xlabel("Time (s)", fontsize=fontsize)
+
 
 axarr_acc_val.flat[0].set_ylabel("Accuracy validation set", fontsize=fontsize)
 axarr_acc_test.flat[0].set_ylabel("Accuracy test set", fontsize=fontsize)
@@ -168,7 +169,8 @@ if save_fig:
         fig.savefig("%smulticlass_%s.svg" % (
             fig_dir_svg, string), bbox_inches="tight")
     plot_legend_apart(
-        all_axarr[0][0], "%smulticlass_%s_legend.pdf" % (fig_dir, string))
+        axarr_acc_val[0], "%smulticlass_%s_legend.pdf" % (fig_dir, string),
+        ncol=3)
 
 for fig in all_figs:
     fig.legend()

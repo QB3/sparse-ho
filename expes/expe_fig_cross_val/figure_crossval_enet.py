@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt, round_down, discrete_cmap
 
+save_fig = True
+# save_fig = False
+
 configure_plt()
+fontsize = 18
 
 algorithms = [
     'grid_search10', 'random', 'bayesian', 'grad_search']
@@ -25,13 +29,14 @@ log_alphas_full = np.load(
     allow_pickle=True)
 X = log_alphas_full[:, 0].reshape(30, 30)
 log_alphas_full = X[:, 0]
+log_alpha_min = log_alphas_full.min()
+log_alpha_max = log_alphas_full.max()
 X, Y = np.meshgrid(log_alphas_full, log_alphas_full)
 Z = objs_full.reshape(30, 30)
 
-
 fig, axarr = plt.subplots(
     1, len(algorithms), sharex=True, sharey=True,
-    figsize=[18, 4], constrained_layout=True)
+    figsize=[10.67, 3], constrained_layout=True)
 
 min_grid = Z.min()
 for algorithm in algorithms:
@@ -66,17 +71,17 @@ for i, algorithm in enumerate(algorithms):
     axarr[i].set_title(dict_title[algorithm])
     axarr[i].set_xlabel("$\lambda_1 - \lambda_{\max}$")
     print(objs.min())
+    axarr[i].set_xlim([log_alpha_min, log_alpha_max])
+    axarr[i].set_ylim([log_alpha_min, log_alpha_max])
+    axarr[i].set_aspect('equal', adjustable='box')
 
-cba = fig.colorbar(pcm, ax=axarr[3], ticks=[1, 5, 10, 15, 20, 25])
-cba.set_label('Iterations')
-cba2 = fig.colorbar(cs, ax=axarr[0], location='left')
-cba2.set_label(r"$\mathcal{C}(\beta^{(\lambda)})$")
+cba = fig.colorbar(pcm, ax=axarr[3], ticks=[1, 5, 10, 15, 20, 25], shrink=0.6)
+cba.set_label('Iterations', fontsize=fontsize)
+cba2 = fig.colorbar(cs, ax=axarr[0], location='left', shrink=0.6)
+cba2.set_label(r"$\mathcal{C}(\beta^{(\lambda)})$", fontsize=fontsize)
 
-axarr[0].set_ylabel(r"$\mathcal{C}(\beta^{(\lambda)})$")
-axarr[0].set_ylabel("$\lambda_2 - \lambda_{\max}$")
-
-# save_fig = True
-save_fig = False
+axarr[0].set_ylabel(r"$\mathcal{C}(\beta^{(\lambda)})$", fontsize=fontsize)
+axarr[0].set_ylabel("$\lambda_2 - \lambda_{\max}$", fontsize=fontsize)
 
 if save_fig:
     fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"

@@ -53,7 +53,7 @@ for model_name in model_names:
     axarr.flat[4].set_ylabel(
         r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$", fontsize=fontsize)
 
-    fig.tight_layout()
+    # fig.tight_layout()
 
     if save_fig:
         fig.savefig(
