@@ -6,7 +6,7 @@ import os
 
 from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
-fontsize = 25
+fontsize = 18
 
 save_fig = True
 n_iter_crop = 180
@@ -116,10 +116,10 @@ div_alphas = np.sort(div_alphas)
 
 fig, axarr = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[18, 10])
+    figsize=[10.67, 3.5])
 fig2, axarr2 = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
-    figsize=[20, 10])
+    figsize=[10.67, 3.5])
 # for n_features in list_n_features:
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
