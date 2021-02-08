@@ -69,7 +69,7 @@ for i, algorithm in enumerate(algorithms):
         clip_on=False)
 
     axarr[i].set_title(dict_title[algorithm])
-    axarr[i].set_xlabel("$\lambda_1 - \lambda_{\max}$")
+    axarr[i].set_xlabel("$\lambda_1 - \lambda_{\max}$", fontsize=fontsize)
     print(objs.min())
     axarr[i].set_xlim([log_alpha_min, log_alpha_max])
     axarr[i].set_ylim([log_alpha_min, log_alpha_max])

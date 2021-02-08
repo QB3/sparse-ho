@@ -6,8 +6,8 @@ from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
     dict_method, dict_title, configure_plt)
 
-save_fig = True
-# save_fig = False
+# save_fig = True
+save_fig = False
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -110,12 +110,6 @@ for idx, dataset in enumerate(dataset_names):
 
     lines = []
 
-    # axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    # axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-    # axarr_test.flat[idx].tick_params(labelsize=fontsize)
-
-    # axarr_val.flat[idx].tick_params(labelsize=fontsize)
-
     E0 = df_data.objs[2][0]
     for _, (time, obj, alpha, method, _) in enumerate(
             zip(times, objs, alphas, methods, tols)):
@@ -172,7 +166,8 @@ for j in range(len(dataset_names)):
     axarr_grad[2, j].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel(
-    "$-----------$" "\n" "CV loss", fontsize=fontsize)
+    "$-----------$"
+    "\n" "CV loss", fontsize=fontsize)
 axarr_grad.flat[0].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
 # axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 # for ax in axarr_val:
@@ -183,7 +178,8 @@ fig_val.tight_layout()
 # fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
-        fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
+        fig_dir + "%s_val.pdf" % model_name)
+        # fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
     fig_val.savefig(
         fig_dir_svg + "%s_val.svg" % model_name, bbox_inches="tight")
     # fig_test.savefig(

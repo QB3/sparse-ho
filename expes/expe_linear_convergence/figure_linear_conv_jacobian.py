@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from sparse_ho.utils_plot import configure_plt
 
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -29,7 +29,7 @@ dict_title["real-sim"] = "real-sim"
 
 for model_name in model_names:
     fig, axarr = plt.subplots(
-        2, 4, sharex=False, sharey=False, figsize=[10.67, 3.5],)
+        2, 4, sharex=False, sharey=False, figsize=[10.67, 5.5],)
     for idx, dataset in enumerate(dataset_names):
         df_data = pandas.read_pickle(
             "%s_%s.pkl" % (dataset, model_name))
@@ -49,11 +49,11 @@ for model_name in model_names:
             dict_title[dataset]), size=fontsize)
 
     axarr.flat[0].set_ylabel(
-        r"$||\beta^{(k)} - \hat \beta||$", fontsize=fontsize)
+        r"$\|\beta^{(k)} - \hat \beta\|$", fontsize=fontsize)
     axarr.flat[4].set_ylabel(
-        r"$||\mathcal{J}^{(k)} - \hat \mathcal{J}||$", fontsize=fontsize)
+        r"$\|\mathcal{J}^{(k)} - \hat \mathcal{J}\|$", fontsize=fontsize)
 
-    # fig.tight_layout()
+    fig.tight_layout()
 
     if save_fig:
         fig.savefig(
