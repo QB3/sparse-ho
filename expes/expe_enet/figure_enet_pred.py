@@ -193,13 +193,13 @@ for i in range(len(dataset_names)):
         axarr_grad[i, j].set_yticks([-10, -5, 0])
 
 axarr_val.flat[0].set_ylabel(
-    "$-----------$" "\n" "CV loss", fontsize=fontsize)
+    "Cross validation \n loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 
 fig_val.tight_layout()
 # fig_test.tight_layout()
-# fig_grad.tight_layout()
+fig_grad.tight_layout()
 
 
 if save_fig:

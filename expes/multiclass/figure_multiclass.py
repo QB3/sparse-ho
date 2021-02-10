@@ -89,6 +89,12 @@ dict_marker_size['bayesian'] = 4
 dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
 
+dict_xlim = {}
+dict_xlim["mnist"] = 500
+dict_xlim["usps"] = 1_200
+dict_xlim["rcv1_multiclass"] = 1_400
+dict_xlim["aloi"] = 2_000
+
 # dataset_names = ["mnist", "rcv1_multiclass", "sector_scale","aloi"]
 dataset_names = ["mnist", "usps", "rcv1_multiclass", "aloi"]
 # methods = ["implicit_forward_cdls", "random"]
@@ -147,8 +153,10 @@ for idx, dataset_name in enumerate(dataset_names):
                 marker=dict_markers[method])
         except Exception:
             print("No dataset found")
+    for axarr in all_axarr:
+        axarr[idx].set_xlim(0, dict_xlim[dataset_name])
 
-for i in range(len(dataset_names)):
+for i, dataset_name in enumerate(dataset_names):
     axarr_ce[i].set_title("%s (K=%i)" % (
         dict_title[dataset_name], dict_n_classes[dataset_name]))
     axarr_acc_test[i].set_xlabel("Time (s)", fontsize=fontsize)
