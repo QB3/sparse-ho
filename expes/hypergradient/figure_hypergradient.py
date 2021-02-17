@@ -18,7 +18,7 @@ current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
-dict_method['celer'] = 'Imp. F. Iterdiff. + celer'
+dict_method['celer'] = 'Imp. F. Iterdiff. + SOTA'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
@@ -40,6 +40,10 @@ dict_markevery["implicit_forward"] = 1
 dict_markevery["backward"] = 3
 dict_markevery["celer"] = 4
 
+
+dict_div_alphas = {}
+dict_div_alphas[10] = r'$10$'
+dict_div_alphas[100] = r'$10^2$'
 # dict_marker = {}
 # dict_marker["forward"] = "o"
 # dict_marker["implicit_forward"] = "X"
@@ -145,6 +149,9 @@ for idx1, dataset in enumerate(list_datasets):
                 df_method['time'], np.abs(df_method['grad'] - grad),
                 label=dict_method[method], color=dict_color[method],
                 marker="o")
+            
+            if dataset == "news20":
+                axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim([0, 420])
             # fig.legend()
             # plt.xlim(6, 60)
             # axarr.flat[0].set_xlim(6, 60)
@@ -164,7 +171,7 @@ for idx1, dataset in enumerate(list_datasets):
         # axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
         #         time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha), fontsize=fontsize)
+                r"$\log(\lambda_{{\max}}) - \log($" + dict_div_alphas[div_alpha] + r"$)$", fontsize=fontsize)
         axarr.flat[idx1].set_title(dict_title[dataset], fontsize=fontsize )
         # axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
         #       r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
@@ -197,8 +204,8 @@ if save_fig:
     plot_legend_apart(
         axarr[0][0],
         fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
-    fig.show()
-    fig2.show()
+fig.show()
+fig2.show()
 
 
 # labels = []

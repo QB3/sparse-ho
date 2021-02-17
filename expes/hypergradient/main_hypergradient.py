@@ -15,8 +15,8 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-32
-methods = ["forward", "implicit_forward", "celer"]
-# methods = ["ground_truth"]
+# methods = ["forward", "implicit_forward", "celer"]
+methods = ["ground_truth"]
 div_alphas = [100]
 # dataset_names = ["real-sim", "rcv1_train", "news20"]
 dataset_names = ["news20"]
@@ -34,7 +34,9 @@ def parallel_function(
         dataset_name, div_alpha, method):
     X, y = fetch_libsvm(dataset_name)
     n_samples = len(y)
-
+    if dataset_name == "news20" and div_alpha == 100:
+        rng = np.random.RandomState(42)
+        y += rng.randn(n_samples) * 0.01
     for maxit in dict_maxits[(dataset_name, div_alpha)]:
         print("Dataset %s, maxit %i" % (method, maxit))
         for i in range(2):

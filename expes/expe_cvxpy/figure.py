@@ -6,7 +6,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
-save_fig = False
+save_fig = True
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -16,7 +16,12 @@ current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
 dict_method["backward"] = 'B. Iterdiff'
-dict_method['cvxpy'] = 'Cvxpy'
+dict_method['cvxpy'] = 'Cvxpylayers'
+
+dict_div_alphas = {}
+dict_div_alphas[10] = r'$10$'
+dict_div_alphas[100] = r'$10^2$'
+
 
 dict_title = {}
 dict_title["lasso"] = "Lasso"
@@ -69,11 +74,11 @@ for idx, div_alpha in enumerate(div_alphas):
             n_features, times_cvxpy, color=dict_color["cvxpy"],
             marker=dict_markers["cvxpy"], label=dict_method["cvxpy"])
 
-        axarr[idx, idx2].set_xlabel('Number of features', fontsize=fontsize)
+        axarr[len(div_alphas) - 1, idx2].set_xlabel('\# features p', fontsize=fontsize)
         axarr[idx, idx2].set_yticks([1e-2, 1e0, 1e2])
         axarr.flat[idx2].set_title(dict_title[model])
         axarr.flat[idx * len(div_alphas)].set_ylabel(
-                r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
+                r"$\lambda_{{\max}} - \log($" + dict_div_alphas[div_alpha] + r"$)$"
                 + "\n"
                 + " Time (s)", fontsize=fontsize)
 fig.tight_layout()

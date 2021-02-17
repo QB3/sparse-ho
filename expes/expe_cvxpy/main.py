@@ -2,17 +2,17 @@ from joblib import Parallel, delayed, parallel_backend
 from itertools import product
 import numpy as np
 from sparse_ho.utils import Monitor
-from andersoncd.data.real import get_hiva_agnostic
+from andersoncd.data.real import get_gina_agnostic
 from sparse_ho import Forward, Backward
 from sparse_ho.models import Lasso, ElasticNet
 from sparse_ho.tests.cvxpylayer import lasso_cvxpy, enet_cvxpy
 from sparse_ho.criterion import HeldOutMSE
 import time
 
-X, y = get_hiva_agnostic(normalize_y=True)
+X, y = get_gina_agnostic(normalize_y=False)
 n_samples, n_features = X.shape
-idx_train = np.arange(0, (3 * n_samples) // 4)
-idx_val = np.arange(n_samples // 4, n_samples)
+idx_train = np.arange(0, n_samples // 2)
+idx_val = np.arange(n_samples // 2, n_samples)
 
 name_models = ["lasso", "enet"]
 
@@ -26,13 +26,13 @@ dict_cvxpy["enet"] = enet_cvxpy
 
 dict_ncols = {}
 dict_ncols[10] = np.geomspace(100, n_features, num=10, dtype=int)
-dict_ncols[100] = np.geomspace(100, 600, num=10, dtype=int)
+dict_ncols[100] = np.geomspace(100, n_features, num=10, dtype=int)
 
 
 tol = 1e-6
 l1_ratio = 0.8
 repeat = 10
-div_alphas = [10]
+div_alphas = [10, 100]
 
 
 def parallel_function(name_model, div_alpha):
