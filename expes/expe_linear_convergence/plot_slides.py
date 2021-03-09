@@ -7,8 +7,8 @@ from sparse_ho.utils_plot import configure_plt
 
 # save_fig = False
 save_fig = True
-fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
-fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
+fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
+fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 configure_plt()
 
@@ -76,7 +76,7 @@ for model_name in model_names:
     fig.show()
 
 
-labels = ["Support identification"]
+labels = ["Generalized support identification"]
 
 fig3 = plt.figure(figsize=[18, 4])
 fig3.legend([l for l in lines], labels,

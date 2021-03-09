@@ -46,17 +46,12 @@ dict_s['lhs'] = 4
 dict_n_feature = {}
 dict_n_feature["rcv1_train"] = r"($p=19,959$)"
 dict_n_feature["real-sim"] = r"($p=20,958$)"
-dict_n_feature["news20"] = r"($p=130,107$)"
+dict_n_feature["news20"] = r"($p=632,982$)"
 dict_n_feature["finance"] = r"($p=1,668,737$)"
 dict_n_feature["leukemia"] = r"($p=7129$)"
 
 dict_xmax = {}
-dict_xmax["logreg", "rcv1_train"] = 20
-dict_xmax["logreg", "real-sim"] = 30
-dict_xmax["logreg", "leukemia"] = 5
-dict_xmax["logreg", "news20"] = None
-
-dict_xmax["enet", "rcv1_train"] = 200
+dict_xmax["enet", "rcv1_train"] = 250
 dict_xmax["enet", "real-sim"] = 400
 dict_xmax["enet", "leukemia"] = 5
 dict_xmax["enet", "news20"] = 2000
@@ -183,6 +178,7 @@ for idx, dataset in enumerate(dataset_names):
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
 
+axarr_val.flat[0].set_ylim(0.15, 0.6)
 
 for i in range(len(dataset_names)):
     axarr_grad[2, i].set_xlabel(
@@ -193,7 +189,7 @@ for i in range(len(dataset_names)):
         axarr_grad[i, j].set_yticks([-10, -5, 0])
 
 axarr_val.flat[0].set_ylabel(
-    "Cross validation \n loss", fontsize=fontsize)
+    "Cross-validation \n loss", fontsize=fontsize)
 axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
 
 

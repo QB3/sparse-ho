@@ -117,3 +117,10 @@ dict_title["kdda_train"] = "kdda"
 dict_title["climate"] = "climate"
 dict_title["leukemia"] = "leukemia"
 dict_title["real-sim"] = "real-sim"
+
+dict_n_features = {}
+dict_n_features["rcv1_train"] = r"($p=19,959$)"
+dict_n_features["real-sim"] = r"($p=20,958$)"
+dict_n_features["news20"] = r"($p=632,982$)"
+dict_n_features["finance"] = r"($p=1,668,737$)"
+dict_n_features["leukemia"] = r"($p=7129$)"

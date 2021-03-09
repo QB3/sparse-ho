@@ -41,7 +41,7 @@ dict_point_grid_search = {}
 dict_point_grid_search["rcv1_train"] = 10
 dict_point_grid_search["real-sim"] = 10
 dict_point_grid_search["leukemia"] = 10
-dict_point_grid_search["news20"] = 5
+dict_point_grid_search["news20"] = 10
 
 #######################################################################
 dataset_names = ["news20"]

@@ -38,7 +38,8 @@ alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 tol = 1e-3
 max_iter = 1e5
 
-algorithms = ['random']
+algorithms = ['bayesian']
+# algorithms = ['random']
     # 'grid_search100', 'grid_search10', 'grad_search', 'random', 'bayesian']
 
 p_alpha_min = 1 / 10_000
@@ -83,7 +84,7 @@ for algorithm in algorithms:
             algo, cross_val_criterion, model, X, y,
             alpha_max * p_alpha_min,
             alpha_max, monitor, max_evals=10,
-            method=algorithm, size_space=1, tol=tol)
+            method=algorithm, size_space=1, tol=tol, random_state=4)
         objs = np.array(monitor.objs)
         log_alphas = np.log(np.array(monitor.alphas) / alpha_max)
     np.save("results/log_alphas_%s" % algorithm, log_alphas)

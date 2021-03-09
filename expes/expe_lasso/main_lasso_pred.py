@@ -31,14 +31,14 @@ model_name = "lasso"
 # model_name = "logreg"
 
 dict_t_max = {}
-dict_t_max["rcv1_train"] = 100
-dict_t_max["real-sim"] = 200
+dict_t_max["rcv1_train"] = 300
+dict_t_max["real-sim"] = 1800
 dict_t_max["leukemia"] = 10
 dict_t_max["news20"] = 10_000
 
 #######################################################################
-# dataset_names = ["real-sim"]
-dataset_names = ["news20"]
+# dataset_names = ["rcv1_train"]
+dataset_names = [ "real-sim"]
 # dataset_names = ["news20"]
 # dataset_names = ["leukemia"]
 # uncomment the following line to launch the experiments on other

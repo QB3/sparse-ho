@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import (
     discrete_color, dict_color, dict_color_2Dplot, dict_markers,
-    dict_method, dict_title, configure_plt)
+    dict_method, dict_title, dict_n_features, configure_plt)
 
 save_fig = True
 # save_fig = False
@@ -39,13 +39,6 @@ dict_s['grid_search'] = 60
 dict_s['bayesian'] = 60
 dict_s['random'] = 5
 dict_s['lhs'] = 4
-
-dict_n_feature = {}
-dict_n_feature["rcv1_train"] = r"($p=19,959$)"
-dict_n_feature["real-sim"] = r"($p=20,958$)"
-dict_n_feature["news20"] = r"($p=130,107$)"
-dict_n_feature["finance"] = r"($p=1,668,737$)"
-dict_n_feature["leukemia"] = r"($p=7129$)"
 
 dict_xmax = {}
 dict_xmax["logreg", "rcv1_train"] = 20
@@ -87,7 +80,7 @@ fig_val, axarr_val = plt.subplots(
 #     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 10],
+    3, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 8],
     )
 
 model_name = "lasso"
@@ -156,17 +149,18 @@ for idx, dataset in enumerate(dataset_names):
                 marker=marker, markersize=markersize,
                 markevery=dict_markevery[dataset]))
     axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
+    axarr_val.flat[idx].set_ylim(0.15, 0.4)
     axarr_val.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
     axarr_grad.flat[idx].set_title("%s %s" % (
-        dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
+        dict_title[dataset], dict_n_features[dataset]), size=fontsize)
 
 
 for j in range(len(dataset_names)):
     axarr_grad[2, j].set_xlabel(
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel(
-    "Cross validation \n loss", fontsize=fontsize)
+    "Cross-validation \n loss", fontsize=fontsize)
     # "$-----------$"
     # "\n" "CV loss", fontsize=fontsize)
 axarr_grad.flat[0].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
@@ -176,7 +170,7 @@ axarr_grad.flat[0].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
 
 fig_val.tight_layout()
 # fig_test.tight_layout()
-# fig_grad.tight_layout()
+fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
         fig_dir + "%s_val.pdf" % model_name)

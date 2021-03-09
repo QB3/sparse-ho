@@ -158,13 +158,14 @@ for idx, dataset_name in enumerate(dataset_names):
 
 for i, dataset_name in enumerate(dataset_names):
     axarr_ce[i].set_title("%s (K=%i)" % (
-        dict_title[dataset_name], dict_n_classes[dataset_name]))
+        dict_title[dataset_name], dict_n_classes[dataset_name]),
+        fontsize=fontsize)
     axarr_acc_test[i].set_xlabel("Time (s)", fontsize=fontsize)
 
 
 axarr_acc_val.flat[0].set_ylabel("Accuracy validation set", fontsize=fontsize)
 axarr_acc_test.flat[0].set_ylabel("Accuracy test set", fontsize=fontsize)
-axarr_ce.flat[0].set_ylabel("Multiclass cross entropy", fontsize=fontsize)
+axarr_ce.flat[0].set_ylabel("Multiclass cross-entropy", fontsize=fontsize)
 
 for fig in all_figs:
     fig.tight_layout()
