@@ -5,7 +5,6 @@ It is recommended to run this script on a cluster with several CPUs.
 """
 
 import numpy as np
-from numpy.linalg import norm
 from joblib import Parallel, delayed, parallel_backend
 from itertools import product
 import pandas as pd
@@ -38,7 +37,7 @@ dict_t_max["news20"] = 10_000
 
 #######################################################################
 # dataset_names = ["rcv1_train"]
-dataset_names = [ "real-sim"]
+dataset_names = ["real-sim"]
 # dataset_names = ["news20"]
 # dataset_names = ["leukemia"]
 # uncomment the following line to launch the experiments on other

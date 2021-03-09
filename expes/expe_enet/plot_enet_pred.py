@@ -9,7 +9,6 @@ File to play with expes for the enet
 from itertools import product
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.linalg import norm
 
 from sklearn import linear_model
 from sklearn.datasets import make_regression
@@ -57,7 +56,7 @@ estimator = linear_model.ElasticNet(
 dict_monitor = {}
 
 all_algo_name = ['grid_search']
-    # , 'implicit_forward', "implicit_forward_approx", 'bayesian']
+# , 'implicit_forward', "implicit_forward_approx", 'bayesian']
 # , 'random_search']
 # all_algo_name = ['random_search']
 
