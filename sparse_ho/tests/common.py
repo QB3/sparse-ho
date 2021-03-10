@@ -46,20 +46,20 @@ dict_log_alpha["svm"] = 1e-4
 dict_log_alpha["svr"] = np.array([1e-2, 1e-2])
 # Set models to be tested
 models = {}
-# models["lasso"] = Lasso(estimator=None)
-# models["enet"] = ElasticNet(estimator=None)
-# models["wLasso"] = WeightedLasso(estimator=None)
-# models["logreg"] = SparseLogreg(estimator=None)
-# models["svm"] = SVM(estimator=None)
+models["lasso"] = Lasso(estimator=None)
+models["enet"] = ElasticNet(estimator=None)
+models["wLasso"] = WeightedLasso(estimator=None)
+models["logreg"] = SparseLogreg(estimator=None)
+models["svm"] = SVM(estimator=None)
 models["svr"] = SVR(estimator=None)
 
 custom_models = {}
-# custom_models["lasso"] = Lasso(estimator=celer.Lasso(
-#     warm_start=True, fit_intercept=False))
-# custom_models["enet"] = ElasticNet(
-#     estimator=linear_model.ElasticNet(warm_start=True, fit_intercept=False))
-# custom_models["logreg"] = SparseLogreg(
-#     estimator=celer.LogisticRegression(warm_start=True, fit_intercept=False))
+custom_models["lasso"] = Lasso(estimator=celer.Lasso(
+    warm_start=True, fit_intercept=False))
+custom_models["enet"] = ElasticNet(
+    estimator=linear_model.ElasticNet(warm_start=True, fit_intercept=False))
+custom_models["logreg"] = SparseLogreg(
+    estimator=celer.LogisticRegression(warm_start=True, fit_intercept=False))
 
 # Compute "ground truth" with cvxpylayer
 dict_cvxpy_func = {
@@ -111,14 +111,14 @@ def get_v(mask, dense):
 
 
 list_model_crit = [
-    # ('lasso', 'MSE'),
-    # ('enet', 'MSE'),
-    # ('wLasso', 'MSE'),
-    # ('lasso', 'SURE'),
-    # ('logreg', 'logistic'),
-    # ('svm', 'MSE'),
+    ('lasso', 'MSE'),
+    ('enet', 'MSE'),
+    ('wLasso', 'MSE'),
+    ('lasso', 'SURE'),
+    ('logreg', 'logistic'),
+    ('svm', 'MSE'),
     ('svr', 'MSE')
 ]
 
-# list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr"]
+list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr"]
 list_model_names = ["svr"]
