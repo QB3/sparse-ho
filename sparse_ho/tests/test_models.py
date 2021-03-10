@@ -165,10 +165,7 @@ def test_check_grad_logreg_cvxpy(model_name):
 
 
 if __name__ == "__main__":
-    test_beta_jac_custom("logreg")
-    print("#" * 30)
-    for algo in list_algos:
-        print("#" * 20)
-        test_val_grad("svr", "MSE", algo)
-        test_check_grad_sparse_ho('lasso', 'MSE', algo)
-        test_beta_jac('lasso')
+    model_name = 'svr'
+    algo = list_algos[-1]
+    criterion = 'MSE'
+    test_check_grad_sparse_ho(model_name, criterion, algo)
