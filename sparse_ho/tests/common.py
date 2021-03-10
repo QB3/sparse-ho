@@ -51,7 +51,7 @@ models["enet"] = ElasticNet(estimator=None)
 models["wLasso"] = WeightedLasso(estimator=None)
 models["logreg"] = SparseLogreg(estimator=None)
 models["svm"] = SVM(estimator=None)
-models["svr"] = SVR(estimator=None)
+# models["svr"] = SVR(estimator=None)
 
 custom_models = {}
 custom_models["lasso"] = Lasso(estimator=celer.Lasso(
@@ -116,8 +116,8 @@ list_model_crit = [
     ('wLasso', 'MSE'),
     ('lasso', 'SURE'),
     ('logreg', 'logistic'),
-    ('svm', 'MSE'),
-    ('svr', 'MSE')
+    # ('svm', 'MSE'),
+    # ('svr', 'MSE')
     ]
 
 list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr"]
