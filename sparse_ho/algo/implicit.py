@@ -92,10 +92,7 @@ def get_beta_jac_t_v_implicit(
     sol_lin_sys = sol[0]
     print("sol lin syyyyyyyyyyyys")
     print(sol_lin_sys)
-    if not sol_lin_sys:
-        raise ValueError
-
-    if not size_mat:
+    if not size_mat and sol_lin_sys:
         raise ValueError
 
     jac_t_v = model._get_jac_t_v(
