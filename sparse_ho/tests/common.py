@@ -7,7 +7,8 @@ import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.models import (
-    Lasso, ElasticNet, WeightedLasso, SparseLogreg, SVM, SVR)
+    Lasso, ElasticNet, WeightedLasso, SparseLogreg, SVM)
+    # , SVR)
 from sparse_ho.tests.cvxpylayer import (
     enet_cvxpy, weighted_lasso_cvxpy, logreg_cvxpy, lasso_cvxpy,
     lasso_sure_cvxpy, svm_cvxpy, svr_cvxpy)
