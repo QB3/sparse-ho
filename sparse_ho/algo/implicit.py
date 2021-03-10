@@ -90,13 +90,6 @@ def get_beta_jac_t_v_implicit(
             x0=sol0, atol=1e-3)
 
     sol_lin_sys = sol[0]
-    # print("sol lin syyyyyyyyyyyys")
-    # print(sol_lin_sys)
-    # if not sol_lin_sys:
-    #     raise ValueError
-
-    # if not size_mat:
-    #     raise ValueError
 
     jac_t_v = model._get_jac_t_v(
         X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(),
