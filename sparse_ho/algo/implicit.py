@@ -50,9 +50,6 @@ def get_beta_jac_t_v_implicit(
     mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
 
-    if not size_mat:
-        raise ValueError
-
     v = get_v(mask, dense)
     if hasattr(model, 'dual'):
         v = model.get_dual_v(X_train, y_train, v, log_alpha)
@@ -96,6 +93,9 @@ def get_beta_jac_t_v_implicit(
     print("sol lin syyyyyyyyyyyys")
     print(sol_lin_sys)
     if not sol_lin_sys:
+        raise ValueError
+
+    if not size_mat:
         raise ValueError
 
     jac_t_v = model._get_jac_t_v(
