@@ -340,11 +340,7 @@ class SVR(BaseModel):
         maskC = np.abs(alpha) == C
         hessian = X[full_supp, :] @ X[maskC, :].T
         hessian_vec = hessian @ alpha[maskC]
-        print('%' * 80)
-        print(hessian_vec)
-        print(jac)
-        if not np.any(full_supp) and jac:
-            raise ValueError()
+
         jac_t_v = hessian_vec.T @ jac
         jac_t_v += alpha[maskC].T @ v[maskC]
         jac_t_v2 = epsilon * np.sign(alpha[full_supp]) @ jac
