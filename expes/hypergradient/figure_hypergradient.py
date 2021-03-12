@@ -8,7 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
-save_fig = False
+save_fig = True
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -18,7 +18,7 @@ current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
-dict_method['celer'] = 'Imp. F. Iterdiff. + SOTA'
+dict_method['celer'] = 'Imp. F. Iterdiff. + celer'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
