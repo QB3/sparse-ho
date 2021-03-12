@@ -78,7 +78,7 @@ for idx, div_alpha in enumerate(div_alphas):
         axarr[idx, idx2].set_yticks([1e-2, 1e0, 1e2])
         axarr.flat[idx2].set_title(dict_title[model])
         axarr.flat[idx * len(div_alphas)].set_ylabel(
-                r"$\lambda_{{\max}} - \log($" + dict_div_alphas[div_alpha] + r"$)$"
+                r"$e^\lambda = e^{\lambda_{\max}}/$ %s"%dict_div_alphas[div_alpha]
                 + "\n"
                 + " Time (s)", fontsize=fontsize)
 fig.tight_layout()

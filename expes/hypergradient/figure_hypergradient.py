@@ -8,7 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
-save_fig = True
+save_fig = False
 n_iter_crop = 180
 
 fig_dir = "results/"
@@ -42,8 +42,8 @@ dict_markevery["celer"] = 4
 
 
 dict_div_alphas = {}
-dict_div_alphas[10] = r'$10$'
-dict_div_alphas[100] = r'$10^2$'
+dict_div_alphas[10] = "10"
+dict_div_alphas[100] = "10^2"
 # dict_marker = {}
 # dict_marker["forward"] = "o"
 # dict_marker["implicit_forward"] = "X"
@@ -171,7 +171,8 @@ for idx1, dataset in enumerate(list_datasets):
         # axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
         #         time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$\log(\lambda_{{\max}}) - \log($" + dict_div_alphas[div_alpha] + r"$)$", fontsize=fontsize)
+                r"$e^\lambda = e^{\lambda_{\max}}/ %s$"%dict_div_alphas[div_alpha], fontsize=fontsize)
+
         axarr.flat[idx1].set_title(dict_title[dataset], fontsize=fontsize )
         # axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
         #       r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
