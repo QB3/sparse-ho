@@ -29,7 +29,7 @@ dict_title["real-sim"] = "real-sim"
 
 for model_name in model_names:
     fig, axarr = plt.subplots(
-        2, 4, sharex=False, sharey=False, figsize=[10.67, 5.5],)
+        2, 4, sharex=False, sharey=False, figsize=[10.67, 3.5],)
     for idx, dataset in enumerate(dataset_names):
         df_data = pandas.read_pickle(
             "%s_%s.pkl" % (dataset, model_name))

@@ -157,7 +157,7 @@ for idx, dataset_name in enumerate(dataset_names):
         axarr[idx].set_xlim(0, dict_xlim[dataset_name])
 
 for i, dataset_name in enumerate(dataset_names):
-    axarr_ce[i].set_title("%s (K=%i)" % (
+    axarr_ce[i].set_title("%s (q=%i)" % (
         dict_title[dataset_name], dict_n_classes[dataset_name]),
         fontsize=fontsize)
     axarr_acc_test[i].set_xlabel("Time (s)", fontsize=fontsize)

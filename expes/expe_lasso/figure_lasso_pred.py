@@ -74,13 +74,13 @@ dataset_names = ["rcv1_train", "real-sim", "news20"]
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 3.5],)
+    1, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 2.5],)
 
 # fig_test, axarr_test = plt.subplots(
 #     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
-    3, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 8],
+    3, len(dataset_names), sharex='col', sharey=True, figsize=[10.67, 6],
     )
 
 model_name = "lasso"
@@ -152,6 +152,8 @@ for idx, dataset in enumerate(dataset_names):
     axarr_val.flat[idx].set_ylim(0.15, 0.4)
     axarr_val.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
 
+    axarr_grad[idx, 0].set_ylim(0.15, 1)
+
     axarr_grad.flat[idx].set_title("%s %s" % (
         dict_title[dataset], dict_n_features[dataset]), size=fontsize)
 
@@ -161,27 +163,16 @@ for j in range(len(dataset_names)):
         r"$\lambda - \lambda_{\max}$", fontsize=fontsize)
 axarr_val.flat[0].set_ylabel(
     "Cross-validation \n loss", fontsize=fontsize)
-    # "$-----------$"
-    # "\n" "CV loss", fontsize=fontsize)
-axarr_grad.flat[0].set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1])
-# axarr_test.flat[0].set_ylabel("Loss on test set", fontsize=fontsize)
-# for ax in axarr_val:
-#     ax.set_aspect('equal', adjustable='box')
+
+axarr_grad.flat[0].set_yticks([0.2, 0.4, 0.6, 0.8, 1])
 
 fig_val.tight_layout()
-# fig_test.tight_layout()
 fig_grad.tight_layout()
 if save_fig:
     fig_val.savefig(
         fig_dir + "%s_val.pdf" % model_name)
-        # fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
     fig_val.savefig(
         fig_dir_svg + "%s_val.svg" % model_name)
-        # fig_dir_svg + "%s_val.svg" % model_name, bbox_inches="tight")
-    # fig_test.savefig(
-    #     fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
-    # fig_test.savefig(
-    #     fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
     fig_grad.savefig(
         fig_dir + "%s_val_grad.pdf" % model_name)
     fig_grad.savefig(
