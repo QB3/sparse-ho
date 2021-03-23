@@ -6,16 +6,16 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
+# save_fig = False
 save_fig = True
-n_iter_crop = 180
 
 fig_dir = "results/"
 fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
-dict_method["backward"] = 'B. Iterdiff'
+dict_method["forward"] = 'PCD Forward Iterdiff'
+dict_method["backward"] = 'PCD Backward Iterdiff'
 dict_method['cvxpy'] = 'Cvxpylayers'
 
 dict_div_alphas = {}
@@ -32,24 +32,19 @@ dict_color["cvxpy"] = current_palette[3]
 dict_color["backward"] = current_palette[9]
 dict_color["forward"] = current_palette[4]
 
-# dict_marker = {}
-# dict_marker["forward"] = "o"
-# dict_marker["implicit_forward"] = "X"
-# dict_marker["backward"] = "s"
-
 dict_markers = {}
 dict_markers["forward"] = 'o'
 dict_markers["backward"] = 'o'
 dict_markers['cvxpy'] = 'o'
 
-
 models = ["lasso"]
 div_alphas = [10, 100]
 
 fig, axarr = plt.subplots(
-     len(models), len(div_alphas), sharex=False, sharey=False, figsize=[10.67, 5])
+     len(models), len(div_alphas), sharex=False, sharey=True,
+     figsize=[10.67, 3])
 for idx, div_alpha in enumerate(div_alphas):
-    for idx2, model in enumerate(models):
+    for _, model in enumerate(models):
         times_fwd = np.load(
             "results/times_%s_forward_%s.npy" % (model, div_alpha),
             allow_pickle=True)
@@ -74,13 +69,15 @@ for idx, div_alpha in enumerate(div_alphas):
             n_features, times_cvxpy, color=dict_color["cvxpy"],
             marker=dict_markers["cvxpy"], label=dict_method["cvxpy"])
 
-        axarr[len(div_alphas) - 1].set_xlabel('\# features p', fontsize=fontsize)
+        axarr[idx].set_xlabel(
+            '\# features p', fontsize=fontsize)
         axarr[idx].set_yticks([1e-2, 1e0, 1e2])
-        axarr.flat[idx].set_title(dict_title[model])
-        axarr.flat[idx].set_ylabel(
-                r"$e^\lambda = e^{\lambda_{\max}}/$ %s"%dict_div_alphas[div_alpha]
-                + "\n"
-                + " Time (s)", fontsize=fontsize)
+        axarr.flat[idx].set_title(
+            r"$e^\lambda = e^{\lambda_{\max}}/$ %s" % div_alpha)
+
+axarr.flat[0].set_ylabel(
+    " Time (s)", fontsize=fontsize)
+
 fig.tight_layout()
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
