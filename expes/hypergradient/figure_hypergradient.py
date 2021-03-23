@@ -8,6 +8,7 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
+# save_fig = False
 save_fig = True
 
 fig_dir = "results/"
@@ -15,7 +16,7 @@ fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
+dict_method["forward"] = 'PCD Forward Iterdiff'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
 dict_method['celer'] = 'Imp. F. Iterdiff. + Celer'
 dict_method['grid_search'] = 'Grid-search'
@@ -113,10 +114,10 @@ div_alphas = np.sort(div_alphas)
 
 
 fig, axarr = plt.subplots(
-    len(div_alphas), len(list_datasets), sharex=False, sharey=False,
+    len(div_alphas), len(list_datasets), sharex=False, sharey=True,
     figsize=[10.67, 5])
 fig2, axarr2 = plt.subplots(
-    len(div_alphas), len(list_datasets), sharex=False, sharey=False,
+    len(div_alphas), len(list_datasets), sharex=False, sharey=True,
     figsize=[10.67, 5])
 
 for idx1, dataset in enumerate(list_datasets):
@@ -171,26 +172,8 @@ if save_fig:
     fig.savefig(fig_dir_svg + "hypergradient_computation.svg",
                 bbox_inches="tight")
 
-# axarr.flat[1].set_title(dataset)
     plot_legend_apart(
         axarr[0][0],
         fig_dir + "legend_hypergradient_computation.pdf", ncol=3)
 fig.show()
 fig2.show()
-
-
-# labels = []
-# for method in methods:
-#     labels.append(dict_method[method])
-# # labels = ['Seq. F. Iterdiff (ours)', 'F. Iterdiff', 'B. Iterdiff', ]
-# fig3 = plt.figure(figsize=[9.33, 1])
-# fig3.legend(
-#     [l[0] for l in lines], labels, ncol=3, loc='upper center', fontsize=18)
-# fig3.tight_layout()
-# #
-# if save_fig:
-#     fig3.savefig(
-#         fig_dir + "legend_intro_influ_niter.pdf", bbox_inches="tight")
-#     fig3.savefig(
-#         fig_dir_svg + "legend_intro_influ_niter.svg", bbox_inches="tight")
-# fig3.show()
