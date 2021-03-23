@@ -22,12 +22,10 @@ from sparse_ho.optimizers import GradientDescent
 from sparse_ho import ImplicitForward
 from sparse_ho.grid_search import grid_search
 from sparse_ho.ho import hyperopt_wrapper
-# from sparse_ho.bayesian import hyperopt_lasso
 
 from sparse_ho.ho import grad_search
 
 model_name = "lasso"
-# model_name = "logreg"
 
 dict_t_max = {}
 dict_t_max["rcv1_train"] = 300
@@ -37,21 +35,14 @@ dict_t_max["news20"] = 10_000
 
 #######################################################################
 # dataset_names = ["rcv1_train"]
-dataset_names = ["real-sim"]
-# dataset_names = ["news20"]
-# dataset_names = ["leukemia"]
 # uncomment the following line to launch the experiments on other
-# datasets:
-# dataset_names = ["rcv1", "news20", "finance"]
+dataset_names = ["real-sim"]
 methods = [
     "implicit_forward", "implicit_forward_approx", 'grid_search',
     'random', 'bayesian']
-# tolerance_decreases = ["exponential"]
 tolerance_decreases = ["constant"]
-# tols = [1e-8]
 tol = 1e-8
 n_outers = [75]
-n_alphas = 100
 
 dict_n_outers = {}
 dict_n_outers["news20", "implicit_forward"] = 50
@@ -65,14 +56,6 @@ dict_n_outers["finance", "forward"] = 75
 dict_n_outers["finance", "implicit"] = 6
 dict_n_outers["finance", "bayesian"] = 75
 dict_n_outers["finance", "random"] = 50
-
-# dict_algo = {}
-# dict_algo["implicit_forward"] = ImplicitForward
-# dict_algo["implicit"] = Implicit
-# # dict_algo["forward"] = Forward
-# # dict_algo["random"] = Forward
-# # dict_algo["bayesian"] = Forward
-# # dict_algo["grid_search"] = Forward
 
 #######################################################################
 # n_jobs = 1
@@ -147,7 +130,7 @@ def parallel_function(
                 algo, criterion, model, optimizer, X, y, alpha0,
                 monitor)
         else:
-            1 / 0
+            raise NotImplementedError
 
     monitor.times = np.array(monitor.times)
     monitor.objs = np.array(monitor.objs)
@@ -160,7 +143,6 @@ def parallel_function(
 
 
 print("enter sequential")
-backend = 'loky'
 
 with parallel_backend("loky", inner_max_num_threads=1):
     results = Parallel(n_jobs=n_jobs, verbose=100)(

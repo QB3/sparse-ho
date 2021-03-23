@@ -64,20 +64,12 @@ dict_xticks["logreg", "news20"] = (-8, -6, -4, -2, 0)
 
 markersize = 8
 
-# dataset_names = ["rcv1"]
-# dataset_names = ["rcv1", "news20", "finance"]
-# dataset_names = ["rcv1", "real-sim"]
 dataset_names = ["rcv1_train", "real-sim", "news20"]
-# dataset_names = ["leukemia", "rcv1", "real-sim"]
-# dataset_names = ["rcv1", "real-sim", "news20"]
 
 
 plt.close('all')
 fig_val, axarr_val = plt.subplots(
     1, len(dataset_names), sharex=False, sharey=True, figsize=[10.67, 2.5],)
-
-# fig_test, axarr_test = plt.subplots(
-#     1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3.5],)
 
 fig_grad, axarr_grad = plt.subplots(
     3, len(dataset_names), sharex='col', sharey=True, figsize=[10.67, 6],
@@ -181,7 +173,6 @@ if save_fig:
 
 
 fig_val.show()
-# fig_test.show()
 fig_grad.show()
 
 

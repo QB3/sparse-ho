@@ -26,7 +26,6 @@ from sparse_ho.grid_search import grid_search
 
 configure_plt()
 
-# dataset = 'real-sim'
 dataset = 'rcv1_train'
 # dataset = 'simu'
 
@@ -34,7 +33,6 @@ if dataset != 'simu':
     X, y = fetch_libsvm(dataset)
     y -= y.mean()
     y /= norm(y)
-    # X = X[:, :100]
 else:
     X, y = make_regression(
         n_samples=500, n_features=1000, noise=40,
@@ -54,8 +52,6 @@ estimator = celer.Lasso(
 dict_monitor = {}
 
 all_algo_name = ['implicit_forward', 'grid_search']
-# , 'random_search']
-# all_algo_name = ['random_search']
 
 for algo_name in all_algo_name:
     model = Lasso(estimator=estimator)
@@ -65,7 +61,6 @@ for algo_name in all_algo_name:
     kf = KFold(n_splits=5, shuffle=True, random_state=42)
     criterion = CrossVal(sub_criterion, cv=kf)
     algo = ImplicitForward(tol_jac=1e-3)
-    # optimizer = LineSearch(n_outer=10, tol=tol)
     optimizer = GradientDescent(
         n_outer=30, p_grad0=1., verbose=True, tol=tol)
     if algo_name == 'implicit_forward':

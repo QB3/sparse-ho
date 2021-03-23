@@ -39,8 +39,7 @@ tol = 1e-3
 max_iter = 1e5
 
 algorithms = ['bayesian']
-# algorithms = ['random']
-    # 'grid_search100', 'grid_search10', 'grad_search', 'random', 'bayesian']
+# ['grid_search100', 'grid_search10', 'grad_search', 'random', 'bayesian']
 
 p_alpha_min = 1 / 10_000
 print("Starting path computation...")

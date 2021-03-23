@@ -5,7 +5,6 @@ It is recommended to run this script on a cluster with several CPUs.
 """
 
 import numpy as np
-# from numpy.linalg import norm
 from joblib import Parallel, delayed, parallel_backend
 from itertools import product
 import pandas as pd
@@ -23,13 +22,10 @@ from sparse_ho.optimizers import GradientDescent
 from sparse_ho import ImplicitForward
 from sparse_ho.grid_search import grid_search
 from sparse_ho.ho import hyperopt_wrapper
-# from sparse_ho.bayesian import hyperopt_lasso
 
 from sparse_ho.ho import grad_search
 
 model_name = "enet"
-# model_name = "lasso"
-# model_name = "logreg"
 
 dict_t_max = {}
 dict_t_max["rcv1_train"] = 1000
@@ -45,16 +41,9 @@ dict_point_grid_search["news20"] = 10
 
 #######################################################################
 dataset_names = ["news20"]
-# dataset_names = ["real-sim"]
 # dataset_names = ["rcv1_train", "real-sim"]
-# dataset_names = ["news20"]
-# dataset_names = ["leukemia"]
-# uncomment the following line to launch the experiments on other
-# datasets:
-# dataset_names = ["rcv1", "news20", "finance"]
 methods = [
     "implicit_forward", "implicit_forward_approx", 'grid_search', 'bayesian']
-# tolerance_decreases = ["exponential"]
 tolerance_decreases = ["constant"]
 # tols = [1e-8]
 tol = 1e-6
@@ -75,14 +64,6 @@ dict_n_outers["finance", "implicit"] = 6
 dict_n_outers["finance", "bayesian"] = 75
 dict_n_outers["finance", "random"] = 50
 
-# dict_algo = {}
-# dict_algo["implicit_forward"] = ImplicitForward
-# dict_algo["implicit"] = Implicit
-# # dict_algo["forward"] = Forward
-# # dict_algo["random"] = Forward
-# # dict_algo["bayesian"] = Forward
-# # dict_algo["grid_search"] = Forward
-
 #######################################################################
 # n_jobs = 1
 n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
@@ -101,7 +82,6 @@ def parallel_function(
     # load data
     X, y = fetch_libsvm(dataset_name)
     y -= np.mean(y)
-    # X = X[:, :10]
     # compute alpha_max
     alpha_max = np.abs(X.T @ y).max() / len(y)
 
@@ -122,9 +102,7 @@ def parallel_function(
     except Exception:
         n_outer = 20
 
-    # TODO to improve
     size_loop = 2
-
     for _ in range(size_loop):
         if model_name == "lasso" or model_name == "enet":
             sub_criterion = HeldOutMSE(None, None)
@@ -165,7 +143,7 @@ def parallel_function(
                 algo, criterion, model, optimizer, X, y, alpha0,
                 monitor)
         else:
-            1 / 0
+            raise NotImplementedError
 
     monitor.times = np.array(monitor.times)
     monitor.objs = np.array(monitor.objs)
