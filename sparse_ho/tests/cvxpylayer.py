@@ -41,7 +41,7 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     beta_, = layer(lambda_alpha_th[0], lambda_alpha_th[1],
                    solver_args={'eps': 1e-6,  'max_iters': 2000})
 
-    # get test loss and it's gradient
+    # get test loss and its gradient
     test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()
 

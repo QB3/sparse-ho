@@ -1,6 +1,6 @@
 """
-This is the file to reproduce the experiments of Figure 2:
-'Computation time for the HO of the Lasso on real data.'
+This is the file to reproduce the experiments of the figure
+'Computation time for the HO of the enet on real data.'
 It is recommended to run this script on a cluster with several CPUs.
 """
 
@@ -8,13 +8,13 @@ import numpy as np
 from joblib import Parallel, delayed, parallel_backend
 from itertools import product
 import pandas as pd
-import celer
+from sklearn import linear_model
 
 from sklearn.model_selection import KFold
 
 from libsvmdata import fetch_libsvm
 
-from sparse_ho.models import Lasso, SparseLogreg
+from sparse_ho.models import ElasticNet, SparseLogreg
 from sparse_ho.criterion import HeldOutMSE, HeldOutLogistic, CrossVal
 from sparse_ho.utils import Monitor
 from sparse_ho.optimizers import GradientDescent
@@ -25,24 +25,31 @@ from sparse_ho.ho import hyperopt_wrapper
 
 from sparse_ho.ho import grad_search
 
-model_name = "lasso"
+model_name = "enet"
 
 dict_t_max = {}
-dict_t_max["rcv1_train"] = 300
-dict_t_max["real-sim"] = 1800
+dict_t_max["rcv1_train"] = 1000
+dict_t_max["real-sim"] = 1000
 dict_t_max["leukemia"] = 10
 dict_t_max["news20"] = 10_000
 
+dict_point_grid_search = {}
+dict_point_grid_search["rcv1_train"] = 10
+dict_point_grid_search["real-sim"] = 10
+dict_point_grid_search["leukemia"] = 10
+dict_point_grid_search["news20"] = 10
+
 #######################################################################
-# dataset_names = ["rcv1_train"]
-# uncomment the following line to launch the experiments on other
-dataset_names = ["real-sim"]
+dataset_names = ["news20"]
+# dataset_names = ["rcv1_train", "real-sim"]
 methods = [
-    "implicit_forward", "implicit_forward_approx", 'grid_search',
-    'random', 'bayesian']
+    "implicit_forward", "implicit_forward_approx", 'grid_search', 'bayesian']
 tolerance_decreases = ["constant"]
-tol = 1e-8
+# tols = [1e-8]
+tol = 1e-6
+# tol = 1e-8
 n_outers = [75]
+n_alphas = 100
 
 dict_n_outers = {}
 dict_n_outers["news20", "implicit_forward"] = 50
@@ -62,6 +69,10 @@ dict_n_outers["finance", "random"] = 50
 n_jobs = len(dataset_names) * len(methods) * len(tolerance_decreases)
 n_jobs = min(n_jobs, 10)
 #######################################################################
+dict_palphamin = {}
+dict_palphamin["rcv1_train"] = 1 / 100_000
+dict_palphamin["real-sim"] = 1 / 100_000
+dict_palphamin["news20"] = 1 / 1_000_000
 
 
 def parallel_function(
@@ -70,18 +81,18 @@ def parallel_function(
 
     # load data
     X, y = fetch_libsvm(dataset_name)
-    y -= y.mean()
+    y -= np.mean(y)
     # compute alpha_max
     alpha_max = np.abs(X.T @ y).max() / len(y)
 
     if model_name == "logreg":
         alpha_max /= 2
-    alpha_min = alpha_max / 10_000
+    alpha_min = alpha_max * dict_palphamin[dataset_name]
 
-    if model_name == "lasso":
-        estimator = celer.Lasso(
-            fit_intercept=False, max_iter=100, warm_start=True, tol=tol)
-        model = Lasso(estimator=estimator)
+    if model_name == "enet":
+        estimator = linear_model.ElasticNet(
+            fit_intercept=False, max_iter=10_000, warm_start=True, tol=tol)
+        model = ElasticNet(estimator=estimator)
     elif model_name == "logreg":
         model = SparseLogreg(estimator=estimator)
 
@@ -92,9 +103,8 @@ def parallel_function(
         n_outer = 20
 
     size_loop = 2
-
     for _ in range(size_loop):
-        if model_name == "lasso":
+        if model_name == "lasso" or model_name == "enet":
             sub_criterion = HeldOutMSE(None, None)
         elif model_name == "logreg":
             criterion = HeldOutLogistic(None, None)
@@ -105,17 +115,20 @@ def parallel_function(
         monitor = Monitor()
         t_max = dict_t_max[dataset_name]
         if method == 'grid_search':
+            num1D = dict_point_grid_search[dataset_name]
+            alpha1D = np.geomspace(alpha_max, alpha_min, num=num1D)
+            alphas = [np.array(i) for i in product(alpha1D, alpha1D)]
             grid_search(
                 algo, criterion, model, X, y, alpha_min, alpha_max,
-                monitor, max_evals=100, tol=tol)
+                monitor, max_evals=100, tol=tol, alphas=alphas)
         elif method == 'random' or method == 'bayesian':
             hyperopt_wrapper(
                 algo, criterion, model, X, y, alpha_min, alpha_max,
-                monitor, max_evals=30, tol=tol, method=method, size_space=1,
+                monitor, max_evals=30, tol=tol, method=method, size_space=2,
                 t_max=t_max)
         elif method.startswith("implicit_forward"):
             # do gradient descent to find the optimal lambda
-            alpha0 = alpha_max / 100
+            alpha0 = np.array([alpha_max / 100, alpha_max / 100])
             n_outer = 30
             if method == 'implicit_forward':
                 optimizer = GradientDescent(
@@ -142,7 +155,7 @@ def parallel_function(
             model_name)
 
 
-print("enter sequential")
+print("enter parallel")
 
 with parallel_backend("loky", inner_max_num_threads=1):
     results = Parallel(n_jobs=n_jobs, verbose=100)(
