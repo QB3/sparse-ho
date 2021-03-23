@@ -116,8 +116,8 @@ list_model_crit = [
     ('wLasso', 'MSE'),
     ('lasso', 'SURE'),
     ('logreg', 'logistic'),
-    # ('svm', 'MSE'),
-    # ('svr', 'MSE')
+    ('svm', 'MSE'),
+    ('svr', 'MSE')
     ]
 
 list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr"]
