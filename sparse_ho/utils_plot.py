@@ -29,7 +29,7 @@ def plot_legend_apart(ax, figname, ncol=None, figwidth=10.67, fontsize=18):
     # fig = plt.figure(figsize=(30, 4), constrained_layout=True)
     # fig = plt.figure(figsize=(figwidth, 2), constrained_layout=True)
     # fig.legend(ax.lines, [line.get_label() for line in ax.lines], ncol=ncol,
-               loc="upper center", fontsize=fontsize)
+    #           loc="upper center", fontsize=fontsize)
     fig.tight_layout()
     fig.savefig(figname)
     os.system("pdfcrop %s %s" % (figname, figname))
