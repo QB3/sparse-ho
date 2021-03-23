@@ -1,258 +1,111 @@
+"""
+=============================
+Expe Lasso
+=============================
+
+File to play with expes for the Lasso
+"""
+
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
+from numpy.linalg import norm
 
+from sklearn.datasets import make_regression
+from sklearn.model_selection import KFold
+import celer
+from libsvmdata import fetch_libsvm
+
+from sparse_ho import ImplicitForward
+from sparse_ho import grad_search, hyperopt_wrapper
+from sparse_ho.models import Lasso
+from sparse_ho.criterion import HeldOutMSE, CrossVal
+from sparse_ho.optimizers import GradientDescent
+from sparse_ho.utils import Monitor
 from sparse_ho.utils_plot import configure_plt
-
-# save_fig = False
-save_fig = True
-fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
-fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
-
+from sparse_ho.grid_search import grid_search
 
 configure_plt()
 
-fontsize = 16
+dataset = 'rcv1_train'
+# dataset = 'simu'
 
-current_palette = sns.color_palette("colorblind")
-dict_color = {}
-dict_color["grid_search"] = current_palette[3]
-dict_color["random"] = current_palette[5]
-dict_color["bayesian"] = current_palette[0]
-dict_color["implicit_forward"] = current_palette[2]
-dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
+if dataset != 'simu':
+    X, y = fetch_libsvm(dataset)
+    y -= y.mean()
+    y /= norm(y)
+else:
+    X, y = make_regression(
+        n_samples=500, n_features=1000, noise=40,
+        random_state=42)
 
-dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
-dict_method['implicit'] = 'Implicit'
-dict_method['grid_search'] = 'Grid-search'
-dict_method['bayesian'] = 'Bayesian'
-dict_method['random'] = 'Random-search'
-dict_method['hyperopt'] = 'Random-search'
-dict_method['backward'] = 'B. Iterdiff.'
+n_samples = len(y)
+alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
+alpha_min = alpha_max / 10_000
 
 
-dict_markers = {}
-dict_markers["forward"] = 'o'
-dict_markers["implicit_forward"] = 'X'
-dict_markers['implicit'] = 'v'
-dict_markers['grid_search'] = 'd'
-dict_markers['bayesian'] = 'P'
-dict_markers['random'] = '*'
+tol = 1e-8
 
-dict_title = {}
-dict_title["rcv1"] = "rcv1"
-dict_title["20newsgroups"] = "20news"
-dict_title["finance"] = "finance"
-dict_title["kdda_train"] = "kdda"
-dict_title["climate"] = "climate"
-dict_title["leukemia"] = "leukemia"
-dict_title["real-sim"] = "real-sim"
-
-dict_markevery = {}
-dict_markevery["20newsgroups"] = 5
-dict_markevery["finance"] = 10
-dict_markevery["rcv1"] = 1
-dict_markevery["real-sim"] = 10
-dict_markevery["leukemia"] = 10
-
-dict_marker_size = {}
-dict_marker_size["forward"] = 4
-dict_marker_size["implicit_forward"] = 5
-dict_marker_size["fast_iterdiff"] = 4
-dict_marker_size['implicit'] = 4
-dict_marker_size['grid_search'] = 1
-dict_marker_size['bayesian'] = 4
-dict_marker_size['random'] = 5
-dict_marker_size['lhs'] = 4
-
-dict_n_feature = {}
-dict_n_feature["rcv1"] = r"($p=19,959$)"
-dict_n_feature["real-sim"] = r"($p=20,958$)"
-dict_n_feature["20newsgroups"] = r"($p=130,107$)"
-dict_n_feature["finance"] = r"($p=1,668,737$)"
-dict_n_feature["leukemia"] = r"($p=7129$)"
-
-dict_xmax = {}
-dict_xmax["logreg", "rcv1"] = 20
-dict_xmax["logreg", "real-sim"] = 30
-dict_xmax["logreg", "leukemia"] = 5
-dict_xmax["logreg", "20newsgroups"] = None
-
-dict_xmax["lasso", "rcv1"] = 5
-dict_xmax["lasso", "real-sim"] = 10
-dict_xmax["lasso", "leukemia"] = 5
-dict_xmax["lasso", "20newsgroups"] = 15
-
-dict_xticks = {}
-dict_xticks["lasso", "rcv1"] = (-6, -4, -2, 0)
-dict_xticks["lasso", "real-sim"] = (-6, -4, -2, 0)
-dict_xticks["lasso", "leukemia"] = (-6, -4, -2, 0)
-dict_xticks["lasso", "20newsgroups"] = (-8, -6, -4, -2, 0)
-
-dict_xticks["logreg", "rcv1"] = (-8, -6, -4, -2, 0)
-dict_xticks["logreg", "real-sim"] = (-8, -6, -4, -2, 0)
-dict_xticks["logreg", "leukemia"] = (-8, -6, -4, -2, 0)
-dict_xticks["logreg", "20newsgroups"] = (-8, -6, -4, -2, 0)
-
-markersize = 8
-
-# dataset_names = ["rcv1"]
-# dataset_names = ["rcv1", "20newsgroups", "finance"]
-# dataset_names = ["rcv1", "real-sim"]
-dataset_names = ["leukemia", "rcv1", "real-sim"]
-# dataset_names = ["rcv1", "real-sim", "20newsgroups"]
+estimator = celer.Lasso(
+    fit_intercept=False, max_iter=100, warm_start=True, tol=tol)
 
 
-plt.close('all')
-fig_val, axarr_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+dict_monitor = {}
 
-fig_test, axarr_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
+all_algo_name = ['implicit_forward', 'grid_search']
 
-fig_grad, axarr_grad = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4],)
-
-# model_name = "lasso"
-model_name = "logreg"
-
-for idx, dataset in enumerate(dataset_names):
-    df_data = pd.read_pickle("%s_%s.pkl" % (model_name, dataset))
-    # df_data = pd.read_pickle("%s.pkl" % dataset)
-
-    # df_data = df_data[df_data['tolerance_decrease'] == 'exponential']
-    df_data = df_data[df_data['tolerance_decrease'] == 'constant']
-
-    methods = df_data['method']
-    times = df_data['times']
-    objs = df_data['objs']
-    objs_tests = df_data['objs_test']
-    log_alphas = df_data['log_alphas']
-    # log_alpha_max = df_data['log_alpha_max'][0]
-    log_alpha_max = df_data['log_alpha_max'].to_numpy()[0]
-    tols = df_data['tolerance_decrease']
-    norm_y_vals = df_data['norm y_val']
-    norm_val = 0
-    for norm_y_valss in norm_y_vals:
-        norm_val = norm_y_valss
-
-    min_objs = np.infty
-    for obj in objs:
-        min_objs = min(min_objs, obj.min())
-
-    lines = []
-
-    # plot for performance on test set
-    plt.figure()
-    for i, (time, obj, objs_test, method, tol) in enumerate(
-            zip(times, objs, objs_tests, methods, tols)):
-        # assert not np.allclose(obj, objs_test)
-        marker = dict_markers[method]
-        objs_test = [np.min(
-            objs_test[:k]) for k in np.arange(len(objs_test)) + 1]
-        # axarr_test.flat[idx].semilogy(
-        axarr_test.flat[idx].plot(
-            time, objs_test, color=dict_color[method],
-            label="%s" % (dict_method[method]),
-            marker=marker, markersize=markersize,
-            markevery=dict_markevery[dataset])
-
-    axarr_test.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-    # axarr_test.flat[idx].set_xticks(dict_xticks[model_name, dataset])
-
-    axarr_grad.flat[idx].set_xlabel(r"$\lambda - \lambda_\max$", fontsize=fontsize)
-    axarr_test.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-    axarr_test.flat[idx].tick_params(labelsize=fontsize)
-    axarr_val.flat[idx].tick_params(labelsize=fontsize)
-
-    for i, (time, obj, log_alpha, method, tol) in enumerate(
-            zip(times, objs, log_alphas, methods, tols)):
-        marker = dict_markers[method]
-        # if method.startswith(('grid_search', "implicit_forward", "random")):
-        if method.startswith(('grid_search', "implicit_forward")):
-            if method.startswith(('grid_search', "random")):
-                markevery = dict_markevery[dataset]
-                color = dict_color[method]
-                s = dict_marker_size[method]
-            else:
-                markevery = 1
-                color = [plt.cm.Greens((
-                    i+len(obj)/1.1) / len(
-                        obj) / 2) for i in np.arange(len(obj))]
-                s = 100
-            # axarr_grad.flat[idx].plot(
-            axarr_grad.flat[idx].scatter(
-                np.array(log_alpha) - log_alpha_max, obj, color=color,
-                label="%s" % (dict_method[method]),
-                marker=marker, s=s)
-            axarr_grad.flat[idx].set_xticks(dict_xticks[model_name, dataset])
-    # plot for objective minus optimum on validation set
-    for i, (time, obj, method, tol) in enumerate(
-            zip(times, objs, methods, tols)):
-        marker = dict_markers[method]
-        obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
-        lines.append(
-            axarr_val.flat[idx].plot(
-                time, obj,
-                color=dict_color[method], label="%s" % (dict_method[method]),
-                marker=marker, markersize=markersize,
-                markevery=dict_markevery[dataset]))
-    axarr_val.flat[idx].set_xlim(0, dict_xmax[model_name, dataset])
-
-    axarr_grad.flat[idx].set_title("%s %s" % (
-        dict_title[dataset], dict_n_feature[dataset]), size=fontsize)
-
-axarr_grad.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
-axarr_val.flat[0].set_ylabel("Loss on validation set", fontsize=fontsize)
-axarr_test.flat[0].set_ylabel(
-    "Loss on test set", fontsize=fontsize)
-
-fig_val.tight_layout()
-fig_test.tight_layout()
-fig_grad.tight_layout()
-if save_fig:
-    fig_val.savefig(
-        fig_dir + "%s_val.pdf" % model_name, bbox_inches="tight")
-    fig_val.savefig(
-        fig_dir_svg + "%s_val.svg" % model_name, bbox_inches="tight")
-    fig_test.savefig(
-        fig_dir + "%s_test.pdf" % model_name, bbox_inches="tight")
-    fig_test.savefig(
-        fig_dir_svg + "%s_test.svg" % model_name, bbox_inches="tight")
-    fig_grad.savefig(
-        fig_dir + "%s_val_grad.pdf" % model_name, bbox_inches="tight")
-    fig_grad.savefig(
-        fig_dir_svg + "%s_lasso_val_grad.svg" % model_name,
-        bbox_inches="tight")
+for algo_name in all_algo_name:
+    model = Lasso(estimator=estimator)
+    sub_criterion = HeldOutMSE(None, None)
+    alpha0 = alpha_max / 10
+    monitor = Monitor()
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    criterion = CrossVal(sub_criterion, cv=kf)
+    algo = ImplicitForward(tol_jac=1e-3)
+    optimizer = GradientDescent(
+        n_outer=30, p_grad0=1., verbose=True, tol=tol)
+    if algo_name == 'implicit_forward':
+        grad_search(
+            algo, criterion, model, optimizer, X, y, alpha0,
+            monitor)
+    elif algo_name == 'grid_search':
+        grid_search(
+            algo, criterion, model, X, y, alpha_min, alpha_max,
+            monitor, max_evals=20, tol=tol)
+    elif algo_name == 'random_search':
+        hyperopt_wrapper(
+            algo, criterion, model, X, y, alpha_min, alpha_max,
+            monitor, max_evals=20, tol=tol, method='random', size_space=1)
+    dict_monitor[algo_name] = monitor
 
 
-fig_val.show()
-fig_test.show()
-fig_grad.show()
+min_objs = np.infty
+for monitor in dict_monitor.values():
+    monitor.objs = np.array(monitor.objs)
+    min_objs = min(min_objs, monitor.objs.min())
 
+scaling_factor = (y @ y) / len(y)
+plt.figure()
+for monitor in dict_monitor.values():
+    plt.plot(monitor.times, monitor.objs / scaling_factor)
+plt.xlabel('Time (s)')
+plt.ylabel('Objective')
+plt.show(block=False)
 
-#################################################################
-# plot legend
-labels = []
-for method in methods:
-    labels.append(dict_method[method])
+plt.figure()
+for monitor in dict_monitor.values():
+    plt.semilogy(monitor.times, (monitor.objs - min_objs) / scaling_factor)
+plt.xlabel('Time (s)')
+plt.ylabel('Objective - optimum')
+plt.show(block=False)
 
-fig_legend = plt.figure(figsize=[18, 4])
-fig_legend.legend(
-    [l[0] for l in lines], labels,
-    ncol=3, loc='upper center', fontsize=fontsize - 4)
-fig_legend.tight_layout()
-if save_fig:
-    fig_legend.savefig(
-        fig_dir + "lasso_pred_legend.pdf", bbox_inches="tight")
-fig_legend.show()
-
-fig5 = plt.figure(figsize=[18, 4])
-fig5.legend([l[0] for l in lines], labels,
-            ncol=6, loc='upper center', fontsize=fontsize - 4)
-fig5.tight_layout()
-fig5.show()
+plt.figure()
+monitor_grid = dict_monitor['grid_search']
+plt.semilogx(
+    monitor_grid.alphas / alpha_max,
+    monitor_grid.objs / scaling_factor)
+for monitor in dict_monitor.values():
+    plt.scatter(
+        monitor.alphas / alpha_max, monitor.objs / scaling_factor, marker='X')
+plt.xlabel('alpha')
+plt.ylabel('Objective')
+plt.show(block=False)

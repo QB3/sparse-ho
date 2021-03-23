@@ -11,6 +11,7 @@
 import numpy as np
 from hyperopt import hp
 from hyperopt import fmin, tpe, rand
+from functools import partial
 from sklearn.utils import check_random_state
 
 
@@ -108,8 +109,9 @@ def hyperopt_wrapper(
     rng = check_random_state(random_state)
 
     if method == "bayesian":
+        algo = partial(tpe.suggest, n_startup_jobs=5)
         fmin(
-            objective, space, algo=tpe.suggest, max_evals=max_evals,
+            objective, space, algo=algo, max_evals=max_evals,
             timeout=t_max, rstate=rng)
     elif method == "random":
         fmin(

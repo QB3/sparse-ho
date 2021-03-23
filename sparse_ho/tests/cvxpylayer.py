@@ -40,7 +40,7 @@ def enet_cvxpy(X, y, lambda_alpha, idx_train, idx_val):
     lambda_alpha_th = torch.tensor(lambda_alpha, requires_grad=True)
     beta_, = layer(lambda_alpha_th[0], lambda_alpha_th[1])
 
-    # get test loss and it's gradient
+    # get test loss and its gradient
     test_loss = (Xtest @ beta_ - ytest).pow(2).mean()
     test_loss.backward()
 
