@@ -9,7 +9,6 @@ configure_plt()
 fontsize = 18
 
 save_fig = True
-n_iter_crop = 180
 
 fig_dir = "results/"
 fig_dir_svg = "results/"
@@ -44,10 +43,6 @@ dict_markevery["celer"] = 4
 dict_div_alphas = {}
 dict_div_alphas[10] = "10"
 dict_div_alphas[100] = "10^2"
-# dict_marker = {}
-# dict_marker["forward"] = "o"
-# dict_marker["implicit_forward"] = "X"
-# dict_marker["backward"] = "s"
 
 dict_markers = {}
 dict_markers["forward"] = 'o'
@@ -99,7 +94,6 @@ dict_title["news20"] = "20news"
 dict_title["colon"] = "colon"
 dict_title["real-sim"] = "real-sim"
 
-# df_data = pandas.read_pickle("results_non_unique.pkl")
 files = os.listdir('results/')
 
 for i in range(len(files)):
@@ -124,7 +118,7 @@ fig, axarr = plt.subplots(
 fig2, axarr2 = plt.subplots(
     len(div_alphas), len(list_datasets), sharex=False, sharey=False,
     figsize=[10.67, 5])
-# for n_features in list_n_features:
+
 for idx1, dataset in enumerate(list_datasets):
     df_dataset = df_data[df_data['dataset'] == dataset]
     for idx2, div_alpha in enumerate(div_alphas):
@@ -134,8 +128,6 @@ for idx1, dataset in enumerate(list_datasets):
         lines = []
         # plt.figure()
         for method in methods:
-            markevery = dict_markevery[method]
-            marker = dict_markers[method]
             df_method = df_div[df_div['method'] == method]
             df_method = df_method.sort_values('maxit')
             lines.append(
@@ -149,44 +141,22 @@ for idx1, dataset in enumerate(list_datasets):
                 df_method['time'], np.abs(df_method['grad'] - grad),
                 label=dict_method[method], color=dict_color[method],
                 marker="o")
-            
+
             if dataset == "news20":
                 axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim([0, 420])
-            # fig.legend()
-            # plt.xlim(6, 60)
-            # axarr.flat[0].set_xlim(6, 60)
-            # axarr.flat[1].set_xlim(6, 60)
-            # axarr.flat[0].ylabel("Objective minus optimum")
-            # axarr.flat[0].xlabel("Number of iterations")
-            # plt.title("p = %i, rho = %0.2f" % (n_features, rho))
-            # plt.tight_layout()
-            # plt.show(block=False)
 
-        # axarr2.flat[idx2 * len(list_datasets) + idx1].set_xlabel(
-        #        r"$\#$ epochs", fontsize=18)
         axarr2.flat[idx2 * len(list_datasets) + idx1].set_ylim(
                 y_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets) + idx1].set_ylim(
                 y_lims[dataset, div_alpha])
-        # axarr.flat[idx2 * len(list_datasets) + idx1].set_xlim(
-        #         time_lims[dataset, div_alpha])
         axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-                r"$e^\lambda = e^{\lambda_{\max}}/ %s$"%dict_div_alphas[div_alpha], fontsize=fontsize)
+                r"$e^\lambda = e^{\lambda_{\max}}/ %s$" %
+                dict_div_alphas[div_alpha], fontsize=fontsize)
 
-        axarr.flat[idx1].set_title(dict_title[dataset], fontsize=fontsize )
-        # axarr2.flat[idx2 * len(list_datasets)].set_ylabel(
-        #       r"$\lambda_{{\max}} / $" + ("%i" % div_alpha)
-        #       + "\n"
-        #       + "\n"
-        #       + r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
-        #       + r'$|- \hat{\mathcal{J}}^\top\nabla|$'
-        #       + r'$| \mathcal{C}(\hat{\beta}^{(\lambda)})|$', size=fontsize)
+        axarr.flat[idx1].set_title(dict_title[dataset], fontsize=fontsize)
+
         axarr2.flat[idx1].set_title(dict_title[dataset])
 
-        # axarr.flat[1].set_ylabel(
-        #        r'$|\mathcal{J}^\top\nabla \mathcal{C}(\beta^{(\lambda)})|$'
-        #        + r'$|- \hat{\mathcal{J}}^\top\nabla |$'
-        #        + r'$|\mathcal{C}(\hat{\beta}^{(\lambda)})|$', fontsize=18)
 for i in np.arange(len(list_datasets)):
     axarr.flat[-(i + 1)].set_xlabel("Time (s)", fontsize=fontsize)
     axarr2.flat[-(i + 1)].set_xlabel(r"$\#$ epochs", fontsize=fontsize)

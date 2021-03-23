@@ -15,10 +15,8 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-32
-# methods = ["forward", "implicit_forward", "celer"]
 methods = ["ground_truth"]
 div_alphas = [100]
-# dataset_names = ["real-sim", "rcv1_train", "news20"]
 dataset_names = ["news20"]
 rep = 10
 dict_maxits = {}
@@ -91,7 +89,7 @@ def parallel_function(
                 elif method == "backward":
                     algo = Backward()
                 else:
-                    1 / 0
+                    raise NotImplementedError
                 algo.max_iter = maxit
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
@@ -103,8 +101,7 @@ def parallel_function(
             val, grad, monitor.times[0])
         df = pandas.DataFrame(results).transpose()
         df.columns = [
-            'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad',
-            'time']
+            'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad', 'time']
         str_results = "results/hypergradient_%s_%i_%s_%i.pkl" % (
             dataset_name, div_alpha, method, maxit)
         df.to_pickle(str_results)
