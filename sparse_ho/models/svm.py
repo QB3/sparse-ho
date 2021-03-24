@@ -175,7 +175,7 @@ class SVM(BaseModel):
         if np.any(sign == 1.0):
             ddual_var[sign == 1.0] = np.repeat(C, (sign == 1).sum())
         if is_sparse:
-            self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))
+            self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))[:, 0]
         else:
             self.dbeta = np.sum(y * ddual_var * X.T, axis=1)
         return ddual_var
@@ -199,7 +199,7 @@ class SVM(BaseModel):
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
             dbeta, dual_var, ddual_var, L, C, sign_beta):
-        sign = np.zeros(dual_var.shape[0])
+        sign = np.zeros(n_samples)
         sign[dual_var == 0.0] = -1.0
         sign[dual_var == C] = 1.0
         for j in np.arange(0, n_samples)[sign == 0.0]:
