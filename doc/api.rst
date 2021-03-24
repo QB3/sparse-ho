@@ -90,4 +90,3 @@ Utils
    :toctree: generated/
 
    Monitor
-   WarmStart

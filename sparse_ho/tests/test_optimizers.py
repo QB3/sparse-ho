@@ -12,7 +12,7 @@ from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
 from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
 from sparse_ho.ho import grad_search
-from sparse_ho.optimizers import LineSearch
+from sparse_ho.optimizers import LineSearch, GradientDescent
 
 n_samples = 100
 n_features = 100
@@ -51,36 +51,33 @@ models_custom = [
     Lasso(max_iter=max_iter, estimator=estimator),
 ]
 
+Optimizers = [LineSearch, GradientDescent]
 
+
+@pytest.mark.parametrize('Optimizer', Optimizers)
 @pytest.mark.parametrize('model', models)
 @pytest.mark.parametrize('crit', ['MSE', 'sure'])
-def test_grad_search(model, crit):
+def test_grad_search(Optimizer, model, crit):
     """check that the paths are the same in the line search"""
-    if crit == 'MSE':
-        n_outer = 2
-        criterion = HeldOutMSE(idx_train, idx_val)
-    else:
-        n_outer = 2
-        criterion = FiniteDiffMonteCarloSure(sigma_star)
-    # TODO MM@QBE if else scheme surprising
+    n_outer = 2
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor1 = Monitor()
     algo = Forward()
-    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
+    optimizer = Optimizer(n_outer=n_outer, tol=1e-16)
     grad_search(
         algo, criterion, model, optimizer, X, y, alpha0, monitor1)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor2 = Monitor()
     algo = Implicit()
-    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
+    optimizer = Optimizer(n_outer=n_outer, tol=1e-16)
     grad_search(algo, criterion, model, optimizer, X, y, alpha0, monitor2)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     monitor3 = Monitor()
     algo = ImplicitForward(tol_jac=1e-8, n_iter_jac=5000)
-    optimizer = LineSearch(n_outer=n_outer, tol=1e-16)
+    optimizer = Optimizer(n_outer=n_outer, tol=1e-16)
     grad_search(algo, criterion, model, optimizer, X, y, alpha0, monitor3)
 
     np.testing.assert_allclose(
