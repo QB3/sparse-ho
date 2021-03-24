@@ -12,3 +12,5 @@ coverage:
 comment:
   layout: "header, diff, sunburst, uncovered"
 behavior: default
+fixes:
+  - "/home/runner/work/sparse-ho/sparse-ho/::"
