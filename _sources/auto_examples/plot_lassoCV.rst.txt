@@ -126,7 +126,7 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   12.3s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   13.1s finished
     scikit finished
 
 
@@ -234,8 +234,8 @@ Plot results
 
  .. code-block:: none
 
-    Time for grid search: 12.31 s
-    Time for grad search (sparse-ho): 3.66 s
+    Time for grid search: 13.14 s
+    Time for grad search (sparse-ho): 4.37 s
     Minimum outer criterion value with grid search: 1938.13556
     Minimum outer criterion value with grad search: 1927.89740
 
@@ -245,7 +245,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.339 seconds)
+   **Total running time of the script:** ( 0 minutes  17.916 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_lassoCV.py:
