@@ -164,7 +164,7 @@ Grid-search
     Iteration 19 / 20
     Iteration 20 / 20
     scikit finished
-    Time to compute grad search: 1.39 s
+    Time to compute grad search: 1.17 s
 
 
 
@@ -245,7 +245,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 2.38 s
+    Time to compute grad search: 2.37 s
 
 
 
@@ -253,7 +253,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.294 seconds)
+   **Total running time of the script:** ( 0 minutes  4.088 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

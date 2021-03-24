@@ -95,86 +95,37 @@
   <div class="section" id="sparse-ho">
 <h1>sparse-ho<a class="headerlink" href="#sparse-ho" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://github.com/QB3/sparse-ho/actions?query=workflow%3Abuild"><img alt="image0" src="https://github.com/QB3/sparse-ho/workflows/build/badge.svg?branch=master" /></a> <a class="reference external" href="https://app.codecov.io/gh/qb3/sparse-ho"><img alt="image1" src="https://codecov.io/gh/QB3/sparse-ho/branch/master/graphs/badge.svg?branch=master" /></a></p>
-<p>sparse-ho stands for “sparse hyperparameter optimization”. This code aims to offer
-a efficient solution to the problem of hyperparameter setting for sparse models such as Lasso.
-Contrarily to grid search, the proposed method can handle efficiently many hyperparameters.</p>
-<p>This package implements the implicit forward differentiation algorithm, a fast algorithm to
-compute the Jacobian of the Lasso as described in <a class="reference external" href="https://arxiv.org/pdf/2002.08943.pdf">this paper</a>.</p>
-<p>It also implements a large number of competitors, such as the forward differentiation, the backward differentiation, and the implicit differentiation.</p>
+<p><cite>sparse-ho</cite> stands for “sparse hyperparameter optimization”.
+This package implements efficient hyperparameter tuning for sparse machine learning models.
+It supports models such as the Lasso, the Weighted Lasso, multiclass sparse Logistic regression, SVM, etc.</p>
+<p>Relying on a first order algorithm for bilevel optimization, <code class="docutils literal notranslate"><span class="pre">sparse-ho</span></code>’s performances scales gracefully with the number of hyperparameters to tune.</p>
+<p>In order to benchmark performances, the package also implements alternatives such as forward or backward differentiation.</p>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>Please visit <a href="#id1"><span class="problematic" id="id2">`https://qb3.github.io/sparse-ho`_</span></a> for the latest version of the documentation.</p>
+</div>
 <div class="section" id="install">
 <h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
-<p>To be able to run the experiments  you should install the conda environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">sparse</span><span class="o">-</span><span class="n">ho</span><span class="o">-</span><span class="n">env</span>
-</pre></div>
-</div>
-<p>(you may need to open  fresh new terminal).</p>
-<p>To be able to run the code you first need to run, in the folder that contains
-the setup.py file (root folder):</p>
+<p>To run the code you first need to clone the repository, and then run, in the folder containing
+the <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> file (root folder):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>
 </pre></div>
 </div>
-<p>You should now be able to run a first example which reproduces Figure 1:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">examples</span><span class="o">/</span><span class="n">plot_time_to_compute_single_gradient</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>If you want to compare methods to solve the whole hyperparameter optimization
-problem, you can run the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">examples</span><span class="o">/</span><span class="n">plot_friendly_example</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>in particular you can play with the parameters of the bayesian solver in
-the implicit_forward/bayesian.py file.</p>
-<p>You should now be able to play with the methods and the estimators.</p>
-</div>
-</div>
-<div class="section" id="reproduce-all-experiments">
-<h1>Reproduce all experiments<a class="headerlink" href="#reproduce-all-experiments" title="Permalink to this headline">¶</a></h1>
-<p>Scripts to reproduce all the experiments: Figure 2, 3, 4, 5.</p>
-<p>Be careful, you may want to run these scripts on a server with multiple CPUs.</p>
-<p>All the figures of the paper can be reproduced.</p>
-<p>What is needed is in the implicit_forward/expes folder:</p>
-<ul class="simple">
-<li><p>Figure 2:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">main_lasso_pred</span><span class="o">.</span><span class="n">py</span>
-<span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">plot_lasso_pred</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Figure 3:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">main_lasso_est</span><span class="o">.</span><span class="n">py</span>
-<span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">plot_lasso_est</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Figure 4:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">main_wLasso</span><span class="o">.</span><span class="n">py</span>
-<span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">plot_wLasso</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Figure 5 in Appendix:</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">run</span> <span class="n">main_mcp_pred</span><span class="o">.</span><span class="n">py</span>
-<span class="n">ipython</span> <span class="o">-</span><span class="n">i</span> <span class="n">plot_mcp_pred</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
 </div>
 </div>
 <div class="section" id="cite">
 <h1>Cite<a class="headerlink" href="#cite" title="Permalink to this headline">¶</a></h1>
 <p>If you use this code, please cite:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">bertrand2020implicit</span><span class="p">,</span>
-<span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Implicit</span> <span class="n">differentiation</span> <span class="n">of</span> <span class="n">Lasso</span><span class="o">-</span><span class="nb">type</span> <span class="n">models</span> <span class="k">for</span> <span class="n">hyperparameter</span> <span class="n">optimization</span><span class="p">},</span>
-<span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Bertrand</span><span class="p">,</span> <span class="n">Quentin</span> <span class="ow">and</span> <span class="n">Klopfenstein</span><span class="p">,</span> <span class="n">Quentin</span> <span class="ow">and</span> <span class="n">Blondel</span><span class="p">,</span> <span class="n">Mathieu</span> <span class="ow">and</span> <span class="n">Vaiter</span><span class="p">,</span> <span class="n">Samuel</span> <span class="ow">and</span> <span class="n">Gramfort</span><span class="p">,</span> <span class="n">Alexandre</span> <span class="ow">and</span> <span class="n">Salmon</span><span class="p">,</span> <span class="n">Joseph</span><span class="p">},</span>
-<span class="n">journal</span><span class="o">=</span><span class="p">{</span><span class="n">arXiv</span> <span class="n">preprint</span> <span class="n">arXiv</span><span class="p">:</span><span class="mf">2002.08943</span><span class="p">},</span>
-<span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2020</span><span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@inproceedings</span><span class="p">{</span><span class="n">bertrand2020implicit</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Implicit</span> <span class="n">differentiation</span> <span class="n">of</span> <span class="n">Lasso</span><span class="o">-</span><span class="nb">type</span> <span class="n">models</span> <span class="k">for</span> <span class="n">hyperparameter</span> <span class="n">optimization</span><span class="p">},</span>
+    <span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Bertrand</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span> <span class="ow">and</span> <span class="n">Klopfenstein</span><span class="p">,</span> <span class="n">Q</span><span class="o">.</span> <span class="ow">and</span> <span class="n">Blondel</span><span class="p">,</span> <span class="n">M</span><span class="o">.</span> <span class="ow">and</span> <span class="n">Vaiter</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span> <span class="ow">and</span> <span class="n">Gramfort</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span> <span class="ow">and</span> <span class="n">Salmon</span><span class="p">,</span> <span class="n">J</span><span class="o">.</span><span class="p">},</span>
+    <span class="n">booktitle</span><span class="o">=</span><span class="p">{</span><span class="n">ICML</span><span class="p">},</span>
+    <span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2020</span><span class="p">},</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>ArXiv links:</p>
+<p>Code to reproduce the figures of the paper is in the <code class="docutils literal notranslate"><span class="pre">expes</span></code> folder.</p>
+<p>ArXiv link:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://arxiv.org/pdf/2002.08943.pdf">https://arxiv.org/pdf/2002.08943.pdf</a></p></li>
 </ul>
