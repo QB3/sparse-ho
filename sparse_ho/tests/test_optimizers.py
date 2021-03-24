@@ -10,7 +10,8 @@ from sparse_ho.models import Lasso
 from sparse_ho import Forward
 from sparse_ho import ImplicitForward
 from sparse_ho import Implicit
-from sparse_ho.criterion import HeldOutMSE, FiniteDiffMonteCarloSure
+from sparse_ho.criterion import HeldOutMSE
+# XXX TODO test FiniteDiffMonteCarloSure crtiterion
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch, GradientDescent
 
