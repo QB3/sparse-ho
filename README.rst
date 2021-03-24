@@ -4,7 +4,7 @@ sparse-ho
 |image0| |image1|
 
 `sparse-ho` stands for "sparse hyperparameter optimization".
-This package implement efficient hyperparameter tuning for sparse machine learning models.
+This package implements efficient hyperparameter tuning for sparse machine learning models.
 It supports models such as the Lasso, the Weighted Lasso, multiclass sparse Logistic regression, SVM, etc.
 
 Relying on a first order algorithm for bilevel optimization, ``sparse-ho``'s performances scales gracefully with the number of hyperparameters to tune.
