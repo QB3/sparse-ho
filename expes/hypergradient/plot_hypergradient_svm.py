@@ -14,7 +14,8 @@ from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward, Backward
 from sparse_ho.utils import Monitor
 
-maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
+maxits = [5, 10, 25, 50, 75, 100]
+# maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
 methods = ["forward", "implicit_forward", "sota"]
 
 dict_label = {}
@@ -24,21 +25,21 @@ dict_label["sota"] = "Implicit + sota"
 
 dataset_name = "real-sim"
 
-logC = np.log(0.1)
+logC = np.log(0.01)
 
 tol = 1e-32
 
-X, y, w_true = make_correlated_data(
-    n_samples=3_000, n_features=100, random_state=0, snr=5)
-y = np.sign(y)
+# X, y, w_true = make_correlated_data(
+#     n_samples=3_000, n_features=100, random_state=0, snr=5)
+# y = np.sign(y)
 # print(X.sum())
 
-# X, y = fetch_libsvm(dataset_name)
-# X = X[:, :10]
-# X = csr_matrix(X)  # very important for SVM
-# my_bool = norm(X, axis=1) != 0
-# X = X[my_bool, :]
-# y = y[my_bool]
+X, y = fetch_libsvm(dataset_name)
+X = X[:, :10]
+X = csr_matrix(X)  # very important for SVM
+my_bool = norm(X, axis=1) != 0
+X = X[my_bool, :]
+y = y[my_bool]
 
 sss1 = StratifiedShuffleSplit(n_splits=2, test_size=0.3333, random_state=0)
 idx_train, idx_val = sss1.split(X, y)

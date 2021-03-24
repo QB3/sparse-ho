@@ -277,7 +277,6 @@ class SVM(BaseModel):
         else:
             hessian = (y[full_supp] * X[full_supp, :].T).T @ \
             (y[maskC] * X[maskC, :].T)
-        import ipdb; ipdb.set_trace()
 
         hessian_vec = hessian @ np.repeat(C, maskC.sum())
         jac_t_v = hessian_vec.T @ jac
