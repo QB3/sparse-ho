@@ -115,4 +115,4 @@ ArXiv links:
 .. |image0| image:: https://github.com/QB3/sparse-ho/workflows/build/badge.svg?branch=master
    :target: https://github.com/QB3/sparse-ho/actions?query=workflow%3Abuild
 .. |image1| image:: https://codecov.io/gh/QB3/sparse-ho/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/mathurinm/QB3/sparse-ho
+   :target: https://app.codecov.io/gh/qb3/sparse-ho
