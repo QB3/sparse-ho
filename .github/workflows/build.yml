@@ -34,7 +34,7 @@ jobs:
         pip install pytest pytest-cov coverage numpydoc codecov
         rm -rf coverage .coverage
         NUMBA_DISABLE_JIT=1 pytest -lv --cov-report term-missing sparse_ho --cov=sparse_ho --cov-config .coveragerc
-
+        codecov
     - name: codecov
       uses: codecov/codecov-action@v1
       with:
