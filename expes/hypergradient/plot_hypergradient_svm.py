@@ -5,6 +5,7 @@ from sklearn.model_selection import StratifiedShuffleSplit
 
 from lightning.classification import LinearSVC
 from libsvmdata import fetch_libsvm
+from scipy.sparse.linalg import norm
 
 from sparse_ho.models import SVM
 from sparse_ho.criterion import HeldOutSmoothedHinge
@@ -29,7 +30,9 @@ tol = 1e-32
 X, y = fetch_libsvm(dataset_name)
 X = X[:, :100]
 X = csr_matrix(X)  # very important for SVM
-
+my_bool = norm(X, axis=1) != 0
+X = X[my_bool, :]
+y = y[my_bool]
 
 sss1 = StratifiedShuffleSplit(n_splits=2, test_size=0.3333, random_state=0)
 idx_train, idx_val = sss1.split(X, y)

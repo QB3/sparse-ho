@@ -37,6 +37,7 @@ class SVM(BaseModel):
         self.estimator = estimator
         self.max_iter = max_iter
         self.dual = True
+        self.dual_var = None
         self.ddual_var = None
 
     def _init_dbeta_ddual_var(
@@ -227,7 +228,7 @@ class SVM(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
-        return X[:, mask]
+        return X[mask, :]
 
     @staticmethod
     def reduce_y(y, mask):
@@ -311,9 +312,7 @@ class SVM(BaseModel):
     def _use_estimator(self, X, y, C, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(
-            tol=tol, C=C,
-            fit_intercept=False, max_iter=max_iter)
+        self.estimator.set_params(tol=tol, C=C, max_iter=max_iter)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]
