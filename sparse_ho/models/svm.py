@@ -228,7 +228,7 @@ class SVM(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
-        return X[mask, :]
+        return X
 
     @staticmethod
     def reduce_y(y, mask):
@@ -242,9 +242,9 @@ class SVM(BaseModel):
 
     def get_dual_v(self, X, y, v, log_C):
         if issparse(X):
-            v_dual = v * (X.T).multiply(y)
-            v_dual = np.sum(v_dual, axis=1)
-            v_dual = np.squeeze(np.array(v_dual))
+            v_dual = v @ (X.T).multiply(y)
+            # v_dual = np.sum(v_dual)
+            # v_dual = np.squeeze(np.array(v_dual))
         else:
             v_dual = (y * X.T).T @ v
         return v_dual
@@ -271,8 +271,14 @@ class SVM(BaseModel):
         C = C[0]
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         maskC = self.dual_var == C
-        hessian = (y[full_supp] * X[full_supp, :].T).T @ \
+        if issparse(X):
+            Xy = X[full_supp, :].multiply(y[full_supp, np.newaxis])
+            hessian = Xy @ X[maskC, :].multiply(y[maskC, np.newaxis]).T
+        else:
+            hessian = (y[full_supp] * X[full_supp, :].T).T @ \
             (y[maskC] * X[maskC, :].T)
+        import ipdb; ipdb.set_trace()
+
         hessian_vec = hessian @ np.repeat(C, maskC.sum())
         jac_t_v = hessian_vec.T @ jac
         jac_t_v += np.repeat(C, maskC.sum()).T @ v[maskC]
@@ -315,5 +321,7 @@ class SVM(BaseModel):
         self.estimator.set_params(tol=tol, C=C, max_iter=max_iter)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
-        dense = self.estimator.coef_[mask]
+        mask = mask[0, :]
+        dense = (self.estimator.coef_)[0, :][mask]
+        self.dual_var = np.abs(self.estimator.dual_coef_[0, :])
         return mask, dense, None
