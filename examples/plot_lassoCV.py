@@ -27,7 +27,7 @@ from sklearn.model_selection import KFold
 from sparse_ho import ImplicitForward, grad_search
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
-from sparse_ho.optimizers import LineSearch
+from sparse_ho.optimizers import GradientDescent
 from sparse_ho.utils import Monitor
 from sparse_ho.utils_plot import discrete_cmap
 
@@ -81,11 +81,11 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso()
 criterion = HeldOutMSE(None, None)
-alpha0 = alpha_max / 10
+alpha0 = alpha_max / 100
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
 algo = ImplicitForward()
-optimizer = LineSearch(n_outer=10, tol=tol)
+optimizer = GradientDescent(n_outer=10, tol=tol)
 grad_search(
     algo, cross_val_criterion, model, optimizer, X, y, alpha0,
     monitor_grad)
