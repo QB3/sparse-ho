@@ -72,9 +72,6 @@ print('scikit finished')
 # Now do the hyperparameter optimization with implicit differentiation
 # --------------------------------------------------------------------
 
-estimator = sklearn.linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
-
 print('sparse-ho started')
 
 t0 = time.time()
