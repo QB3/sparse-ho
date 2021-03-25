@@ -11,7 +11,7 @@ from celer.datasets import make_correlated_data
 from sparse_ho.models import SVM
 from sparse_ho.criterion import HeldOutSmoothedHinge
 from sparse_ho import ImplicitForward, Implicit
-from sparse_ho import Forward, Backward
+from sparse_ho import Forward
 from sparse_ho.utils import Monitor
 
 maxits = [5, 10, 25, 50, 75, 100]
@@ -24,7 +24,7 @@ dict_label["implicit_forward"] = "Implicit"
 dict_label["sota"] = "Implicit + sota"
 
 
-logC = np.log(0.01)
+logC = np.log(0.15)
 
 tol = 1e-32
 
@@ -35,7 +35,7 @@ tol = 1e-32
 
 dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)
-# X = X[:, :2000]
+X = X[:, :2000]
 X = csr_matrix(X)  # very important for SVM
 my_bool = norm(X, axis=1) != 0
 X = X[my_bool, :]
@@ -86,8 +86,6 @@ for max_iter in maxits:
                         use_stop_crit=False)
                 elif method == "implicit":
                     algo = Implicit(max_iter=1000)
-                elif method == "backward":
-                    algo = Backward()
                 else:
                     raise NotImplementedError
                 algo.max_iter = max_iter
