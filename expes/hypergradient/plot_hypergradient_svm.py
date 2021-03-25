@@ -23,9 +23,8 @@ dict_label["forward"] = "forward"
 dict_label["implicit_forward"] = "Implicit"
 dict_label["sota"] = "Implicit + sota"
 
-dataset_name = "real-sim"
 
-logC = np.log(0.01)
+logC = np.log(0.1)
 
 tol = 1e-32
 
@@ -34,8 +33,9 @@ tol = 1e-32
 # y = np.sign(y)
 # print(X.sum())
 
+dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)
-X = X[:, :10]
+X = X[:, :2000]
 X = csr_matrix(X)  # very important for SVM
 my_bool = norm(X, axis=1) != 0
 X = X[my_bool, :]
