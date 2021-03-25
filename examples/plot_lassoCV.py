@@ -53,7 +53,6 @@ n_alphas = 10
 alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
 tol = 1e-8
-max_iter = 1e5
 
 #############################################################################
 # Cross-validation with scikit-learn
@@ -63,7 +62,7 @@ print('scikit started')
 t0 = time.time()
 reg = LassoCV(
     cv=kf, verbose=True, tol=tol, fit_intercept=False,
-    alphas=alphas, max_iter=max_iter).fit(X, y)
+    alphas=alphas, max_iter=1e5).fit(X, y)
 reg.score(X, y)
 t_sk = time.time() - t0
 
@@ -81,7 +80,7 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso()
 criterion = HeldOutMSE(None, None)
-alpha0 = alpha_max / 1.5
+alpha0 = 0.9 * alpha_max
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
 algo = ImplicitForward()
