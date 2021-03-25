@@ -325,9 +325,9 @@ class SVR(BaseModel):
 
         return X[full_supp, :] @ X[full_supp, :].T
 
-    def get_dual_v(self, X, y, v, log_hyperparam):
+    def get_dual_v(self, mask, dense, X, y, v, log_hyperparam):
         if v.shape[0] != 0:
-            return X @ v
+            return X[:, mask] @ v
         else:
             return np.zeros(X.shape[0])
 

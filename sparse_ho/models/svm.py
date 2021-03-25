@@ -148,7 +148,7 @@ class SVM(BaseModel):
 
     @staticmethod
     def _get_jac(dbeta, mask):
-        return dbeta[mask]
+        return dbeta
 
     @staticmethod
     def _init_dbeta0(mask, mask0, jac0):
@@ -240,13 +240,13 @@ class SVM(BaseModel):
         sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
-    def get_dual_v(self, X, y, v, log_C):
+    def get_dual_v(self, mask, dense, X, y, v, log_C):
         if issparse(X):
-            v_dual = v @ (X.T).multiply(y)
+            v_dual = v @ (X[:, mask].T).multiply(y)
             # v_dual = np.sum(v_dual)
             # v_dual = np.squeeze(np.array(v_dual))
         else:
-            v_dual = (y * X.T).T @ v
+            v_dual = (y * X[:, mask].T).T @ v
         return v_dual
 
     @staticmethod
