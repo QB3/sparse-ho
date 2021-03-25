@@ -81,7 +81,7 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso()
 criterion = HeldOutMSE(None, None)
-alpha0 = alpha_max / 100
+alpha0 = alpha_max / 1.5
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
 algo = ImplicitForward()
