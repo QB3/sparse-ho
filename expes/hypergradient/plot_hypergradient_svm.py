@@ -6,7 +6,6 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from lightning.classification import LinearSVC
 from libsvmdata import fetch_libsvm
 from scipy.sparse.linalg import norm
-from celer.datasets import make_correlated_data
 
 from sparse_ho.models import SVM
 from sparse_ho.criterion import HeldOutSmoothedHinge
@@ -27,11 +26,6 @@ dict_label["sota"] = "Implicit + sota"
 logC = np.log(0.15)
 
 tol = 1e-32
-
-# X, y, w_true = make_correlated_data(
-#     n_samples=3_000, n_features=100, random_state=0, snr=5)
-# y = np.sign(y)
-# print(X.sum())
 
 dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)

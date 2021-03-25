@@ -175,7 +175,8 @@ class SVM(BaseModel):
         if np.any(sign == 1.0):
             ddual_var[sign == 1.0] = np.repeat(C, (sign == 1).sum())
         if is_sparse:
-            self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))[:, 0]
+            self.dbeta = np.array(
+                np.sum(X.T.multiply(y * ddual_var), axis=1))[:, 0]
         else:
             self.dbeta = np.sum(y * ddual_var * X.T, axis=1)
         return ddual_var
@@ -276,7 +277,7 @@ class SVM(BaseModel):
             hessian = Xy @ X[maskC, :].multiply(y[maskC, np.newaxis]).T
         else:
             hessian = (y[full_supp] * X[full_supp, :].T).T @ \
-            (y[maskC] * X[maskC, :].T)
+                       (y[maskC] * X[maskC, :].T)
 
         hessian_vec = hessian @ np.repeat(C, maskC.sum())
         jac_t_v = hessian_vec.T @ jac
