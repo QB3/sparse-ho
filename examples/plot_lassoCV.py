@@ -71,11 +71,13 @@ print('scikit finished')
 ##############################################################################
 # Now do the hyperparameter optimization with implicit differentiation
 # --------------------------------------------------------------------
+estimator = Lasso(fit_intercept=False, warm_start=True, max_iter=1e5)
+
 
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso()
+model = Lasso(estimator)
 criterion = HeldOutMSE(None, None)
 alpha0 = 0.9 * alpha_max
 monitor_grad = Monitor()
