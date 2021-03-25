@@ -120,7 +120,7 @@ for a Lasso using a full cross-validation score.</p>
 <span class="kn">from</span> <span class="nn">sparse_ho</span> <span class="kn">import</span> <span class="n">ImplicitForward</span><span class="p">,</span> <span class="n">grad_search</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">Lasso</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.criterion</span> <span class="kn">import</span> <span class="n">HeldOutMSE</span><span class="p">,</span> <span class="n">CrossVal</span>
-<span class="kn">from</span> <span class="nn">sparse_ho.optimizers</span> <span class="kn">import</span> <span class="n">LineSearch</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.optimizers</span> <span class="kn">import</span> <span class="n">GradientDescent</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
 <span class="kn">from</span> <span class="nn">sparse_ho.utils_plot</span> <span class="kn">import</span> <span class="n">discrete_cmap</span>
 
@@ -146,7 +146,6 @@ for a Lasso using a full cross-validation score.</p>
 <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">alpha_max</span><span class="p">,</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">1_000</span><span class="p">,</span> <span class="n">n_alphas</span><span class="p">)</span>
 
 <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-8</span>
-<span class="n">max_iter</span> <span class="o">=</span> <span class="mf">1e5</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
@@ -160,7 +159,7 @@ for a Lasso using a full cross-validation score.</p>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">reg</span> <span class="o">=</span> <span class="n">LassoCV</span><span class="p">(</span>
     <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
 <span class="n">reg</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
 <span class="n">t_sk</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
 
@@ -170,7 +169,7 @@ for a Lasso using a full cross-validation score.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>scikit started
 [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   15.4s finished
+..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   13.3s finished
 scikit finished
 </pre></div>
 </div>
@@ -185,11 +184,11 @@ scikit finished
 <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">()</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">HeldOutMSE</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="n">alpha0</span> <span class="o">=</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span>
+<span class="n">alpha0</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">alpha_max</span>
 <span class="n">monitor_grad</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
 <span class="n">cross_val_criterion</span> <span class="o">=</span> <span class="n">CrossVal</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">kf</span><span class="p">)</span>
 <span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">LineSearch</span><span class="p">(</span><span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">GradientDescent</span><span class="p">(</span><span class="n">n_outer</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
 <span class="n">grad_search</span><span class="p">(</span>
     <span class="n">algo</span><span class="p">,</span> <span class="n">cross_val_criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <span class="n">alpha0</span><span class="p">,</span>
     <span class="n">monitor_grad</span><span class="p">)</span>
@@ -243,13 +242,13 @@ sparse-ho finished
 </div>
 <img alt="plot lassoCV" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_lassoCV_001.png" />
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time for grid search: 15.50 s
-Time for grad search (sparse-ho): 5.78 s
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time for grid search: 13.29 s
+Time for grad search (sparse-ho): 3.60 s
 Minimum outer criterion value with grid search: 1938.13556
-Minimum outer criterion value with grad search: 1927.89740
+Minimum outer criterion value with grad search: 1937.83528
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  21.759 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  17.314 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-lassocv-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/96ab415ed013f843e51c365fe008248c/plot_lassoCV.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_lassoCV.py</span></code></a></p>

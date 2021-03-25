@@ -25,7 +25,7 @@ Lasso with Cross-validation
 This example shows how to perform hyperparameter optimization
 for a Lasso using a full cross-validation score.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-58
+.. GENERATED FROM PYTHON SOURCE LINES 9-57
 
 .. code-block:: default
 
@@ -50,7 +50,7 @@ for a Lasso using a full cross-validation score.
     from sparse_ho import ImplicitForward, grad_search
     from sparse_ho.models import Lasso
     from sparse_ho.criterion import HeldOutMSE, CrossVal
-    from sparse_ho.optimizers import LineSearch
+    from sparse_ho.optimizers import GradientDescent
     from sparse_ho.utils import Monitor
     from sparse_ho.utils_plot import discrete_cmap
 
@@ -76,7 +76,6 @@ for a Lasso using a full cross-validation score.
     alphas = np.geomspace(alpha_max, alpha_max / 1_000, n_alphas)
 
     tol = 1e-8
-    max_iter = 1e5
 
 
 
@@ -94,12 +93,12 @@ for a Lasso using a full cross-validation score.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 58-60
 
 Cross-validation with scikit-learn
 ----------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-72
+.. GENERATED FROM PYTHON SOURCE LINES 60-71
 
 .. code-block:: default
 
@@ -108,7 +107,7 @@ Cross-validation with scikit-learn
     t0 = time.time()
     reg = LassoCV(
         cv=kf, verbose=True, tol=tol, fit_intercept=False,
-        alphas=alphas, max_iter=max_iter).fit(X, y)
+        alphas=alphas, max_iter=1e5).fit(X, y)
     reg.score(X, y)
     t_sk = time.time() - t0
 
@@ -126,18 +125,18 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   15.4s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   13.3s finished
     scikit finished
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 72-74
 
 Now do the hyperparameter optimization with implicit differentiation
 --------------------------------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-97
+.. GENERATED FROM PYTHON SOURCE LINES 74-96
 
 .. code-block:: default
 
@@ -150,11 +149,11 @@ Now do the hyperparameter optimization with implicit differentiation
     t0 = time.time()
     model = Lasso()
     criterion = HeldOutMSE(None, None)
-    alpha0 = alpha_max / 10
+    alpha0 = 0.9 * alpha_max
     monitor_grad = Monitor()
     cross_val_criterion = CrossVal(criterion, cv=kf)
     algo = ImplicitForward()
-    optimizer = LineSearch(n_outer=10, tol=tol)
+    optimizer = GradientDescent(n_outer=10, tol=tol)
     grad_search(
         algo, cross_val_criterion, model, optimizer, X, y, alpha0,
         monitor_grad)
@@ -179,12 +178,12 @@ Now do the hyperparameter optimization with implicit differentiation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-100
+.. GENERATED FROM PYTHON SOURCE LINES 97-99
 
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-132
+.. GENERATED FROM PYTHON SOURCE LINES 99-131
 
 .. code-block:: default
 
@@ -234,10 +233,10 @@ Plot results
 
  .. code-block:: none
 
-    Time for grid search: 15.50 s
-    Time for grad search (sparse-ho): 5.78 s
+    Time for grid search: 13.29 s
+    Time for grad search (sparse-ho): 3.60 s
     Minimum outer criterion value with grid search: 1938.13556
-    Minimum outer criterion value with grad search: 1927.89740
+    Minimum outer criterion value with grad search: 1937.83528
 
 
 
@@ -245,7 +244,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.759 seconds)
+   **Total running time of the script:** ( 0 minutes  17.314 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_lassoCV.py:
