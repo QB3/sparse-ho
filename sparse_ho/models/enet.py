@@ -392,12 +392,12 @@ class ElasticNet(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_hessian(X_train, y_train, mask, dense, log_alpha):
+    def get_hessian(X, y_train, mask, dense, log_alpha):
         """Compute Hessian of datafit.
 
         Parameters
         ----------
-        X_train: np.array-like, shape (n_samples, n_features)
+        X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y_train: np.array, shape (n_samples,)
             Observation vector.
@@ -408,10 +408,9 @@ class ElasticNet(BaseModel):
         log_alpha: np.array, shape (2,)
             Logarithm of hyperparameter.
         """
-        # TODO why X_train here, can we use X?
-        n_samples = X_train.shape[0]
+        n_samples = X.shape[0]
         hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + \
-            (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
+            (1 / n_samples) * X[:, mask].T @ X[:, mask]
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):
@@ -430,16 +429,6 @@ class ElasticNet(BaseModel):
         TODO
         """
         return v
-
-    # def compute_alpha_max(self):
-    #     """Compute minimal hyperparameter value leading to a 0 model."""
-    #     # TODO is this used? It's not for wlasso
-    #     if self.log_alpha_max is None:
-    #         alpha_max = np.max(np.abs(self.X.T @ self.y))
-    #         alpha_max /= self.X.shape[0]
-    #         self.log_alpha_max = np.log(alpha_max)
-    #     # TODO there is no self.X and self.y in fact
-    #     return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, dual_var,
                     ddual_var, alpha):
