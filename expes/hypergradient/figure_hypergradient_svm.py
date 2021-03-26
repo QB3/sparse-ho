@@ -9,8 +9,8 @@ from main_hypergradient_svm import dict_max_iter
 configure_plt()
 fontsize = 18
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
@@ -91,14 +91,14 @@ dict_title["real-sim"] = "real-sim"
 # n_points = 5
 # dict_max_iter = {}
 # dict_max_iter["real-sim"] = np.linspace(5, 100, n_points, dtype=np.int)
-methods = ["forward", "implicit_forward", "sota"]
+methods = ["implicit_forward", "sota", "forward"]
 
 list_datasets = ["rcv1_train", "real-sim"]
 
 
 fig, axarr = plt.subplots(
     1, len(list_datasets), sharex=False, sharey=True,
-    figsize=[10.67, 5])
+    figsize=[10.67, 3])
 
 for idx1, dataset_name in enumerate(list_datasets):
     all_max_iter = dict_max_iter[dataset_name]
@@ -120,10 +120,6 @@ for idx1, dataset_name in enumerate(list_datasets):
         axarr[idx1].semilogy(
             times, np.abs(grads - true_grad), label=dict_method[method],
             color=dict_color[method], marker="o")
-        # axarr.flat[idx1].set_ylim(y_lims[dataset, div_alpha])
-        # axarr.flat[idx2 * len(list_datasets)].set_ylabel(
-        #         r"$e^\lambda = e^{\lambda_{\max}}/ %s$" %
-        #         dict_div_alphas[div_alpha], fontsize=fontsize)
 
         axarr[idx1].set_title(dict_title[dataset_name], fontsize=fontsize)
         axarr[idx1].set_xlabel("Time (s)", fontsize=fontsize)
@@ -138,6 +134,6 @@ if save_fig:
     fig.savefig(
         fig_dir_svg + "hypergradient_computation_svm.svg", bbox_inches="tight")
     plot_legend_apart(
-        axarr[0][0],
+        axarr[0],
         fig_dir + "legend_hypergradient_computation_svm.pdf", ncol=3)
 fig.show()

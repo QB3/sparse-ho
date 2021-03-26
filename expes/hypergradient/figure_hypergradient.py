@@ -16,7 +16,7 @@ fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'PCD Forward Iterdiff'
+dict_method["forward"] = 'PCD Forward Iterdiff.'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
 dict_method['celer'] = 'Imp. F. Iterdiff. + Celer'
 dict_method['grid_search'] = 'Grid-search'
