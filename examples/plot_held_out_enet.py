@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import linear_model
 from libsvmdata.datasets import fetch_libsvm
-from sklearn.datasets import make_regression
+from celer.datasets import make_correlated_data
 from sklearn.metrics import mean_squared_error
 
 from sparse_ho import ImplicitForward
@@ -44,8 +44,8 @@ if dataset == 'rcv1':
     y -= y.mean()
     y /= np.linalg.norm(y)
 else:
-    X, y = make_regression(
-        n_samples=20, n_features=100, noise=1, random_state=42)
+    X, y, _ = make_correlated_data(
+        n_samples=200, n_features=400, snr=5, random_state=0)
 
 
 n_samples = X.shape[0]
@@ -94,8 +94,8 @@ estimator = linear_model.ElasticNet(
 print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
-n_outer = 25
-alpha0 = np.array([alpha_max * 0.3, alpha_max / 10])
+n_outer = 10
+alpha0 = np.array([alpha_max * 0.9, alpha_max * 0.9])
 model = ElasticNet(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
@@ -116,7 +116,7 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 # Plot results
 # ------------
 
-cmap = discrete_cmap(n_outer, 'Greens')
+cmap = discrete_cmap(n_outer, 'Reds')
 X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, results.T)
@@ -127,6 +127,9 @@ ax.scatter(
     monitor.alphas[:, 0] / alpha_max, monitor.alphas[:, 1] / alpha_max,
     s=40, color=cmap(np.linspace(0, 1, n_outer)), zorder=10,
     marker="X", label="$1$st order")
+ax.plot(
+    monitor.alphas[:, 0] / alpha_max, monitor.alphas[:, 1] / alpha_max,
+    c=cmap(0))
 ax.set_xlim(X.min(), X.max())
 ax.set_xlabel("L1 regularization")
 ax.set_ylabel("L2 regularization")
