@@ -303,7 +303,7 @@ class SparseLogreg(BaseModel):
         ----------
         X : np.array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features)
+        mask : np.array, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -316,7 +316,7 @@ class SparseLogreg(BaseModel):
         ----------
         y : np.array, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features)  TODO shape n_samples right?
+        mask : np.array, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y
@@ -410,17 +410,6 @@ class SparseLogreg(BaseModel):
         TODO
         """
         return v
-
-    def compute_alpha_max(self, X, y):
-        """Compute minimal hyperparameter value leading to a 0 model.
-
-        Parameters
-        ----------
-        X: TODO
-        y: TODO
-        """
-        alpha_max = np.max(np.abs(X.T @ y)) / (4 * X.shape[0])
-        return np.log(alpha_max)
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
                     ddual_var, alpha):

@@ -303,7 +303,7 @@ class WeightedLasso(BaseModel):
         ----------
         X : np.array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features)
+        mask : np.array, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -316,7 +316,7 @@ class WeightedLasso(BaseModel):
         ----------
         y : np.array, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features)  TODO shape n_samples right?
+        mask : np.array, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y

@@ -46,13 +46,12 @@ def get_beta_jac_iterdiff(
     """
     Parameters
     --------------
-    X: np.array, shape (n_samples, n_features)
-        design matrix
-        It can also be a sparse CSC matrix
+    X: np.array-like, shape (n_samples, n_features)
+        Design matrix.
     y: np.array, shape (n_samples,)
-        observations
-    log_alpha: float or np.array, shape (n_features)
-        log  of eth coefficient multiplying the penalization
+        Observation vector.
+    log_alpha: float or np.array, shape (n_features,)
+        Logarithm of hyperparameter.
     beta0: np.array, shape (n_features,)
         initial value of the regression coefficients
         beta for warm start
@@ -69,7 +68,7 @@ def get_beta_jac_iterdiff(
         to compute or not the Jacobian along with the regression
         coefficients
     model: string
-        model used, "lasso", "wlasso", or "mcp"
+        model used, "lasso", "wlasso", or "mcp" TODO not a string
     return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way
