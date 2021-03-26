@@ -13,8 +13,9 @@ from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward
 from sparse_ho.utils import Monitor
 
-maxits = [5, 10, 25, 50, 75, 100]
-# maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
+# maxits = [5, 10, 25, 50, 75, 100]
+maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
+# maxits = [5, 10, 25, 50, 75, 100, 500, 1000, 5000, 10_000]
 methods = ["forward", "implicit_forward", "sota"]
 
 dict_label = {}
@@ -23,17 +24,25 @@ dict_label["implicit_forward"] = "Implicit"
 dict_label["sota"] = "Implicit + sota"
 
 
-logC = np.log(0.15)
+# logC = np.log(10000)
+logC = np.log(0.0008)
+# logC = np.log(0.15)
 
 tol = 1e-32
 
-dataset_name = "real-sim"
+dataset_name = "gisette"
+# dataset_name = "covtype"
+# dataset_name = "rcv1_train"
+# dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)
-X = X[:, :2000]
+y[y == 2] = -1  # for covtype
+X = X[:, :100]
 X = csr_matrix(X)  # very important for SVM
 my_bool = norm(X, axis=1) != 0
 X = X[my_bool, :]
 y = y[my_bool]
+# X = X[:100, :]
+# y = y[:100]
 
 sss1 = StratifiedShuffleSplit(n_splits=2, test_size=0.3333, random_state=0)
 idx_train, idx_val = sss1.split(X, y)
@@ -43,14 +52,14 @@ idx_val = idx_val[0]
 
 true_monitor = Monitor()
 clf = LinearSVC(
-        C=np.exp(logC), tol=1e-32, max_iter=10_000, loss='hinge',
-        permute=False)
+        C=np.exp(logC), tol=1e-32, max_iter=1_000, loss='hinge',
+        permute=False, verbose=True)
 criterion = HeldOutSmoothedHinge(idx_train, idx_val)
 algo = Implicit(criterion)
-model = SVM(estimator=clf, max_iter=10_000)
+model = SVM(estimator=clf)
 true_val, true_grad = criterion.get_val_grad(
         model, X, y, logC, algo.get_beta_jac_v, tol=1e-14,
-        monitor=true_monitor)
+        monitor=true_monitor, max_iter=10_000)
 
 dict_res = {}
 for max_iter in maxits:

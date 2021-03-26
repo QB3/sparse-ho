@@ -20,21 +20,25 @@ from sparse_ho.utils import Monitor
 tol = 1e-32
 methods = ["ground_truth", "forward", "implicit_forward", "sota"]
 # div_alphas = [100]
-dataset_names = ["real-sim"]
+dataset_names = ["rcv1_train"]
+# dataset_names = ["real-sim"]
 
 n_points = 10
 dict_max_iter = {}
 dict_max_iter["real-sim"] = np.linspace(5, 100, n_points, dtype=np.int)
+dict_max_iter["rcv1_train"] = np.linspace(5, 5_000, n_points, dtype=np.int)
 
 dict_logC = {}
 dict_logC["real-sim"] = [np.log(0.1)]
+dict_logC["rcv1_train"] = [np.log(0.2)]
 
 
 def parallel_function(
         dataset_name, method):
     X, y = fetch_libsvm(dataset_name)
     X, y = fetch_libsvm(dataset_name)
-    X = X[:, :2000]
+    if dataset_name == "real-sim":
+        X = X[:, :2000]
     X = csr_matrix(X)  # very important for SVM
     my_bool = norm(X, axis=1) != 0
     X = X[my_bool, :]

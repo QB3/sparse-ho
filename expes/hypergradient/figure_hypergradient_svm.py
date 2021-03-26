@@ -16,7 +16,7 @@ fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'PCD Forward Iterdiff'
+dict_method["forward"] = 'PCD Forward Iterdiff.'
 dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
 dict_method['sota'] = 'Imp. F. Iterdiff. + Lightning'
 dict_method['grid_search'] = 'Grid-search'
@@ -77,15 +77,9 @@ epoch_lims["real-sim", 25] = 195
 epoch_lims["rcv1_train", 10] = 145
 epoch_lims["rcv1_train", 5] = 990
 ##############################################
-time_lims = {}
-time_lims["real-sim", 10] = (1e0, 100)
-time_lims["real-sim", 5] = (1e0, 100)
-time_lims["rcv1_train", 10] = (1e0, 500)
-time_lims["rcv1_train", 5] = (1e0, 500)
-time_lims["news20", 10] = (1e0, 1000)
-time_lims["news20", 25] = (1e0, 10000)
-time_lims["colon", 10] = (1e-1, 50)
-time_lims["colon", 25] = (1e-1, 100)
+dict_xlim = {}
+dict_xlim["rcv1_train"] = 60
+dict_xlim["real-sim"] = 4
 ##############################################
 
 dict_title = {}
@@ -99,7 +93,7 @@ dict_title["real-sim"] = "real-sim"
 # dict_max_iter["real-sim"] = np.linspace(5, 100, n_points, dtype=np.int)
 methods = ["forward", "implicit_forward", "sota"]
 
-list_datasets = ["real-sim", "real-sim"]
+list_datasets = ["rcv1_train", "real-sim"]
 
 
 fig, axarr = plt.subplots(
@@ -133,11 +127,8 @@ for idx1, dataset_name in enumerate(list_datasets):
 
         axarr[idx1].set_title(dict_title[dataset_name], fontsize=fontsize)
         axarr[idx1].set_xlabel("Time (s)", fontsize=fontsize)
-        # axarr[idx1].set_ylabel("Time (s)", fontsize=fontsize)
-
-
-# for i in np.arange(len(list_datasets)):
-#     axarr.flat[-(i + 1)].set_xlabel("Time (s)", fontsize=fontsize)
+        axarr[idx1].set_ylim((1e-14, 1e-2))
+        axarr[idx1].set_xlim((0, dict_xlim[dataset_name]))
 
 fig.tight_layout()
 
