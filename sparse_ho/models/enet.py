@@ -327,7 +327,7 @@ class ElasticNet(BaseModel):
         ----------
         X : np.array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features)
+        mask : np.array, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -340,7 +340,7 @@ class ElasticNet(BaseModel):
         ----------
         y : np.array, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features)  TODO shape n_samples right?
+        mask : np.array, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y
@@ -430,16 +430,6 @@ class ElasticNet(BaseModel):
         TODO
         """
         return v
-
-    # def compute_alpha_max(self):
-    #     """Compute minimal hyperparameter value leading to a 0 model."""
-    #     # TODO is this used? It's not for wlasso
-    #     if self.log_alpha_max is None:
-    #         alpha_max = np.max(np.abs(self.X.T @ self.y))
-    #         alpha_max /= self.X.shape[0]
-    #         self.log_alpha_max = np.log(alpha_max)
-    #     # TODO there is no self.X and self.y in fact
-    #     return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, dual_var,
                     ddual_var, alpha):
