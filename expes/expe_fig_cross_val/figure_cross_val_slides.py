@@ -9,8 +9,8 @@ configure_plt()
 # save_fig = False
 save_fig_grid = False
 # save_fig = True
-# save_fig_grad = True
-save_fig_grad = False
+save_fig_grad = True
+# save_fig_grad = False
 fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
 
@@ -68,16 +68,19 @@ color = [
 for i in np.arange(len(objs_grad)+1):
     fig, ax = plt.subplots(1, 1)
     ax.plot(
-        p_alphas_grid, objs_grid, color=current_palette[0], linewidth=7.0)
+        p_alphas_grid, objs_grid, color=current_palette[0], linewidth=7.0,
+        zorder=1)
     # ax.plot(
     #     p_alphas_grid, objs_grid, 'bo', label='0-order method',
     #     color=current_palette[1], markersize=15)
     ax.scatter(
         p_alphas_grid, objs_grid,
-        s=300, color=current_palette[1], marker="o", label="$O$ order")
+        s=300, color=current_palette[1], marker="o", label="$O$ order",
+        zorder=2)
     ax.scatter(
         p_alphas_grad[:i], objs_grad[:i],
-        s=700, color=color[:i], marker="X", label="$1$st order")
+        s=700, color=color[:i], marker="X", label="$1$st order",
+        zorder=3)
     plt.xscale('log')
     ax.set_xlabel(r'$\lambda / \lambda_{\max}$', fontsize=fontsize)
     plt.ylabel(
