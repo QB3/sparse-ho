@@ -147,13 +147,16 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Implicit.html#sparse_ho.Implicit" title="sparse_ho.Implicit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Implicit</span></code></a>([max_iter])</p></td>
+<td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit differentiation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the implicit forward algorithm.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([verbose, use_stop_crit])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the forward algorithm.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([verbose, use_stop_crit])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the backward differentiation.</p></td>
 </tr>
 </tbody>
@@ -168,6 +171,13 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, criterion, model, …)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.hyperopt_wrapper.html#sparse_ho.hyperopt_wrapper" title="sparse_ho.hyperopt_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hyperopt_wrapper</span></code></a>(algo, criterion, model, X, …)</p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p></p></dd>

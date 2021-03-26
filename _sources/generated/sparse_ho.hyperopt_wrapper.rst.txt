@@ -1,0 +1,6 @@
+﻿sparse\_ho.hyperopt\_wrapper
+============================
+
+.. currentmodule:: sparse_ho
+
+.. autofunction:: hyperopt_wrapper

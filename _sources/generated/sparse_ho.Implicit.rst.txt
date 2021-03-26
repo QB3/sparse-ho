@@ -1,0 +1,23 @@
+﻿sparse\_ho.Implicit
+===================
+
+.. currentmodule:: sparse_ho
+
+.. autoclass:: Implicit
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Implicit.__init__
+      ~Implicit.get_beta_jac_v
+   
+   
+
+   
+   
+   

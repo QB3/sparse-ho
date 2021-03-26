@@ -19,7 +19,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="sparse_ho.Forward" href="sparse_ho.Forward.html" />
-    <link rel="prev" title="sparse_ho.criterion.HeldOutLogistic" href="sparse_ho.criterion.HeldOutLogistic.html" />
+    <link rel="prev" title="sparse_ho.Implicit" href="sparse_ho.Implicit.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -97,25 +97,29 @@
 <h1>sparse_ho.ImplicitForward<a class="headerlink" href="#sparse-ho-implicitforward" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.ImplicitForward">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.</span></code><code class="sig-name descname"><span class="pre">ImplicitForward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.</span></code><code class="sig-name descname"><span class="pre">ImplicitForward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with
 respect to the hyperparameter using the implicit forward algorithm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>max_iter: int</strong></dt><dd><p>maximum number of iteration for the inner solver</p>
+<dt><strong>tol_jac: float</strong></dt><dd><p>Tolerance for the Jacobian computation.</p>
 </dd>
-<dt><strong>tol_jac: float</strong></dt><dd><p>tolerance for the Jacobian computation</p>
+<dt><strong>max_iter: int</strong></dt><dd><p>Maximum number of iterations for the inner solver.</p>
 </dd>
-<dt><strong>n_iter_jac: int</strong></dt><dd><p>maximum number of iteration for the Jacobian computation</p>
+<dt><strong>n_iter_jac: int</strong></dt><dd><p>Maximum number of iterations for the Jacobian computation.</p>
 </dd>
-<dt><strong>verbose: bool</strong></dt><dd></dd>
+<dt><strong>use_stop_crit: bool, optional (default=True)</strong></dt><dd><p>Use stopping criterion in hypergradient computation. If False,
+run to maximum number of iterations.</p>
+</dd>
+<dt><strong>verbose: bool, optional (default=False)</strong></dt><dd><p>Verbosity of the algorithm.</p>
+</dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.ImplicitForward.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter_jac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.ImplicitForward.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 

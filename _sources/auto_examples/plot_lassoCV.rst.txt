@@ -125,7 +125,7 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   13.3s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   12.6s finished
     scikit finished
 
 
@@ -233,10 +233,12 @@ Plot results
 
  .. code-block:: none
 
-    Time for grid search: 13.29 s
-    Time for grad search (sparse-ho): 3.60 s
+    Time for grid search: 12.61 s
+    Time for grad search (sparse-ho): 3.00 s
     Minimum outer criterion value with grid search: 1938.13556
     Minimum outer criterion value with grad search: 1937.83528
+    /home/circleci/project/examples/plot_lassoCV.py:116: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
+      ax.plot(
 
 
 
@@ -244,7 +246,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  17.314 seconds)
+   **Total running time of the script:** ( 0 minutes  15.989 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_lassoCV.py:
