@@ -192,7 +192,8 @@ class WeightedLasso(BaseModel):
         ----------
         mask: TODO
         jac_v: TODO
-        n_features: TOD
+        n_features: int
+            Number of features.
         """
         # MM sorry I don't get what this does
         # TODO n_features should be n_hyperparams, right ?

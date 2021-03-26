@@ -164,7 +164,8 @@ class Lasso(BaseModel):
         ----------
         mask: TODO
         jac_v: TODO
-        n_features: TOD
+        n_features: int
+            Number of features.
         """
         # MM sorry I don't get what this does
         return jac_v

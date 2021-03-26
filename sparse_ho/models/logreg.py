@@ -109,7 +109,6 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     @njit
-    # TODO
     def _update_bcd_jac_backward(X, alpha, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         r = X @ beta
@@ -160,7 +159,8 @@ class SparseLogreg(BaseModel):
         ----------
         mask: TODO
         jac_v: TODO
-        n_features: TODO
+        n_features: int
+            Number of features.
         """
         return jac_v
 

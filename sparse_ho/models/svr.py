@@ -363,7 +363,8 @@ class SVR(BaseModel):
         ----------
         mask: TODO
         jac_v: TODO
-        n_features: TODO
+        n_features: int
+            Number of features.
         """
         return jac_v
 
