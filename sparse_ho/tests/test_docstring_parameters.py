@@ -29,6 +29,7 @@ def _get_args(function, varargs=False):
 public_modules = [
     # the list of modules users need to access for all functionality
     'sparse_ho',
+    # 'sparse_ho.models',
 ]
 
 
@@ -46,11 +47,8 @@ def get_name(func):
 
 # functions to ignore args / docstring of
 _docstring_ignores = [
-    "sparse_ho.algo.backward.get_beta_jac_v",
-    "sparse_ho.algo.forward.get_beta_jac_v",
-    "sparse_ho.algo.implicit.get_beta_jac_v",
-    "sparse_ho.algo.implicit_forward.get_beta_jac",
-    "sparse_ho.algo.implicit_forward.get_beta_jac_v",
+    ".*get_beta_jac_v$",
+    ".*get_beta_jac$",
 ]
 _tab_ignores = []
 
@@ -207,3 +205,5 @@ def test_documented():
 
 if __name__ == "__main__":
     test_docstring_parameters()
+    test_tabs()
+    test_documented()

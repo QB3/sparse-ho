@@ -74,6 +74,7 @@ Functions
    :toctree: generated/
 
    grad_search
+   hyperopt_wrapper
 
 
 Utils
