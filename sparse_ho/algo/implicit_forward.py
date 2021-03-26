@@ -9,23 +9,27 @@ class ImplicitForward():
 
     Parameters
     ----------
-    max_iter: int
-        maximum number of iteration for the inner solver
     tol_jac: float
-        tolerance for the Jacobian computation
+        Tolerance for the Jacobian computation.
+    max_iter: int
+        Maximum number of iterations for the inner solver.
     n_iter_jac: int
-        maximum number of iteration for the Jacobian computation
-    verbose: bool
+        Maximum number of iterations for the Jacobian computation.
+    use_stop_crit: bool, optional (default=True)
+        Use stopping criterion in hypergradient computation. If False,
+        run to maximum number of iterations.
+    verbose: bool, optional (default=False)
+        Verbosity of the algorithm.
     """
 
     def __init__(
             self, tol_jac=1e-3, max_iter=100, n_iter_jac=100,
-            verbose=False, use_stop_crit=True):
+            use_stop_crit=True, verbose=False):
         self.max_iter = max_iter
         self.tol_jac = tol_jac
         self.n_iter_jac = n_iter_jac
-        self.verbose = verbose
         self.use_stop_crit = use_stop_crit
+        self.verbose = verbose
 
     def get_beta_jac(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
@@ -46,7 +50,6 @@ class ImplicitForward():
         mask, dense, jac = get_beta_jac_fast_iterdiff(
             X, y, log_alpha, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
-            # tol_jac=self.tol_jac,
             tol_jac=self.tol_jac, tol=tol, niter_jac=self.n_iter_jac,
             model=model, max_iter=self.max_iter, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
