@@ -7,10 +7,10 @@ from sparse_ho.utils_plot import configure_plt
 configure_plt()
 
 # save_fig = False
-save_fig_grid = False
+save_fig_grid = True
 # save_fig = True
-save_fig_grad = True
-# save_fig_grad = False
+# save_fig_grad = True
+save_fig_grad = False
 fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
 
@@ -23,42 +23,33 @@ objs_grid = np.load("objs.npy")
 p_alphas_grad = np.load("p_alphas_grad.npy")
 objs_grad = np.load("objs_grad.npy")
 
-fontsize = 30
-# for i in np.arange(len(objs_grad)+1):
-#     fig, ax = plt.subplots(1, 1)
-#     ax.plot(
-#         p_alphas_grid, objs_grid, color=current_palette[0], linewidth=7.0)
-#     ax.plot(
-#         p_alphas_grid[:i], objs_grid[:i], 'bo', label='0-order method',
-#         color=current_palette[1], markersize=15)
-#     plt.xscale('log')
-#     ax.set_xlabel(r'$\lambda / \lambda_{\max}$', fontsize=fontsize)
-#     plt.ylabel(
-#         r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
-#         fontsize=fontsize)
-#     plt.xticks(fontsize=fontsize)
-#     plt.yticks(fontsize=fontsize)
-#     ax.set_xlim(p_alphas_grid.min(), p_alphas_grid.max())
-#     plt.tight_layout()
+fontsize = 23
+for i in np.arange(len(objs_grad)+1):
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(
+        p_alphas_grid, objs_grid, color=current_palette[0], linewidth=7.0)
+    ax.plot(
+        p_alphas_grid[:i], objs_grid[:i], 'bo', label='0-order method',
+        color=current_palette[1], markersize=15)
+    plt.xscale('log')
+    ax.set_xlabel(r'$\lambda / \lambda_{\max}$', fontsize=fontsize)
+    plt.ylabel(
+        r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
+        fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    ax.set_xlim(p_alphas_grid.min(), p_alphas_grid.max())
+    plt.tight_layout()
 
-#     if save_fig_grid:
-#         fig.savefig(
-#             fig_dir + "grid_search_real_sim_lasso_%i.pdf" % i,
-#             bbox_inches="tight")
-#         fig.savefig(
-#             fig_dir_svg + "grid_search_real_sim_lasso_%i.svg" % i,
-#             bbox_inches="tight")
-#     else:
-#         plt.show(block=False)
-
-
-# fig, ax = plt.subplots(1, 1)
-# ax.semilogx(
-#     p_alphas_grid, objs_grid, color=current_palette[0], linewidth=7.0)
-# ax.plot(
-#     p_alphas_grid, objs_grid, 'bo', label='0-order method',
-#     color=current_palette[1], markersize=15)
-# fig.show()
+    if save_fig_grid:
+        fig.savefig(
+            fig_dir + "grid_search_real_sim_lasso_%i.pdf" % i,
+            bbox_inches="tight")
+        fig.savefig(
+            fig_dir_svg + "grid_search_real_sim_lasso_%i.svg" % i,
+            bbox_inches="tight")
+    else:
+        plt.show(block=False)
 
 color = [
     plt.cm.Reds((i + len(objs_grad) / 3 + 1) / len(objs_grad))
