@@ -21,18 +21,12 @@ class Lasso(BaseModel):
     estimator: sklearn estimator
         Estimator used to solve the optimization problem. Must follow the
         scikit-learn API.
-    log_alpha_max: float or None, default=None
-        logarithm of minimal regularization strength giving a 0 solution. TODO
     """
 
     def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, max_iter=1000, estimator=None):
         self.max_iter = max_iter
         self.estimator = estimator
-        self.log_alpha_max = log_alpha_max
-        # TODO all models: there is no need to pass it. Just store it with
-        # name log_alpha_max_ the first time it is computed. like coef_ for
-        # Lasso, not set at init but only after fitting
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
                               dense0=None, compute_jac=True):
@@ -270,17 +264,12 @@ class Lasso(BaseModel):
         log_alpha: float
             Logarithm of projected hyperparameter.
         """
-        # TODO np.clip
-        if self.log_alpha_max is None:
+        if not hasattr(self, "log_alpha_max"):
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < self.log_alpha_max - 12:
-            return self.log_alpha_max - 12
-        elif log_alpha > self.log_alpha_max + np.log(0.9):
-            return self.log_alpha_max + np.log(0.9)
-        else:
-            return log_alpha
+        return np.clip(log_alpha, self.log_alpha_max - 12,
+                       self.log_alpha_max + np.log(0.9))
 
     @staticmethod
     def get_L(X):
@@ -418,14 +407,6 @@ class Lasso(BaseModel):
         TODO
         """
         return v
-
-    def compute_alpha_max(self):
-        """Compute minimal hyperparameter value leading to a 0 model."""
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
-            self.log_alpha_max = np.log(alpha_max)
-        return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta,
                     dual_var, ddual_var, alpha):

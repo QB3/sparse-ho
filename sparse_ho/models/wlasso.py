@@ -24,15 +24,12 @@ class WeightedLasso(BaseModel):
         Maximum number of iterations for TODO
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
-    log_alpha_max: float
-        logarithm of alpha_max if already precomputed
     """
 
     def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, max_iter=1000, estimator=None):
         self.max_iter = max_iter
         self.estimator = estimator
-        self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
                               dense0=None, compute_jac=True):
@@ -234,25 +231,20 @@ class WeightedLasso(BaseModel):
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
-        log_alpha: np.array, shape (2,)
+        log_alpha: np.array, shape (n_features,)
             Logarithm of hyperparameter.
 
         Returns
         -------
-        log_alpha: float
+        log_alpha: np.array, shape (n_features,)
             Logarithm of projected hyperparameter.
         """
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(X.T @ y))
-            alpha_max /= X.shape[0]
+        if not hasattr(self, "log_alpha_max"):
+            alpha_max = np.max(np.abs(X.T @ y)) / X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        # TODO np.clip
-        proj_log_alpha = log_alpha.copy()
-        proj_log_alpha[proj_log_alpha < -12] = -12
-        if np.max(proj_log_alpha > self.log_alpha_max):
-            proj_log_alpha[
-                proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
-        return proj_log_alpha
+        log_alpha = np.clip(log_alpha, self.log_alpha_max - 5,
+                            self.log_alpha_max + np.log(0.9))
+        return log_alpha
 
     @staticmethod
     def get_L(X):

@@ -19,14 +19,11 @@ class ElasticNet(BaseModel):
     estimator: sklearn estimator
         Estimator used to solve the optimization problem. Must follow the
         scikit-learn API.
-    log_alpha_max: float or None, default=None
-        logarithm of minimal regularization strength giving a 0 solution. TODO
     """
 
     def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, max_iter=1000, estimator=None):
         self.max_iter = max_iter
-        self.log_alpha_max = log_alpha_max
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
@@ -282,19 +279,13 @@ class ElasticNet(BaseModel):
         log_alpha: float
             Logarithm of projected hyperparameter.
         """
-        if self.log_alpha_max is None:
+        if not hasattr(self, "log_alpha_max"):
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        # TODO use np.clip here
-        if log_alpha[0] < self.log_alpha_max - 7:
-            log_alpha[0] = self.log_alpha_max - 7
-        elif log_alpha[0] > self.log_alpha_max + np.log(0.9):
-            log_alpha[0] = self.log_alpha_max + np.log(0.9)
-        if log_alpha[1] < self.log_alpha_max - 7:
-            log_alpha[1] = self.log_alpha_max - 7
-        elif log_alpha[1] > self.log_alpha_max + np.log(0.9):
-            log_alpha[1] = self.log_alpha_max + np.log(0.9)
+
+        log_alpha = np.clip(log_alpha, self.log_alpha_max - 7,
+                            self.log_alpha_max + np.log(0.9))
         return log_alpha
 
     @staticmethod
@@ -440,15 +431,15 @@ class ElasticNet(BaseModel):
         """
         return v
 
-    def compute_alpha_max(self):
-        """Compute minimal hyperparameter value leading to a 0 model."""
-        # TODO is this used? It's not for wlasso
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(self.X.T @ self.y))
-            alpha_max /= self.X.shape[0]
-            self.log_alpha_max = np.log(alpha_max)
-        # TODO there is no self.X and self.y in fact
-        return self.log_alpha_max
+    # def compute_alpha_max(self):
+    #     """Compute minimal hyperparameter value leading to a 0 model."""
+    #     # TODO is this used? It's not for wlasso
+    #     if self.log_alpha_max is None:
+    #         alpha_max = np.max(np.abs(self.X.T @ self.y))
+    #         alpha_max /= self.X.shape[0]
+    #         self.log_alpha_max = np.log(alpha_max)
+    #     # TODO there is no self.X and self.y in fact
+    #     return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, dual_var,
                     ddual_var, alpha):

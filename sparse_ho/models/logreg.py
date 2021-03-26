@@ -21,14 +21,11 @@ class SparseLogreg(BaseModel):
     estimator: sklearn estimator
         Estimator used to solve the optimization problem. Must follow the
         scikit-learn API.
-    log_alpha_max: float or None, default=None
-        logarithm of minimal regularization strength giving a 0 solution. TODO
     """
 
     def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
+            self, max_iter=1000, estimator=None):
         self.max_iter = max_iter
-        self.log_alpha_max = log_alpha_max
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, dense0=None,
@@ -274,17 +271,13 @@ class SparseLogreg(BaseModel):
         log_alpha: float
             Logarithm of projected hyperparameter.
         """
-        # TODO clip
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(X.T @ y))
-            alpha_max /= (4 * X.shape[0])
+        if not hasattr(self, "log_alpha_max"):
+            alpha_max = np.max(np.abs(X.T @ y)) / (2 * X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < self.log_alpha_max - 8:
-            return self.log_alpha_max - 8
-        elif log_alpha > self.log_alpha_max + np.log(0.9):
-            return self.log_alpha_max + np.log(0.9)
-        else:
-            return log_alpha
+
+        log_alpha = np.clip(log_alpha, self.log_alpha_max - 8,
+                            self.log_alpha_max + np.log(0.9))
+        return log_alpha
 
     @staticmethod
     def get_L(X):

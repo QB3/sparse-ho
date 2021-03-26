@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 from numba import njit
-from scipy.sparse import sparse
+from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 
 
