@@ -1,8 +1,9 @@
 import numpy as np
+from numba import njit
 from numpy.linalg import norm
+from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 
-from numba import njit
 
 from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import ST, init_dbeta0_new_p
@@ -254,22 +255,20 @@ class WeightedLasso(BaseModel):
         return proj_log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
         L: float
             The Lipschitz constant.
         """
-        if is_sparse:
+        if issparse(X):
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])

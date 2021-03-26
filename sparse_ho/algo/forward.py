@@ -93,7 +93,7 @@ def get_beta_jac_iterdiff(
     is_sparse = issparse(X)
     if not is_sparse and not np.isfortran(X):
         X = np.asfortranarray(X)
-    L = model.get_L(X, is_sparse=is_sparse)
+    L = model.get_L(X)
 
     ############################################
     alpha = np.exp(log_alpha)

@@ -287,22 +287,20 @@ class SparseLogreg(BaseModel):
             return log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
         L: float
             The Lipschitz constant.
         """
-        return 0.0  # TODO sure?
+        return 0.0  # TODO implement?
 
     @staticmethod
     def reduce_X(X, mask):

@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
+from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 from numba import njit
 
@@ -282,22 +283,20 @@ class Lasso(BaseModel):
             return log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
         L: float
             The Lipschitz constant.
         """
-        if is_sparse:
+        if issparse(X):
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])

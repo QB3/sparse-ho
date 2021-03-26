@@ -1,8 +1,9 @@
 import numpy as np
 from numpy.linalg import norm
+from numba import njit
+from scipy.sparse import sparse
 import scipy.sparse.linalg as slinalg
 
-from numba import njit
 
 from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import proj_box_svm, ind_box
@@ -281,22 +282,20 @@ class SVR(BaseModel):
         return alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
         L: float
             The Lipschitz constant.
         """
-        if is_sparse:
+        if issparse(X):
             return slinalg.norm(X, axis=1) ** 2
         else:
             return norm(X, axis=1) ** 2

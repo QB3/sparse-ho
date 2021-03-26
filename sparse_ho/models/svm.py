@@ -211,22 +211,20 @@ class SVM(BaseModel):
         return alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
         L: float
             The Lipschitz constant.
         """
-        if is_sparse:
+        if issparse(X):
             return slinalg.norm(X, axis=1) ** 2
         else:
             return norm(X, axis=1) ** 2

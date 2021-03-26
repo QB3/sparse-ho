@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
+from scipy.sparse import issparse
 
 from numba import njit
 
@@ -297,15 +298,13 @@ class ElasticNet(BaseModel):
         return log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
+    def get_L(X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        is_sparse: bool
-            TODO MM remove?
 
         Returns
         -------
@@ -313,7 +312,7 @@ class ElasticNet(BaseModel):
             The Lipschitz constant.
         """
 
-        if is_sparse:
+        if issparse(X):
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
