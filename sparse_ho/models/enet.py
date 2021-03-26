@@ -388,14 +388,14 @@ class ElasticNet(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_hessian(X, y_train, mask, dense, log_alpha):
+    def get_hessian(X, y, mask, dense, log_alpha):
         """Compute Hessian of datafit.
 
         Parameters
         ----------
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
-        y_train: np.array, shape (n_samples,)
+        y: np.array, shape (n_samples,)
             Observation vector.
         mask: np.array, shape (n_features,)
             Mask corresponding to non zero entries of beta.
