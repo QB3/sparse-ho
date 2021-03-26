@@ -94,7 +94,7 @@ estimator = linear_model.ElasticNet(
 print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()
-n_outer = 25
+n_outer = 10
 alpha0 = np.array([alpha_max * 0.9, alpha_max * 0.9])
 model = ElasticNet(max_iter=max_iter, estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
@@ -116,7 +116,7 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 # Plot results
 # ------------
 
-cmap = discrete_cmap(n_outer, 'Greens')
+cmap = discrete_cmap(n_outer, 'Reds')
 X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
 cp = ax.contourf(X, Y, results.T)
