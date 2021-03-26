@@ -110,7 +110,7 @@ for an elastic-net using a held-out validation set.</p>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
 <span class="kn">from</span> <span class="nn">libsvmdata.datasets</span> <span class="kn">import</span> <span class="n">fetch_libsvm</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_regression</span>
+<span class="kn">from</span> <span class="nn">celer.datasets</span> <span class="kn">import</span> <span class="n">make_correlated_data</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
 
 <span class="kn">from</span> <span class="nn">sparse_ho</span> <span class="kn">import</span> <span class="n">ImplicitForward</span>
@@ -135,8 +135,8 @@ for an elastic-net using a held-out validation set.</p>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">-=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">/=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.linalg.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <span class="n">make_regression</span><span class="p">(</span>
-        <span class="n">n_samples</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">_</span></a> <span class="o">=</span> <span class="n">make_correlated_data</span><span class="p">(</span>
+        <span class="n">n_samples</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">snr</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 
 <span class="n">n_samples</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -194,7 +194,7 @@ lambda 70 / 100
 lambda 80 / 100
 lambda 90 / 100
 Finished grid search
-Minimum outer criterion value with grid search 1.561e+04
+Minimum outer criterion value with grid search 2.268e+01
 </pre></div>
 </div>
 </div>
@@ -205,8 +205,8 @@ Minimum outer criterion value with grid search 1.561e+04
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Started grad-search&quot;</span><span class="p">)</span>
 <span class="n">t_grad_search</span> <span class="o">=</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 <span class="n">monitor</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
-<span class="n">n_outer</span> <span class="o">=</span> <span class="mi">25</span>
-<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">alpha_max</span> <span class="o">*</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">alpha_max</span> <span class="o">/</span> <span class="mi">10</span><span class="p">])</span>
+<span class="n">n_outer</span> <span class="o">=</span> <span class="mi">10</span>
+<a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alpha0</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">alpha_max</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">,</span> <span class="n">alpha_max</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">])</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">ElasticNet</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
 <span class="n">criterion</span> <span class="o">=</span> <span class="n">HeldOutMSE</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_train</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">idx_val</span></a><span class="p">)</span>
 <span class="n">algo</span> <span class="o">=</span> <span class="n">ImplicitForward</span><span class="p">(</span><span class="n">tol_jac</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">n_iter_jac</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span>
@@ -226,41 +226,26 @@ Minimum outer criterion value with grid search 1.561e+04
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Started grad-search
-Iteration 1/25 ||Value outer criterion: 1.64e+04 ||norm grad 5.00e+02
-Iteration 2/25 ||Value outer criterion: 1.59e+04 ||norm grad 2.14e+02
-Iteration 3/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.73e+02
-Iteration 4/25 ||Value outer criterion: 1.57e+04 ||norm grad 7.03e+01
-Iteration 5/25 ||Value outer criterion: 1.58e+04 ||norm grad 4.84e+02
-Iteration 6/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
-Iteration 7/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
-Iteration 8/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.27e+01
-Iteration 9/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.30e+01
-Iteration 10/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.33e+01
-Iteration 11/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.38e+01
-Iteration 12/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.43e+01
-Iteration 13/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.05e+02
-Iteration 14/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.09e+02
-Iteration 15/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.10e+02
-Iteration 16/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.15e+02
-Iteration 17/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.19e+02
-Iteration 18/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.24e+02
-Iteration 19/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.30e+02
-Iteration 20/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.97e+02
-Iteration 21/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.01e+02
-Iteration 22/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.33e+02
-Iteration 23/25 ||Value outer criterion: 1.56e+04 ||norm grad 3.13e+02
-Iteration 24/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.03e+02
-Iteration 25/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.33e+02
-Time grid search 0.100595
-Time grad-search 1.542087
-Minimum grid search 1.561e+04
-Minimum grad search 1.559e+04
+Iteration 1/10 ||Value outer criterion: 4.12e+01 ||norm grad 3.66e+00
+Iteration 2/10 ||Value outer criterion: 3.10e+01 ||norm grad 6.79e+00
+Iteration 3/10 ||Value outer criterion: 2.45e+01 ||norm grad 1.95e+00
+Iteration 4/10 ||Value outer criterion: 2.32e+01 ||norm grad 8.83e-01
+Iteration 5/10 ||Value outer criterion: 2.33e+01 ||norm grad 1.16e+00
+Iteration 6/10 ||Value outer criterion: 2.32e+01 ||norm grad 1.42e+00
+Iteration 7/10 ||Value outer criterion: 2.30e+01 ||norm grad 1.45e+00
+Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
+Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
+Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
+Time grid search 3.529587
+Time grad-search 2.036609
+Minimum grid search 2.268e+01
+Minimum grad search 2.257e+01
 </pre></div>
 </div>
 </div>
 <div class="section" id="plot-results">
 <h2>Plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">discrete_cmap</span><span class="p">(</span><span class="n">n_outer</span><span class="p">,</span> <span class="s1">&#39;Greens&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">discrete_cmap</span><span class="p">(</span><span class="n">n_outer</span><span class="p">,</span> <span class="s1">&#39;Reds&#39;</span><span class="p">)</span>
 <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">Y</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.meshgrid" title="numpy.meshgrid" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas_l1</span></a> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas_l2</span></a> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">)</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">cp</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">Y</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">results</span><span class="o">.</span><span class="n">T</span></a><span class="p">)</span>
@@ -271,6 +256,9 @@ Minimum grad search 1.559e+04
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">monitor</span><span class="o">.</span><span class="n">alphas</span></a><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">monitor</span><span class="o">.</span><span class="n">alphas</span></a><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span>
     <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.linspace" title="numpy.linspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_outer</span><span class="p">)),</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$1$st order&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">monitor</span><span class="o">.</span><span class="n">alphas</span></a><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">monitor</span><span class="o">.</span><span class="n">alphas</span></a><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="o">.</span><span class="n">max</span><span class="p">())</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;L1 regularization&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;L2 regularization&quot;</span><span class="p">)</span>
@@ -285,7 +273,7 @@ Minimum grad search 1.559e+04
 </pre></div>
 </div>
 <img alt="Elastic net held out prediction loss on test set" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_enet_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.184 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.098 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-enet-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3e228e68f223f1a9a886e27642bdca40/plot_held_out_enet.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_enet.py</span></code></a></p>

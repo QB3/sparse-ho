@@ -40,7 +40,7 @@ for an elastic-net using a held-out validation set.
     import matplotlib.pyplot as plt
     from sklearn import linear_model
     from libsvmdata.datasets import fetch_libsvm
-    from sklearn.datasets import make_regression
+    from celer.datasets import make_correlated_data
     from sklearn.metrics import mean_squared_error
 
     from sparse_ho import ImplicitForward
@@ -79,8 +79,8 @@ Load some data
         y -= y.mean()
         y /= np.linalg.norm(y)
     else:
-        X, y = make_regression(
-            n_samples=20, n_features=100, noise=1, random_state=42)
+        X, y, _ = make_correlated_data(
+            n_samples=200, n_features=400, snr=5, random_state=0)
 
 
     n_samples = X.shape[0]
@@ -164,7 +164,7 @@ grid search with scikit-learn
     lambda 80 / 100
     lambda 90 / 100
     Finished grid search
-    Minimum outer criterion value with grid search 1.561e+04
+    Minimum outer criterion value with grid search 2.268e+01
 
 
 
@@ -183,8 +183,8 @@ Grad-search with sparse-ho
     print("Started grad-search")
     t_grad_search = - time.time()
     monitor = Monitor()
-    n_outer = 25
-    alpha0 = np.array([alpha_max * 0.3, alpha_max / 10])
+    n_outer = 10
+    alpha0 = np.array([alpha_max * 0.9, alpha_max * 0.9])
     model = ElasticNet(max_iter=max_iter, estimator=estimator)
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
@@ -212,35 +212,20 @@ Grad-search with sparse-ho
  .. code-block:: none
 
     Started grad-search
-    Iteration 1/25 ||Value outer criterion: 1.64e+04 ||norm grad 5.00e+02
-    Iteration 2/25 ||Value outer criterion: 1.59e+04 ||norm grad 2.14e+02
-    Iteration 3/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.73e+02
-    Iteration 4/25 ||Value outer criterion: 1.57e+04 ||norm grad 7.03e+01
-    Iteration 5/25 ||Value outer criterion: 1.58e+04 ||norm grad 4.84e+02
-    Iteration 6/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
-    Iteration 7/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.00e+01
-    Iteration 8/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.27e+01
-    Iteration 9/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.30e+01
-    Iteration 10/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.33e+01
-    Iteration 11/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.38e+01
-    Iteration 12/25 ||Value outer criterion: 1.57e+04 ||norm grad 6.43e+01
-    Iteration 13/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.05e+02
-    Iteration 14/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.09e+02
-    Iteration 15/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.10e+02
-    Iteration 16/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.15e+02
-    Iteration 17/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.19e+02
-    Iteration 18/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.24e+02
-    Iteration 19/25 ||Value outer criterion: 1.57e+04 ||norm grad 1.30e+02
-    Iteration 20/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.97e+02
-    Iteration 21/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.01e+02
-    Iteration 22/25 ||Value outer criterion: 1.56e+04 ||norm grad 2.33e+02
-    Iteration 23/25 ||Value outer criterion: 1.56e+04 ||norm grad 3.13e+02
-    Iteration 24/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.03e+02
-    Iteration 25/25 ||Value outer criterion: 1.56e+04 ||norm grad 1.33e+02
-    Time grid search 0.100595
-    Time grad-search 1.542087
-    Minimum grid search 1.561e+04
-    Minimum grad search 1.559e+04
+    Iteration 1/10 ||Value outer criterion: 4.12e+01 ||norm grad 3.66e+00
+    Iteration 2/10 ||Value outer criterion: 3.10e+01 ||norm grad 6.79e+00
+    Iteration 3/10 ||Value outer criterion: 2.45e+01 ||norm grad 1.95e+00
+    Iteration 4/10 ||Value outer criterion: 2.32e+01 ||norm grad 8.83e-01
+    Iteration 5/10 ||Value outer criterion: 2.33e+01 ||norm grad 1.16e+00
+    Iteration 6/10 ||Value outer criterion: 2.32e+01 ||norm grad 1.42e+00
+    Iteration 7/10 ||Value outer criterion: 2.30e+01 ||norm grad 1.45e+00
+    Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
+    Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
+    Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
+    Time grid search 3.529587
+    Time grad-search 2.036609
+    Minimum grid search 2.268e+01
+    Minimum grad search 2.257e+01
 
 
 
@@ -250,12 +235,12 @@ Grad-search with sparse-ho
 Plot results
 ------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-141
+.. GENERATED FROM PYTHON SOURCE LINES 118-144
 
 .. code-block:: default
 
 
-    cmap = discrete_cmap(n_outer, 'Greens')
+    cmap = discrete_cmap(n_outer, 'Reds')
     X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
     fig, ax = plt.subplots(1, 1)
     cp = ax.contourf(X, Y, results.T)
@@ -266,6 +251,9 @@ Plot results
         monitor.alphas[:, 0] / alpha_max, monitor.alphas[:, 1] / alpha_max,
         s=40, color=cmap(np.linspace(0, 1, n_outer)), zorder=10,
         marker="X", label="$1$st order")
+    ax.plot(
+        monitor.alphas[:, 0] / alpha_max, monitor.alphas[:, 1] / alpha_max,
+        c=cmap(0))
     ax.set_xlim(X.min(), X.max())
     ax.set_xlabel("L1 regularization")
     ax.set_ylabel("L2 regularization")
@@ -291,7 +279,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.184 seconds)
+   **Total running time of the script:** ( 0 minutes  6.098 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
