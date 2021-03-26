@@ -420,9 +420,7 @@ class SVM(BaseModel):
     def _use_estimator(self, X, y, C, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(
-            tol=tol, C=C,
-            fit_intercept=False, max_iter=max_iter)
+        self.estimator.set_params(tol=tol, C=C, fit_intercept=False)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]

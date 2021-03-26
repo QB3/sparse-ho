@@ -304,7 +304,7 @@ class ElasticNet(BaseModel):
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
-    def _use_estimator(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
         self.estimator.set_params(

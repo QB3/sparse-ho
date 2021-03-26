@@ -477,12 +477,12 @@ class SVR(BaseModel):
         linear_term = alphaX.T @ Xs[maskC, :].T @ alpha[maskC]
         return norm(quadratic_term + linear_term)
 
-    def _use_estimator(self, X, y, hyperparam, tol, max_iter):
+    def _use_estimator(self, X, y, hyperparam, tol):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
         self.estimator.set_params(
             epsilon=hyperparam[1], tol=tol, C=hyperparam[0],
-            fit_intercept=False, max_iter=max_iter)
+            fit_intercept=False)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]

@@ -98,7 +98,7 @@ def get_beta_jac_iterdiff(
     alpha = np.exp(log_alpha)
 
     if hasattr(model, 'estimator') and model.estimator is not None:
-        return model._use_estimator(X, y, alpha, tol, max_iter)
+        return model._use_estimator(X, y, alpha, tol)
 
     try:
         alpha.shape[0]

@@ -283,7 +283,7 @@ class WeightedLasso(BaseModel):
         hessian = X_m.T @ X_m
         return hessian
 
-    def _use_estimator(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol):
         self.estimator.set_params(tol=tol)
         self.estimator.weights = alpha
         self.estimator.fit(X, y)
