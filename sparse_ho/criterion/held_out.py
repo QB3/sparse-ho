@@ -31,7 +31,15 @@ class HeldOutMSE(BaseCriterion):
         self.quantity_to_warm_start = None
 
     def get_val_outer(self, X, y, mask, dense):
-        """Compute the MSE on the validation set."""
+        """Compute the MSE on the validation set.
+
+        Parameters
+        ----------
+        X: TODO
+        y: TODO
+        mask: TODO
+        dense: TODO
+        """
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
@@ -39,6 +47,7 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
+        model: TODO
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -108,6 +117,18 @@ class HeldOutMSE(BaseCriterion):
         return val, grad
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
@@ -133,6 +154,15 @@ class HeldOutLogistic(BaseCriterion):
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
+        """TODO
+
+        Parameters
+        ----------
+        X: TODO
+        y: TODO
+        mask: TODO
+        dense: TODO
+        """
         val = np.sum(np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
         val /= X.shape[0]
         return val
@@ -142,6 +172,7 @@ class HeldOutLogistic(BaseCriterion):
 
         Parameters
         ----------
+        model: TODO
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -213,6 +244,18 @@ class HeldOutLogistic(BaseCriterion):
         return val, grad
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
@@ -220,9 +263,10 @@ class HeldOutLogistic(BaseCriterion):
 class HeldOutSmoothedHinge(BaseCriterion):
     """Smooth Hinge loss.
 
-    Attributes
+    Parameters
     ----------
-    TODO
+    idx_train: TODO
+    idx_val: TODO
     """
 
     def __init__(self, idx_train, idx_val):
@@ -242,8 +286,17 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.quantity_to_warm_start = None
 
     def get_val_outer(self, X, y, mask, dense):
+        """Compute the MSE on the validation set.
+
+        Parameters
+        ----------
+        X: TODO
+        y: TODO
+        mask: TODO
+        dense: TODO
+        """
         if X is None or y is None:
-            return None
+            return None  # TODO why ?
 
         if issparse(X):
             Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
@@ -254,6 +307,25 @@ class HeldOutSmoothedHinge(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
@@ -291,6 +363,20 @@ class HeldOutSmoothedHinge(BaseCriterion):
         return val, grad
 
     def get_val(self, model, X, y, log_alpha, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,  # TODO max_iter
             max_iter=model.max_iter, tol=tol, compute_jac=False)
@@ -299,5 +385,17 @@ class HeldOutSmoothedHinge(BaseCriterion):
         return val
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)

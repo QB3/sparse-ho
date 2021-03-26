@@ -8,6 +8,8 @@ class Adam(BaseOptimizer):
     """This Adam code is taken from
     https://github.com/sagarvegad/Adam-optimizer/blob/master/Adam.py
 
+    Parameters
+    ----------
     n_outer: int, optional (default=100).
         number of maximum updates of alpha.
     epsilon: float, optional (default=1e-3)

@@ -8,11 +8,12 @@ class LineSearch(BaseOptimizer):
     """This line-search code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
+    Parameters
+    ----------
     n_outer: int, optional (default=100).
         number of maximum updates of alpha.
     verbose: bool, optional (default=False)
-        Indicates whether information about hyperparameter
-        optimization process is printed or not.
+        Verbosity.
     tolerance_decrease: string, optional (default="constant")
         Tolerance decrease strategy for approximate gradient.
     tol : float, optional (default=1e-5)

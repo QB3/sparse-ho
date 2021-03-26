@@ -8,18 +8,23 @@ from sparse_ho.optimizers.base import BaseOptimizer
 class GradientDescent(BaseOptimizer):
     """Gradient descent for the outer problem.
 
+    Parameters
+    ----------
     n_outer: int, optional (default=100).
         number of maximum updates of alpha.
     step_size: float
         stepsize of the gradient descent
+    p_grad0: TODO
     verbose: bool, optional (default=False)
         Indicates whether information about hyperparameter
         optimization process is printed or not.
     tol : float, optional (default=1e-5)
         Tolerance for the inner optimization solver.
+    tol_decrease: TODO
     t_max: float, optional (default=10000)
         Maximum running time threshold in seconds.
     """
+
     def __init__(
             self, n_outer=100, step_size=None, p_grad0=1,
             verbose=False, tol=1e-5, tol_decrease=None, t_max=10_000):

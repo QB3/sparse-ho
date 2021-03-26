@@ -52,9 +52,21 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense, mask2, dense2):
-        X_m = X[:, mask]  # avoid multiple calls to X[:, mask]
-        dof = ((X[:, mask2] @ dense2 -
-                X_m @ dense) @ self.delta)
+        """Get value of criterion. TODO where?
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: TODO
+        dense: TODO
+        mask2: TODO
+        dense2: TODO
+        """
+        X_m = X[:, mask]
+        dof = ((X[:, mask2] @ dense2 - X_m @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
         val = norm(y - X_m @ dense) ** 2
@@ -67,6 +79,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
         Parameters
         ----------
+        model: TODO
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -120,7 +133,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
             Logarithm of hyperparameter.
         get_beta_jac_v: TODO
         mask0: TODO
-        densse0: TODO
+        dense0: TODO
         jac0: TODO
         max_iter: TODO
         tol: float, optional (default=1e-3)

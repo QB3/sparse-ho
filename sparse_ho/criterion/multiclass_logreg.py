@@ -60,12 +60,10 @@ class LogisticMulticlass():
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         get_beta_jac_v: TODO
-        max_iter: TODO
-        tol: float, optional (default=1e-3)
-            Tolerance for TODO
-        compute_jac: TODO
         monitor: instance of Monitor.
             Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
         """
         # TODO use sparse matrices
         if self.dict_models is None:
@@ -161,11 +159,13 @@ class LogisticMulticlass():
     def proj_hyperparam(self, model, X, y, log_alpha):
         """Project hyperparameter on admissible range of values
 
-        Parameters:
-        model TODO
-        X TODO
-        y TODO
-        log_alpha TODO"""
+        Parameters
+        ----------
+        model: TODO
+        X: TODO
+        y: TODO
+        log_alpha: TODO
+        """
         # TODO doesn't an other object do this?
         # TODO model not needed I think
         log_alpha_max = model.compute_alpha_max(X, y)
@@ -175,6 +175,15 @@ class LogisticMulticlass():
         return log_alpha
 
     def grad_total_loss(self, all_betas, all_jacs, X, Y):
+        """TODO
+
+        Parameters
+        ----------
+        all_betas: TODO
+        all_jacs: TODO
+        X: TODO
+        Y: TODO
+        """
         grad_ce = grad_cross_entropy(all_betas, X, Y)
         grad_total = (grad_ce * all_jacs).sum(axis=0)
         return grad_total
