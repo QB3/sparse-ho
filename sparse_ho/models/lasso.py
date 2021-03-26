@@ -15,15 +15,13 @@ class Lasso(BaseModel):
 
     Parameters
     ----------
-    log_alpha : float
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
-    estimator: instance of ``sklearn.base.BaseEstimator``
-        An estimator that follows the scikit-learn API.
-    log_alpha_max: float
-        logarithm of alpha_max if already precomputed
+    max_iter: int, optional (default=1000)
+        Maximum number of iterations TODO
+    estimator: sklearn estimator
+        Estimator used to solve the optimization problem. Must follow the
+        scikit-learn API.
+    log_alpha_max: float or None, default=None
+        logarithm of minimal regularization strength giving a 0 solution. TODO
     """
 
     def __init__(
@@ -31,6 +29,9 @@ class Lasso(BaseModel):
         self.max_iter = max_iter
         self.estimator = estimator
         self.log_alpha_max = log_alpha_max
+        # TODO all models: there is no need to pass it. Just store it with
+        # name log_alpha_max_ the first time it is computed. like coef_ for
+        # Lasso, not set at init but only after fitting
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
                               dense0=None, compute_jac=True):
@@ -166,10 +167,26 @@ class Lasso(BaseModel):
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: TOD
+        """
+        # MM sorry I don't get what this does
         return jac_v
 
     @staticmethod
     def get_mask_jac_v(mask, jac_v):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        """
         return jac_v
 
     @staticmethod
@@ -236,6 +253,23 @@ class Lasso(BaseModel):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: float
+            Logarithm of projected hyperparameter.
+        """
+        # TODO np.clip
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
@@ -249,7 +283,20 @@ class Lasso(BaseModel):
 
     @staticmethod
     def get_L(X, is_sparse=False):
-        # print(is_sparse)
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        is_sparse: bool
+            TODO MM remove?
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
         if is_sparse:
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
@@ -266,31 +313,115 @@ class Lasso(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : np.array, shape (n_features)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : np.array, shape (n_samples,)
+            Observation vector.
+        mask : np.array, shape (n_features)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_alpha):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : np.array, shape TODO
+        log_alpha : np.array, shape TODO
+            Logarithm of hyperparameter.
+        """
         return np.sign(x)
 
     def get_beta(self, X, y, mask, dense):
+        """Return primal iterate.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        """
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_hessian(X_train, y_train, mask, dense, log_alpha):
-        X_m = X_train[:, mask]
-        hessian = X_m.T @ X_m
+    def get_hessian(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: np.array
+            Logarithm of hyperparameter.
+        """
+        X_m = X[:, mask]
+        hessian = X_m.T @ X_m  # TODO no normalization by n_samples?
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_alpha : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
         return v
 
     def compute_alpha_max(self):
+        """Compute minimal hyperparameter value leading to a 0 model."""
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= self.X.shape[0]

@@ -9,6 +9,19 @@ from sparse_ho.utils import prox_elasticnet, ST
 
 
 class ElasticNet(BaseModel):
+    """Sparse ho ElasticNet model (inner problem)
+
+    Parameters
+    ----------
+    max_iter: int, optional (default=1000)
+        Maximum number of iterations TODO
+    estimator: sklearn estimator
+        Estimator used to solve the optimization problem. Must follow the
+        scikit-learn API.
+    log_alpha_max: float or None, default=None
+        logarithm of minimal regularization strength giving a 0 solution. TODO
+    """
+
     def __init__(
             self, max_iter=1000, estimator=None, log_alpha_max=None):
         self.max_iter = max_iter
@@ -103,7 +116,7 @@ class ElasticNet(BaseModel):
         n_samples, n_features = X.shape
         for j in (np.arange(sign_beta.shape[0] - 1, -1, -1)):
             grad[0] -= (v_t_jac[j]) * alphas[0] * \
-                    sign_beta[j] / L[j] / (1 + (alphas[1] / L[j]))
+                sign_beta[j] / L[j] / (1 + (alphas[1] / L[j]))
             grad[1] -= (v_t_jac[j]) * (alphas[1] / L[j] * beta[j]) / \
                 (1 + (alphas[1] / L[j]))
             v_t_jac[j] *= (1 / (1 + alphas[1] / L[j])) * \
@@ -141,10 +154,26 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: TOD
+        """
+        # MM sorry I don't get what this does
         return jac_v
 
     @staticmethod
     def get_mask_jac_v(mask, jac_v):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        """
         return jac_v
 
     @staticmethod
@@ -236,10 +265,27 @@ class ElasticNet(BaseModel):
                          alphas[1] * dense @ jac])
 
     def proj_hyperparam(self, X, y, log_alpha):
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: np.array, shape (2,)
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: float
+            Logarithm of projected hyperparameter.
+        """
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
+        # TODO use np.clip here
         if log_alpha[0] < self.log_alpha_max - 7:
             log_alpha[0] = self.log_alpha_max - 7
         elif log_alpha[0] > self.log_alpha_max + np.log(0.9):
@@ -252,7 +298,21 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     def get_L(X, is_sparse=False):
-        # print(is_sparse)
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        is_sparse: bool
+            TODO MM remove?
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
+
         if is_sparse:
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
@@ -271,36 +331,124 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : np.array, shape (n_features)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : np.array, shape (n_samples,)
+            Observation vector.
+        mask : np.array, shape (n_features)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_alpha):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : np.array, shape TODO
+        log_alpha : np.array, shape TODO
+            Logarithm of hyperparameter.
+        """
+        # TODO why is it x ?
         return x
 
     def get_beta(self, X, y, mask, dense):
+        """Return primal iterate.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        """
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
         return jac.T @ v(mask, dense)
 
     @staticmethod
     def get_hessian(X_train, y_train, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X_train: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y_train: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: np.array, shape (2,)
+            Logarithm of hyperparameter.
+        """
+        # TODO why X_train here, can we use X?
         n_samples = X_train.shape[0]
         hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + \
             (1 / n_samples) * X_train[:, mask].T @ X_train[:, mask]
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_alpha : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
         return v
 
     def compute_alpha_max(self):
+        """Compute minimal hyperparameter value leading to a 0 model."""
+        # TODO is this used? It's not for wlasso
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(self.X.T @ self.y))
             alpha_max /= self.X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
+        # TODO there is no self.X and self.y in fact
         return self.log_alpha_max
 
     def get_jac_obj(self, Xs, ys, n_samples, beta, dbeta, dual_var,

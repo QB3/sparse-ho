@@ -19,10 +19,8 @@ class WeightedLasso(BaseModel):
 
     Parameters
     ----------
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
+    max_iter: float, optional (default=1000)
+        Maximum number of iterations for TODO
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
     log_alpha_max: float
@@ -194,12 +192,29 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: TOD
+        """
+        # MM sorry I don't get what this does
+        # TODO n_features should be n_hyperparams, right ?
         res = np.zeros(n_features)
         res[mask] = jac_v
         return res
 
     @staticmethod
     def get_mask_jac_v(mask, jac_v):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        """
         return jac_v[mask]
 
     @staticmethod
@@ -210,12 +225,27 @@ class WeightedLasso(BaseModel):
         return jac_t_v
 
     def proj_hyperparam(self, X, y, log_alpha):
-        """Maybe we could do this in place.
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: np.array, shape (2,)
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: float
+            Logarithm of projected hyperparameter.
         """
         if self.log_alpha_max is None:
             alpha_max = np.max(np.abs(X.T @ y))
             alpha_max /= X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
+        # TODO np.clip
         proj_log_alpha = log_alpha.copy()
         proj_log_alpha[proj_log_alpha < -12] = -12
         if np.max(proj_log_alpha > self.log_alpha_max):
@@ -225,6 +255,20 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def get_L(X, is_sparse=False):
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        is_sparse: bool
+            TODO MM remove?
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
         if is_sparse:
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
@@ -232,6 +276,22 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: np.array
+            Logarithm of hyperparameter.
+        """
+        # TODO no division by n_samples?
         X_m = X[:, mask]
         hessian = X_m.T @ X_m
         return hessian
@@ -246,22 +306,93 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : np.array, shape (n_features)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : np.array, shape (n_samples,)
+            Observation vector.
+        mask : np.array, shape (n_features)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_alpha):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : np.array, shape TODO
+        log_alpha : np.array, shape TODO
+            Logarithm of hyperparameter.
+        """
         return np.sign(x)
 
     def get_beta(self, X, y, mask, dense):
+        """Return primal iterate.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        """
+        # TODO what's the use of this function? it does nothing for all models
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
+        # TODO this is the same for Lasso, Enet, Wlasso. Maybe inherit from
+        # a common class, LinearModelPrimal or something?
         return jac.T @ v(mask, dense)
 
     def generalized_supp(self, X, v, log_alpha):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_alpha : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
         return v
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,

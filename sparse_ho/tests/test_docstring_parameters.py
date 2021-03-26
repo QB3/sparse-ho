@@ -29,7 +29,7 @@ def _get_args(function, varargs=False):
 public_modules = [
     # the list of modules users need to access for all functionality
     'sparse_ho',
-    # 'sparse_ho.models',
+    'sparse_ho.models',
 ]
 
 
@@ -49,6 +49,8 @@ def get_name(func):
 _docstring_ignores = [
     ".*get_beta_jac_v$",
     ".*get_beta_jac$",
+    ".*get_full_jac_obj$",
+    ".*get_jac_obj$",
 ]
 _tab_ignores = []
 

@@ -77,6 +77,26 @@ Functions
    hyperopt_wrapper
 
 
+Models
+======
+
+:py:mod:`sparse_ho.utils`:
+
+.. currentmodule:: sparse_ho.models
+
+.. automodule:: sparse_ho.models
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   ElasticNet
+   Lasso
+   WeightedLasso
+   SVR
+   SparseLogreg
+
 Utils
 =====
 
