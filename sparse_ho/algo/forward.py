@@ -8,12 +8,16 @@ class Forward():
 
     Parameters
     ----------
-    verbose: bool
+    use_stop_crit: bool, optional (default=True)
+        Use stopping criterion in hypergradient computation. If False,
+        run to maximum number of iterations.
+    verbose: bool, optional (default=False)
+        Verbosity of the algorithm.
     """
 
-    def __init__(self, verbose=False, use_stop_crit=True):
-        self.verbose = verbose
+    def __init__(self, use_stop_crit=True, verbose=False):
         self.use_stop_crit = use_stop_crit
+        self.verbose = verbose
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,

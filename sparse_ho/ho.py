@@ -85,16 +85,20 @@ def hyperopt_wrapper(
     max_evals: int (default=50)
         maximum number of evaluation of the function
     tol: float (default=1e-5)
-    random_state=42
-    t_max=1000,
-    method=string (default='bayesian')
-        method for hyperopt, 'random' or 'bayesian'
+        tolerance for TODO
+    random_state: int or instance of RandomState
+        Random number generator used for reproducibility.
+    t_max: int, optional (default=100_000)
+        TODO
+    method: 'random' | 'bayesian' (default='bayesian')
+        method for hyperopt
     size_space: int (default=1)
         size of the hyperparameter space
 
     Returns
     -------
-    XXX missing
+    monitor:
+        The instance of Monitor used during iterations.
     """
 
     def objective(log_alpha):
