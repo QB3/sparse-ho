@@ -96,7 +96,7 @@ t_grad_search = - time.time()
 monitor = Monitor()
 n_outer = 25
 alpha0 = np.array([alpha_max * 0.3, alpha_max / 10])
-model = ElasticNet(max_iter=max_iter, estimator=estimator)
+model = ElasticNet(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
 optimizer = GradientDescent(
