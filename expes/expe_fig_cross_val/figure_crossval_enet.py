@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 from sparse_ho.utils_plot import configure_plt, round_down, discrete_cmap
 
-save_fig = True
-# save_fig = False
+# save_fig = True
+save_fig = False
 
 configure_plt()
 fontsize = 18
@@ -63,6 +63,7 @@ for i, algorithm in enumerate(algorithms):
     assert objs.min() >= min_grid
     cmap = discrete_cmap(len(objs), 'Reds')
     c = np.linspace(1, len(objs), len(objs))
+    # cs = axarr[i].contourf(X, Y, Z.T, levels=levels, cmap='binary')
     cs = axarr[i].contourf(X, Y, Z.T, levels=levels, cmap='viridis')
     pcm = axarr[i].scatter(
         log_alphas[:, 0], log_alphas[:, 1], c=c, marker='x', cmap=cmap,
