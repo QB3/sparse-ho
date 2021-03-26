@@ -49,8 +49,24 @@ class CrossVal(BaseCriterion):
             self.dict_crits[i].idx_val = idx_val
             self.dict_models[i] = copy.deepcopy(model)
 
-    def get_val(
-            self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
+
         if self.dict_crits is None:
             self._initialize(model, X)
         val = np.mean([
@@ -63,6 +79,25 @@ class CrossVal(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
         if self.dict_crits is None:
             self._initialize(model, X)
 
@@ -85,8 +120,24 @@ class CrossVal(BaseCriterion):
         return val, grad
 
     def get_val_outer(cls, *args, **kwargs):
+        """Get value of outer criterion. TODO
+
+        Parameters
+        ----------
+        cls: TODO
+        """
         return NotImplemented
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter.
+
+        Parameters
+        ----------
+        model: TODO
+        X: TODO
+        y: TODO
+        log_alpha: TODO
+        """
+        # TODO is this not done by the models?
         # TODO to improve this proj_hyperparam procedure
         return model.proj_hyperparam(X, y, log_alpha)

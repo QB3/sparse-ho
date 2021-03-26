@@ -63,6 +63,21 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         return val
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
         # TODO add warm start
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
@@ -90,9 +105,30 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v,
-            mask0=None, dense0=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-            monitor=None):
+            mask0=None, dense0=None, jac0=None, max_iter=1000, tol=1e-3,
+            compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        mask0: TODO
+        densse0: TODO
+        jac0: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
 

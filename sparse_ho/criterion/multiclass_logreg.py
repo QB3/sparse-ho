@@ -15,8 +15,8 @@ class LogisticMulticlass():
         indices of the training set
     idx_val: np.array
         indices of the validation set
-    idx_test: np.array
-        indices of the testing set
+    algo: TODO
+    idx_test: TODO
 
     Attributes
     ----------
@@ -48,6 +48,25 @@ class LogisticMulticlass():
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
         # TODO use sparse matrices
         if self.dict_models is None:
             self._initialize(model, X, y)
@@ -93,6 +112,24 @@ class LogisticMulticlass():
 
     def get_val(
             self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+        # TODO not the same as for other losses?
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
         if self.dict_models is None:
             self._initialize(model, X, y)
         all_betas = np.zeros((self.n_features, self.n_classes))
@@ -122,6 +159,15 @@ class LogisticMulticlass():
         return val
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on admissible range of values
+
+        Parameters:
+        model TODO
+        X TODO
+        y TODO
+        log_alpha TODO"""
+        # TODO doesn't an other object do this?
+        # TODO model not needed I think
         log_alpha_max = model.compute_alpha_max(X, y)
         log_alpha[log_alpha < log_alpha_max - 7] = log_alpha_max - 7
         log_alpha[log_alpha > log_alpha_max - np.log(0.9)] = (

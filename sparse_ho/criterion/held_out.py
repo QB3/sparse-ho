@@ -15,13 +15,8 @@ class HeldOutMSE(BaseCriterion):
     ----------
     idx_train: np.array
         indices of the training set
-    idx_test: np.array
-        indices of the testing set
-
-
-    Attributes
-    ----------
-        TODO
+    idx_val: np.array
+        indices of the validation set
     """
     # XXX : this code should be the same as CrossVal as you can pass
     # cv as [(train, test)] ie directly the indices of the train
@@ -40,6 +35,21 @@ class HeldOutMSE(BaseCriterion):
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
         # TODO add warm start
         # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
@@ -54,6 +64,25 @@ class HeldOutMSE(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
@@ -109,6 +138,21 @@ class HeldOutLogistic(BaseCriterion):
         return val
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        """
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
@@ -122,6 +166,25 @@ class HeldOutLogistic(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: TODO
+        max_iter: TODO
+        tol: float, optional (default=1e-3)
+            Tolerance for TODO
+        compute_jac: TODO
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]

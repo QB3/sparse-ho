@@ -29,7 +29,10 @@ def _get_args(function, varargs=False):
 public_modules = [
     # the list of modules users need to access for all functionality
     'sparse_ho',
-    # 'sparse_ho.models',
+    'sparse_ho.datasets',
+    'sparse_ho.algo',
+    'sparse_ho.criterion',
+    'sparse_ho.optimizers',
 ]
 
 
