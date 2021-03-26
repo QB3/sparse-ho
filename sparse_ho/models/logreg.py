@@ -16,16 +16,12 @@ class SparseLogreg(BaseModel):
 
     Parameters
     ----------
-    max_iter: int, optional (default=1000)
-        Maximum number of iterations TODO
     estimator: sklearn estimator
         Estimator used to solve the optimization problem. Must follow the
         scikit-learn API.
     """
 
-    def __init__(
-            self, max_iter=1000, estimator=None):
-        self.max_iter = max_iter
+    def __init__(self, estimator=None):
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, dense0=None,
@@ -421,8 +417,8 @@ class SparseLogreg(BaseModel):
         n_samples = X.shape[0]
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
-        self.estimator.max_iter = self.max_iter
+        self.estimator.set_params(tol=tol, C=1./(alpha*n_samples))
+        self.estimator.max_iter = max_iter
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]

@@ -20,15 +20,11 @@ class WeightedLasso(BaseModel):
 
     Parameters
     ----------
-    max_iter: float, optional (default=1000)
-        Maximum number of iterations for TODO
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
     """
 
-    def __init__(
-            self, max_iter=1000, estimator=None):
-        self.max_iter = max_iter
+    def __init__(self, estimator=None):
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,

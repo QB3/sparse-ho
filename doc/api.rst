@@ -24,9 +24,13 @@ Models
 .. autosummary::
    :toctree: generated/
 
+   ElasticNet
    Lasso
-   WeightedLasso
+   SparseLogreg
    SVM
+   SVR
+   WeightedLasso
+
 
 
 Criterion
@@ -76,26 +80,6 @@ Functions
    grad_search
    hyperopt_wrapper
 
-
-Models
-======
-
-:py:mod:`sparse_ho.utils`:
-
-.. currentmodule:: sparse_ho.models
-
-.. automodule:: sparse_ho.models
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   ElasticNet
-   Lasso
-   WeightedLasso
-   SVR
-   SparseLogreg
 
 Utils
 =====

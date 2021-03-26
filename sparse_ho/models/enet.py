@@ -14,16 +14,12 @@ class ElasticNet(BaseModel):
 
     Parameters
     ----------
-    max_iter: int, optional (default=1000)
-        Maximum number of iterations TODO
     estimator: sklearn estimator
         Estimator used to solve the optimization problem. Must follow the
         scikit-learn API.
     """
 
-    def __init__(
-            self, max_iter=1000, estimator=None):
-        self.max_iter = max_iter
+    def __init__(self, estimator=None):
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,

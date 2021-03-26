@@ -85,15 +85,11 @@ class SVR(BaseModel):
 
     Parameters
     ----------
-    max_iter : int
-        maximum number of epochs for the coordinate descent
-        algorithm
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
     """
 
-    def __init__(self, max_iter=100, estimator=None):
-        self.max_iter = max_iter
+    def __init__(self, estimator=None):
         self.estimator = estimator
         self.dual = True  # solve the pb in the dual
         self.dual_var = None  # save the last dual_var variable for warm_start
