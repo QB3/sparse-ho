@@ -16,17 +16,12 @@ class SparseLogreg(BaseModel):
 
     Parameters
     ----------
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
-    TODO: other parameters should be remove
+    estimator: sklearn estimator
+        Estimator used to solve the optimization problem. Must follow the
+        scikit-learn API.
     """
 
-    def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.max_iter = max_iter
-        self.log_alpha_max = log_alpha_max
+    def __init__(self, estimator=None):
         self.estimator = estimator
 
     def _init_dbeta_ddual_var(self, X, y, dense0=None,
@@ -114,7 +109,6 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     @njit
-    # TODO
     def _update_bcd_jac_backward(X, alpha, grad, beta, v_t_jac, L):
         sign_beta = np.sign(beta)
         r = X @ beta
@@ -159,10 +153,26 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: int
+            Number of features.
+        """
         return jac_v
 
     @staticmethod
     def get_mask_jac_v(mask, jac_v):
+        """TODO I have the feeling this is not used anywhere
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        """
         return jac_v
 
     @staticmethod
@@ -241,40 +251,134 @@ class SparseLogreg(BaseModel):
         return n_samples * alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(X.T @ y))
-            alpha_max /= (4 * X.shape[0])
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: float
+            Logarithm of projected hyperparameter.
+        """
+        if not hasattr(self, "log_alpha_max"):
+            alpha_max = np.max(np.abs(X.T @ y)) / (2 * X.shape[0])
             self.log_alpha_max = np.log(alpha_max)
-        if log_alpha < self.log_alpha_max - 8:
-            return self.log_alpha_max - 8
-        elif log_alpha > self.log_alpha_max + np.log(0.9):
-            return self.log_alpha_max + np.log(0.9)
-        else:
-            return log_alpha
+
+        log_alpha = np.clip(log_alpha, self.log_alpha_max - 8,
+                            self.log_alpha_max + np.log(0.9))
+        return log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
-        return 0.0
+    def get_L(X):
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
+        return 0.0  # TODO implement?
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : np.array, shape (n_features,)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : np.array, shape (n_samples,)
+            Observation vector.
+        mask : np.array, shape (n_features,)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_alpha):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : np.array, shape TODO
+        log_alpha : np.array, shape TODO
+            Logarithm of hyperparameter.
+        """
         return np.sign(x)
 
     def get_beta(self, X, y, mask, dense):
+        """Return primal iterate.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        """
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
         return jac.T @ v(mask, dense)
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: np.array
+            Logarithm of hyperparameter.
+        """
         X_m = X[:, mask]
         a = y * (X_m @ dense)
         temp = sigma(a) * (1 - sigma(a))
@@ -287,13 +391,21 @@ class SparseLogreg(BaseModel):
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):
-        return v
+        """Generalized support of iterate.
 
-    def compute_alpha_max(self, X, y):
-        alpha_max = np.max(np.abs(X.T @ y))
-        alpha_max /= (4 * X.shape[0])
-        log_alpha_max = np.log(alpha_max)
-        return log_alpha_max
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_alpha : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
+        return v
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
                     ddual_var, alpha):
@@ -301,12 +413,11 @@ class SparseLogreg(BaseModel):
             norm(ddual_var.T @ ddual_var +
                  n_samples * alpha * sign_beta @ dbeta))
 
-    def _use_estimator(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol):
         n_samples = X.shape[0]
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(tol=tol, C=1/(alpha*n_samples))
-        self.estimator.max_iter = self.max_iter
+        self.estimator.set_params(tol=tol, C=1./(alpha*n_samples))
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]

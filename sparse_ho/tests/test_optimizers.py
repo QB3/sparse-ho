@@ -43,13 +43,13 @@ max_iter = 1000
 # dict_log_alpha0["wlasso"] = log_alpha + np.log(tab / tab.max())
 
 models = [
-    Lasso(max_iter=max_iter, estimator=None),
+    Lasso(estimator=None),
 ]
 
 estimator = linear_model.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = [
-    Lasso(max_iter=max_iter, estimator=estimator),
+    Lasso(estimator=estimator),
 ]
 
 Optimizers = [LineSearch, GradientDescent]
@@ -93,7 +93,7 @@ def test_grad_search(Optimizer, model, crit):
 
 if __name__ == '__main__':
     models = [
-        Lasso(max_iter=max_iter, estimator=None)]
+        Lasso(estimator=None)]
     crits = ['sure']
     # crits = ['MSE']
     for model in models:

@@ -18,26 +18,15 @@ class SVM(BaseModel):
 
     Parameters
     ----------
-    log_C : float
-        logarithm of the hyperparameter C
-    max_iter : int
-        maximum number of epochs for the coordinate descent
-        algorithm
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
-    dual: bool
-        True if the problem is solved in the dual
-    dual_var: np.array
-        save the last dual_var variable to enable warm_start
-    ddual_var: np.array
-        save the last jacobian of the dual_var to enable warm_start
     """
 
-    def __init__(self, estimator=None, max_iter=100):
+    def __init__(self, estimator=None):
         self.estimator = estimator
-        self.max_iter = max_iter
-        self.dual = True
-        self.ddual_var = None
+        self.dual = True  # solve the pb in the dual
+        self.dual_var = None  # save the last dual_var variable for warm_start
+        self.ddual_var = None  # save the last dual_var jacobian for warm_start
 
     def _init_dbeta_ddual_var(
             self, X, y, dense0=None, mask0=None, jac0=None, compute_jac=True):
@@ -219,27 +208,77 @@ class SVM(BaseModel):
         return alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
-        if is_sparse:
+    def get_L(X):
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
+        if issparse(X):
             return slinalg.norm(X, axis=1) ** 2
         else:
             return norm(X, axis=1) ** 2
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : np.array, shape (n_features,)
+            Generalized support.
+        """
+        # TODO this is the same for 4 models, I thought it would not for this
+        # one.
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : np.array, shape (n_samples,)
+            Observation vector.
+        mask : np.array, shape (n_features,)  TODO shape n_samples right?
+            Generalized support.
+        """
+        # TODO why is nothing reduced?
         return y
 
     def sign(self, x, log_C):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : np.array, shape TODO
+        log_C: np.array, shape TODO
+            Logarithm of hyperparameter.
+        """
         sign = np.zeros(x.shape[0])
         sign[np.isclose(x, 0.0)] = -1.0
         sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
     def get_dual_v(self, X, y, v, log_C):
+        """TODO
+
+        Parameters
+        ----------
+        X: TODO
+        y: TODO
+        v: TODO
+        log_C: TODO
+        """
         if issparse(X):
             v_dual = v * (X.T).multiply(y)
             v_dual = np.sum(v_dual, axis=1)
@@ -250,17 +289,57 @@ class SVM(BaseModel):
 
     @staticmethod
     def get_jac_v(X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
         return jac[mask].T @ v(mask, dense)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: int
+            Number of features.
+        """
+        # MM sorry I don't get what this does
         return jac_v
 
     def get_hessian(self, X, y, mask, dense, log_C):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: np.array, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_C: np.array
+            Logarithm of hyperparameter.
+        """
         C = np.exp(log_C)
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         if issparse(X):
-            Xy = X[full_supp, :].multiply(y[full_supp, np.newaxis])
+            Xy = X[full_supp, :].multiply(y[full_supp, None])
             return Xy @ Xy.T
         else:
             Xy = (y[full_supp] * X[full_supp, :].T)
@@ -278,11 +357,42 @@ class SVM(BaseModel):
         return jac_t_v
 
     def generalized_supp(self, X, v, log_C):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X : np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_C : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
         full_supp = np.logical_and(
             self.dual_var != 0, self.dual_var != np.exp(log_C))
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: np.array, shape (2,)
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: float
+            Logarithm of projected hyperparameter.
+        """
+        # TODO harmonize C vs alpha, OK for alpha everywhere for me (MM)
         return np.clip(log_alpha, -16, 4)
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
@@ -291,7 +401,7 @@ class SVM(BaseModel):
         full_supp = np.logical_and(dual_var != 0, dual_var != C)
         if issparse(Xs):
             dryX = ddual_var[full_supp].T @ \
-                    (Xs[full_supp, :].T).multiply(ys[full_supp]).T
+                (Xs[full_supp, :].T).multiply(ys[full_supp]).T
         else:
             dryX = ddual_var[full_supp].T @ (ys[full_supp] *
                                              Xs[full_supp, :].T).T
@@ -311,9 +421,7 @@ class SVM(BaseModel):
     def _use_estimator(self, X, y, C, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(
-            tol=tol, C=C,
-            fit_intercept=False, max_iter=max_iter)
+        self.estimator.set_params(tol=tol, C=C, fit_intercept=False)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]
