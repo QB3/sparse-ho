@@ -8,12 +8,16 @@ class Forward():
 
     Parameters
     ----------
-    verbose: bool
+    use_stop_crit: bool, optional (default=True)
+        Use stopping criterion in hypergradient computation. If False,
+        run to maximum number of iterations.
+    verbose: bool, optional (default=False)
+        Verbosity of the algorithm.
     """
 
-    def __init__(self, verbose=False, use_stop_crit=True):
-        self.verbose = verbose
+    def __init__(self, use_stop_crit=True, verbose=False):
         self.use_stop_crit = use_stop_crit
+        self.verbose = verbose
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
@@ -42,13 +46,12 @@ def get_beta_jac_iterdiff(
     """
     Parameters
     --------------
-    X: np.array, shape (n_samples, n_features)
-        design matrix
-        It can also be a sparse CSC matrix
+    X: np.array-like, shape (n_samples, n_features)
+        Design matrix.
     y: np.array, shape (n_samples,)
-        observations
-    log_alpha: float or np.array, shape (n_features)
-        log  of eth coefficient multiplying the penalization
+        Observation vector.
+    log_alpha: float or np.array, shape (n_features,)
+        Logarithm of hyperparameter.
     beta0: np.array, shape (n_features,)
         initial value of the regression coefficients
         beta for warm start
@@ -64,8 +67,8 @@ def get_beta_jac_iterdiff(
     compute_jac: bool
         to compute or not the Jacobian along with the regression
         coefficients
-    model: string
-        model used, "lasso", "wlasso", or "mcp"
+    model:  instance of ``sparse_ho.base.BaseModel``
+        An model that follows the sparse_ho API.
     return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way
@@ -89,13 +92,13 @@ def get_beta_jac_iterdiff(
     is_sparse = issparse(X)
     if not is_sparse and not np.isfortran(X):
         X = np.asfortranarray(X)
-    L = model.get_L(X, is_sparse=is_sparse)
+    L = model.get_L(X)
 
     ############################################
     alpha = np.exp(log_alpha)
 
     if hasattr(model, 'estimator') and model.estimator is not None:
-        return model._use_estimator(X, y, alpha, tol, max_iter)
+        return model._use_estimator(X, y, alpha, tol)
 
     try:
         alpha.shape[0]
@@ -147,7 +150,7 @@ def get_beta_jac_iterdiff(
                 dual_gap = pobj[-1] - dobj
                 if verbose:
                     print("dual gap %.2e" % dual_gap)
-                assert dual_gap >= -100 * np.finfo('float').eps
+                assert dual_gap >= -100 * np.finfo('float').eps * dobj
                 if verbose:
                     print("gap %.2e" % dual_gap)
                 if dual_gap < pobj0 * tol:

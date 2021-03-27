@@ -24,9 +24,13 @@ Models
 .. autosummary::
    :toctree: generated/
 
+   ElasticNet
    Lasso
-   WeightedLasso
+   SparseLogreg
    SVM
+   SVR
+   WeightedLasso
+
 
 
 Criterion
@@ -62,6 +66,7 @@ Algorithms
 .. autosummary::
    :toctree: generated/
 
+   Implicit
    ImplicitForward
    Forward
    Backward
@@ -73,6 +78,7 @@ Functions
    :toctree: generated/
 
    grad_search
+   hyperopt_wrapper
 
 
 Utils
@@ -90,4 +96,3 @@ Utils
    :toctree: generated/
 
    Monitor
-   WarmStart

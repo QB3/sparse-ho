@@ -1,16 +1,12 @@
 # This files contains the functions to perform zero order descent for HO
 # hyperparameter setting
 import numpy as np
-try:
-    from smt.sampling_methods import LHS
-except Exception:
-    print("could import smt.sampling_methods")
 
 
 def grid_search(
         criterion, model, X, y, alpha_min, alpha_max, monitor,
         max_evals=50, tol=1e-5, nb_hyperparam=1,
-        beta_star=None, random_state=42, samp="grid", alphas=None,
+        random_state=42, samp="grid", alphas=None,
         t_max=100_000, reverse=True):
     if alphas is None and samp == "grid":
         if reverse:
@@ -40,19 +36,12 @@ def grid_search(
             alphas = np.array(np.meshgrid(
                 alphas, alphas2)).T.reshape(-1, 2)
 
-    elif samp == "lhs":
-        xlimits = np.array([[np.log(alpha_min), np.log(alpha_max)]])
-        sampling = LHS(xlimits=xlimits)
-        num = max_evals
-        alphas = np.exp(sampling(num))
-        alphas = np.clip(alphas, alpha_min, alpha_max)
     min_g_func = np.inf
     alpha_opt = alphas[0]
 
     for i, alpha in enumerate(alphas):
         print("Iteration %i / %i" % (i+1, len(alphas)))
-        if samp == "lhs":
-            alpha = alpha[0]
+
         g_func = criterion.get_val(
             model, X, y, np.log(alpha), monitor, tol=tol)
 

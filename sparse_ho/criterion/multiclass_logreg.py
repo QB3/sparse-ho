@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils_cross_entropy import (
-    cross_entropy, grad_cross_entropy, grad_cross_entropyk, accuracy)
+    cross_entropy, grad_cross_entropy, accuracy)
 
 
 class LogisticMulticlass():
@@ -133,7 +133,7 @@ class LogisticMulticlass():
         grad_total = (grad_ce * all_jacs).sum(axis=0)
         return grad_total
 
-    def grad_k_loss(self, all_betas, jack, X, Y, k):
-        grad_ce = grad_cross_entropyk(all_betas, X, Y, k)
-        grad_k = grad_ce @ jack
-        return grad_k
+    # def grad_k_loss(self, all_betas, jack, X, Y, k):
+    #     grad_ce = grad_cross_entropyk(all_betas, X, Y, k)
+    #     grad_k = grad_ce @ jack
+    #     return grad_k

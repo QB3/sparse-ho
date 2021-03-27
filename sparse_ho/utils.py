@@ -91,21 +91,6 @@ def dual_logreg(y, theta, alpha):
     return d_obj
 
 
-def mcp_pen(x, threshold, gamma=1.2):
-    """ penalty value for mcp regularization
-        Remind that gamma > 1
-    """
-    if isinstance(x, np.ndarray):
-        z = (0.5 * threshold ** 2 * gamma) * np.ones(x.shape)
-        j = np.abs(x) < gamma * threshold
-        z[j] = threshold * np.abs(x[j]) - x[j] ** 2 / (2 * gamma)
-    else:
-        z = (0.5 * threshold ** 2 * gamma)
-        if np.abs(x) < gamma * threshold:
-            z = threshold * np.abs(x) - x ** 2 / (2 * gamma)
-    return z
-
-
 def smooth_hinge(x):
     val = np.zeros(len(x))
     val[x <= 0.0] = 0.5 - x[x <= 0.0]
@@ -134,39 +119,6 @@ def smooth_hinge_loss(X, y, beta):
     val /= X.shape[0]
     grad /= X.shape[0]
     return val, grad
-
-
-@njit
-def mcp_prox(x, threshold, gamma=1.2):
-    """MCP-proximal operator function, as a constraint gamma >1."""
-    y = np.sign(x) * np.maximum(np.abs(x) - threshold, 0) / (1 - 1 / gamma)
-    if np.abs(x) > gamma * threshold:
-        y = x
-    return y
-
-
-@njit
-def mcp_dalpha(x, alpha, gamma):
-    if np.abs(x) >= alpha * gamma:
-        return 0
-    else:
-        return - np.sign(x) / (1 - 1 / gamma)
-
-
-@njit
-def mcp_dgamma(x, alpha, gamma):
-    if np.abs(x) >= alpha * gamma:
-        return 0
-    else:
-        return - ST(x, alpha) / (gamma - 1) ** 2
-
-
-@njit
-def mcp_dx(x, alpha, gamma):
-    if np.abs(x) >= alpha * gamma:
-        return 1
-    else:
-        return np.abs(np.sign(x)) / (1 - 1 / gamma)
 
 
 @njit
@@ -211,13 +163,6 @@ def iou(supp1, supp2):
         supp1, supp2).sum() / np.logical_or(supp1, supp2).sum()
 
 
-def iou_beta(beta1, beta2):
-    supp1 = beta1 != 0
-    supp2 = beta2 != 0
-    return np.logical_and(
-        supp1, supp2).sum() / np.logical_or(supp1, supp2).sum()
-
-
 class Monitor():
     """
     Class used to store computed metrics at each iteration of the outer loop.
@@ -249,45 +194,3 @@ class Monitor():
             self.acc_vals.append(acc_val)
         if acc_test is not None:
             self.acc_vals.append(acc_test)
-
-
-class WarmStart():
-    """
-    Class used to warm start all algorithms.
-    """
-
-    def __init__(self):
-        self.beta_old = None
-        self.beta_old2 = None
-        self.dbeta_old = None
-        self.dbeta_old2 = None
-        self.mask_old = None
-        self.mask_old2 = None
-        self.sol_lin_sys = None
-        self.sol_lin_sys2 = None
-
-    def __call__(
-            self, mask_old, beta_old, dbeta_old=None, mask_old2=None,
-            beta_old2=None, dbeta_old2=None):
-        """
-        Here we save te masks of the active coefficients, the active
-        coefficients of the regressions coefficients, and the active
-        coefficient of the Jacobians.
-        For the SURE criterion there are 2 optimization problem to solve
-        """
-        self.mask_old = mask_old
-        self.beta_old = beta_old
-        self.dbeta_old = dbeta_old
-        self.mask_old2 = mask_old2
-        self.beta_old2 = beta_old2
-        self.dbeta_old2 = dbeta_old2
-        return self.beta_old
-
-    def set_sol_lin_sys(self, sol_lin_sys, sol_lin_sys2=None):
-        """
-        For the implicit differentiation the solution of the previous
-        linear system can be used as a warm start for the next conjugate
-        gradient.
-        """
-        self.sol_lin_sys = sol_lin_sys
-        self.sol_lin_sys2 = sol_lin_sys2

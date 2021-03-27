@@ -38,22 +38,22 @@ class Implicit():
 
 
 def get_beta_jac_t_v_implicit(
-        X_train, y_train, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
+        X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
         model="lasso", sk=False, max_iter=1000, sol_lin_sys=None, n=1,
         sigma=0, delta=0, epsilon=0):
     alpha = np.exp(log_alpha)
-    n_samples, n_features = X_train.shape
+    n_samples, n_features = X.shape
 
     mask, dense, _ = get_beta_jac_iterdiff(
-        X_train, y_train, log_alpha, mask0=mask0, dense0=dense0,
+        X, y, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
-    mat_to_inv = model.get_hessian(X_train, y_train, mask, dense, log_alpha)
+    mat_to_inv = model.get_hessian(X, y, mask, dense, log_alpha)
     size_mat = mat_to_inv.shape[0]
     v = get_v(mask, dense)
     if hasattr(model, 'dual'):
-        v = model.get_dual_v(mask, dense, X_train, y_train, v, log_alpha)
+        v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
     # TODO: to clean
-    is_sparse = issparse(X_train)
+    is_sparse = issparse(X)
     if not alpha.shape:
         alphas = np.ones(n_features) * alpha
     else:
@@ -66,7 +66,7 @@ def get_beta_jac_t_v_implicit(
         sol0 = np.zeros(size_mat)
     try:
         sol = cg(
-            mat_to_inv, - model.generalized_supp(X_train, v, log_alpha),
+            mat_to_inv, - model.generalized_supp(X, v, log_alpha),
             # x0=sol0, tol=tol, maxiter=1e5)
             x0=sol0, tol=tol)
         if sol[1] == 0:
@@ -77,20 +77,20 @@ def get_beta_jac_t_v_implicit(
         print("Matrix to invert was badly conditioned")
         size_mat = mat_to_inv.shape[0]
         if is_sparse:
-            reg_amount = 1e-7 * norm(model.reduce_X(X_train, mask).todense(),
+            reg_amount = 1e-7 * norm(model.reduce_X(X, mask).todense(),
                                      ord=2) ** 2
             mat_to_inv += reg_amount * identity(size_mat)
         else:
-            reg_amount = 1e-7 * norm(model.reduce_X(X_train, mask), ord=2) ** 2
+            reg_amount = 1e-7 * norm(model.reduce_X(X, mask), ord=2) ** 2
             mat_to_inv += reg_amount * np.eye(size_mat)
         sol = cg(
             mat_to_inv + reg_amount * identity(size_mat),
-            - model.generalized_supp(X_train, v, log_alpha),
+            - model.generalized_supp(X, v, log_alpha),
             x0=sol0, atol=1e-3)
 
     sol_lin_sys = sol[0]
 
     jac_t_v = model._get_jac_t_v(
-        X_train, y_train, sol_lin_sys, mask, dense, alphas, v.copy(),
+        X, y, sol_lin_sys, mask, dense, alphas, v.copy(),
         n_samples)
     return mask, dense, jac_t_v, sol[0]
