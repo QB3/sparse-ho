@@ -137,7 +137,7 @@ Grid-search
 
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, max_iter=max_iter)
-    model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+    model = SparseLogreg(estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
     monitor_grid = Monitor()
     grid_search(
@@ -211,7 +211,7 @@ Grad-search
     for optimizer_name in optimizer_names:
         estimator = LogisticRegression(
             penalty='l1', fit_intercept=False, solver='saga', tol=tol)
-        model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+        model = SparseLogreg(estimator=estimator)
         criterion = HeldOutLogistic(idx_train, idx_val)
 
         monitor_grad = Monitor()
@@ -279,7 +279,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.212 seconds)
+   **Total running time of the script:** ( 0 minutes  2.871 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_compare_optimizers.py:

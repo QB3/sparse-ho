@@ -14,7 +14,6 @@
    .. autosummary::
    
       ~Lasso.__init__
-      ~Lasso.compute_alpha_max
       ~Lasso.generalized_supp
       ~Lasso.get_L
       ~Lasso.get_beta

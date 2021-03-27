@@ -18,8 +18,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sparse_ho.criterion.HeldOutMSE" href="sparse_ho.criterion.HeldOutMSE.html" />
-    <link rel="prev" title="sparse_ho.models.WeightedLasso" href="sparse_ho.models.WeightedLasso.html" />
+    <link rel="next" title="sparse_ho.models.SVR" href="sparse_ho.models.SVR.html" />
+    <link rel="prev" title="sparse_ho.models.SparseLogreg" href="sparse_ho.models.SparseLogreg.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -97,7 +97,7 @@
 <h1>sparse_ho.models.SVM<a class="headerlink" href="#sparse-ho-models-svm" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="sparse_ho.models.SVM">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.models.</span></code><code class="sig-name descname"><span class="pre">SVM</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.models.</span></code><code class="sig-name descname"><span class="pre">SVM</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM" title="Permalink to this definition">¶</a></dt>
 <dd><p>The support vector Machine classifier without bias
 The optimization problem is solved in the dual:
 1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
@@ -105,25 +105,14 @@ s.t 0 &lt;= r_i &lt;= C</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>log_C</strong><span class="classifier">float</span></dt><dd><p>logarithm of the hyperparameter C</p>
-</dd>
-<dt><strong>max_iter</strong><span class="classifier">int</span></dt><dd><p>maximum number of epochs for the coordinate descent
-algorithm</p>
-</dd>
 <dt><strong>estimator: instance of ``sklearn.base.BaseEstimator``</strong></dt><dd><p>An estimator that follows the scikit-learn API.</p>
-</dd>
-<dt><strong>dual: bool</strong></dt><dd><p>True if the problem is solved in the dual</p>
-</dd>
-<dt><strong>dual_var: np.array</strong></dt><dd><p>save the last dual_var variable to enable warm_start</p>
-</dd>
-<dt><strong>ddual_var: np.array</strong></dt><dd><p>save the last jacobian of the dual_var to enable warm_start</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
 <dt id="sparse_ho.models.SVM.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.models.SVM.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -134,41 +123,41 @@ algorithm</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.SVM.__init__" title="sparse_ho.models.SVM.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([estimator, max_iter])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.models.SVM.__init__" title="sparse_ho.models.SVM.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([estimator])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">generalized_supp</span></code>(X, v, log_C)</p></td>
-<td><p></p></td>
+<td><p>Generalized support of iterate.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X[, is_sparse])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_L</span></code>(X)</p></td>
+<td><p>Compute Lipschitz constant of datafit.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dual_v</span></code>(X, y, v, log_C)</p></td>
-<td><p></p></td>
+<td><p>TODO</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
-<td><p></p></td>
+<td><p>TODO</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(X, y, mask, dense, log_C)</p></td>
-<td><p></p></td>
+<td><p>Compute Hessian of datafit.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, n_samples, sign_beta, …)</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(X, y, mask, dense, jac, v)</p></td>
-<td><p></p></td>
+<td><p>Compute hypergradient.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(X, y, log_alpha)</p></td>
-<td><p></p></td>
+<td><p>Project hyperparameter on an admissible range of values.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_X</span></code>(X, mask)</p></td>
-<td><p></p></td>
+<td><p>Reduce design matrix to generalized support.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_y</span></code>(y, mask)</p></td>
-<td><p></p></td>
+<td><p>Reduce observation vector to generalized support.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sign</span></code>(x, log_C)</p></td>
-<td><p></p></td>
+<td><p>Get sign of iterate.</p></td>
 </tr>
 </tbody>
 </table>

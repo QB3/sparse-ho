@@ -18,7 +18,7 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="sparse_ho.models.Lasso" href="generated/sparse_ho.models.Lasso.html" />
+    <link rel="next" title="sparse_ho.models.ElasticNet" href="generated/sparse_ho.models.ElasticNet.html" />
     <link rel="prev" title="sparse-ho" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -105,14 +105,23 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>([max_iter, estimator, log_alpha_max])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.ElasticNet.html#sparse_ho.models.ElasticNet" title="sparse_ho.models.ElasticNet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElasticNet</span></code></a>([estimator])</p></td>
+<td><p>Sparse ho ElasticNet model (inner problem)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>([estimator])</p></td>
 <td><p>Linear Model trained with L1 prior as regularizer (aka the Lasso) The optimization objective for Lasso is: (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.WeightedLasso.html#sparse_ho.models.WeightedLasso" title="sparse_ho.models.WeightedLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightedLasso</span></code></a>([max_iter, estimator, …])</p></td>
-<td><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SparseLogreg.html#sparse_ho.models.SparseLogreg" title="sparse_ho.models.SparseLogreg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseLogreg</span></code></a>([estimator])</p></td>
+<td><p>Sparse Logistic Regression classifier.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>([estimator, max_iter])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>([estimator])</p></td>
 <td><p>The support vector Machine classifier without bias The optimization problem is solved in the dual: 1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i s.t 0 &lt;= r_i &lt;= C</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVR.html#sparse_ho.models.SVR" title="sparse_ho.models.SVR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVR</span></code></a>([estimator])</p></td>
+<td><p>The support vector regression without bias The optimization problem is solved in the dual.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.WeightedLasso.html#sparse_ho.models.WeightedLasso" title="sparse_ho.models.WeightedLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightedLasso</span></code></a>([estimator])</p></td>
+<td><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso)</p></td>
 </tr>
 </tbody>
 </table>

@@ -142,7 +142,7 @@ Grid-search
 
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, max_iter=max_iter)
-    model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+    model = SparseLogreg(estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
     monitor_grid = Monitor()
     grid_search(
@@ -188,7 +188,7 @@ Grid-search
     Iteration 19 / 20
     Iteration 20 / 20
     scikit finished
-    Time to compute grad search: 1.19 s
+    Time to compute grad search: 0.93 s
 
 
 
@@ -209,7 +209,7 @@ Grad-search
 
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, tol=tol)
-    model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+    model = SparseLogreg(estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
 
     monitor_grad = Monitor()
@@ -269,7 +269,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 2.09 s
+    Time to compute grad search: 1.70 s
     /home/circleci/project/examples/plot_sparse_log_reg.py:128: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
       plt.plot(
 
@@ -279,7 +279,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.732 seconds)
+   **Total running time of the script:** ( 0 minutes  3.058 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
