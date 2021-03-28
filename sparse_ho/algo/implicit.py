@@ -24,7 +24,7 @@ class Implicit():
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             jac0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            compute_jac=False, backward=False, full_jac_v=False):
+            backward=False, full_jac_v=False):
 
         mask, dense, jac_v, sol_lin_sys = get_beta_jac_t_v_implicit(
             X, y, log_alpha, get_v,
@@ -39,8 +39,7 @@ class Implicit():
 
 def get_beta_jac_t_v_implicit(
         X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
-        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None, n=1,
-        sigma=0, delta=0, epsilon=0):
+        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None):
     alpha = np.exp(log_alpha)
     n_samples, n_features = X.shape
 

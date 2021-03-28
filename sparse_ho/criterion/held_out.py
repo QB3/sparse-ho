@@ -64,20 +64,23 @@ class HeldOutMSE(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
-        # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
+            mask0=self.mask0, dense0=self.dense0, tol=tol,
             compute_jac=False)
         value_outer = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+
+        self.mask0 = mask
+        self.dense0 = dense
+
         if monitor is not None:
             monitor(value_outer, None, alpha=np.exp(log_alpha))
         return value_outer
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
-            tol=1e-5, compute_jac=True, monitor=None):
+            tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
         Parameters
@@ -96,8 +99,6 @@ class HeldOutMSE(BaseCriterion):
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
-        compute_jac: bool
-            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -112,8 +113,7 @@ class HeldOutMSE(BaseCriterion):
             X_train, y_train, log_alpha, model,
             get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
@@ -197,19 +197,22 @@ class HeldOutLogistic(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
-            compute_jac=False)
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
+            mask0=self.mask0, dense0=self.dense0, tol=tol, compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+
+        self.mask0 = mask
+        self.dense0 = dense
+
         if monitor is not None:
             monitor(val, None, mask, dense, alpha=np.exp(log_alpha))
         return val
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
-            tol=1e-5, compute_jac=True, monitor=None):
+            tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
         Parameters
@@ -228,8 +231,6 @@ class HeldOutLogistic(BaseCriterion):
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
-        compute_jac: bool
-            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -248,8 +249,7 @@ class HeldOutLogistic(BaseCriterion):
             X_train, y_train, log_alpha, model, get_v, mask0=self.mask0,
             dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense
@@ -319,8 +319,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
         dense: ndarray
             Values of the non-zeros coefficients.
         """
-        if X is None or y is None:
-            return None  # TODO why ?
 
         if issparse(X):
             Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
@@ -330,7 +328,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
-            tol=1e-5, compute_jac=True, monitor=None):
+            tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
         Parameters
@@ -349,8 +347,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
-        compute_jac: bool
-            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -376,8 +372,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             X_train, y_train, log_alpha, model, get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, full_jac_v=True)
 
         self.mask0 = mask
         self.dense0 = dense

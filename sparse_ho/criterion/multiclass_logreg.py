@@ -82,7 +82,7 @@ class LogisticMulticlass():
                 X[self.idx_train, :], self.one_hot_code[self.idx_train, k],
                 log_alpha[k], self.dict_models[k], None, mask0=mask0,
                 dense0=dense0,
-                quantity_to_warm_start=jac0, compute_jac=True, tol=tol)
+                quantity_to_warm_start=jac0, tol=tol)
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
             all_jacs[mask, k] = jac  # maybe use np.ix_
@@ -145,7 +145,7 @@ class LogisticMulticlass():
                 X[self.idx_train, :], self.one_hot_code[self.idx_train, k],
                 log_alpha[k], self.dict_models[k], None, mask0=mask0,
                 dense0=dense0,
-                quantity_to_warm_start=jac0, compute_jac=False, tol=tol)
+                quantity_to_warm_start=jac0, tol=tol)
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
         acc_val = accuracy(

@@ -114,15 +114,19 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
-            X, y + self.epsilon * self.delta,
-            log_alpha, model, tol=tol, compute_jac=False)
+            X, y + self.epsilon * self.delta, log_alpha, model,
+            mask0=self.mask02, dense0=self.dense02, tol=tol, compute_jac=False)
+
+        self.mask0 = None
+        self.dense0 = None
+        self.mask02 = None
+        self.dense02 = None
 
         val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         if monitor is not None:
@@ -141,7 +145,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=1000,
-            tol=1e-3, compute_jac=True, monitor=None):
+            tol=1e-3, monitor=None):
         """Get value and gradient of criterion.
 
         Parameters
@@ -160,8 +164,6 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
-        compute_jac: bool
-            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -182,15 +184,13 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
             X, y, log_alpha, model, v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, full_jac_v=True)
         mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
             X, y + self.epsilon * self.delta,
             log_alpha, model, v2, mask0=self.mask02,
             dense0=self.dense02,
             quantity_to_warm_start=self.quantity_to_warm_start2,
-            max_iter=max_iter, tol=tol, compute_jac=compute_jac,
-            full_jac_v=True)
+            max_iter=max_iter, tol=tol, full_jac_v=True)
         val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         self.mask0 = mask
         self.dense0 = dense
