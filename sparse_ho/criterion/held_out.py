@@ -97,7 +97,7 @@ class HeldOutMSE(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         compute_jac: bool
-            To compute or not the Jacobian.  # This should be removed
+            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -229,7 +229,7 @@ class HeldOutLogistic(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         compute_jac: bool
-            To compute or not the Jacobian.  # This should be removed
+            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -350,7 +350,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         compute_jac: bool
-            To compute or not the Jacobian.  # This should be removed
+            To compute or not the Jacobian.  # TODO This should be removed
         monitor: instance of Monitor.
             Monitor.
         """

@@ -54,8 +54,8 @@ class CrossVal(BaseCriterion):
 
         Parameters
         ----------
-        model: instance of Model
-            A sparse_ho model
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -65,7 +65,7 @@ class CrossVal(BaseCriterion):
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for the inner optimization solver.
+            Tolerance for the inner problem.
         """
 
         if self.dict_crits is None:
@@ -84,8 +84,8 @@ class CrossVal(BaseCriterion):
 
         Parameters
         ----------
-        model: instance of Model
-            A sparse_ho model
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -97,7 +97,7 @@ class CrossVal(BaseCriterion):
         max_iter: int
             Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)
-            Tolerance for the inner optimization problem
+            Tolerance for the inner problem.
         compute_jac: bool (default False)  # TODO this param should be removed
             To compute or not the Jacobian
         monitor: instance of Monitor.
