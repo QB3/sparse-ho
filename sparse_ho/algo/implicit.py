@@ -51,7 +51,7 @@ def get_beta_jac_t_v_implicit(
     size_mat = mat_to_inv.shape[0]
     v = get_v(mask, dense)
     if hasattr(model, 'dual'):
-        v = model.get_dual_v(X, y, v, log_alpha)
+        v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
     # TODO: to clean
     is_sparse = issparse(X)
     if not alpha.shape:

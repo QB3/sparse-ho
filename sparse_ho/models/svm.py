@@ -136,7 +136,7 @@ class SVM(BaseModel):
 
     @staticmethod
     def _get_jac(dbeta, mask):
-        return dbeta[mask]
+        return dbeta
 
     @staticmethod
     def _init_dbeta0(mask, mask0, jac0):
@@ -163,7 +163,8 @@ class SVM(BaseModel):
         if np.any(sign == 1.0):
             ddual_var[sign == 1.0] = np.repeat(C, (sign == 1).sum())
         if is_sparse:
-            self.dbeta = np.array(np.sum(X.T.multiply(y * ddual_var), axis=1))
+            self.dbeta = np.array(
+                np.sum(X.T.multiply(y * ddual_var), axis=1))[:, 0]
         else:
             self.dbeta = np.sum(y * ddual_var * X.T, axis=1)
         return ddual_var
@@ -187,7 +188,7 @@ class SVM(BaseModel):
     def _update_only_jac_sparse(
             data, indptr, indices, y, n_samples, n_features,
             dbeta, dual_var, ddual_var, L, C, sign_beta):
-        sign = np.zeros(dual_var.shape[0])
+        sign = np.zeros(n_samples)
         sign[dual_var == 0.0] = -1.0
         sign[dual_var == C] = 1.0
         for j in np.arange(0, n_samples)[sign == 0.0]:
@@ -237,9 +238,7 @@ class SVM(BaseModel):
         mask : np.array, shape (n_features,)
             Generalized support.
         """
-        # TODO this is the same for 4 models, I thought it would not for this
-        # one.
-        return X[:, mask]
+        return X
 
     @staticmethod
     def reduce_y(y, mask):
@@ -269,22 +268,24 @@ class SVM(BaseModel):
         sign[np.isclose(x, np.exp(log_C))] = 1.0
         return sign
 
-    def get_dual_v(self, X, y, v, log_C):
+    def get_dual_v(self, mask, dense, X, y, v, log_C):
         """TODO
 
         Parameters
         ----------
+        mask: TODO
+        dense: TODO
         X: TODO
         y: TODO
         v: TODO
         log_C: TODO
         """
         if issparse(X):
-            v_dual = v * (X.T).multiply(y)
-            v_dual = np.sum(v_dual, axis=1)
-            v_dual = np.squeeze(np.array(v_dual))
+            v_dual = v @ (X[:, mask].T).multiply(y)
+            # v_dual = np.sum(v_dual)
+            # v_dual = np.squeeze(np.array(v_dual))
         else:
-            v_dual = (y * X.T).T @ v
+            v_dual = (y * X[:, mask].T).T @ v
         return v_dual
 
     @staticmethod
@@ -349,8 +350,13 @@ class SVM(BaseModel):
         C = C[0]
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         maskC = self.dual_var == C
-        hessian = (y[full_supp] * X[full_supp, :].T).T @ \
-            (y[maskC] * X[maskC, :].T)
+        if issparse(X):
+            Xy = X[full_supp, :].multiply(y[full_supp, np.newaxis])
+            hessian = Xy @ X[maskC, :].multiply(y[maskC, np.newaxis]).T
+        else:
+            hessian = (y[full_supp] * X[full_supp, :].T).T @ \
+                (y[maskC] * X[maskC, :].T)
+
         hessian_vec = hessian @ np.repeat(C, maskC.sum())
         jac_t_v = hessian_vec.T @ jac
         jac_t_v += np.repeat(C, maskC.sum()).T @ v[maskC]
@@ -421,8 +427,10 @@ class SVM(BaseModel):
     def _use_estimator(self, X, y, C, tol, max_iter):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(tol=tol, C=C, fit_intercept=False)
+        self.estimator.set_params(tol=tol, C=C, max_iter=max_iter)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
-        dense = self.estimator.coef_[mask]
+        mask = mask[0, :]
+        dense = (self.estimator.coef_)[0, :][mask]
+        self.dual_var = np.abs(self.estimator.dual_coef_[0, :])
         return mask, dense, None
