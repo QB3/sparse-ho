@@ -88,8 +88,7 @@ def get_only_jac(
         use_stop_crit=True):
     n_samples, n_features = Xs.shape
 
-    is_sparse = issparse(Xs)
-    L = model.get_L(Xs, is_sparse)
+    L = model.get_L(Xs)
 
     objs = []
 
@@ -104,7 +103,7 @@ def get_only_jac(
     for i in range(niter_jac):
         if verbose:
             print("%i -st iterations over %i" % (i, niter_jac))
-        if is_sparse:
+        if issparse(Xs):
             model._update_only_jac_sparse(
                 Xs.data, Xs.indptr, Xs.indices, y, n_samples,
                 n_features, dbeta, dual_var, ddual_var, L, alpha, sign_beta)

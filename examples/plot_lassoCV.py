@@ -72,13 +72,13 @@ print('scikit finished')
 # Now do the hyperparameter optimization with implicit differentiation
 # --------------------------------------------------------------------
 
-estimator = sklearn.linear_model.Lasso(
-    fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
+estimator = sklearn.linear_model.Lasso(fit_intercept=False,
+                                       warm_start=True, max_iter=1e5)
 
 print('sparse-ho started')
 
 t0 = time.time()
-model = Lasso()
+model = Lasso(estimator)
 criterion = HeldOutMSE(None, None)
 alpha0 = 0.9 * alpha_max
 monitor_grad = Monitor()
@@ -122,7 +122,7 @@ ax.scatter(
     label='1-st order method',  marker='X',
     color=cmap(np.linspace(0, 1, len(objs_grad))), s=40, zorder=40)
 plt.xlabel(r"$\lambda / \lambda_{\max}$")
-plt.ylabel("(Normalized) Cross-validation loss")
+plt.ylabel("Cross-validation loss")
 ax.set_xscale("log")
 plt.tick_params(width=5)
 plt.legend()

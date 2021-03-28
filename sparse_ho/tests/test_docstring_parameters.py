@@ -33,6 +33,7 @@ public_modules = [
     'sparse_ho.algo',
     'sparse_ho.criterion',
     'sparse_ho.optimizers',
+    'sparse_ho.models'
 ]
 
 
@@ -52,6 +53,8 @@ def get_name(func):
 _docstring_ignores = [
     ".*get_beta_jac_v$",
     ".*get_beta_jac$",
+    ".*get_full_jac_obj$",
+    ".*get_jac_obj$",
 ]
 _tab_ignores = []
 

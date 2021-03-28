@@ -106,8 +106,6 @@ class HeldOutMSE(BaseCriterion):
             max_iter=max_iter, tol=tol, compute_jac=compute_jac,
             full_jac_v=True)
 
-        # assert isinstance(quantity_to_warm_start, np.ndarray)
-
         self.mask0 = mask
         self.dense0 = dense
         self.quantity_to_warm_start = quantity_to_warm_start
@@ -362,7 +360,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         return val, grad
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3, max_iter=10000):
         """Get value of criterion.
 
         Parameters
@@ -378,8 +376,8 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Tolerance for TODO
         """
         mask, dense, _ = get_beta_jac_iterdiff(
-            X, y, log_alpha, model,  # TODO max_iter
-            max_iter=model.max_iter, tol=tol, compute_jac=False)
+            X, y, log_alpha, model,
+            max_iter=max_iter, tol=tol, compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val

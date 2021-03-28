@@ -24,9 +24,13 @@ Models
 .. autosummary::
    :toctree: generated/
 
+   ElasticNet
    Lasso
-   WeightedLasso
+   SparseLogreg
    SVM
+   SVR
+   WeightedLasso
+
 
 
 Criterion
