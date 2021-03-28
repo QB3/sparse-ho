@@ -145,7 +145,7 @@ class CrossVal(BaseCriterion):
             A model that follows the sparse_ho API.
         X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float
             Logarithm of hyperparameter.

@@ -22,7 +22,7 @@ class LogisticMulticlass():
 
     Attributes
     ----------
-    dict_models: dictionnary
+    dict_models: dict
         Dictionnary with the models corresponding to each class.
     """
 
