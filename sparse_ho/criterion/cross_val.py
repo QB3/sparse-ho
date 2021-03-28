@@ -126,6 +126,7 @@ class CrossVal(BaseCriterion):
 
     def get_val_outer(cls, *args, **kwargs):
         """Get value of outer criterion.
+
         This is not implemented because for CV the loss is computed on each
         fold.
 
