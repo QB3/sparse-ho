@@ -1,0 +1,26 @@
+﻿sparse\_ho.criterion.LogisticMulticlass
+=======================================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: LogisticMulticlass
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LogisticMulticlass.__init__
+      ~LogisticMulticlass.get_val
+      ~LogisticMulticlass.get_val_grad
+      ~LogisticMulticlass.grad_total_loss
+      ~LogisticMulticlass.proj_hyperparam
+   
+   
+
+   
+   
+   

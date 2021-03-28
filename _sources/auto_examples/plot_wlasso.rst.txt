@@ -176,7 +176,7 @@ Vanilla LassoCV
 Weighted Lasso with sparse-ho.
 We use the vanilla lassoCV coefficients as a starting point
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-87
+.. GENERATED FROM PYTHON SOURCE LINES 76-88
 
 .. code-block:: default
 
@@ -188,7 +188,8 @@ We use the vanilla lassoCV coefficients as a starting point
     criterion = CrossVal(sub_criterion, cv=cv)
     algo = ImplicitForward()
     monitor = Monitor()
-    optimizer = GradientDescent(n_outer=100, tol=1e-7, verbose=True, p_grad0=1.9)
+    optimizer = GradientDescent(
+        n_outer=100, tol=1e-7, verbose=True, p_grad_norm=1.9)
     results = grad_search(
         algo, criterion, model, optimizer, X, y, alpha0, monitor)
 
@@ -305,7 +306,7 @@ We use the vanilla lassoCV coefficients as a starting point
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-91
+.. GENERATED FROM PYTHON SOURCE LINES 89-92
 
 .. code-block:: default
 
@@ -340,11 +341,11 @@ We use the vanilla lassoCV coefficients as a starting point
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-93
+.. GENERATED FROM PYTHON SOURCE LINES 93-94
 
 MSE on validation set
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-115
+.. GENERATED FROM PYTHON SOURCE LINES 94-116
 
 .. code-block:: default
 
@@ -393,7 +394,7 @@ MSE on validation set
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.995 seconds)
+   **Total running time of the script:** ( 0 minutes  4.099 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_wlasso.py:

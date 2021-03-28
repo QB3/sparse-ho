@@ -1,0 +1,26 @@
+﻿sparse\_ho.criterion.HeldOutSmoothedHinge
+=========================================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: HeldOutSmoothedHinge
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~HeldOutSmoothedHinge.__init__
+      ~HeldOutSmoothedHinge.get_val
+      ~HeldOutSmoothedHinge.get_val_grad
+      ~HeldOutSmoothedHinge.get_val_outer
+      ~HeldOutSmoothedHinge.proj_hyperparam
+   
+   
+
+   
+   
+   

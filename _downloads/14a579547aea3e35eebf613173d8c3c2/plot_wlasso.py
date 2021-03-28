@@ -81,7 +81,8 @@ sub_criterion = HeldOutMSE(idx_train, idx_val)
 criterion = CrossVal(sub_criterion, cv=cv)
 algo = ImplicitForward()
 monitor = Monitor()
-optimizer = GradientDescent(n_outer=100, tol=1e-7, verbose=True, p_grad0=1.9)
+optimizer = GradientDescent(
+    n_outer=100, tol=1e-7, verbose=True, p_grad_norm=1.9)
 results = grad_search(
     algo, criterion, model, optimizer, X, y, alpha0, monitor)
 ##############################################################################

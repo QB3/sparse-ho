@@ -95,7 +95,7 @@
       
   <div class="section" id="api-documentation">
 <span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="#module-0" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
+<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
 <span class="target" id="module-sparse_ho"></span><div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.models" title="sparse_ho.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.models</span></code></a>:</p>
@@ -135,21 +135,30 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutMSE.html#sparse_ho.criterion.HeldOutMSE" title="sparse_ho.criterion.HeldOutMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutMSE</span></code></a>(idx_train, idx_val)</p></td>
-<td><p>Held out loss for quadratic datafit.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.CrossVal.html#sparse_ho.criterion.CrossVal" title="sparse_ho.criterion.CrossVal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossVal</span></code></a>(criterion[, cv])</p></td>
+<td><p>Cross-validation loss.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.FiniteDiffMonteCarloSure.html#sparse_ho.criterion.FiniteDiffMonteCarloSure" title="sparse_ho.criterion.FiniteDiffMonteCarloSure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FiniteDiffMonteCarloSure</span></code></a>(sigma[, …])</p></td>
 <td><p>Smoothed version of the Stein Unbiased Risk Estimator (SURE).</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutMSE.html#sparse_ho.criterion.HeldOutMSE" title="sparse_ho.criterion.HeldOutMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutMSE</span></code></a>(idx_train, idx_val)</p></td>
+<td><p>Held out loss for quadratic datafit.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutSmoothedHinge.html#sparse_ho.criterion.HeldOutSmoothedHinge" title="sparse_ho.criterion.HeldOutSmoothedHinge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutSmoothedHinge</span></code></a>(idx_train, idx_val)</p></td>
+<td><p>Smooth Hinge loss.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutLogistic.html#sparse_ho.criterion.HeldOutLogistic" title="sparse_ho.criterion.HeldOutLogistic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutLogistic</span></code></a>(idx_train, idx_val)</p></td>
 <td><p>Logistic loss on held out data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.LogisticMulticlass.html#sparse_ho.criterion.LogisticMulticlass" title="sparse_ho.criterion.LogisticMulticlass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LogisticMulticlass</span></code></a>(idx_train, idx_val, algo)</p></td>
+<td><p>Multiclass logistic loss.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="algorithms">
 <h2>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="#module-0" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
+<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
 <span class="target" id="module-0"></span><table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -168,6 +177,18 @@
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Algorithm that will compute the (hyper)gradient, ie the gradient with respect to the hyperparameter using the backward differentiation.</p></td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optimizers">
+<h2>Optimizers<a class="headerlink" href="#optimizers" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
+<span class="target" id="module-1"></span><table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
 </tbody>
 </table>
 </div>

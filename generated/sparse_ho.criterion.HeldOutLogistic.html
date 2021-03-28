@@ -18,8 +18,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sparse_ho.Implicit" href="sparse_ho.Implicit.html" />
-    <link rel="prev" title="sparse_ho.criterion.FiniteDiffMonteCarloSure" href="sparse_ho.criterion.FiniteDiffMonteCarloSure.html" />
+    <link rel="next" title="sparse_ho.criterion.LogisticMulticlass" href="sparse_ho.criterion.LogisticMulticlass.html" />
+    <link rel="prev" title="sparse_ho.criterion.HeldOutSmoothedHinge" href="sparse_ho.criterion.HeldOutSmoothedHinge.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -102,9 +102,9 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>idx_train: np.array</strong></dt><dd><p>indices of the training set</p>
+<dt><strong>idx_train: ndarray</strong></dt><dd><p>indices of the training set</p>
 </dd>
-<dt><strong>idx_val: np.array</strong></dt><dd><p>indices of the validation set</p>
+<dt><strong>idx_val: ndarray</strong></dt><dd><p>indices of the validation set</p>
 </dd>
 </dl>
 </dd>
@@ -126,16 +126,16 @@
 <td><p>Initialize self.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(model, X, y, log_alpha[, monitor, tol])</p></td>
-<td><p></p></td>
+<td><p>Get value of criterion.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(model, X, y, log_alpha, …[, …])</p></td>
-<td><p></p></td>
+<td><p>Get value and gradient of criterion.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_outer</span></code>(X, y, mask, dense)</p></td>
-<td><p></p></td>
+<td><p>Compute the logistic loss on the validation set.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(model, X, y, log_alpha)</p></td>
-<td><p></p></td>
+<td><p>Project hyperparameter on a range of admissible values.</p></td>
 </tr>
 </tbody>
 </table>

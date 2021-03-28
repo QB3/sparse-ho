@@ -1,0 +1,26 @@
+﻿sparse\_ho.criterion.CrossVal
+=============================
+
+.. currentmodule:: sparse_ho.criterion
+
+.. autoclass:: CrossVal
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CrossVal.__init__
+      ~CrossVal.get_val
+      ~CrossVal.get_val_grad
+      ~CrossVal.get_val_outer
+      ~CrossVal.proj_hyperparam
+   
+   
+
+   
+   
+   

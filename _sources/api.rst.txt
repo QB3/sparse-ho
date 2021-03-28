@@ -47,9 +47,12 @@ Criterion
 .. autosummary::
    :toctree: generated/
 
-   HeldOutMSE
+   CrossVal
    FiniteDiffMonteCarloSure
+   HeldOutMSE
+   HeldOutSmoothedHinge
    HeldOutLogistic
+   LogisticMulticlass
 
 
 Algorithms
@@ -70,6 +73,25 @@ Algorithms
    ImplicitForward
    Forward
    Backward
+
+
+Optimizers
+==========
+
+:py:mod:`sparse_ho`:
+
+.. currentmodule:: sparse_ho
+
+.. automodule:: sparse_ho
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   Adam
+   GradientDescent
+   LineSearch
 
 Functions
 =========

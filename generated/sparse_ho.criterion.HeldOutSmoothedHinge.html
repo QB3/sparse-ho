@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Computation times &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.criterion.HeldOutSmoothedHinge &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -18,6 +18,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sparse_ho.criterion.HeldOutLogistic" href="sparse_ho.criterion.HeldOutLogistic.html" />
+    <link rel="prev" title="sparse_ho.criterion.HeldOutMSE" href="sparse_ho.criterion.HeldOutMSE.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -46,7 +48,7 @@
         <div class="collapse navbar-collapse nav-collapse">
           <ul class="nav navbar-nav">
             
-                <li><a href="index.html">Examples</a></li>
+                <li><a href="../auto_examples/index.html">Examples</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="https://github.com/QB3/sparse-ho">GitHub</a></li>
             
@@ -59,8 +61,8 @@
      href="../index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
       role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Documentation</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/QB3/sparse-ho/">Fork sparse-ho on Github</a></li>
 </ul>
 </ul>
@@ -91,46 +93,59 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>01:05.809</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<table class="docutils align-default">
+  <div class="section" id="sparse-ho-criterion-heldoutsmoothedhinge">
+<h1>sparse_ho.criterion.HeldOutSmoothedHinge<a class="headerlink" href="#sparse-ho-criterion-heldoutsmoothedhinge" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="sparse_ho.criterion.HeldOutSmoothedHinge">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.criterion.</span></code><code class="sig-name descname"><span class="pre">HeldOutSmoothedHinge</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutSmoothedHinge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooth Hinge loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>idx_train: ndarray</strong></dt><dd><p>indices of the training set</p>
+</dd>
+<dt><strong>idx_val: ndarray</strong></dt><dd><p>indices of the validation set</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sparse_ho.criterion.HeldOutSmoothedHinge.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx_val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.criterion.HeldOutSmoothedHinge.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>idx_train: ndarray</dt><dd><p>indices of the training set</p>
+</dd>
+<dt>idx_val: ndarray</dt><dd><p>indices of the validation set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
 <colgroup>
-<col style="width: 83%" />
 <col style="width: 10%" />
-<col style="width: 7%" />
+<col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_held_out_lasso.html#sphx-glr-auto-examples-plot-held-out-lasso-py"><span class="std std-ref">Lasso with held-out test set</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_held_out_lasso.py</span></code>)</p></td>
-<td><p>00:34.882</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.criterion.HeldOutSmoothedHinge.__init__" title="sparse_ho.criterion.HeldOutSmoothedHinge.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(idx_train, idx_val)</p></td>
+<td><p>Parameters:</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_lassoCV.html#sphx-glr-auto-examples-plot-lassocv-py"><span class="std std-ref">Lasso with Cross-validation</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_lassoCV.py</span></code>)</p></td>
-<td><p>00:12.547</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val</span></code>(model, X, y, log_alpha[, tol])</p></td>
+<td><p>Get value of criterion.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_held_out_enet.html#sphx-glr-auto-examples-plot-held-out-enet-py"><span class="std std-ref">Elastic net with held-out test set</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_held_out_enet.py</span></code>)</p></td>
-<td><p>00:05.478</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_grad</span></code>(model, X, y, log_alpha, …[, …])</p></td>
+<td><p>Get value and gradient of criterion.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_wlasso.html#sphx-glr-auto-examples-plot-wlasso-py"><span class="std std-ref">Weighted Lasso with held-out test set</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_wlasso.py</span></code>)</p></td>
-<td><p>00:04.099</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_val_outer</span></code>(X, y, mask, dense)</p></td>
+<td><p>Compute the smoothed Hinge on the validation set.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_sparse_log_reg.html#sphx-glr-auto-examples-plot-sparse-log-reg-py"><span class="std std-ref">Sparse logistic regression</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_sparse_log_reg.py</span></code>)</p></td>
-<td><p>00:03.448</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_compare_optimizers.html#sphx-glr-auto-examples-plot-compare-optimizers-py"><span class="std std-ref">Compare outer optimizers</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_compare_optimizers.py</span></code>)</p></td>
-<td><p>00:02.958</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_use_callback.html#sphx-glr-auto-examples-plot-use-callback-py"><span class="std std-ref">Monitor custom metrics along hyperoptimization</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_use_callback.py</span></code>)</p></td>
-<td><p>00:02.396</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(model, X, y, log_alpha)</p></td>
+<td><p>Project hyperparameter on a range of admissible values.</p></td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
 </div>
 
 

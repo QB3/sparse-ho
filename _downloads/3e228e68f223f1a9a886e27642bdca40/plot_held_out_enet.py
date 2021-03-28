@@ -100,7 +100,7 @@ model = ElasticNet(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
 algo = ImplicitForward(tol_jac=1e-3, n_iter_jac=100, max_iter=max_iter)
 optimizer = GradientDescent(
-    n_outer=n_outer, tol=tol, p_grad0=1.5, verbose=True)
+    n_outer=n_outer, tol=tol, p_grad_norm=1.5, verbose=True)
 grad_search(
     algo, criterion, model, optimizer, X, y, alpha0=alpha0,
     monitor=monitor)
