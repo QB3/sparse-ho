@@ -92,7 +92,8 @@ class CrossVal(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)
@@ -124,7 +125,9 @@ class CrossVal(BaseCriterion):
         return val, grad
 
     def get_val_outer(cls, *args, **kwargs):
-        """Get value of outer criterion. TODO
+        """Get value of outer criterion.
+        This is not implemented because for CV the loss is computed on each
+        fold.
 
         Parameters
         ----------
@@ -133,14 +136,18 @@ class CrossVal(BaseCriterion):
         return NotImplemented
 
     def proj_hyperparam(self, model, X, y, log_alpha):
-        """Project hyperparameter.
+        """Project hyperparameter on a range of admissible values.
 
         Parameters
         ----------
-        model: TODO
-        X: TODO
-        y: TODO
-        log_alpha: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
         """
         # TODO is this not done by the models?
         # TODO to improve this proj_hyperparam procedure
