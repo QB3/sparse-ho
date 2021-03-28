@@ -35,10 +35,14 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
-        X: TODO
-        y: TODO
-        mask: TODO
-        dense: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: np.array
+            Values of the non-zeros coefficients.
         """
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
@@ -47,7 +51,8 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -57,7 +62,7 @@ class HeldOutMSE(BaseCriterion):
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner problem.
         """
         # TODO add warm start
         # TODO add test for get val
@@ -77,18 +82,22 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
-        max_iter: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
-        compute_jac: TODO
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -119,7 +128,8 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -152,14 +162,18 @@ class HeldOutLogistic(BaseCriterion):
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
-        """TODO
+        """Compute the logistic loss on the validation set.
 
         Parameters
         ----------
-        X: TODO
-        y: TODO
-        mask: TODO
-        dense: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: np.array
+            Values of the non-zeros coefficients.
         """
         val = np.sum(np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
         val /= X.shape[0]
@@ -170,7 +184,8 @@ class HeldOutLogistic(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -180,7 +195,7 @@ class HeldOutLogistic(BaseCriterion):
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner problem.
         """
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
@@ -199,18 +214,22 @@ class HeldOutLogistic(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
-        max_iter: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
-        compute_jac: TODO
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -246,7 +265,8 @@ class HeldOutLogistic(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -263,8 +283,10 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: TODO
-    idx_val: TODO
+    idx_train: np.array
+        indices of the training set
+    idx_val: np.array
+        indices of the validation set
     """
 
     def __init__(self, idx_train, idx_val):
@@ -284,14 +306,18 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.quantity_to_warm_start = None
 
     def get_val_outer(self, X, y, mask, dense):
-        """Compute the MSE on the validation set.
+        """Compute the smoothed Hinge on the validation set.
 
         Parameters
         ----------
-        X: TODO
-        y: TODO
-        mask: TODO
-        dense: TODO
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        mask: np.array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: np.array
+            Values of the non-zeros coefficients.
         """
         if X is None or y is None:
             return None  # TODO why ?
@@ -309,18 +335,22 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
-        max_iter: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
-        compute_jac: TODO
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # This should be removed
         monitor: instance of Monitor.
             Monitor.
         """
@@ -360,12 +390,13 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         return val, grad
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3, max_iter=10000):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
         """Get value of criterion.
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -373,11 +404,12 @@ class HeldOutSmoothedHinge(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner problem.
         """
+        # TODO add maxiter param for all get_val
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,
-            max_iter=max_iter, tol=tol, compute_jac=False)
+            tol=tol, compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
@@ -387,7 +419,8 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            An model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
