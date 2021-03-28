@@ -54,7 +54,8 @@ class CrossVal(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of Model
+            A sparse_ho model
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -64,7 +65,7 @@ class CrossVal(BaseCriterion):
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner optimization solver.
         """
 
         if self.dict_crits is None:
@@ -83,7 +84,8 @@ class CrossVal(BaseCriterion):
 
         Parameters
         ----------
-        model: TODO
+        model: instance of Model
+            A sparse_ho model
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -91,10 +93,12 @@ class CrossVal(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         get_beta_jac_v: TODO
-        max_iter: TODO
+        max_iter: int
+            Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
-        compute_jac: TODO
+            Tolerance for the inner optimization problem
+        compute_jac: bool (default False)  # TODO this param should be removed
+            To compute or not the Jacobian
         monitor: instance of Monitor.
             Monitor.
         """
