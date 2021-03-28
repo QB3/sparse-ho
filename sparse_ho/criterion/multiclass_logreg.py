@@ -57,7 +57,7 @@ class LogisticMulticlass():
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
