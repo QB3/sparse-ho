@@ -15,12 +15,15 @@ class LogisticMulticlass():
         indices of the training set
     idx_val: np.array
         indices of the validation set
-    algo: TODO
-    idx_test: TODO
+    algo: instance of ``sparse_ho.base.AlgoModel``
+        A model that follows the sparse_ho API.
+    idx_test: np.array
+        indices of the test set
 
     Attributes
     ----------
-        TODO
+    dict_models: dictionnary
+        Dictionnary with the models corresponding to each class.
     """
 
     def __init__(self, idx_train, idx_val, algo, idx_test=None):
@@ -52,18 +55,20 @@ class LogisticMulticlass():
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner problem.
         """
         # TODO use sparse matrices
         if self.dict_models is None:
@@ -115,18 +120,20 @@ class LogisticMulticlass():
 
         Parameters
         ----------
-        model: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: TODO
+        get_beta_jac_v: function
+            Returns the product of the transpoe of the Jacobian and a vector v.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
-            Tolerance for TODO
+            Tolerance for the inner problem.
         """
         if self.dict_models is None:
             self._initialize(model, X, y)
@@ -161,10 +168,14 @@ class LogisticMulticlass():
 
         Parameters
         ----------
-        model: TODO
-        X: TODO
-        y: TODO
-        log_alpha: TODO
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: np.array, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
         """
         # TODO doesn't an other object do this?
         # TODO model not needed I think
@@ -175,14 +186,18 @@ class LogisticMulticlass():
         return log_alpha
 
     def grad_total_loss(self, all_betas, all_jacs, X, Y):
-        """TODO
+        """Compute the gradient of the multiclass logistic loss.
 
         Parameters
         ----------
-        all_betas: TODO
-        all_jacs: TODO
-        X: TODO
-        Y: TODO
+        all_betas: np.array-like, shape (n_features, n_classes)
+            Solutions of the optimization problems corresponding to each class.
+        all_jacs: np.array-like, shape (n_features, n_classes)
+            Jacobians of the optimization problems corresponding to each class.
+        X: np.array-like, shape (n_samples, n_features)
+            Design matrix.
+        Y: np.array, shape (n_samples, n_classes)
+            One hot encoding representation of the observation y.
         """
         grad_ce = grad_cross_entropy(all_betas, X, Y)
         grad_total = (grad_ce * all_jacs).sum(axis=0)
