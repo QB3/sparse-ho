@@ -114,15 +114,19 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
         mask2, dense2, _ = get_beta_jac_iterdiff(
-            X, y + self.epsilon * self.delta,
-            log_alpha, model, tol=tol, compute_jac=False)
+            X, y + self.epsilon * self.delta, log_alpha, model,
+            mask0=self.mask02, dense0=self.dense02, tol=tol, compute_jac=False)
+
+        self.mask0 = None
+        self.dense0 = None
+        self.mask02 = None
+        self.dense02 = None
 
         val = self.get_val_outer(X, y, mask, dense, mask2, dense2)
         if monitor is not None:
