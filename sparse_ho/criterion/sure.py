@@ -27,16 +27,16 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
     ----------
     Finite differentiation Monte Carlo SURE relies on the resolution of 2
     optimization problems.
-    mask0: np.array-like, shape (n_features,)
+    mask0: array-like, shape (n_features,)
         Boolean array corresponding to the non-zeros coefficients of the
         solution of the first optimization problem.
-    mask02: np.array-like, shape (n_features,)
+    mask02: array-like, shape (n_features,)
         Boolean array corresponding to the non-zeros coefficients of the
         solution of the second optimization problem.
-    dense: np.array
+    dense: ndarray
         Values of the non-zeros coefficients of the
         solution of the first optimization problem.
-    dense2: np.array
+    dense2: ndarray
         Values of the non-zeros coefficients of the
         solution of the second optimization problem.
 
@@ -70,20 +70,20 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array-like, shape (n_features,)
+        mask: array-like, shape (n_features,)
             Boolean array corresponding to the non-zeros coefficients of the
             solution of the first optimization problem.
-        dense: np.array
+        dense: ndarray
             Values of the non-zeros coefficients of the
             solution of the first optimization problem.
-        mask2: np.array-like, shape (n_features,)
+        mask2: array-like, shape (n_features,)
             Boolean array corresponding to the non-zeros coefficients of the
             solution of the second optimization problem.
-        dense2: np.array
+        dense2: ndarray
             Values of the non-zeros coefficients of the
             solution of the second optimization problem.
         """
@@ -103,9 +103,9 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
@@ -148,13 +148,13 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.

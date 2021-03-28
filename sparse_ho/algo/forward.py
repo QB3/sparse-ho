@@ -46,16 +46,16 @@ def get_beta_jac_iterdiff(
     """
     Parameters
     --------------
-    X: np.array-like, shape (n_samples, n_features)
+    X: array-like, shape (n_samples, n_features)
         Design matrix.
-    y: np.array, shape (n_samples,)
+    y: ndarray, shape (n_samples,)
         Observation vector.
     log_alpha: float or np.array, shape (n_features,)
         Logarithm of hyperparameter.
-    beta0: np.array, shape (n_features,)
+    beta0: ndarray, shape (n_features,)
         initial value of the regression coefficients
         beta for warm start
-    dbeta0: np.array, shape (n_features,)
+    dbeta0: ndarray, shape (n_features,)
         initial value of the jacobian dbeta for warm start
     max_iter: int
         number of iterations of the algorithm
@@ -80,11 +80,11 @@ def get_beta_jac_iterdiff(
 
     Returns
     -------
-    mask : np.array, shape (n_features,)
+    mask : ndarray, shape (n_features,)
         The mask of non-zero coefficients in beta.
-    dense : np.array, shape (n_nonzeros,)
+    dense : ndarray, shape (n_nonzeros,)
         The beta coefficients on the support
-    jac : np.array, shape (n_nonzeros,) or (n_nonzeros, q)
+    jac : ndarray, shape (n_nonzeros,) or (n_nonzeros, q)
         The jacobian restricted to the support. If there are more than
         one hyperparameter then it has two dimensions.
     """

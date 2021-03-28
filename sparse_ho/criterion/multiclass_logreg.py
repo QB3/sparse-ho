@@ -11,9 +11,9 @@ class LogisticMulticlass():
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
     algo: instance of ``sparse_ho.base.AlgoModel``
         A model that follows the sparse_ho API.
@@ -23,7 +23,7 @@ class LogisticMulticlass():
     Attributes
     ----------
     dict_models: dict
-        Dictionnary with the models corresponding to each class.
+        dict with the models corresponding to each class.
     """
 
     def __init__(self, idx_train, idx_val, algo, idx_test=None):
@@ -59,11 +59,11 @@ class LogisticMulticlass():
             A model that follows the sparse_ho API.
         X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         monitor: instance of Monitor.
             Monitor.
@@ -122,13 +122,13 @@ class LogisticMulticlass():
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         monitor: instance of Monitor.
             Monitor.
@@ -170,9 +170,9 @@ class LogisticMulticlass():
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
@@ -190,13 +190,13 @@ class LogisticMulticlass():
 
         Parameters
         ----------
-        all_betas: np.array-like, shape (n_features, n_classes)
+        all_betas: array-like, shape (n_features, n_classes)
             Solutions of the optimization problems corresponding to each class.
-        all_jacs: np.array-like, shape (n_features, n_classes)
+        all_jacs: array-like, shape (n_features, n_classes)
             Jacobians of the optimization problems corresponding to each class.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        Y: np.array, shape (n_samples, n_classes)
+        Y: ndarray, shape (n_samples, n_classes)
             One hot encoding representation of the observation y.
         """
         grad_ce = grad_cross_entropy(all_betas, X, Y)

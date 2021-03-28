@@ -13,9 +13,9 @@ class HeldOutMSE(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
     """
     # XXX : this code should be the same as CrossVal as you can pass
@@ -35,13 +35,13 @@ class HeldOutMSE(BaseCriterion):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array-like, shape (n_features,)
+        mask: array-like, shape (n_features,)
             Boolean array corresponding to the non-zeros coefficients.
-        dense: np.array
+        dense: ndarray
             Values of the non-zeros coefficients.
         """
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
@@ -53,9 +53,9 @@ class HeldOutMSE(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
@@ -84,13 +84,13 @@ class HeldOutMSE(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -130,9 +130,9 @@ class HeldOutMSE(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float
             Logarithm of hyperparameter.
@@ -146,9 +146,9 @@ class HeldOutLogistic(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
     """
 
@@ -166,13 +166,13 @@ class HeldOutLogistic(BaseCriterion):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array-like, shape (n_features,)
+        mask: array-like, shape (n_features,)
             Boolean array corresponding to the non-zeros coefficients.
-        dense: np.array
+        dense: ndarray
             Values of the non-zeros coefficients.
         """
         val = np.sum(np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
@@ -186,9 +186,9 @@ class HeldOutLogistic(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
@@ -216,13 +216,13 @@ class HeldOutLogistic(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -267,9 +267,9 @@ class HeldOutLogistic(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float
             Logarithm of hyperparameter.
@@ -283,9 +283,9 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
     """
 
@@ -293,9 +293,9 @@ class HeldOutSmoothedHinge(BaseCriterion):
         """
         Parameters:
         ----------
-        idx_train: np.array
+        idx_train: ndarray
             indices of the training set
-        idx_val: np.array
+        idx_val: ndarray
             indices of the validation set
         """
         self.idx_train = idx_train
@@ -310,13 +310,13 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array-like, shape (n_features,)
+        mask: array-like, shape (n_features,)
             Boolean array corresponding to the non-zeros coefficients.
-        dense: np.array
+        dense: ndarray
             Values of the non-zeros coefficients.
         """
         if X is None or y is None:
@@ -337,13 +337,13 @@ class HeldOutSmoothedHinge(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -397,9 +397,9 @@ class HeldOutSmoothedHinge(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
@@ -421,9 +421,9 @@ class HeldOutSmoothedHinge(BaseCriterion):
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float
             Logarithm of hyperparameter.
