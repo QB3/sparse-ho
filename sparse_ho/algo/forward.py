@@ -68,7 +68,7 @@ def get_beta_jac_iterdiff(
         to compute or not the Jacobian along with the regression
         coefficients
     model:  instance of ``sparse_ho.base.BaseModel``
-        An model that follows the sparse_ho API.
+        A model that follows the sparse_ho API.
     return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way

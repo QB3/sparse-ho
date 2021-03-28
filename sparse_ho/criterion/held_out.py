@@ -52,7 +52,7 @@ class HeldOutMSE(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -83,7 +83,7 @@ class HeldOutMSE(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -129,7 +129,7 @@ class HeldOutMSE(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -185,7 +185,7 @@ class HeldOutLogistic(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -215,7 +215,7 @@ class HeldOutLogistic(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -266,7 +266,7 @@ class HeldOutLogistic(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -336,7 +336,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -396,7 +396,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
@@ -420,7 +420,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         Parameters
         ----------
         model: instance of ``sparse_ho.base.BaseModel``
-            An model that follows the sparse_ho API.
+            A model that follows the sparse_ho API.
         X: np.array-like, shape (n_samples, n_features)
             Design matrix.
         y: np.array, shape (n_samples,)
