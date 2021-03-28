@@ -92,7 +92,7 @@ class CrossVal(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: function
+        get_beta_jac_v: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum iteration for the inner optimization problem.
