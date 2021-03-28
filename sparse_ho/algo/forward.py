@@ -22,12 +22,11 @@ class Forward():
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            compute_jac=True, full_jac_v=False):
+            full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
-            jac0=quantity_to_warm_start,
-            max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, verbose=self.verbose,
+            jac0=quantity_to_warm_start, max_iter=max_iter, tol=tol,
+            compute_jac=True, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
         if jac is not None:
             jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
