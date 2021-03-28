@@ -255,9 +255,9 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
         log_alpha: float
             Logarithm of hyperparameter.
@@ -281,7 +281,7 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
 
         Returns
@@ -297,9 +297,9 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features,)
+        mask : ndarray, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -310,9 +310,9 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        y : np.array, shape (n_samples,)
+        y : ndarray, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features,)  TODO shape n_samples right?
+        mask : ndarray, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y
@@ -322,8 +322,8 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        x : np.array, shape TODO
-        log_alpha : np.array, shape TODO
+        x : ndarray, shape TODO
+        log_alpha : ndarray, shape TODO
             Logarithm of hyperparameter.
         """
         return np.sign(x)
@@ -333,13 +333,13 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         """
         return mask, dense
@@ -349,13 +349,13 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         jac: TODO
         v: TODO
@@ -368,15 +368,15 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
-        log_alpha: np.array
+        log_alpha: ndarray
             Logarithm of hyperparameter.
         """
         X_m = X[:, mask]
@@ -395,7 +395,7 @@ class SparseLogreg(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
         v : TODO
         log_alpha : float

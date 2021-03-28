@@ -25,7 +25,20 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
 
     Attributes
     ----------
-    TODO
+    Finite differentiation Monte Carlo SURE relies on the resolution of 2
+    optimization problems.
+    mask0: array-like, shape (n_features,)
+        Boolean array corresponding to the non-zeros coefficients of the
+        solution of the first optimization problem.
+    mask02: array-like, shape (n_features,)
+        Boolean array corresponding to the non-zeros coefficients of the
+        solution of the second optimization problem.
+    dense: ndarray
+        Values of the non-zeros coefficients of the
+        solution of the first optimization problem.
+    dense2: ndarray
+        Values of the non-zeros coefficients of the
+        solution of the second optimization problem.
 
     References
     ----------
@@ -52,9 +65,30 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         self.rmse = None
 
     def get_val_outer(self, X, y, mask, dense, mask2, dense2):
-        X_m = X[:, mask]  # avoid multiple calls to X[:, mask]
-        dof = ((X[:, mask2] @ dense2 -
-                X_m @ dense) @ self.delta)
+        """Compute the value of the smoothed version of the
+        Stein Unbiased Risk Estimator (SURE).
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients of the
+            solution of the first optimization problem.
+        dense: ndarray
+            Values of the non-zeros coefficients of the
+            solution of the first optimization problem.
+        mask2: array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients of the
+            solution of the second optimization problem.
+        dense2: ndarray
+            Values of the non-zeros coefficients of the
+            solution of the second optimization problem.
+        """
+        X_m = X[:, mask]
+        dof = ((X[:, mask2] @ dense2 - X_m @ dense) @ self.delta)
         dof /= self.epsilon
         # compute the value of the sure
         val = norm(y - X_m @ dense) ** 2
@@ -63,6 +97,23 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         return val
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
         # TODO add warm start
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
@@ -89,10 +140,31 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         self.init_delta_epsilon = True
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v,
-            mask0=None, dense0=None,
-            jac0=None, max_iter=1000, tol=1e-3, compute_jac=True,
-            monitor=None):
+            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=1000,
+            tol=1e-3, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # TODO This should be removed
+        monitor: instance of Monitor.
+            Monitor.
+        """
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
 

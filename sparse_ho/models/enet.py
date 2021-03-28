@@ -264,11 +264,11 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        log_alpha: np.array, shape (2,)
+        log_alpha: ndarray, shape (2,)
             Logarithm of hyperparameter.
 
         Returns
@@ -291,7 +291,7 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
 
         Returns
@@ -322,9 +322,9 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features,)
+        mask : ndarray, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -335,9 +335,9 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        y : np.array, shape (n_samples,)
+        y : ndarray, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features,)  TODO shape n_samples right?
+        mask : ndarray, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y
@@ -347,8 +347,8 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        x : np.array, shape TODO
-        log_alpha : np.array, shape TODO
+        x : ndarray, shape TODO
+        log_alpha : ndarray, shape TODO
             Logarithm of hyperparameter.
         """
         # TODO why is it x ?
@@ -359,13 +359,13 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         """
         return mask, dense
@@ -375,13 +375,13 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         jac: TODO
         v: TODO
@@ -394,15 +394,15 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
-        log_alpha: np.array, shape (2,)
+        log_alpha: ndarray, shape (2,)
             Logarithm of hyperparameter.
         """
         n_samples = X.shape[0]
@@ -415,7 +415,7 @@ class ElasticNet(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
         v : TODO
         log_alpha : float

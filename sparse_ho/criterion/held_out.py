@@ -13,15 +13,10 @@ class HeldOutMSE(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_test: np.array
-        indices of the testing set
-
-
-    Attributes
-    ----------
-        TODO
+    idx_val: ndarray
+        indices of the validation set
     """
     # XXX : this code should be the same as CrossVal as you can pass
     # cv as [(train, test)] ie directly the indices of the train
@@ -36,10 +31,39 @@ class HeldOutMSE(BaseCriterion):
         self.quantity_to_warm_start = None
 
     def get_val_outer(self, X, y, mask, dense):
-        """Compute the MSE on the validation set."""
+        """Compute the MSE on the validation set.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: ndarray
+            Values of the non-zeros coefficients.
+        """
         return norm(y - X[:, mask] @ dense) ** 2 / len(y)
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
         # TODO add warm start
         # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
@@ -54,6 +78,29 @@ class HeldOutMSE(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # TODO This should be removed
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
@@ -77,6 +124,19 @@ class HeldOutMSE(BaseCriterion):
         return val, grad
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
@@ -86,9 +146,9 @@ class HeldOutLogistic(BaseCriterion):
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
     """
 
@@ -102,11 +162,41 @@ class HeldOutLogistic(BaseCriterion):
 
     @staticmethod
     def get_val_outer(X, y, mask, dense):
+        """Compute the logistic loss on the validation set.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: ndarray
+            Values of the non-zeros coefficients.
+        """
         val = np.sum(np.log(1 + np.exp(-y * (X[:, mask] @ dense))))
         val /= X.shape[0]
         return val
 
     def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
         # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
             X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
@@ -120,6 +210,29 @@ class HeldOutLogistic(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # TODO This should be removed
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
@@ -148,6 +261,19 @@ class HeldOutLogistic(BaseCriterion):
         return val, grad
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)
 
@@ -155,18 +281,21 @@ class HeldOutLogistic(BaseCriterion):
 class HeldOutSmoothedHinge(BaseCriterion):
     """Smooth Hinge loss.
 
-    Attributes
+    Parameters
     ----------
-    TODO
+    idx_train: ndarray
+        indices of the training set
+    idx_val: ndarray
+        indices of the validation set
     """
 
     def __init__(self, idx_train, idx_val):
         """
         Parameters:
         ----------
-        idx_train: np.array
+        idx_train: ndarray
             indices of the training set
-        idx_val: np.array
+        idx_val: ndarray
             indices of the validation set
         """
         self.idx_train = idx_train
@@ -177,8 +306,21 @@ class HeldOutSmoothedHinge(BaseCriterion):
         self.quantity_to_warm_start = None
 
     def get_val_outer(self, X, y, mask, dense):
+        """Compute the smoothed Hinge on the validation set.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: array-like, shape (n_features,)
+            Boolean array corresponding to the non-zeros coefficients.
+        dense: ndarray
+            Values of the non-zeros coefficients.
+        """
         if X is None or y is None:
-            return None
+            return None  # TODO why ?
 
         if issparse(X):
             Xbeta_y = (X[:, mask].T).multiply(y).T @ dense
@@ -189,6 +331,29 @@ class HeldOutSmoothedHinge(BaseCriterion):
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
             tol=1e-5, compute_jac=True, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum number of iteration for the inner problem.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        compute_jac: bool
+            To compute or not the Jacobian.  # TODO This should be removed
+        monitor: instance of Monitor.
+            Monitor.
+        """
 
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
@@ -225,14 +390,43 @@ class HeldOutSmoothedHinge(BaseCriterion):
 
         return val, grad
 
-    def get_val(self, model, X, y, log_alpha, tol=1e-3, max_iter=10000):
+    def get_val(self, model, X, y, log_alpha, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
+        # TODO add maxiter param for all get_val
         mask, dense, _ = get_beta_jac_iterdiff(
             X, y, log_alpha, model,
-            max_iter=max_iter, tol=tol, compute_jac=False)
+            tol=tol, compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val], y[self.idx_val], mask, dense)
         return val
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
         return model.proj_hyperparam(
             X[self.idx_train, :], y[self.idx_train], log_alpha)

@@ -224,16 +224,16 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        log_alpha: np.array, shape (n_features,)
+        log_alpha: ndarray, shape (n_features,)
             Logarithm of hyperparameter.
 
         Returns
         -------
-        log_alpha: np.array, shape (n_features,)
+        log_alpha: ndarray, shape (n_features,)
             Logarithm of projected hyperparameter.
         """
         if not hasattr(self, "log_alpha_max"):
@@ -249,7 +249,7 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
 
         Returns
@@ -268,15 +268,15 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
-        log_alpha: np.array
+        log_alpha: ndarray
             Logarithm of hyperparameter.
         """
         # TODO no division by n_samples?
@@ -298,9 +298,9 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
-        mask : np.array, shape (n_features,)
+        mask : ndarray, shape (n_features,)
             Generalized support.
         """
         return X[:, mask]
@@ -311,9 +311,9 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        y : np.array, shape (n_samples,)
+        y : ndarray, shape (n_samples,)
             Observation vector.
-        mask : np.array, shape (n_features,)  TODO shape n_samples right?
+        mask : ndarray, shape (n_features,)  TODO shape n_samples right?
             Generalized support.
         """
         return y
@@ -323,8 +323,8 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        x : np.array, shape TODO
-        log_alpha : np.array, shape TODO
+        x : ndarray, shape TODO
+        log_alpha : ndarray, shape TODO
             Logarithm of hyperparameter.
         """
         return np.sign(x)
@@ -334,13 +334,13 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         """
         # TODO what's the use of this function? it does nothing for all models
@@ -351,13 +351,13 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X: np.array-like, shape (n_samples, n_features)
+        X: array-like, shape (n_samples, n_features)
             Design matrix.
-        y: np.array, shape (n_samples,)
+        y: ndarray, shape (n_samples,)
             Observation vector.
-        mask: np.array, shape (n_features,)
+        mask: ndarray, shape (n_features,)
             Mask corresponding to non zero entries of beta.
-        dense: np.array, shape (mask.sum(),)
+        dense: ndarray, shape (mask.sum(),)
             Non zero entries of beta.
         jac: TODO
         v: TODO
@@ -371,7 +371,7 @@ class WeightedLasso(BaseModel):
 
         Parameters
         ----------
-        X : np.array-like, shape (n_samples, n_features)
+        X : array-like, shape (n_samples, n_features)
             Design matrix.
         v : TODO
         log_alpha : float

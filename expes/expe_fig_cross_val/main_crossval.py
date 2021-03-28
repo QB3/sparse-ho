@@ -56,7 +56,7 @@ for algorithm in algorithms:
     monitor = Monitor()
     cross_val_criterion = CrossVal(criterion, cv=kf)
     algo = ImplicitForward()
-    optimizer = GradientDescent(n_outer=10, tol=tol, verbose=True, p_grad0=1)
+    optimizer = GradientDescent(n_outer=10, tol=tol, verbose=True, p_grad_norm=1)
     # optimizer = LineSearch(n_outer=10, tol=tol, verbose=True)
     if algorithm == 'grad_search':
         grad_search(
