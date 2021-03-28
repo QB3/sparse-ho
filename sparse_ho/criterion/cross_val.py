@@ -79,7 +79,7 @@ class CrossVal(BaseCriterion):
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
-            tol=1e-5, compute_jac=True, monitor=None):
+            tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
         Parameters
@@ -98,8 +98,6 @@ class CrossVal(BaseCriterion):
             Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
-        compute_jac: bool (default False)  # TODO this param should be removed
-            To compute or not the Jacobian
         monitor: instance of Monitor.
             Monitor.
         """
@@ -111,7 +109,7 @@ class CrossVal(BaseCriterion):
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
                 self.dict_models[i], X, y, log_alpha, get_beta_jac_v,
-                max_iter=max_iter, tol=tol, compute_jac=compute_jac)
+                max_iter=max_iter, tol=tol)
             val += vali
             if gradi is not None:
                 grad += gradi
