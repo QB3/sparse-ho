@@ -17,7 +17,7 @@ class LogisticMulticlass():
         indices of the validation set
     algo: instance of ``sparse_ho.base.AlgoModel``
         A model that follows the sparse_ho API.
-    idx_test: np.array
+    idx_test: ndarray
         indices of the test set
 
     Attributes
