@@ -64,13 +64,16 @@ class HeldOutMSE(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
-        # TODO add test for get val
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
+            mask0=self.mask0, dense0=self.dense0, tol=tol,
             compute_jac=False)
         value_outer = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+
+        self.mask0 = mask
+        self.dense0 = dense
+
         if monitor is not None:
             monitor(value_outer, None, alpha=np.exp(log_alpha))
         return value_outer
@@ -197,12 +200,15 @@ class HeldOutLogistic(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        # TODO add warm start
         mask, dense, _ = get_beta_jac_iterdiff(
-            X[self.idx_train], y[self.idx_train], log_alpha, model, tol=tol,
-            compute_jac=False)
+            X[self.idx_train], y[self.idx_train], log_alpha, model,
+            mask0=self.mask0, dense0=self.dense0, tol=tol, compute_jac=False)
         val = self.get_val_outer(
             X[self.idx_val, :], y[self.idx_val], mask, dense)
+
+        self.mask0 = mask
+        self.dense0 = dense
+
         if monitor is not None:
             monitor(val, None, mask, dense, alpha=np.exp(log_alpha))
         return val
@@ -319,8 +325,6 @@ class HeldOutSmoothedHinge(BaseCriterion):
         dense: ndarray
             Values of the non-zeros coefficients.
         """
-        if X is None or y is None:
-            return None  # TODO why ?
 
         if issparse(X):
             Xbeta_y = (X[:, mask].T).multiply(y).T @ dense

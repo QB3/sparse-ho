@@ -33,6 +33,7 @@ def test_cross_val_criterion(model_name, criterion):
     for log_alpha in dict_list_log_alphas[model_name]:
         criterion.get_val(
             model, X, y, log_alpha, tol=tol, monitor=monitor_get_val)
+    for log_alpha in dict_list_log_alphas[model_name]:
         criterion.get_val_grad(
             model, X, y, log_alpha, algo.get_beta_jac_v,
             tol=tol, monitor=monitor_get_val_grad)
