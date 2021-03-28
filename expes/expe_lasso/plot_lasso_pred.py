@@ -62,7 +62,7 @@ for algo_name in all_algo_name:
     criterion = CrossVal(sub_criterion, cv=kf)
     algo = ImplicitForward(tol_jac=1e-3)
     optimizer = GradientDescent(
-        n_outer=30, p_grad0=1., verbose=True, tol=tol)
+        n_outer=30, p_grad_norm=1., verbose=True, tol=tol)
     if algo_name == 'implicit_forward':
         grad_search(
             algo, criterion, model, optimizer, X, y, alpha0,

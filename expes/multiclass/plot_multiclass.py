@@ -70,7 +70,7 @@ log_alpha0 = np.ones(n_classes) * np.log(0.1 * alpha_max)
 idx_min = np.argmin(np.array(monitor_grid.objs))
 log_alpha0 = monitor_grid.log_alphas[idx_min]
 optimizer = GradientDescent(
-    n_outer=n_outer, step_size=None, p_grad0=0.1, tol=tol)
+    n_outer=n_outer, step_size=None, p_grad_norm=0.1, tol=tol)
 grad_search(
     algo, logit_multiclass, model, optimizer, X, y, log_alpha0, monitor)
 

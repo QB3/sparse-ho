@@ -72,11 +72,11 @@ for algo_name in all_algo_name:
     if algo_name.startswith('implicit_forward'):
         if algo_name == "implicit_forward_approx":
             optimizer = GradientDescent(
-               n_outer=30, p_grad0=1., verbose=True, tol=tol,
+               n_outer=30, p_grad_norm=1., verbose=True, tol=tol,
                tol_decrease="geom")
         else:
             optimizer = GradientDescent(
-               n_outer=30, p_grad0=1., verbose=True, tol=tol)
+               n_outer=30, p_grad_norm=1., verbose=True, tol=tol)
         grad_search(
             algo, criterion, model, optimizer, X, y, alpha0,
             monitor)

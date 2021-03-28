@@ -119,11 +119,11 @@ def parallel_function(
             n_outer = 30
             if method == 'implicit_forward':
                 optimizer = GradientDescent(
-                    n_outer=n_outer, p_grad0=1, verbose=True, tol=tol,
+                    n_outer=n_outer, p_grad_norm=1, verbose=True, tol=tol,
                     t_max=t_max)
             else:
                 optimizer = GradientDescent(
-                    n_outer=n_outer, p_grad0=1, verbose=True, tol=tol,
+                    n_outer=n_outer, p_grad_norm=1, verbose=True, tol=tol,
                     t_max=t_max,
                     tol_decrease="geom")
             grad_search(

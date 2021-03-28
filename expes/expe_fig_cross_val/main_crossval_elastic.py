@@ -60,7 +60,7 @@ for algorithm in algorithms:
     if algorithm.startswith('grad_search'):
         if algorithm == 'grad_search':
             optimizer = GradientDescent(
-                n_outer=max_evals, tol=tol, verbose=True, p_grad0=1.9)
+                n_outer=max_evals, tol=tol, verbose=True, p_grad_norm=1.9)
         else:
             optimizer = LineSearch(n_outer=25, verbose=True, tol=tol)
         grad_search(
