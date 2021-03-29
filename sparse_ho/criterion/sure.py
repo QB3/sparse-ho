@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 from sklearn.utils import check_random_state
 
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 from sparse_ho.criterion.base import BaseCriterion
 
 
@@ -116,10 +116,10 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         """
         if not self.init_delta_epsilon:
             self._init_delta_epsilon(X)
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X, y, log_alpha, model,
             tol=tol, mask0=self.mask0, dense0=self.dense0, compute_jac=False)
-        mask2, dense2, _ = get_beta_jac_iterdiff(
+        mask2, dense2, _ = compute_beta(
             X, y + self.epsilon * self.delta, log_alpha, model,
             mask0=self.mask02, dense0=self.dense02, tol=tol, compute_jac=False)
 

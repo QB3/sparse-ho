@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 
 
 class Backward():
@@ -26,7 +26,7 @@ class Backward():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
-        mask, dense, list_sign = get_beta_jac_iterdiff(
+        mask, dense, list_sign = compute_beta(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=None, max_iter=max_iter, tol=tol,
             compute_jac=False, return_all=True,

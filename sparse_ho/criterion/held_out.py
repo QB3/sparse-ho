@@ -4,7 +4,7 @@ from scipy.sparse import issparse
 
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 from sparse_ho.criterion.base import BaseCriterion
 
 
@@ -64,7 +64,7 @@ class HeldOutMSE(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X[self.idx_train], y[self.idx_train], log_alpha, model,
             mask0=self.mask0, dense0=self.dense0, tol=tol,
             compute_jac=False)
@@ -197,7 +197,7 @@ class HeldOutLogistic(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X[self.idx_train], y[self.idx_train], log_alpha, model,
             mask0=self.mask0, dense0=self.dense0, tol=tol, compute_jac=False)
         val = self.get_val_outer(
@@ -402,7 +402,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Tolerance for the inner problem.
         """
         # TODO add maxiter param for all get_val
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X, y, log_alpha, model,
             tol=tol, compute_jac=False)
         val = self.get_val_outer(

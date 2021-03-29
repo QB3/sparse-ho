@@ -7,7 +7,7 @@ from scipy.optimize import check_grad
 
 from sparse_ho import Forward, ImplicitForward, Implicit
 
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
 from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
 from sparse_ho.criterion import (
@@ -41,11 +41,11 @@ def test_beta_jac(key):
         X_s = X_r
     else:
         X_s = X_c
-    supp1, dense1, jac1 = get_beta_jac_iterdiff(
+    supp1, dense1, jac1 = compute_beta(
         X, y, dict_log_alpha[key], tol=tol, model=models[key])
     supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
         X, y, dict_log_alpha[key], tol=tol, model=models[key], tol_jac=tol)
-    supp3, dense3, jac3 = get_beta_jac_iterdiff(
+    supp3, dense3, jac3 = compute_beta(
         X_s, y, dict_log_alpha[key], tol=tol,
         model=models[key])
     supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(

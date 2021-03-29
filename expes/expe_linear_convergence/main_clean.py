@@ -15,7 +15,7 @@ from sparse_ho.models import Lasso, SparseLogreg
 
 from celer import Lasso as Lasso_cel
 # from sparse_ho.utils import sigma
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.forward import compute_beta
 from sparse_ho.datasets.real import load_libsvm
 
 p_alphas = {}
@@ -113,7 +113,7 @@ def linear_cv(
 
     log_alpha = np.log(alpha)
 
-    list_beta, list_jac = get_beta_jac_iterdiff(
+    list_beta, list_jac = compute_beta(
         X, y, log_alpha, model, save_iterates=True, tol=tol,
         max_iter=max_iter, compute_jac=compute_jac)
 

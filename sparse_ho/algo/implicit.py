@@ -3,7 +3,7 @@ import numpy as np
 from scipy.sparse.linalg import cg
 
 from sparse_ho.utils import init_dbeta0_new
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 
 
 class Implicit():
@@ -102,7 +102,7 @@ def get_beta_jac_t_v_implicit(
         maximum number of iteration for the resolution od the linear system
     """
     alpha = np.exp(log_alpha)
-    mask, dense, _ = get_beta_jac_iterdiff(
+    mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
     n_features = X.shape[1]

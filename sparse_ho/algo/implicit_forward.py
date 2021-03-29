@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import issparse
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 
 
 class ImplicitForward():
@@ -64,7 +64,7 @@ def get_beta_jac_fast_iterdiff(
         tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False,
         use_stop_crit=True):
 
-    mask, dense, _ = get_beta_jac_iterdiff(
+    mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0, jac0=jac0, tol=tol,
         max_iter=max_iter, compute_jac=False, model=model, verbose=verbose,
         use_stop_crit=use_stop_crit)

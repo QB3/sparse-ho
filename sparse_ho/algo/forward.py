@@ -23,7 +23,7 @@ class Forward():
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
-        mask, dense, jac = get_beta_jac_iterdiff(
+        mask, dense, jac = compute_beta(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start, max_iter=max_iter, tol=tol,
             compute_jac=True, verbose=self.verbose,
@@ -38,7 +38,7 @@ class Forward():
         return mask, dense, jac_v, jac
 
 
-def get_beta_jac_iterdiff(
+def compute_beta(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
         save_iterates=False, verbose=False, use_stop_crit=True, gap_freq=10):
