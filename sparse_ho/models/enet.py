@@ -391,7 +391,7 @@ class ElasticNet(BaseModel):
 
     @staticmethod
     def get_mv(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+        """Compute matrix vector product with the Hessian of datafit.
 
         Parameters
         ----------
@@ -413,28 +413,6 @@ class ElasticNet(BaseModel):
             return X_m.T @ (X_m @ v) / n_samples + np.exp(log_alpha[1]) * v
         linop = LinearOperator((size_supp, size_supp), matvec=mv)
         return linop
-
-    @staticmethod
-    def get_hessian(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
-
-        Parameters
-        ----------
-        X: array-like, shape (n_samples, n_features)
-            Design matrix.
-        y: ndarray, shape (n_samples,)
-            Observation vector.
-        mask: ndarray, shape (n_features,)
-            Mask corresponding to non zero entries of beta.
-        dense: ndarray, shape (mask.sum(),)
-            Non zero entries of beta.
-        log_alpha: ndarray, shape (2,)
-            Logarithm of hyperparameter.
-        """
-        n_samples = X.shape[0]
-        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + \
-            (1 / n_samples) * X[:, mask].T @ X[:, mask]
-        return hessian
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.

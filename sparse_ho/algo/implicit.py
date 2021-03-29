@@ -45,7 +45,7 @@ def get_beta_jac_t_v_implicit(
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
-    n_samples, n_features = X.shape
+    n_features = X.shape[1]
 
     mat_to_inv = model.get_mv(X, y, mask, dense, log_alpha)
 
@@ -53,6 +53,7 @@ def get_beta_jac_t_v_implicit(
     if hasattr(model, 'dual'):
         v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
 
+    # TODO I think this should be removed
     if not alpha.shape:
         alphas = np.ones(n_features) * alpha
     else:
@@ -61,7 +62,7 @@ def get_beta_jac_t_v_implicit(
     if sol_lin_sys is not None and not hasattr(model, 'dual'):
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
     else:
-        sol0 = None  # TODO add warm start for SVM
+        sol0 = None  # TODO add warm start for SVM and SVR
     sol = cg(
         mat_to_inv, - model.generalized_supp(X, v, log_alpha),
         x0=sol0, tol=tol_lin_sys, maxiter=max_iter_lin_sys)

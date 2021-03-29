@@ -323,7 +323,7 @@ class SVM(BaseModel):
         return jac_v
 
     def get_mv(self, X, y, mask, dense, log_C):
-        """Compute Hessian of datafit.
+        """Compute matrix vector product with the Hessian of datafit.
 
         Parameters
         ----------
@@ -353,31 +353,6 @@ class SVM(BaseModel):
 
         linop = LinearOperator((size_supp, size_supp), matvec=mv)
         return linop
-
-    def get_hessian(self, X, y, mask, dense, log_C):
-        """Compute Hessian of datafit.
-
-        Parameters
-        ----------
-        X: array-like, shape (n_samples, n_features)
-            Design matrix.
-        y: ndarray, shape (n_samples,)
-            Observation vector.
-        mask: ndarray, shape (n_features,)
-            Mask corresponding to non zero entries of beta.
-        dense: ndarray, shape (mask.sum(),)
-            Non zero entries of beta.
-        log_C: ndarray
-            Logarithm of hyperparameter.
-        """
-        C = np.exp(log_C)
-        full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
-        if issparse(X):
-            Xy = X[full_supp, :].multiply(y[full_supp, None])
-            return Xy @ Xy.T
-        else:
-            Xy = (y[full_supp] * X[full_supp, :].T)
-            return Xy.T @ Xy
 
     def _get_jac_t_v(self, X, y, jac, mask, dense, C, v):
         C = C[0]

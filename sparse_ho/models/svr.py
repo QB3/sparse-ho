@@ -370,7 +370,7 @@ class SVR(BaseModel):
         return jac_v
 
     def get_mv(self, X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+        """Compute matrix vector product with the Hessian of datafit.
 
         Parameters
         ----------
@@ -399,30 +399,6 @@ class SVR(BaseModel):
         linop = LinearOperator((size_supp, size_supp), matvec=mv)
 
         return linop
-
-    def get_hessian(self, X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
-
-        Parameters
-        ----------
-        X: array-like, shape (n_samples, n_features)
-            Design matrix.
-        y: ndarray, shape (n_samples,)
-            Observation vector.
-        mask: ndarray, shape (n_features,)
-            Mask corresponding to non zero entries of beta.
-        dense: ndarray, shape (mask.sum(),)
-            Non zero entries of beta.
-        log_alpha: ndarray
-            Logarithm of hyperparameter.
-        """
-        C = np.exp(log_alpha[0])
-        n_samples = X.shape[0]
-        dual_coef = self.dual_var[0:n_samples] - \
-            self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(dual_coef != 0, np.abs(dual_coef) != C)
-
-        return X[full_supp, :] @ X[full_supp, :].T
 
     def get_dual_v(self, mask, dense, X, y, v, log_hyperparam):
         """TODO

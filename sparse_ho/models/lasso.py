@@ -370,7 +370,7 @@ class Lasso(BaseModel):
 
     @staticmethod
     def get_mv(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+        """Compute matrix vector product with the Hessian of datafit.
 
         Parameters
         ----------
@@ -392,28 +392,6 @@ class Lasso(BaseModel):
             return X_m.T @ (X_m @ v) / n_samples
         linop = LinearOperator((size_supp, size_supp), matvec=mv)
         return linop
-
-    @staticmethod
-    def get_hessian(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
-
-        Parameters
-        ----------
-        X: array-like, shape (n_samples, n_features)
-            Design matrix.
-        y: ndarray, shape (n_samples,)
-            Observation vector.
-        mask: ndarray, shape (n_features,)
-            Mask corresponding to non zero entries of beta.
-        dense: ndarray, shape (mask.sum(),)
-            Non zero entries of beta.
-        log_alpha: ndarray
-            Logarithm of hyperparameter.
-        """
-        X_m = X[:, mask]
-        n_samples = X_m.shape[0]
-        hessian = X_m.T @ X_m / n_samples
-        return hessian
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.
