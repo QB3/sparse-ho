@@ -24,9 +24,13 @@ Models
 .. autosummary::
    :toctree: generated/
 
+   ElasticNet
    Lasso
-   WeightedLasso
+   SparseLogreg
    SVM
+   SVR
+   WeightedLasso
+
 
 
 Criterion
@@ -43,9 +47,12 @@ Criterion
 .. autosummary::
    :toctree: generated/
 
-   HeldOutMSE
+   CrossVal
    FiniteDiffMonteCarloSure
+   HeldOutMSE
+   HeldOutSmoothedHinge
    HeldOutLogistic
+   LogisticMulticlass
 
 
 Algorithms
@@ -62,9 +69,29 @@ Algorithms
 .. autosummary::
    :toctree: generated/
 
+   Implicit
    ImplicitForward
    Forward
    Backward
+
+
+Optimizers
+==========
+
+:py:mod:`sparse_ho`:
+
+.. currentmodule:: sparse_ho
+
+.. automodule:: sparse_ho
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   Adam
+   GradientDescent
+   LineSearch
 
 Functions
 =========
@@ -73,6 +100,7 @@ Functions
    :toctree: generated/
 
    grad_search
+   hyperopt_wrapper
 
 
 Utils
@@ -90,4 +118,3 @@ Utils
    :toctree: generated/
 
    Monitor
-   WarmStart

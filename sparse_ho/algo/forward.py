@@ -8,22 +8,25 @@ class Forward():
 
     Parameters
     ----------
-    verbose: bool
+    use_stop_crit: bool, optional (default=True)
+        Use stopping criterion in hypergradient computation. If False,
+        run to maximum number of iterations.
+    verbose: bool, optional (default=False)
+        Verbosity of the algorithm.
     """
 
-    def __init__(self, verbose=False, use_stop_crit=True):
-        self.verbose = verbose
+    def __init__(self, use_stop_crit=True, verbose=False):
         self.use_stop_crit = use_stop_crit
+        self.verbose = verbose
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            compute_jac=True, full_jac_v=False):
+            full_jac_v=False):
         mask, dense, jac = get_beta_jac_iterdiff(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
-            jac0=quantity_to_warm_start,
-            max_iter=max_iter, tol=tol,
-            compute_jac=compute_jac, verbose=self.verbose,
+            jac0=quantity_to_warm_start, max_iter=max_iter, tol=tol,
+            compute_jac=True, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
         if jac is not None:
             jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
@@ -42,17 +45,16 @@ def get_beta_jac_iterdiff(
     """
     Parameters
     --------------
-    X: np.array, shape (n_samples, n_features)
-        design matrix
-        It can also be a sparse CSC matrix
-    y: np.array, shape (n_samples,)
-        observations
-    log_alpha: float or np.array, shape (n_features)
-        log  of eth coefficient multiplying the penalization
-    beta0: np.array, shape (n_features,)
+    X: array-like, shape (n_samples, n_features)
+        Design matrix.
+    y: ndarray, shape (n_samples,)
+        Observation vector.
+    log_alpha: float or np.array, shape (n_features,)
+        Logarithm of hyperparameter.
+    beta0: ndarray, shape (n_features,)
         initial value of the regression coefficients
         beta for warm start
-    dbeta0: np.array, shape (n_features,)
+    dbeta0: ndarray, shape (n_features,)
         initial value of the jacobian dbeta for warm start
     max_iter: int
         number of iterations of the algorithm
@@ -64,8 +66,8 @@ def get_beta_jac_iterdiff(
     compute_jac: bool
         to compute or not the Jacobian along with the regression
         coefficients
-    model: string
-        model used, "lasso", "wlasso", or "mcp"
+    model:  instance of ``sparse_ho.base.BaseModel``
+        A model that follows the sparse_ho API.
     return_all: bool
         to store the iterates or not in order to compute the Jacobian in a
         backward way
@@ -77,11 +79,11 @@ def get_beta_jac_iterdiff(
 
     Returns
     -------
-    mask : np.array, shape (n_features,)
+    mask : ndarray, shape (n_features,)
         The mask of non-zero coefficients in beta.
-    dense : np.array, shape (n_nonzeros,)
+    dense : ndarray, shape (n_nonzeros,)
         The beta coefficients on the support
-    jac : np.array, shape (n_nonzeros,) or (n_nonzeros, q)
+    jac : ndarray, shape (n_nonzeros,) or (n_nonzeros, q)
         The jacobian restricted to the support. If there are more than
         one hyperparameter then it has two dimensions.
     """
@@ -89,13 +91,13 @@ def get_beta_jac_iterdiff(
     is_sparse = issparse(X)
     if not is_sparse and not np.isfortran(X):
         X = np.asfortranarray(X)
-    L = model.get_L(X, is_sparse=is_sparse)
+    L = model.get_L(X)
 
     ############################################
     alpha = np.exp(log_alpha)
 
     if hasattr(model, 'estimator') and model.estimator is not None:
-        return model._use_estimator(X, y, alpha, tol, max_iter)
+        return model._use_estimator(X, y, alpha, tol)
 
     try:
         alpha.shape[0]
@@ -147,7 +149,7 @@ def get_beta_jac_iterdiff(
                 dual_gap = pobj[-1] - dobj
                 if verbose:
                     print("dual gap %.2e" % dual_gap)
-                assert dual_gap >= -100 * np.finfo('float').eps
+                assert dual_gap >= -100 * np.finfo('float').eps * dobj
                 if verbose:
                     print("gap %.2e" % dual_gap)
                 if dual_gap < pobj0 * tol:
@@ -163,6 +165,7 @@ def get_beta_jac_iterdiff(
     else:
         if verbose:
             print('did not converge !')
+
     mask = beta != 0
     dense = beta[mask]
     jac = model._get_jac(dbeta, mask)

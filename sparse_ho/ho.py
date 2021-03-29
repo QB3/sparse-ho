@@ -11,6 +11,7 @@
 import numpy as np
 from hyperopt import hp
 from hyperopt import fmin, tpe, rand
+from functools import partial
 from sklearn.utils import check_random_state
 
 
@@ -24,9 +25,11 @@ def grad_search(
     criterion:  instance of BaseCriterion
         criterion to optimize during hyperparameter optimization
         (outer optimization problem).
-    model:  instance of BaseModel
+    model: instance of BaseModel
         model on which hyperparameter has to be selected
         (inner optimization problem).
+    optimizer: instance of Optimizer
+        optimizer used to minimize the criterion (outer optimization)
     X: array like of shape (n_samples, n_features)
         Design matrix.
     y: array like of shape (n_samples,)
@@ -82,16 +85,20 @@ def hyperopt_wrapper(
     max_evals: int (default=50)
         maximum number of evaluation of the function
     tol: float (default=1e-5)
-    random_state=42
-    t_max=1000,
-    method=string (default='bayesian')
-        method for hyperopt, 'random' or 'bayesian'
+        tolerance for TODO
+    random_state: int or instance of RandomState
+        Random number generator used for reproducibility.
+    t_max: int, optional (default=100_000)
+        TODO
+    method: 'random' | 'bayesian' (default='bayesian')
+        method for hyperopt
     size_space: int (default=1)
         size of the hyperparameter space
 
     Returns
     -------
-    XXX missing
+    monitor:
+        The instance of Monitor used during iterations.
     """
 
     def objective(log_alpha):
@@ -108,8 +115,9 @@ def hyperopt_wrapper(
     rng = check_random_state(random_state)
 
     if method == "bayesian":
+        algo = partial(tpe.suggest, n_startup_jobs=5)
         fmin(
-            objective, space, algo=tpe.suggest, max_evals=max_evals,
+            objective, space, algo=algo, max_evals=max_evals,
             timeout=t_max, rstate=rng)
     elif method == "random":
         fmin(

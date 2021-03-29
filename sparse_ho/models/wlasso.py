@@ -1,8 +1,9 @@
 import numpy as np
+from numba import njit
 from numpy.linalg import norm
+from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 
-from numba import njit
 
 from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import ST, init_dbeta0_new_p
@@ -19,21 +20,12 @@ class WeightedLasso(BaseModel):
 
     Parameters
     ----------
-    X: {ndarray, sparse matrix} of (n_samples, n_features)
-        Data.
-    y: {ndarray, sparse matrix} of (n_samples)
-        Target
     estimator: instance of ``sklearn.base.BaseEstimator``
         An estimator that follows the scikit-learn API.
-    log_alpha_max: float
-        logarithm of alpha_max if already precomputed
     """
 
-    def __init__(
-            self, max_iter=1000, estimator=None, log_alpha_max=None):
-        self.max_iter = max_iter
+    def __init__(self, estimator=None):
         self.estimator = estimator
-        self.log_alpha_max = log_alpha_max
 
     def _init_dbeta_ddual_var(self, X, y, mask0=None, jac0=None,
                               dense0=None, compute_jac=True):
@@ -194,12 +186,30 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: int
+            Number of features.
+        """
+        # MM sorry I don't get what this does
+        # TODO n_features should be n_hyperparams, right ?
         res = np.zeros(n_features)
         res[mask] = jac_v
         return res
 
     @staticmethod
     def get_mask_jac_v(mask, jac_v):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        """
         return jac_v[mask]
 
     @staticmethod
@@ -210,33 +220,71 @@ class WeightedLasso(BaseModel):
         return jac_t_v
 
     def proj_hyperparam(self, X, y, log_alpha):
-        """Maybe we could do this in place.
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: ndarray, shape (n_features,)
+            Logarithm of hyperparameter.
+
+        Returns
+        -------
+        log_alpha: ndarray, shape (n_features,)
+            Logarithm of projected hyperparameter.
         """
-        if self.log_alpha_max is None:
-            alpha_max = np.max(np.abs(X.T @ y))
-            alpha_max /= X.shape[0]
+        if not hasattr(self, "log_alpha_max"):
+            alpha_max = np.max(np.abs(X.T @ y)) / X.shape[0]
             self.log_alpha_max = np.log(alpha_max)
-        proj_log_alpha = log_alpha.copy()
-        proj_log_alpha[proj_log_alpha < -12] = -12
-        if np.max(proj_log_alpha > self.log_alpha_max):
-            proj_log_alpha[
-                proj_log_alpha > self.log_alpha_max] = self.log_alpha_max
-        return proj_log_alpha
+        log_alpha = np.clip(log_alpha, self.log_alpha_max - 5,
+                            self.log_alpha_max + np.log(0.9))
+        return log_alpha
 
     @staticmethod
-    def get_L(X, is_sparse=False):
-        if is_sparse:
+    def get_L(X):
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
+        if issparse(X):
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: ndarray
+            Logarithm of hyperparameter.
+        """
+        # TODO no division by n_samples?
         X_m = X[:, mask]
         hessian = X_m.T @ X_m
         return hessian
 
-    def _use_estimator(self, X, y, alpha, tol, max_iter):
+    def _use_estimator(self, X, y, alpha, tol):
         self.estimator.set_params(tol=tol)
         self.estimator.weights = alpha
         self.estimator.fit(X, y)
@@ -246,22 +294,93 @@ class WeightedLasso(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : ndarray, shape (n_features,)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples,)
+            Observation vector.
+        mask : ndarray, shape (n_features,)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_alpha):
+        """Get sign of iterate.
+
+        Parameters
+        ----------
+        x : ndarray, shape TODO
+        log_alpha : ndarray, shape TODO
+            Logarithm of hyperparameter.
+        """
         return np.sign(x)
 
     def get_beta(self, X, y, mask, dense):
+        """Return primal iterate.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        """
+        # TODO what's the use of this function? it does nothing for all models
         return mask, dense
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
+        # TODO this is the same for Lasso, Enet, Wlasso. Maybe inherit from
+        # a common class, LinearModelPrimal or something?
         return jac.T @ v(mask, dense)
 
     def generalized_supp(self, X, v, log_alpha):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Design matrix.
+        v : TODO
+        log_alpha : float
+            Log of hyperparameter.
+
+        Returns
+        -------
+        TODO
+        """
         return v
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,

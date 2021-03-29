@@ -49,8 +49,25 @@ class CrossVal(BaseCriterion):
             self.dict_crits[i].idx_val = idx_val
             self.dict_models[i] = copy.deepcopy(model)
 
-    def get_val(
-            self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+    def get_val(self, model, X, y, log_alpha, monitor=None, tol=1e-3):
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
+
         if self.dict_crits is None:
             self._initialize(model, X)
         val = np.mean([
@@ -62,7 +79,28 @@ class CrossVal(BaseCriterion):
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
-            tol=1e-5, compute_jac=True, monitor=None):
+            tol=1e-5, monitor=None):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        max_iter: int
+            Maximum iteration for the inner optimization problem.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        monitor: instance of Monitor.
+            Monitor.
+        """
         if self.dict_crits is None:
             self._initialize(model, X)
 
@@ -71,7 +109,7 @@ class CrossVal(BaseCriterion):
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
                 self.dict_models[i], X, y, log_alpha, get_beta_jac_v,
-                max_iter=max_iter, tol=tol, compute_jac=compute_jac)
+                max_iter=max_iter, tol=tol)
             val += vali
             if gradi is not None:
                 grad += gradi
@@ -85,8 +123,31 @@ class CrossVal(BaseCriterion):
         return val, grad
 
     def get_val_outer(cls, *args, **kwargs):
+        """Get value of outer criterion.
+
+        This is not implemented because for CV the loss is computed on each
+        fold.
+
+        Parameters
+        ----------
+        cls: TODO
+        """
         return NotImplemented
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on a range of admissible values.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float
+            Logarithm of hyperparameter.
+        """
+        # TODO is this not done by the models?
         # TODO to improve this proj_hyperparam procedure
         return model.proj_hyperparam(X, y, log_alpha)

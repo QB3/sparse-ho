@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 from sparse_ho.utils_cross_entropy import (
-    cross_entropy, grad_cross_entropy, grad_cross_entropyk, accuracy)
+    cross_entropy, grad_cross_entropy, accuracy)
 
 
 class LogisticMulticlass():
@@ -11,16 +11,19 @@ class LogisticMulticlass():
 
     Parameters
     ----------
-    idx_train: np.array
+    idx_train: ndarray
         indices of the training set
-    idx_val: np.array
+    idx_val: ndarray
         indices of the validation set
-    idx_test: np.array
-        indices of the testing set
+    algo: instance of ``sparse_ho.base.AlgoModel``
+        A model that follows the sparse_ho API.
+    idx_test: ndarray
+        indices of the test set
 
     Attributes
     ----------
-        TODO
+    dict_models: dict
+        dict with the models corresponding to each class.
     """
 
     def __init__(self, idx_train, idx_val, algo, idx_test=None):
@@ -48,6 +51,25 @@ class LogisticMulticlass():
 
     def get_val_grad(
             self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+        """Get value and gradient of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
         # TODO use sparse matrices
         if self.dict_models is None:
             self._initialize(model, X, y)
@@ -60,7 +82,7 @@ class LogisticMulticlass():
                 X[self.idx_train, :], self.one_hot_code[self.idx_train, k],
                 log_alpha[k], self.dict_models[k], None, mask0=mask0,
                 dense0=dense0,
-                quantity_to_warm_start=jac0, compute_jac=True, tol=tol)
+                quantity_to_warm_start=jac0, tol=tol)
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
             all_jacs[mask, k] = jac  # maybe use np.ix_
@@ -93,6 +115,26 @@ class LogisticMulticlass():
 
     def get_val(
             self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+        # TODO not the same as for other losses?
+        """Get value of criterion.
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        get_beta_jac_v: callable
+            Returns the product of the transpoe of the Jacobian and a vector v.
+        monitor: instance of Monitor.
+            Monitor.
+        tol: float, optional (default=1e-3)
+            Tolerance for the inner problem.
+        """
         if self.dict_models is None:
             self._initialize(model, X, y)
         all_betas = np.zeros((self.n_features, self.n_classes))
@@ -103,7 +145,7 @@ class LogisticMulticlass():
                 X[self.idx_train, :], self.one_hot_code[self.idx_train, k],
                 log_alpha[k], self.dict_models[k], None, mask0=mask0,
                 dense0=dense0,
-                quantity_to_warm_start=jac0, compute_jac=False, tol=tol)
+                quantity_to_warm_start=jac0, tol=tol)
             self.dict_warm_start[k] = (mask, dense, jac)
             all_betas[mask, k] = dense  # maybe use np.ix_
         acc_val = accuracy(
@@ -122,6 +164,21 @@ class LogisticMulticlass():
         return val
 
     def proj_hyperparam(self, model, X, y, log_alpha):
+        """Project hyperparameter on admissible range of values
+
+        Parameters
+        ----------
+        model: instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array
+            Logarithm of hyperparameter.
+        """
+        # TODO doesn't an other object do this?
+        # TODO model not needed I think
         log_alpha_max = model.compute_alpha_max(X, y)
         log_alpha[log_alpha < log_alpha_max - 7] = log_alpha_max - 7
         log_alpha[log_alpha > log_alpha_max - np.log(0.9)] = (
@@ -129,11 +186,24 @@ class LogisticMulticlass():
         return log_alpha
 
     def grad_total_loss(self, all_betas, all_jacs, X, Y):
+        """Compute the gradient of the multiclass logistic loss.
+
+        Parameters
+        ----------
+        all_betas: array-like, shape (n_features, n_classes)
+            Solutions of the optimization problems corresponding to each class.
+        all_jacs: array-like, shape (n_features, n_classes)
+            Jacobians of the optimization problems corresponding to each class.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        Y: ndarray, shape (n_samples, n_classes)
+            One hot encoding representation of the observation y.
+        """
         grad_ce = grad_cross_entropy(all_betas, X, Y)
         grad_total = (grad_ce * all_jacs).sum(axis=0)
         return grad_total
 
-    def grad_k_loss(self, all_betas, jack, X, Y, k):
-        grad_ce = grad_cross_entropyk(all_betas, X, Y, k)
-        grad_k = grad_ce @ jack
-        return grad_k
+    # def grad_k_loss(self, all_betas, jack, X, Y, k):
+    #     grad_ce = grad_cross_entropyk(all_betas, X, Y, k)
+    #     grad_k = grad_ce @ jack
+    #     return grad_k

@@ -69,7 +69,7 @@ alphas = alpha_max * p_alphas
 
 estimator = LogisticRegression(
     penalty='l1', fit_intercept=False, max_iter=max_iter)
-model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+model = SparseLogreg(estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grid = Monitor()
 grid_search(
@@ -93,7 +93,7 @@ alpha0 = alpha_max / 10  # starting point
 for optimizer_name in optimizer_names:
     estimator = LogisticRegression(
         penalty='l1', fit_intercept=False, solver='saga', tol=tol)
-    model = SparseLogreg(max_iter=max_iter, estimator=estimator)
+    model = SparseLogreg(estimator=estimator)
     criterion = HeldOutLogistic(idx_train, idx_val)
 
     monitor_grad = Monitor()

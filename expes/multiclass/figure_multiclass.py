@@ -1,44 +1,18 @@
 import numpy as np
 import pandas
-import seaborn as sns
+# import seaborn as sns
 import matplotlib.pyplot as plt
-from sparse_ho.utils_plot import configure_plt, plot_legend_apart
+from sparse_ho.utils_plot import (
+    configure_plt, plot_legend_apart, dict_color, dict_method)
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 configure_plt()
 
-fontsize = 16
-
-current_palette = sns.color_palette("colorblind")
-dict_color = {}
-dict_color["grid_search"] = current_palette[3]
-dict_color["random"] = current_palette[5]
-dict_color["bayesian"] = current_palette[0]
-dict_color["implicit_forward"] = current_palette[2]
-dict_color["implicit_forward_cdls"] = current_palette[2]
-dict_color["implicit_forward_scipy"] = current_palette[2]
-dict_color["fast_iterdiff"] = current_palette[2]
-dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
-dict_color["lhs"] = current_palette[6]
-
-dict_method = {}
-dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff. (ours)'
-dict_method["implicit_forward_cdls"] = 'Imp. F. Iterdiff. CD LS'
-dict_method["implicit_forward_scipy"] = 'Imp. F. Iterdiff. LS'
-dict_method["fast_iterdiff"] = 'Imp. F. Iterdiff. (ours)'
-dict_method['implicit'] = 'Implicit'
-dict_method['grid_search'] = 'Grid-search'
-dict_method['bayesian'] = 'Bayesian'
-dict_method['random'] = 'Random-search'
-dict_method['hyperopt'] = 'Random-search'
-dict_method['backward'] = 'B. Iterdiff.'
-dict_method['lhs'] = 'Lattice Hyp.'
+fontsize = 18
 
 
 dict_markers = {}
@@ -115,6 +89,12 @@ dict_marker_size['bayesian'] = 4
 dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
 
+dict_xlim = {}
+dict_xlim["mnist"] = 500
+dict_xlim["usps"] = 1_200
+dict_xlim["rcv1_multiclass"] = 1_400
+dict_xlim["aloi"] = 2_000
+
 # dataset_names = ["mnist", "rcv1_multiclass", "sector_scale","aloi"]
 dataset_names = ["mnist", "usps", "rcv1_multiclass", "aloi"]
 # methods = ["implicit_forward_cdls", "random"]
@@ -125,14 +105,14 @@ methods = ["random", "bayesian", "implicit_forward"]
 
 plt.close('all')
 fig_acc_val, axarr_acc_val = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 fig_acc_test, axarr_acc_test = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 # figure for cross entropy
 fig_ce, axarr_ce = plt.subplots(
-    1, len(dataset_names), sharex=False, sharey=False, figsize=[14, 4])
+    1, len(dataset_names), sharex=False, sharey=False, figsize=[10.67, 3])
 
 all_figs = [fig_acc_val, fig_acc_test, fig_ce]
 all_axarr = [axarr_acc_val, axarr_acc_test, axarr_ce]
@@ -173,15 +153,19 @@ for idx, dataset_name in enumerate(dataset_names):
                 marker=dict_markers[method])
         except Exception:
             print("No dataset found")
-
     for axarr in all_axarr:
-        axarr.flat[idx].set_xlabel("Time (s)", fontsize=fontsize)
-        axarr.flat[idx].set_title("%s (K=%i)" % (
-            dict_title[dataset_name], dict_n_classes[dataset_name]))
+        axarr[idx].set_xlim(0, dict_xlim[dataset_name])
+
+for i, dataset_name in enumerate(dataset_names):
+    axarr_ce[i].set_title("%s (q=%i)" % (
+        dict_title[dataset_name], dict_n_classes[dataset_name]),
+        fontsize=fontsize)
+    axarr_acc_test[i].set_xlabel("Time (s)", fontsize=fontsize)
+
 
 axarr_acc_val.flat[0].set_ylabel("Accuracy validation set", fontsize=fontsize)
 axarr_acc_test.flat[0].set_ylabel("Accuracy test set", fontsize=fontsize)
-axarr_ce.flat[0].set_ylabel("Multiclass cross entropy", fontsize=fontsize)
+axarr_ce.flat[0].set_ylabel("Multiclass cross-entropy", fontsize=fontsize)
 
 for fig in all_figs:
     fig.tight_layout()
@@ -194,7 +178,8 @@ if save_fig:
         fig.savefig("%smulticlass_%s.svg" % (
             fig_dir_svg, string), bbox_inches="tight")
     plot_legend_apart(
-        all_axarr[0][0], "%smulticlass_%s_legend.pdf" % (fig_dir, string))
+        axarr_acc_val[0], "%smulticlass_%s_legend.pdf" % (fig_dir, string),
+        ncol=3)
 
 for fig in all_figs:
     fig.legend()
