@@ -364,7 +364,8 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     def get_mv(X, y, mask, dense, log_alpha):
-        """Compute matrix vector product with the Hessian of datafit.
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit
 
         Parameters
         ----------

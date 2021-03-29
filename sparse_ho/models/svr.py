@@ -370,7 +370,8 @@ class SVR(BaseModel):
         return jac_v
 
     def get_mv(self, X, y, mask, dense, log_alpha):
-        """Compute matrix vector product with the Hessian of datafit.
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit.
 
         Parameters
         ----------
