@@ -7,10 +7,11 @@ from sparse_ho.utils_plot import configure_plt
 configure_plt()
 
 # save_fig = False
-save_fig_grid = True
+# save_fig_grid = True
+save_fig_grid = False
 # save_fig = True
-# save_fig_grad = True
-save_fig_grad = False
+save_fig_grad = True
+# save_fig_grad = False
 fig_dir = "../../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
 fig_dir_svg = "../../../CD_SUGAR/tex/slides_qbe_long/images/"
 
@@ -80,6 +81,7 @@ for i in np.arange(len(objs_grad)+1):
     plt.xticks(fontsize=fontsize)
     plt.yticks(fontsize=fontsize)
     ax.set_xlim(p_alphas_grid.min(), p_alphas_grid.max())
+    ax.set_ylim(0.17, 1)
     plt.tight_layout()
 
     if save_fig_grad:
