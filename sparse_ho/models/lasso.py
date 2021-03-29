@@ -3,6 +3,7 @@ from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
 from numba import njit
+from scipy.sparse.linalg import LinearOperator
 
 from sparse_ho.utils import init_dbeta0_new, ST
 from sparse_ho.utils import sparse_scalar_product
@@ -242,7 +243,7 @@ class Lasso(BaseModel):
 
     @staticmethod
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
-        return n_samples * alphas[mask] * np.sign(dense) @ jac
+        return alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):
         """Project hyperparameter on an admissible range of values.
@@ -368,6 +369,31 @@ class Lasso(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
+    def get_mv(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: ndarray
+            Logarithm of hyperparameter.
+        """
+        X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
+
+        def mv(v):
+            return X_m.T @ (X_m @ v) / n_samples
+        linop = LinearOperator((size_supp, size_supp), matvec=mv)
+        return linop
+
+    @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
         """Compute Hessian of datafit.
 
@@ -385,7 +411,8 @@ class Lasso(BaseModel):
             Logarithm of hyperparameter.
         """
         X_m = X[:, mask]
-        hessian = X_m.T @ X_m  # TODO no normalization by n_samples?
+        n_samples = X_m.shape[0]
+        hessian = X_m.T @ X_m / n_samples
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):

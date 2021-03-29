@@ -2,9 +2,9 @@ import numpy as np
 from numpy.linalg import norm
 from scipy.sparse import issparse, csc_matrix
 from numba import njit
+from scipy.sparse.linalg import LinearOperator
 
 from sparse_ho.utils import init_dbeta0_new, ST, sigma, dual_logreg
-
 from sparse_ho.models.base import BaseModel
 
 
@@ -248,7 +248,7 @@ class SparseLogreg(BaseModel):
 
     @staticmethod
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
-        return n_samples * alphas[mask] * np.sign(dense) @ jac
+        return alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):
         """Project hyperparameter on an admissible range of values.
@@ -363,6 +363,40 @@ class SparseLogreg(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
+    def get_mv(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: ndarray
+            Logarithm of hyperparameter.
+        """
+        X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
+        a = y * (X_m @ dense)
+        temp = sigma(a) * (1 - sigma(a))
+        is_sparse = issparse(X)
+
+        def mv(v):
+            if is_sparse:
+                return X_m.T @ (temp * (X_m @ v)) / n_samples
+            else:
+                hessian = X_m.T @ (temp * (X_m @ v)) / n_samples
+            return hessian
+
+        linop = LinearOperator((size_supp, size_supp), matvec=mv)
+        return linop
+
+
+    @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
         """Compute Hessian of datafit.
 
@@ -380,14 +414,14 @@ class SparseLogreg(BaseModel):
             Logarithm of hyperparameter.
         """
         X_m = X[:, mask]
+        n_samples = X_m.shape[0]
         a = y * (X_m @ dense)
         temp = sigma(a) * (1 - sigma(a))
         is_sparse = issparse(X)
         if is_sparse:
-            hessian = csc_matrix(
-                X_m.T.multiply(temp)) @ X_m
+            hessian = csc_matrix(X_m.T.multiply(temp)) @ X_m / n_samples
         else:
-            hessian = (X_m.T * temp) @ X_m
+            hessian = (X_m.T * temp) @ X_m / n_samples
         return hessian
 
     def generalized_supp(self, X, v, log_alpha):
