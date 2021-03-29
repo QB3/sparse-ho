@@ -57,7 +57,7 @@ alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 
 alpha_min = 1e-4 * alpha_max
 
-n_grid = 10
+n_grid = 15
 alphas_l1 = np.geomspace(alpha_max, alpha_min, n_grid)
 alphas_l2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
@@ -119,7 +119,7 @@ print("Minimum grad search %0.3e" % np.array(monitor.objs).min())
 cmap = discrete_cmap(n_outer, 'Reds')
 X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
 fig, ax = plt.subplots(1, 1)
-cp = ax.contourf(X, Y, results.T)
+cp = ax.contour(X, Y, results.T, levels=40)
 ax.scatter(
     X, Y, s=10, c="orange", marker="o", label="$0$th order (grid search)",
     clip_on=False)
@@ -139,5 +139,5 @@ cb = fig.colorbar(cp)
 cb.set_label("Held-out loss")
 plt.xscale('log')
 plt.yscale('log')
-plt.legend()
+plt.legend(loc='upper left')
 plt.show(block=False)

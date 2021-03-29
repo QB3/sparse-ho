@@ -117,7 +117,7 @@ for a Lasso using a held-out validation set.
     Dataset: rcv1_train
     Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/rcv1_train.binary.bz2 (13.1 MB)
 
-    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:09, 106kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:09, 106kB/s]    file_sizes:   1%|2                           | 106k/13.7M [00:00<01:19, 171kB/s]    file_sizes:   2%|4                           | 221k/13.7M [00:00<00:45, 299kB/s]    file_sizes:   3%|9                           | 451k/13.7M [00:01<00:24, 547kB/s]    file_sizes:   7%|#7                         | 909k/13.7M [00:01<00:12, 1.03MB/s]    file_sizes:  13%|###4                      | 1.83M/13.7M [00:01<00:05, 1.99MB/s]    file_sizes:  27%|######9                   | 3.66M/13.7M [00:01<00:02, 3.85MB/s]    file_sizes:  38%|#########9                | 5.23M/13.7M [00:02<00:01, 4.76MB/s]    file_sizes:  50%|############8             | 6.81M/13.7M [00:02<00:01, 5.38MB/s]    file_sizes:  61%|###############8          | 8.38M/13.7M [00:02<00:00, 5.80MB/s]    file_sizes:  72%|##################8       | 9.95M/13.7M [00:02<00:00, 6.09MB/s]    file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03<00:00, 6.30MB/s]    file_sizes:  95%|########################8 | 13.1M/13.7M [00:03<00:00, 6.44MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 4.21MB/s]
+    file_sizes:   0%|                                   | 0.00/13.7M [00:00<?, ?B/s]    file_sizes:   0%|                           | 24.6k/13.7M [00:00<02:08, 106kB/s]    file_sizes:   0%|                           | 49.2k/13.7M [00:00<02:08, 106kB/s]    file_sizes:   1%|1                          | 73.7k/13.7M [00:00<02:10, 105kB/s]    file_sizes:   1%|4                           | 197k/13.7M [00:00<00:49, 271kB/s]    file_sizes:   2%|6                           | 295k/13.7M [00:01<00:41, 326kB/s]    file_sizes:   4%|#                           | 524k/13.7M [00:01<00:23, 551kB/s]    file_sizes:   7%|#9                         | 983k/13.7M [00:01<00:12, 1.01MB/s]    file_sizes:  21%|#####5                    | 2.95M/13.7M [00:01<00:03, 3.33MB/s]    file_sizes:  33%|########5                 | 4.52M/13.7M [00:02<00:02, 4.40MB/s]    file_sizes:  44%|###########5              | 6.09M/13.7M [00:02<00:01, 5.13MB/s]    file_sizes:  56%|##############5           | 7.67M/13.7M [00:02<00:01, 5.62MB/s]    file_sizes:  67%|#################4        | 9.24M/13.7M [00:02<00:00, 5.97MB/s]    file_sizes:  79%|####################4     | 10.8M/13.7M [00:03<00:00, 6.19MB/s]    file_sizes:  90%|#######################4  | 12.4M/13.7M [00:03<00:00, 6.29MB/s]    file_sizes:  98%|#########################4| 13.4M/13.7M [00:03<00:00, 5.84MB/s]    file_sizes: 100%|##########################| 13.7M/13.7M [00:03<00:00, 3.92MB/s]
     Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
     Decompressing...
     Loading svmlight file...
@@ -277,8 +277,8 @@ Plot results
  .. code-block:: none
 
     sparse-ho finished
-    Time for grid search: 14.47 s
-    Time for grad search (sparse-ho): 15.40 s
+    Time for grid search: 14.24 s
+    Time for grad search (sparse-ho): 13.59 s
     Minimum outer criterion value with grid search: 0.21316
     Minimum outer criterion value with grad search: 0.21255
     /home/circleci/project/examples/plot_held_out_lasso.py:122: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
@@ -290,7 +290,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  42.962 seconds)
+   **Total running time of the script:** ( 0 minutes  40.061 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_lasso.py:

@@ -92,7 +92,7 @@ Load some data
 
     alpha_min = 1e-4 * alpha_max
 
-    n_grid = 10
+    n_grid = 15
     alphas_l1 = np.geomspace(alpha_max, alpha_min, n_grid)
     alphas_l2 = np.geomspace(alpha_max, alpha_min, n_grid)
 
@@ -153,18 +153,23 @@ grid search with scikit-learn
  .. code-block:: none
 
     Started grid search
-    lambda 0 / 100
-    lambda 10 / 100
-    lambda 20 / 100
-    lambda 30 / 100
-    lambda 40 / 100
-    lambda 50 / 100
-    lambda 60 / 100
-    lambda 70 / 100
-    lambda 80 / 100
-    lambda 90 / 100
+    lambda 0 / 225
+    lambda 15 / 225
+    lambda 30 / 225
+    lambda 45 / 225
+    lambda 60 / 225
+    lambda 75 / 225
+    lambda 90 / 225
+    lambda 105 / 225
+    lambda 120 / 225
+    lambda 135 / 225
+    lambda 150 / 225
+    lambda 165 / 225
+    lambda 180 / 225
+    lambda 195 / 225
+    lambda 210 / 225
     Finished grid search
-    Minimum outer criterion value with grid search 2.268e+01
+    Minimum outer criterion value with grid search 2.258e+01
 
 
 
@@ -222,9 +227,9 @@ Grad-search with sparse-ho
     Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
     Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
     Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
-    Time grid search 3.749127
-    Time grad-search 2.265374
-    Minimum grid search 2.268e+01
+    Time grid search 7.606749
+    Time grad-search 2.065788
+    Minimum grid search 2.258e+01
     Minimum grad search 2.257e+01
 
 
@@ -243,7 +248,7 @@ Plot results
     cmap = discrete_cmap(n_outer, 'Reds')
     X, Y = np.meshgrid(alphas_l1 / alpha_max, alphas_l2 / alpha_max)
     fig, ax = plt.subplots(1, 1)
-    cp = ax.contourf(X, Y, results.T)
+    cp = ax.contour(X, Y, results.T, levels=40)
     ax.scatter(
         X, Y, s=10, c="orange", marker="o", label="$0$th order (grid search)",
         clip_on=False)
@@ -263,7 +268,7 @@ Plot results
     cb.set_label("Held-out loss")
     plt.xscale('log')
     plt.yscale('log')
-    plt.legend()
+    plt.legend(loc='upper left')
     plt.show(block=False)
 
 
@@ -279,7 +284,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.646 seconds)
+   **Total running time of the script:** ( 0 minutes  10.248 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
