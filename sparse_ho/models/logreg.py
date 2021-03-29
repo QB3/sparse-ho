@@ -392,8 +392,7 @@ class SparseLogreg(BaseModel):
                 hessian = X_m.T @ (temp * (X_m @ v)) / n_samples
             return hessian
 
-        linop = LinearOperator((size_supp, size_supp), matvec=mv)
-        return linop
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.

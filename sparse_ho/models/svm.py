@@ -351,8 +351,7 @@ class SVM(BaseModel):
             else:
                 return y_m * (X_m @ ((X_m.T @ (y_m * v))))
 
-        linop = LinearOperator((size_supp, size_supp), matvec=mv)
-        return linop
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def _get_jac_t_v(self, X, y, jac, mask, dense, C, v):
         C = C[0]

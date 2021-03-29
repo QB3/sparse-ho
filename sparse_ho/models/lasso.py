@@ -390,8 +390,7 @@ class Lasso(BaseModel):
 
         def mv(v):
             return X_m.T @ (X_m @ v) / n_samples
-        linop = LinearOperator((size_supp, size_supp), matvec=mv)
-        return linop
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.

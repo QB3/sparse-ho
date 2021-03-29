@@ -396,9 +396,7 @@ class SVR(BaseModel):
 
         def mv(v):
             return X_m @ (X_m.T @ v)
-        linop = LinearOperator((size_supp, size_supp), matvec=mv)
-
-        return linop
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def get_dual_v(self, mask, dense, X, y, v, log_hyperparam):
         """TODO
