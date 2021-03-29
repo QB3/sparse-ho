@@ -144,7 +144,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
         self.init_delta_epsilon = True
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=1000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=1000,
             tol=1e-3, monitor=None):
         """Get value and gradient of criterion.
 
@@ -158,7 +158,7 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
+        compute_beta_grad: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -180,12 +180,12 @@ class FiniteDiffMonteCarloSure(BaseCriterion):
             return ((2 * self.sigma ** 2 *
                      X[:, mask].T @ self.delta / self.epsilon))
 
-        mask, dense, jac_v, quantity_to_warm_start = get_beta_jac_v(
+        mask, dense, jac_v, quantity_to_warm_start = compute_beta_grad(
             X, y, log_alpha, model, v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
-        mask2, dense2, jac_v2, quantity_to_warm_start2 = get_beta_jac_v(
+        mask2, dense2, jac_v2, quantity_to_warm_start2 = compute_beta_grad(
             X, y + self.epsilon * self.delta,
             log_alpha, model, v2, mask0=self.mask02,
             dense0=self.dense02,

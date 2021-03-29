@@ -109,7 +109,7 @@ def test_val_grad(model_name, criterion_name, algo):
     log_alpha = dict_log_alpha[model_name]
     model = models[model_name]
     val, grad = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+        model, X, y, log_alpha, algo.compute_beta_grad, tol=tol)
     np.testing.assert_allclose(
         dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5, atol=1e-5)
     np.testing.assert_allclose(
@@ -136,12 +136,14 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
 
     def get_val(log_alpha):
         val, _ = criterion.get_val_grad(
-            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
+            model, X, y, np.squeeze(log_alpha), algo.compute_beta_grad,
+            tol=tol)
         return val
 
     def get_grad(log_alpha):
         _, grad = criterion.get_val_grad(
-            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
+            model, X, y, np.squeeze(log_alpha), algo.compute_beta_grad,
+            tol=tol)
         return grad
 
     for log_alpha in dict_list_log_alphas[model_name]:

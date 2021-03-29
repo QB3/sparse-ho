@@ -54,7 +54,7 @@ for maxit in maxits:
                     tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
                 algo.max_iter = maxit
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-12,
+                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-12,
                         monitor=monitor, max_iter=maxit)
             else:
                 model = Lasso(max_iter=maxit)
@@ -74,7 +74,7 @@ for maxit in maxits:
                 algo.max_iter = maxit
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+                        model, X, y, log_alpha, algo.compute_beta_grad, tol=tol,
                         monitor=monitor, max_iter=maxit)
 
         dict_res[method, maxit] = (
@@ -89,7 +89,7 @@ criterion = HeldOutMSE(idx_train, idx_val)
 algo = Implicit(criterion)
 model = Lasso(estimator=clf, max_iter=10000)
 true_val, true_grad = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
+        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-14,
         monitor=true_monitor)
 
 fig_time, ax_time = plt.subplots()

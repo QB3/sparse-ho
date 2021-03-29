@@ -56,7 +56,7 @@ def parallel_function(
                     tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
                 algo.max_iter = maxit
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-12,
+                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-12,
                         monitor=monitor, max_iter=maxit)
             elif method == "ground_truth":
                 for file in os.listdir("results/"):
@@ -74,7 +74,7 @@ def parallel_function(
                     algo = Implicit(criterion)
                 model = Lasso(estimator=clf, max_iter=10000)
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=1e-14,
+                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-14,
                         monitor=monitor)
             else:
                 model = Lasso(max_iter=maxit)
@@ -93,7 +93,7 @@ def parallel_function(
                 algo.max_iter = maxit
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+                        model, X, y, log_alpha, algo.compute_beta_grad, tol=tol,
                         monitor=monitor, max_iter=maxit)
 
         results = (

@@ -79,7 +79,7 @@ class HeldOutMSE(BaseCriterion):
         return value_outer
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -93,7 +93,7 @@ class HeldOutMSE(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
+        compute_beta_grad: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -109,7 +109,7 @@ class HeldOutMSE(BaseCriterion):
         def get_v(mask, dense):
             X_val_m = X_val[:, mask]
             return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
             X_train, y_train, log_alpha, model,
             get_v, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
@@ -211,7 +211,7 @@ class HeldOutLogistic(BaseCriterion):
         return val
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -225,7 +225,7 @@ class HeldOutLogistic(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
+        compute_beta_grad: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -245,7 +245,7 @@ class HeldOutLogistic(BaseCriterion):
             v /= len(y_val)
             return v
 
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
             X_train, y_train, log_alpha, model, get_v, mask0=self.mask0,
             dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
@@ -327,7 +327,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         return np.sum(smooth_hinge(Xbeta_y)) / len(y)
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -341,7 +341,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
+        compute_beta_grad: callable
             Returns the product of the transpoe of the Jacobian and a vector v.
         max_iter: int
             Maximum number of iteration for the inner problem.
@@ -368,7 +368,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             v /= len(self.idx_val)
             return v
 
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
             X_train, y_train, log_alpha, model, get_v,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,

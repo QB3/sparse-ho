@@ -47,7 +47,7 @@ def grad_search(
 
     def _get_val_grad(log_alpha, tol, monitor):
         return criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol,
+            model, X, y, log_alpha, algo.compute_beta_grad, tol=tol,
             monitor=monitor)
 
     def _proj_hyperparam(log_alpha):

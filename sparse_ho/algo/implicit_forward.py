@@ -42,7 +42,7 @@ class ImplicitForward():
             max_iter=self.max_iter, verbose=self.verbose)
         return mask, dense, jac
 
-    def get_beta_jac_v(
+    def compute_beta_grad(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             backward=False, full_jac_v=False):

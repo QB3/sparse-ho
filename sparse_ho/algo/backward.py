@@ -22,7 +22,7 @@ class Backward():
         self.use_stop_crit = use_stop_crit
         self.verbose = verbose
 
-    def get_beta_jac_v(
+    def compute_beta_grad(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):

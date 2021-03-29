@@ -68,7 +68,7 @@ def parallel_function(
                 algo = Implicit(criterion)
                 model.estimator = clf
                 val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.get_beta_jac_v, tol=1e-14,
+                        model, X, y, logC, algo.compute_beta_grad, tol=1e-14,
                         monitor=monitor)
             else:
                 if method == "sota":
@@ -89,7 +89,7 @@ def parallel_function(
                 algo.max_iter = max_iter
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.get_beta_jac_v, tol=tol,
+                        model, X, y, logC, algo.compute_beta_grad, tol=tol,
                         monitor=monitor, max_iter=max_iter)
 
         results = (

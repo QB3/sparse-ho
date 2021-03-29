@@ -35,7 +35,7 @@ def test_cross_val_criterion(model_name, criterion):
             model, X, y, log_alpha, tol=tol, monitor=monitor_get_val)
     for log_alpha in dict_list_log_alphas[model_name]:
         criterion.get_val_grad(
-            model, X, y, log_alpha, algo.get_beta_jac_v,
+            model, X, y, log_alpha, algo.compute_beta_grad,
             tol=tol, monitor=monitor_get_val_grad)
 
     obj_val = np.array(monitor_get_val.objs)
