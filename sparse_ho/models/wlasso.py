@@ -3,7 +3,7 @@ from numba import njit
 from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
-
+from scipy.sparse.linalg import LinearOperator
 
 from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import ST, init_dbeta0_new_p
@@ -216,7 +216,7 @@ class WeightedLasso(BaseModel):
     def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
-        jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
+        jac_t_v = alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -261,6 +261,31 @@ class WeightedLasso(BaseModel):
             return slinalg.norm(X, axis=0) ** 2 / (X.shape[0])
         else:
             return norm(X, axis=0) ** 2 / (X.shape[0])
+
+    @staticmethod
+    def get_mv(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: ndarray
+            Logarithm of hyperparameter.
+        """
+        X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
+
+        def mv(v):
+            return X_m.T @ (X_m @ v) / n_samples
+        linop = LinearOperator((size_supp, size_supp), matvec=mv)
+        return linop
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):
