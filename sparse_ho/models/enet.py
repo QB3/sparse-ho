@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse
+from scipy.sparse.linalg import LinearOperator
 
 from numba import njit
 
@@ -387,6 +388,31 @@ class ElasticNet(BaseModel):
         v: TODO
         """
         return jac.T @ v(mask, dense)
+
+    @staticmethod
+    def get_mv(X, y, mask, dense, log_alpha):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_alpha: ndarray, shape (2,)
+            Logarithm of hyperparameter.
+        """
+        X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
+
+        def mv(v):
+            return X_m.T @ (X_m @ v) / n_samples + np.exp(log_alpha[1]) * v
+        linop = LinearOperator((size_supp, size_supp), matvec=mv)
+        return linop
 
     @staticmethod
     def get_hessian(X, y, mask, dense, log_alpha):

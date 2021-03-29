@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse
+from scipy.sparse.linalg import LinearOperator
 
 from numba import njit
 
@@ -320,6 +321,38 @@ class SVM(BaseModel):
         """
         # MM sorry I don't get what this does
         return jac_v
+
+    def get_mv(self, X, y, mask, dense, log_C):
+        """Compute Hessian of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        log_C: ndarray
+            Logarithm of hyperparameter.
+        """
+        C = np.exp(log_C)
+        full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
+
+        X_m = X[full_supp, :]
+        y_m = y[full_supp]
+        size_supp = X_m.shape[0]
+
+        def mv(v):
+            if issparse(X):
+                return y_m * (X_m @ ((X_m.T @ (y_m * v))))
+            else:
+                return y_m * (X_m @ ((X_m.T @ (y_m * v))))
+
+        linop = LinearOperator((size_supp, size_supp), matvec=mv)
+        return linop
 
     def get_hessian(self, X, y, mask, dense, log_C):
         """Compute Hessian of datafit.

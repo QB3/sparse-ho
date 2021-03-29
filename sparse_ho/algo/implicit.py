@@ -39,25 +39,24 @@ class Implicit():
 
 def get_beta_jac_t_v_implicit(
         X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
-        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None):
+        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None,
+        tol_lin_sys=1e-6, max_iter_lin_sys=100):
     alpha = np.exp(log_alpha)
-    n_samples, n_features = X.shape
-
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
-
+    n_samples, n_features = X.shape
     size_mat = mask.sum()
 
     if hasattr(model, 'get_mv'):
         mat_to_inv = model.get_mv(X, y, mask, dense, log_alpha)
     else:
         mat_to_inv = model.get_hessian(X, y, mask, dense, log_alpha)
+
     v = get_v(mask, dense)
     if hasattr(model, 'dual'):
         v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
-    # TODO: to clean
-    is_sparse = issparse(X)
+
     if not alpha.shape:
         alphas = np.ones(n_features) * alpha
     else:
@@ -66,31 +65,10 @@ def get_beta_jac_t_v_implicit(
     if sol_lin_sys is not None and not hasattr(model, 'dual'):
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
     else:
-        size_mat = mat_to_inv.shape[0]
-        sol0 = np.zeros(size_mat)
-    try:
-        sol = cg(
-            mat_to_inv, - model.generalized_supp(X, v, log_alpha),
-            # x0=sol0, tol=tol, maxiter=1e5)
-            x0=sol0, tol=tol)
-        if sol[1] == 0:
-            sol_lin_sys = sol[0]
-        else:
-            raise ValueError('cg did not converge.')
-    except Exception:
-        print("Matrix to invert was badly conditioned")
-        size_mat = mat_to_inv.shape[0]
-        if is_sparse:
-            reg_amount = 1e-7 * norm(model.reduce_X(X, mask).todense(),
-                                     ord=2) ** 2
-            mat_to_inv += reg_amount * identity(size_mat)
-        else:
-            reg_amount = 1e-7 * norm(model.reduce_X(X, mask), ord=2) ** 2
-            mat_to_inv += reg_amount * np.eye(size_mat)
-        sol = cg(
-            mat_to_inv + reg_amount * identity(size_mat),
-            - model.generalized_supp(X, v, log_alpha),
-            x0=sol0, atol=1e-3)
+        sol0 = None  # TODO add warm start for SVM
+    sol = cg(
+        mat_to_inv, - model.generalized_supp(X, v, log_alpha),
+        x0=sol0, tol=tol_lin_sys, maxiter=max_iter_lin_sys)
 
     sol_lin_sys = sol[0]
 
