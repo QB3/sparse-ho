@@ -1,7 +1,5 @@
 import numpy as np
-from numpy.linalg import norm
 
-from scipy.sparse import issparse, identity
 from scipy.sparse.linalg import cg
 
 from sparse_ho.utils import init_dbeta0_new
