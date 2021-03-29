@@ -12,22 +12,56 @@ class Implicit():
 
     Parameters
     ----------
-    max_iter: int
-            maximum number of iteration for the inner solver
+    max_iter: int (default=100)
+        maximum number of iteration for the inner solver
+    max_iter_lin_sys: int (default=100)
+        maximum number of iteration for the resolution od the linear system
+    tol_lin_sys: float (default=1e-6)
+        tolerance for the resolution of the linear system
     """
 
-    def __init__(self, max_iter=100):
+    def __init__(self, max_iter=100, max_iter_lin_sys=100, tol_lin_sys=1e-6):
         self.max_iter = max_iter
+        self.max_iter_lin_sys = max_iter_lin_sys
+        self.tol_lin_sys = tol_lin_sys
 
     def get_beta_jac_v(
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            jac0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            backward=False, full_jac_v=False):
+            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            full_jac_v=False):
+        """Algorithm that will compute the (hyper)gradient, ie the gradient with
+        respect to the hyperparameter using the implicit differentiation.
 
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            design matrix
+        y: ndarray, shape (n_samples,)
+            observation vector
+        log_alpha: float or np.array, shape (n_features,)
+            logarithm of hyperparameter
+        model:  instance of ``sparse_ho.base.BaseModel``
+            a model that follows the sparse_ho API
+        get_v: callable
+            function which return the values of the the vector v
+        mask0: ndarray, shape (n_features,)
+            boolean of active active for warm start
+        dense0: ndarray, shape (n_features,)
+            initial value of the value on the support for warm start
+        quantity_to_warm_start: ndarray
+            previous solution of the linear system
+        max_iter: int
+            maximum number of iteration for the inner solver
+        tol: float
+            the tolerance for the optimization
+        full_jac_v: bool
+            ?
+        """
         mask, dense, jac_v, sol_lin_sys = get_beta_jac_t_v_implicit(
-            X, y, log_alpha, get_v,
-            mask0=mask0, dense0=dense0, max_iter=max_iter,
-            sol_lin_sys=quantity_to_warm_start, tol=tol, model=model)
+            X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
+            max_iter=max_iter, tol=tol, sol_lin_sys=quantity_to_warm_start,
+            tol_lin_sys=self.tol_lin_sys,
+            max_iter_lin_sys=self.max_iter_lin_sys, model=model)
 
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
@@ -37,8 +71,36 @@ class Implicit():
 
 def get_beta_jac_t_v_implicit(
         X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
-        model="lasso", sk=False, max_iter=1000, sol_lin_sys=None,
+        model="lasso", max_iter=1000, sol_lin_sys=None,
         tol_lin_sys=1e-6, max_iter_lin_sys=100):
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the implicit differentiation.
+
+    Parameters
+    ----------
+    X: array-like, shape (n_samples, n_features)
+        Design matrix.
+    y: ndarray, shape (n_samples,)
+        observation vector.
+    log_alpha: float or np.array, shape (n_features,)
+        logarithm of hyperparameter.
+    mask0: ndarray, shape (n_features,)
+        boolean of active active for warm start
+    dense0: ndarray, shape (n_features,)
+        initial value of the value on the support for warm start
+    tol: float
+        the tolerance for the optimization
+    model:  instance of ``sparse_ho.base.BaseModel``
+        a model that follows the sparse_ho API.
+    max_iter: int
+        maximum number of iteration for the inner solver
+    sol_lin_sys: ndarray
+        previous solution of the linear system for warm start
+    tol_lin_sys: float
+        tolerance for the resolution of the linear system
+    max_iter_lin_sys: int
+        maximum number of iteration for the resolution od the linear system
+    """
     alpha = np.exp(log_alpha)
     mask, dense, _ = get_beta_jac_iterdiff(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
