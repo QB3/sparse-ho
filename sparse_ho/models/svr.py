@@ -441,7 +441,7 @@ class SVR(BaseModel):
         else:
             return np.zeros(X.shape[0])
 
-    def _get_jac_t_v(self, X, y, jac, mask, dense, hyperparam, v, n_samples):
+    def _get_jac_t_v(self, X, y, jac, mask, dense, hyperparam, v):
         C = hyperparam[0]
         n_samples = X.shape[0]
         epsilon = hyperparam[1]

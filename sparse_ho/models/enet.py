@@ -256,7 +256,7 @@ class ElasticNet(BaseModel):
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
+    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v):
         return np.array([alphas[0] * np.sign(dense) @ jac,
                          alphas[1] * dense @ jac])
 

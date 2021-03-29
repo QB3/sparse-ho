@@ -379,7 +379,7 @@ class SVM(BaseModel):
             Xy = (y[full_supp] * X[full_supp, :].T)
             return Xy.T @ Xy
 
-    def _get_jac_t_v(self, X, y, jac, mask, dense, C, v, n_samples):
+    def _get_jac_t_v(self, X, y, jac, mask, dense, C, v):
         C = C[0]
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         maskC = self.dual_var == C
