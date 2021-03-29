@@ -102,7 +102,7 @@ def linear_cv(
         dense = beta_star[mask]
     # if model == "lasso":
     v = - alpha * np.sign(beta_star[mask])
-    mat_to_inv = model.get_mv(mask, dense, np.log(alpha))
+    mat_to_inv = model.get_mat_vec(mask, dense, np.log(alpha))
     # mat_to_inv = X[:, mask].T  @ X[:, mask]
 
     jac_temp = cg(mat_to_inv, v, tol=1e-10)

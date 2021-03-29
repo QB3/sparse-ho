@@ -390,7 +390,7 @@ class ElasticNet(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_mv(X, y, mask, dense, log_alpha):
+    def get_mat_vec(X, y, mask, dense, log_alpha):
         """Returns a LinearOperator computing the matrix vector product
         with the Hessian of datafit. It is necessary to avoid storing a
         potentially large matrix, and keep advantage of the sparsity of X.

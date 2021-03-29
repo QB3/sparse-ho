@@ -107,7 +107,7 @@ def get_beta_jac_t_v_implicit(
         tol=tol, max_iter=max_iter, compute_jac=False, model=model)
     n_features = X.shape[1]
 
-    mat_to_inv = model.get_mv(X, y, mask, dense, log_alpha)
+    mat_to_inv = model.get_mat_vec(X, y, mask, dense, log_alpha)
 
     v = get_v(mask, dense)
     if hasattr(model, 'dual'):
