@@ -371,7 +371,8 @@ class SVR(BaseModel):
 
     def get_mv(self, X, y, mask, dense, log_alpha):
         """Returns a LinearOperator computing the matrix vector product
-        with the Hessian of datafit.
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
