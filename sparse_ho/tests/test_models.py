@@ -9,7 +9,7 @@ from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import compute_beta
 from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
+from sparse_ho.algo.implicit import compute_beta_grad_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
 
@@ -64,7 +64,7 @@ def test_beta_jac(key):
     assert np.allclose(dense3, dense4)
     assert np.allclose(jac3, jac4, atol=1e-6)
 
-    get_beta_jac_t_v_implicit(
+    compute_beta_grad_implicit(
         X, y, dict_log_alpha[key], get_v, model=models[key])
 
 
