@@ -29,8 +29,8 @@ class Implicit():
         self.tol_lin_sys = tol_lin_sys
 
     def compute_beta_grad(
-            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            self, X, y, log_alpha, model, get_grad_outer, mask0=None,
+            dense0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
         """Compute beta and the hypergradient, with implicit differentiation.
 
@@ -44,9 +44,9 @@ class Implicit():
             Logarithm of hyperparameter.
         model:  instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        get_v: callable
-            Function which return the values of the vector v.
-            v is the gradient of the outer criterion.
+        get_grad_outer: callable
+            Function which returns the values of the gradient
+            of the outer criterion.
         mask0: ndarray, shape (n_features,)
             Boolean of active feature of the previous regression coefficients
             beta for warm start.
@@ -63,7 +63,7 @@ class Implicit():
             TODO
         """
         mask, dense, jac_v, sol_lin_sys = compute_beta_grad_implicit(
-            X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
+            X, y, log_alpha, get_grad_outer, mask0=mask0, dense0=dense0,
             max_iter=max_iter, tol=tol, sol_lin_sys=quantity_to_warm_start,
             tol_lin_sys=self.tol_lin_sys,
             max_iter_lin_sys=self.max_iter_lin_sys, model=model)
@@ -75,7 +75,7 @@ class Implicit():
 
 
 def compute_beta_grad_implicit(
-        X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
+        X, y, log_alpha, get_grad_outer, mask0=None, dense0=None, tol=1e-3,
         model="lasso", max_iter=1000, sol_lin_sys=None,
         tol_lin_sys=1e-6, max_iter_lin_sys=100):
     """Compute beta and the hypergradient with implicit differentiation.
@@ -123,7 +123,7 @@ def compute_beta_grad_implicit(
 
     mat_to_inv = model.get_mat_vec(X, y, mask, dense, log_alpha)
 
-    v = get_v(mask, dense)
+    v = get_grad_outer(mask, dense)
     if hasattr(model, 'dual'):
         v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
 

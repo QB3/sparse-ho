@@ -105,7 +105,7 @@ dict_list_log_alphas["svr"] = [
         np.log(np.geomspace(1e-2, 1e-1, num=5)))]
 
 
-def get_v(mask, dense):
+def get_grad_outer(mask, dense):
     return 2 * (X[np.ix_(idx_val, mask)].T @ (
         X[np.ix_(idx_val, mask)] @ dense - y[idx_val])) / len(idx_val)
 

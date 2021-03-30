@@ -24,8 +24,8 @@ class Forward():
         self.verbose = verbose
 
     def compute_beta_grad(
-            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            self, X, y, log_alpha, model, get_grad_outer, mask0=None,
+            dense0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
         """Compute beta and hypergradient, with forward differentiation of
         proximal coordinate descent.
@@ -40,9 +40,9 @@ class Forward():
             Logarithm of hyperparameter.
         model:  instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
-        get_v: callable
-            Function which return the values of the vector v.
-            v is the gradient of the outer criterion.
+        get_grad_outer: callable
+            Function which returns the values of the gradient
+            of the outer criterion.
         mask0: ndarray, shape (n_features,)
             Boolean of active feature of the previous regression coefficients
             beta for warm start.
@@ -65,7 +65,7 @@ class Forward():
             compute_jac=True, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
         if jac is not None:
-            jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
+            jac_v = model.get_jac_v(X, y, mask, dense, jac, get_grad_outer)
             if full_jac_v:
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:

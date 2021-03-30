@@ -16,7 +16,7 @@ from sparse_ho.criterion import (
 from sparse_ho.tests.common import (
     X, X_s, y, sigma_star, idx_train, idx_val,
     dict_log_alpha, models, custom_models, dict_cvxpy_func,
-    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_v,
+    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_grad_outer,
     list_model_crit, list_model_names)
 
 # list of algorithms to be tested
@@ -65,7 +65,7 @@ def test_beta_jac(key):
     assert np.allclose(jac3, jac4, atol=1e-6)
 
     compute_beta_grad_implicit(
-        X, y, dict_log_alpha[key], get_v, model=models[key])
+        X, y, dict_log_alpha[key], get_grad_outer, model=models[key])
 
 
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))

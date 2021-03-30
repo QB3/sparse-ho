@@ -106,12 +106,12 @@ class HeldOutMSE(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
         mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
             X_train, y_train, log_alpha, model,
-            get_v, mask0=self.mask0, dense0=self.dense0,
+            get_grad_outer, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
 
@@ -238,7 +238,7 @@ class HeldOutLogistic(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             temp = sigma(y_val * (X_val_m @ dense))
             v = X_val_m.T @ (y_val * (temp - 1))
@@ -246,8 +246,8 @@ class HeldOutLogistic(BaseCriterion):
             return v
 
         mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
-            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0,
-            dense0=self.dense0,
+            X_train, y_train, log_alpha, model, get_grad_outer, mask0=self.
+            mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
 
@@ -354,7 +354,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             Xbeta_y = y_val * (X_val_m @ dense)
             deriv = derivative_smooth_hinge(Xbeta_y)
@@ -369,7 +369,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             return v
 
         mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
-            X_train, y_train, log_alpha, model, get_v,
+            X_train, y_train, log_alpha, model, get_grad_outer,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)

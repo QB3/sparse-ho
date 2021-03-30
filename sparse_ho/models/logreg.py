@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.linalg import norm
-from scipy.sparse import issparse
 from numba import njit
 from scipy.sparse.linalg import LinearOperator
 
