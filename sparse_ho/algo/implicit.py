@@ -7,14 +7,11 @@ from sparse_ho.algo.forward import compute_beta
 
 
 class Implicit():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the implicit differentiation.
+    """Algorithm to compute the hypergradient using implicit differentiation.
 
-    The hypergradient computation is done in 3 steps:
-    1- solve the inner optimization problem
-    2 - solve a linear system on the support (ie the non-zeros coefficients)
-    of the solution.
-    3- use the solution of the linear system to compute the gradient.
+    First the inner optimization problem is solved, then the gradient is
+    computed after resolution of a linear system on the generalized support
+    of the regression coefficients.
 
     Parameters
     ----------
@@ -147,6 +144,5 @@ def compute_beta_grad_implicit(
     sol_lin_sys = sol[0]
 
     # 3 compute the gradient
-    grad = model._get_grad(
-        X, y, sol_lin_sys, mask, dense, alphas, v)
+    grad = model._get_grad(X, y, sol_lin_sys, mask, dense, alphas, v)
     return mask, dense, grad, sol_lin_sys

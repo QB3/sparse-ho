@@ -6,8 +6,9 @@ from sparse_ho.algo.forward import compute_beta
 
 
 class Backward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the backward differentiation.
+    """Algorithm to compute the hypergradient using backward differentiation.
+
+    TODO explain in a sentence
 
     Parameters
     ----------

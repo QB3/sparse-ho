@@ -4,8 +4,10 @@ from sparse_ho.algo.forward import compute_beta
 
 
 class ImplicitForward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the implicit forward algorithm.
+    """Algorithm to compute the hypergradient using implicit forward
+    differentiation.
+
+    TODO explain in a sentence.
 
     Parameters
     ----------
