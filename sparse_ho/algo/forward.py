@@ -43,7 +43,8 @@ class Forward():
         model:  instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
         get_v: callable
-            Function which return the values of the the vector v.
+            Function which return the values of the vector v.
+            v is the gradient of the outer criterion.
         mask0: ndarray, shape (n_features,)
             Boolean of active feature of the previous regression coefficients
             beta for warm start.
