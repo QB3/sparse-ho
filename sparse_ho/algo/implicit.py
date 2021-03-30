@@ -44,10 +44,10 @@ class Implicit():
             A model that follows the sparse_ho API.
         get_v: callable
             Function which return the values of the the vector v.
-        mask0: ndarray, shape (mask.sum(),)
+        mask0: ndarray, shape (n_features,)
             Boolean of active feature of the previous regression coefficient
             beta for warm start.
-        dense0: ndarray, shape
+        dense0: ndarray, shape (mask.sum(),)
             Initial value of the previous regression coefficient
             beta for warm start.
         quantity_to_warm_start: ndarray
@@ -57,7 +57,7 @@ class Implicit():
         tol: float
             The tolerance for the inner optimization problem.
         full_jac_v: bool
-            ?
+            TODO
         """
         mask, dense, jac_v, sol_lin_sys = compute_beta_grad_implicit(
             X, y, log_alpha, get_v, mask0=mask0, dense0=dense0,
@@ -86,10 +86,10 @@ def compute_beta_grad_implicit(
         Observation vector.
     log_alpha: float or np.array, shape (n_features,)
         Logarithm of hyperparameter.
-    mask0: ndarray, shape (mask.sum(),)
+    mask0: ndarray, shape (n_features,)
         Boolean of active feature of the previous regression coefficient
         beta for warm start.
-    dense0: ndarray, shape
+    dense0: ndarray, shape (mask.sum(),)
         Initial value of the previous regression coefficient
         beta for warm start.
     tol: float
