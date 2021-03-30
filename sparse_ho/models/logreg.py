@@ -385,14 +385,9 @@ class SparseLogreg(BaseModel):
         n_samples, size_supp = X_m.shape
         a = y * (X_m @ dense)
         grad_sigmoid = sigma(a) * (1 - sigma(a))
-        is_sparse = issparse(X)
 
         def mv(v):
-            if is_sparse:
-                return X_m.T @ (grad_sigmoid * (X_m @ v)) / n_samples
-            else:
-                hessian = X_m.T @ (grad_sigmoid * (X_m @ v)) / n_samples
-            return hessian
+            return X_m.T @ (grad_sigmoid * (X_m @ v)) / n_samples
 
         return LinearOperator((size_supp, size_supp), matvec=mv)
 
