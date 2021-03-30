@@ -10,6 +10,12 @@ class Implicit():
     """Algorithm that will compute the (hyper)gradient, ie the gradient with
     respect to the hyperparameter using the implicit differentiation.
 
+    The hypergradient computation is done in 3 steps:
+    1- solve the inner optimization problem
+    2 - solve a linear system on the support (ie the non-zeros coefficients)
+    of the solution.
+    3- use the solution of the linear system to compute the gradient.
+
     Parameters
     ----------
     max_iter: int (default=100)
@@ -78,6 +84,12 @@ def compute_beta_grad_implicit(
     """Algorithm that will compute the (hyper)gradient, ie the gradient with
     respect to the hyperparameter using the implicit differentiation.
 
+    The hypergradient computation is done in 3 steps:
+    1- solve the inner optimization problem
+    2 - solve a linear system on the support (ie the non-zeros coefficients)
+    of the solution.
+    3- use the solution of the linear system to compute the gradient.
+
     Parameters
     ----------
     X: array-like, shape (n_samples, n_features)
@@ -105,6 +117,8 @@ def compute_beta_grad_implicit(
     max_iter_lin_sys: int
         Maximum number of iterations for the resolution of the linear system.
     """
+
+    # 1 compute the regression coefficient beta, store in mask dense
     alpha = np.exp(log_alpha)
     mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
@@ -117,12 +131,12 @@ def compute_beta_grad_implicit(
     if hasattr(model, 'dual'):
         v = model.get_dual_v(mask, dense, X, y, v, log_alpha)
 
+    # 2 solve the linear system
     # TODO I think this should be removed
     if not alpha.shape:
         alphas = np.ones(n_features) * alpha
     else:
         alphas = alpha.copy()
-
     if sol_lin_sys is not None and not hasattr(model, 'dual'):
         sol0 = init_dbeta0_new(sol_lin_sys, mask, mask0)
     else:
@@ -130,9 +144,9 @@ def compute_beta_grad_implicit(
     sol = cg(
         mat_to_inv, - model.generalized_supp(X, v, log_alpha),
         x0=sol0, tol=tol_lin_sys, maxiter=max_iter_lin_sys)
-
     sol_lin_sys = sol[0]
 
+    # 3 compute the gradient
     grad = model._get_grad(
         X, y, sol_lin_sys, mask, dense, alphas, v)
-    return mask, dense, grad, sol[0]
+    return mask, dense, grad, sol_lin_sys
