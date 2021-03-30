@@ -115,7 +115,7 @@ def compute_beta_grad_implicit(
         Maximum number of iterations for the resolution of the linear system.
     """
 
-    # 1 compute the regression coefficients beta, store in mask dense
+    # 1 compute the regression coefficients beta, stored in mask and dense
     alpha = np.exp(log_alpha)
     mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
