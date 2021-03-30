@@ -11,10 +11,11 @@ from sparse_ho.utils import init_dbeta0_new
 
 
 class SVM(BaseModel):
-    """The support vector Machine classifier without bias
+    """Support Vector Machine classifier without bias.
+
     The optimization problem is solved in the dual:
-    1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
-    s.t 0 <= r_i <= C
+        1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
+        s.t 0 <= r_i <= C
 
     Parameters
     ----------

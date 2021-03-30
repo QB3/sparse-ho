@@ -5,16 +5,18 @@ from sparse_ho.optimizers.base import BaseOptimizer
 
 
 class Adam(BaseOptimizer):
-    """This Adam code is taken from
+    """ADAM optimizer for the outer problem.
+
+    This Adam code is taken from
     https://github.com/sagarvegad/Adam-optimizer/blob/master/Adam.py
 
     Parameters
     ----------
     n_outer: int, optional (default=100).
-        number of maximum updates of alpha.
+        Number of maximum updates of alpha.
     epsilon: float, optional (default=1e-3)
     lr: float, optional (default=1e-2)
-        learning rate
+        Learning rate
     beta_1: float, optional (default=0.9)
     beta_2: float, optional (default=0.999)
     verbose: bool, optional (default=False)
