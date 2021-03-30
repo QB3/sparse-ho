@@ -242,7 +242,7 @@ class Lasso(BaseModel):
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v):
+    def _get_grad(X, y, jac, mask, dense, alphas, v):
         return alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):

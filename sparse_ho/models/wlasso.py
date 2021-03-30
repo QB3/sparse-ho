@@ -213,7 +213,7 @@ class WeightedLasso(BaseModel):
         return jac_v[mask]
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v):
+    def _get_grad(X, y, jac, mask, dense, alphas, v):
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
         jac_t_v = alphas[mask] * np.sign(dense) * jac

@@ -133,6 +133,6 @@ def compute_beta_grad_implicit(
 
     sol_lin_sys = sol[0]
 
-    jac_t_v = model._get_jac_t_v(
-        X, y, sol_lin_sys, mask, dense, alphas, v.copy())
-    return mask, dense, jac_t_v, sol[0]
+    grad = model._get_grad(
+        X, y, sol_lin_sys, mask, dense, alphas, v)
+    return mask, dense, grad, sol[0]
