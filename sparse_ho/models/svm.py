@@ -348,10 +348,7 @@ class SVM(BaseModel):
         size_supp = X_m.shape[0]
 
         def mv(v):
-            if issparse(X):
-                return y_m * (X_m @ ((X_m.T @ (y_m * v))))
-            else:
-                return y_m * (X_m @ ((X_m.T @ (y_m * v))))
+            return y_m * (X_m @ ((X_m.T @ (y_m * v))))
 
         return LinearOperator((size_supp, size_supp), matvec=mv)
 
