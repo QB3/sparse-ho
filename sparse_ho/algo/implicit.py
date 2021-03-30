@@ -9,9 +9,9 @@ from sparse_ho.algo.forward import compute_beta
 class Implicit():
     """Algorithm to compute the hypergradient using implicit differentiation.
 
-    First the inner optimization problem is solved, then the gradient is
-    computed after resolution of a linear system on the generalized support
-    of the regression coefficients.
+    First the algorithm computes the regression coefficients beta, then the
+    gradient is computed after resolution of a linear system on the generalized
+    support of the regression coefficients.
 
     Parameters
     ----------
