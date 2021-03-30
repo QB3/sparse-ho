@@ -14,7 +14,7 @@
    .. autosummary::
    
       ~Backward.__init__
-      ~Backward.get_beta_jac_v
+      ~Backward.compute_beta_grad
    
    
 

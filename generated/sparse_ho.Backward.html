@@ -98,8 +98,10 @@
 <dl class="py class">
 <dt id="sparse_ho.Backward">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.</span></code><code class="sig-name descname"><span class="pre">Backward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.Backward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Algorithm that will compute the (hyper)gradient, ie the gradient with
-respect to the hyperparameter using the backward differentiation.</p>
+<dd><p>Algorithm to compute the hypergradient using backward differentiation.</p>
+<p>The algorithm first computes the regression coefficients beta, using
+proximal coordinate descent, storing all the iterates.
+Then the gradient is computed in a backward way.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -127,8 +129,8 @@ run to maximum number of iterations.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.Backward.__init__" title="sparse_ho.Backward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_beta_jac_v</span></code>(X, y, log_alpha, model, get_v)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_beta_grad</span></code>(X, y, log_alpha, model, …)</p></td>
+<td><p>Compute beta and hypergradient with backward differentiation of proximal coordinate descent.</p></td>
 </tr>
 </tbody>
 </table>

@@ -18,10 +18,10 @@
       ~WeightedLasso.get_L
       ~WeightedLasso.get_beta
       ~WeightedLasso.get_full_jac_v
-      ~WeightedLasso.get_hessian
       ~WeightedLasso.get_jac_obj
       ~WeightedLasso.get_jac_v
       ~WeightedLasso.get_mask_jac_v
+      ~WeightedLasso.get_mat_vec
       ~WeightedLasso.proj_hyperparam
       ~WeightedLasso.reduce_X
       ~WeightedLasso.reduce_y

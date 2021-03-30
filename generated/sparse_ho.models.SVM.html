@@ -138,14 +138,14 @@ s.t 0 &lt;= r_i &lt;= C</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_full_jac_v</span></code>(mask, jac_v, n_features)</p></td>
 <td><p>TODO</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hessian</span></code>(X, y, mask, dense, log_C)</p></td>
-<td><p>Compute Hessian of datafit.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, n_samples, sign_beta, …)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_obj</span></code>(Xs, ys, n_samples, sign_beta, …)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(X, y, mask, dense, jac, v)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_jac_v</span></code>(X, y, mask, dense, jac, v)</p></td>
 <td><p>Compute hypergradient.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mat_vec</span></code>(X, y, mask, dense, log_C)</p></td>
+<td><p>Returns a LinearOperator computing the matrix vector product with the Hessian of datafit.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">proj_hyperparam</span></code>(X, y, log_alpha)</p></td>
 <td><p>Project hyperparameter on an admissible range of values.</p></td>

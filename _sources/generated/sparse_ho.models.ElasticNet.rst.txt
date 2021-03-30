@@ -18,10 +18,10 @@
       ~ElasticNet.get_L
       ~ElasticNet.get_beta
       ~ElasticNet.get_full_jac_v
-      ~ElasticNet.get_hessian
       ~ElasticNet.get_jac_obj
       ~ElasticNet.get_jac_v
       ~ElasticNet.get_mask_jac_v
+      ~ElasticNet.get_mat_vec
       ~ElasticNet.proj_hyperparam
       ~ElasticNet.reduce_X
       ~ElasticNet.reduce_y

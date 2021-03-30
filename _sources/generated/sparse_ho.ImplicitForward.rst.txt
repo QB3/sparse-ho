@@ -14,8 +14,8 @@
    .. autosummary::
    
       ~ImplicitForward.__init__
+      ~ImplicitForward.compute_beta_grad
       ~ImplicitForward.get_beta_jac
-      ~ImplicitForward.get_beta_jac_v
    
    
 

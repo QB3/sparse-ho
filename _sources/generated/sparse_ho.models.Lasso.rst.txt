@@ -18,10 +18,10 @@
       ~Lasso.get_L
       ~Lasso.get_beta
       ~Lasso.get_full_jac_v
-      ~Lasso.get_hessian
       ~Lasso.get_jac_obj
       ~Lasso.get_jac_v
       ~Lasso.get_mask_jac_v
+      ~Lasso.get_mat_vec
       ~Lasso.proj_hyperparam
       ~Lasso.reduce_X
       ~Lasso.reduce_y

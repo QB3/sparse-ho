@@ -18,10 +18,10 @@
       ~SparseLogreg.get_L
       ~SparseLogreg.get_beta
       ~SparseLogreg.get_full_jac_v
-      ~SparseLogreg.get_hessian
       ~SparseLogreg.get_jac_obj
       ~SparseLogreg.get_jac_v
       ~SparseLogreg.get_mask_jac_v
+      ~SparseLogreg.get_mat_vec
       ~SparseLogreg.proj_hyperparam
       ~SparseLogreg.reduce_X
       ~SparseLogreg.reduce_y
