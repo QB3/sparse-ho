@@ -3,13 +3,12 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the forward differentiation of
+    """Algorithm to compute the hypergradient using forward differentiation of
     proximal coordinate descent.
 
     The algorithm jointly and iteratively computes the regression coefficients
-    and the Jacobian using the forward differentiation of the proximal
-    coordinate descent algorithm.
+    and the Jacobian using forward differentiation of proximal
+    coordinate descent.
 
     Parameters
     ----------
@@ -28,8 +27,7 @@ class Forward():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
-        """Algorithm that will compute the (hyper)gradient, ie the gradient with
-        respect to the hyperparameter using the forward differentiation of
+        """Compute beta and hypergradient, with forward differentiation of
         proximal coordinate descent.
 
         Parameters

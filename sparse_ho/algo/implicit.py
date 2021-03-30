@@ -11,7 +11,7 @@ class Implicit():
 
     First the algorithm computes the regression coefficients beta, then the
     gradient is computed after resolution of a linear system on the generalized
-    support of the regression coefficients.
+    support of beta.
 
     Parameters
     ----------
@@ -32,8 +32,7 @@ class Implicit():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
-        """Algorithm that will compute the (hyper)gradient, ie the gradient with
-        respect to the hyperparameter using the implicit differentiation.
+        """Compute beta and the hypergradient, with implicit differentiation.
 
         Parameters
         ----------
@@ -79,8 +78,7 @@ def compute_beta_grad_implicit(
         X, y, log_alpha, get_v, mask0=None, dense0=None, tol=1e-3,
         model="lasso", max_iter=1000, sol_lin_sys=None,
         tol_lin_sys=1e-6, max_iter_lin_sys=100):
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the implicit differentiation.
+    """Compute beta and the hypergradient with implicit differentiation.
 
     The hypergradient computation is done in 3 steps:
     - 1 solve the inner optimization problem.
