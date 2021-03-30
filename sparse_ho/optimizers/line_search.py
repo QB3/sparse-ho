@@ -5,7 +5,9 @@ from sparse_ho.optimizers.base import BaseOptimizer
 
 
 class LineSearch(BaseOptimizer):
-    """This line-search code is taken from here:
+    """Gradient descent with line search for the outer problem.
+
+    The code is taken from here:
     https://github.com/fabianp/hoag/blob/master/hoag/hoag.py
 
     Parameters

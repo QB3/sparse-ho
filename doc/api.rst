@@ -58,11 +58,11 @@ Criterion
 Algorithms
 ==========
 
-:py:mod:`sparse_ho`:
+:py:mod:`sparse_ho.algo`:
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
-.. automodule:: sparse_ho
+.. automodule:: sparse_ho.algo
    :no-members:
    :no-inherited-members:
 
@@ -78,11 +78,11 @@ Algorithms
 Optimizers
 ==========
 
-:py:mod:`sparse_ho`:
+:py:mod:`sparse_ho.optimizers`:
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.optimizers
 
-.. automodule:: sparse_ho
+.. automodule:: sparse_ho.optimizers
    :no-members:
    :no-inherited-members:
 

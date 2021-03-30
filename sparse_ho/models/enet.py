@@ -11,7 +11,7 @@ from sparse_ho.utils import prox_elasticnet, ST
 
 
 class ElasticNet(BaseModel):
-    """Sparse ho ElasticNet model (inner problem)
+    """Sparse ho ElasticNet model (inner problem).
 
     Parameters
     ----------

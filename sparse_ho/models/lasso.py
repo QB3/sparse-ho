@@ -11,7 +11,8 @@ from sparse_ho.models.base import BaseModel
 
 
 class Lasso(BaseModel):
-    """Linear Model trained with L1 prior as regularizer (aka the Lasso)
+    """Linear Model trained with L1 prior as regularizer (aka the Lasso).
+
     The optimization objective for Lasso is:
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
 

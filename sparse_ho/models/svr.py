@@ -81,7 +81,8 @@ def _update_beta_jac_bcd_aux_sparse(data, indptr, indices, y, epsilon, beta,
 
 
 class SVR(BaseModel):
-    """The support vector regression without bias
+    """The support vector regression without bias.
+
     The optimization problem is solved in the dual.
 
     Parameters

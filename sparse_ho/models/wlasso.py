@@ -10,7 +10,7 @@ from sparse_ho.utils import ST, init_dbeta0_new_p
 
 
 class WeightedLasso(BaseModel):
-    r"""Linear Model trained with weighted L1 regularizer (aka weighted Lasso)
+    r"""Linear Model trained with weighted L1 regularizer (aka weighted Lasso).
 
     The optimization objective for weighted Lasso is:
 
