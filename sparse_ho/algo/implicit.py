@@ -82,10 +82,10 @@ def compute_beta_grad_implicit(
     respect to the hyperparameter using the implicit differentiation.
 
     The hypergradient computation is done in 3 steps:
-    1- solve the inner optimization problem
-    2 - solve a linear system on the support (ie the non-zeros coefficients)
+    - 1 solve the inner optimization problem.
+    - 2 solve a linear system on the support (ie the non-zeros coefficients)
     of the solution.
-    3- use the solution of the linear system to compute the gradient.
+    - 3 use the solution of the linear system to compute the gradient.
 
     Parameters
     ----------
