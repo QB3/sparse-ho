@@ -4,10 +4,10 @@ from sparse_ho.algo.forward import compute_beta
 
 
 class ImplicitForward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using implicit forward differentiation.
+    """Algorithm to compute the hypergradient using implicit forward
+    differentiation.
 
-    First the algorithm compute the regression coefficients.
+    First the algorithm computes the regression coefficients.
     Then the iterations of the forward differentiation are applied to compute
     the Jacobian.
 
@@ -39,8 +39,8 @@ class ImplicitForward():
             self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
-        """Algorithm that will compute the (hyper)gradient, ie the gradient with
-        respect to the hyperparameter using implicit forward differentiation.
+        """Compute beta and hypergradient using implicit forward
+        differentiation.
 
         Parameters
         ----------
