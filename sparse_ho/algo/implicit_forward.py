@@ -53,8 +53,7 @@ class ImplicitForward():
         model:  instance of ``sparse_ho.base.BaseModel``
             A model that follows the sparse_ho API.
         get_grad_outer: callable
-            Function which returns the values of the gradient
-            of the outer criterion.
+            Function which returns the gradient of the outer criterion.
         mask0: ndarray, shape (n_features,)
             Boolean of active feature of the previous regression coefficients
             beta for warm start.
