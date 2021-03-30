@@ -3,9 +3,13 @@ from scipy.sparse import issparse
 
 
 class Forward():
-    """Algorithm to compute the hypergradient using forward differentiation.
+    """Algorithm that will compute the (hyper)gradient, ie the gradient with
+    respect to the hyperparameter using the forward differentiation of
+    proximal coordinate descent.
 
-    TODO explain in a sentence.
+    The algorithm jointly and iteratively computes the regression coefficients
+    and the Jacobian using the forward differentiation of the proximal
+    coordinate descent algorithm.
 
     Parameters
     ----------
@@ -21,16 +25,48 @@ class Forward():
         self.verbose = verbose
 
     def compute_beta_grad(
-            self, X, y, log_alpha, model, v, mask0=None, dense0=None,
+            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
             quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
             full_jac_v=False):
+        """Algorithm that will compute the (hyper)gradient, ie the gradient with
+        respect to the hyperparameter using the forward differentiation of
+        proximal coordinate descent.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array, shape (n_features,)
+            Logarithm of hyperparameter.
+        model:  instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        get_v: callable
+            Function which return the values of the the vector v.
+        mask0: ndarray, shape (n_features,)
+            Boolean of active feature of the previous regression coefficients
+            beta for warm start.
+        dense0: ndarray, shape (mask.sum(),)
+            Initial value of the previous regression coefficients
+            beta for warm start.
+        quantity_to_warm_start: ndarray
+            Previous Jacobian of the inner optimization problem.
+        max_iter: int
+            Maximum number of iteration for the inner solver.
+        tol: float
+            The tolerance for the inner optimization problem.
+        full_jac_v: bool
+            TODO
+        """
+        # jointly compute the regression coefficients beta and the Jacobian
         mask, dense, jac = compute_beta(
             X, y, log_alpha, model, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start, max_iter=max_iter, tol=tol,
             compute_jac=True, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
         if jac is not None:
-            jac_v = model.get_jac_v(X, y, mask, dense, jac, v)
+            jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
             if full_jac_v:
                 jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
         else:

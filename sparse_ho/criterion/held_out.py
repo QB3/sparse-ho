@@ -94,7 +94,7 @@ class HeldOutMSE(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the regression coefficient beta and the hypergradient.
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
@@ -226,7 +226,7 @@ class HeldOutLogistic(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the regression coefficient beta and the hypergradient.
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
@@ -342,7 +342,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the regression coefficient beta and the hypergradient.
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)

@@ -93,7 +93,7 @@ class CrossVal(BaseCriterion):
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the regression coefficient beta and the hypergradient.
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)

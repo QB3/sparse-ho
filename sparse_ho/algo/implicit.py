@@ -48,10 +48,10 @@ class Implicit():
         get_v: callable
             Function which return the values of the the vector v.
         mask0: ndarray, shape (n_features,)
-            Boolean of active feature of the previous regression coefficient
+            Boolean of active feature of the previous regression coefficients
             beta for warm start.
         dense0: ndarray, shape (mask.sum(),)
-            Initial value of the previous regression coefficient
+            Initial value of the previous regression coefficients
             beta for warm start.
         quantity_to_warm_start: ndarray
             Previous solution of the linear system.
@@ -96,10 +96,10 @@ def compute_beta_grad_implicit(
     log_alpha: float or np.array, shape (n_features,)
         Logarithm of hyperparameter.
     mask0: ndarray, shape (n_features,)
-        Boolean of active feature of the previous regression coefficient
+        Boolean of active feature of the previous regression coefficients
         beta for warm start.
     dense0: ndarray, shape (mask.sum(),)
-        Initial value of the previous regression coefficient
+        Initial value of the previous regression coefficients
         beta for warm start.
     tol: float
         The tolerance for the inner optimization problem.
@@ -115,7 +115,7 @@ def compute_beta_grad_implicit(
         Maximum number of iterations for the resolution of the linear system.
     """
 
-    # 1 compute the regression coefficient beta, store in mask dense
+    # 1 compute the regression coefficients beta, store in mask dense
     alpha = np.exp(log_alpha)
     mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0,

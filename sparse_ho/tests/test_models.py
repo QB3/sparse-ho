@@ -8,7 +8,7 @@ from scipy.optimize import check_grad
 from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import compute_beta
-from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
+from sparse_ho.algo.implicit_forward import get_bet_jac_implicit_forward
 from sparse_ho.algo.implicit import compute_beta_grad_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
@@ -43,12 +43,12 @@ def test_beta_jac(key):
         X_s = X_c
     supp1, dense1, jac1 = compute_beta(
         X, y, dict_log_alpha[key], tol=tol, model=models[key])
-    supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
+    supp2, dense2, jac2 = get_bet_jac_implicit_forward(
         X, y, dict_log_alpha[key], tol=tol, model=models[key], tol_jac=tol)
     supp3, dense3, jac3 = compute_beta(
         X_s, y, dict_log_alpha[key], tol=tol,
         model=models[key])
-    supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
+    supp4, dense4, jac4 = get_bet_jac_implicit_forward(
         X_s, y, dict_log_alpha[key],
         tol=tol, model=models[key], tol_jac=tol)
 
@@ -77,10 +77,10 @@ def test_beta_jac_custom(model_name):
         X_s = X_c
 
     for log_alpha in dict_list_log_alphas[model_name]:
-        supp, dense, jac = get_beta_jac_fast_iterdiff(
+        supp, dense, jac = get_bet_jac_implicit_forward(
             X_s, y, log_alpha,
             tol=tol, model=models[model_name], tol_jac=tol)
-        supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+        supp_custom, dense_custom, jac_custom = get_bet_jac_implicit_forward(
             X_s, y, log_alpha,
             tol=tol, model=custom_models[model_name], tol_jac=tol)
         assert np.all(supp == supp_custom)
