@@ -1,11 +1,15 @@
 import numpy as np
 from scipy.sparse import issparse
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 
 
 class ImplicitForward():
-    """Algorithm that will compute the (hyper)gradient, ie the gradient with
-    respect to the hyperparameter using the implicit forward algorithm.
+    """Algorithm to compute the hypergradient using implicit forward
+    differentiation.
+
+    First the algorithm computes the regression coefficients.
+    Then the iterations of the forward differentiation are applied to compute
+    the Jacobian.
 
     Parameters
     ----------
@@ -32,39 +36,70 @@ class ImplicitForward():
         self.verbose = verbose
 
     def get_beta_jac(
-            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            backward=False, full_jac_v=False):
-        mask, dense, jac = get_beta_jac_fast_iterdiff(
+            self, X, y, log_alpha, model, get_grad_outer, mask0=None,
+            dense0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            full_jac_v=False):
+        """Compute beta and hypergradient using implicit forward
+        differentiation.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_alpha: float or np.array, shape (n_features,)
+            Logarithm of hyperparameter.
+        model:  instance of ``sparse_ho.base.BaseModel``
+            A model that follows the sparse_ho API.
+        get_grad_outer: callable
+            Function which returns the gradient of the outer criterion.
+        mask0: ndarray, shape (n_features,)
+            Boolean of active feature of the previous regression coefficients
+            beta for warm start.
+        dense0: ndarray, shape (mask.sum(),)
+            Initial value of the previous regression coefficients
+            beta for warm start.
+        quantity_to_warm_start: ndarray
+            Previous Jacobian of the inner optimization problem.
+        max_iter: int
+            Maximum number of iteration for the inner solver.
+        tol: float
+            The tolerance for the inner optimization problem.
+        full_jac_v: bool
+            TODO
+        """
+
+        mask, dense, jac = get_bet_jac_implicit_forward(
             X, y, log_alpha, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             tol_jac=tol, tol=tol, niter_jac=self.n_iter_jac, model=model,
             max_iter=self.max_iter, verbose=self.verbose)
         return mask, dense, jac
 
-    def get_beta_jac_v(
-            self, X, y, log_alpha, model, get_v, mask0=None, dense0=None,
-            quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
-            backward=False, full_jac_v=False):
-        mask, dense, jac = get_beta_jac_fast_iterdiff(
+    def compute_beta_grad(
+            self, X, y, log_alpha, model, get_grad_outer, mask0=None,
+            dense0=None, quantity_to_warm_start=None, max_iter=1000, tol=1e-3,
+            full_jac_v=False):
+        mask, dense, jac = get_bet_jac_implicit_forward(
             X, y, log_alpha, mask0=mask0, dense0=dense0,
             jac0=quantity_to_warm_start,
             tol_jac=self.tol_jac, tol=tol, niter_jac=self.n_iter_jac,
             model=model, max_iter=self.max_iter, verbose=self.verbose,
             use_stop_crit=self.use_stop_crit)
-        jac_v = model.get_jac_v(X, y, mask, dense, jac, get_v)
+        jac_v = model.get_jac_v(X, y, mask, dense, jac, get_grad_outer)
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
 
         return mask, dense, jac_v, jac
 
 
-def get_beta_jac_fast_iterdiff(
+def get_bet_jac_implicit_forward(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
         tol=1e-3, max_iter=1000, niter_jac=1000, tol_jac=1e-6, verbose=False,
         use_stop_crit=True):
 
-    mask, dense, _ = get_beta_jac_iterdiff(
+    mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0, jac0=jac0, tol=tol,
         max_iter=max_iter, compute_jac=False, model=model, verbose=verbose,
         use_stop_crit=use_stop_crit)

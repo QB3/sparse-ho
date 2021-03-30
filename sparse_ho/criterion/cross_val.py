@@ -78,7 +78,7 @@ class CrossVal(BaseCriterion):
         return val
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -92,8 +92,8 @@ class CrossVal(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum iteration for the inner optimization problem.
         tol: float, optional (default=1e-3)
@@ -108,7 +108,7 @@ class CrossVal(BaseCriterion):
         grad = 0
         for i in range(self.n_splits):
             vali, gradi = self.dict_crits[i].get_val_grad(
-                self.dict_models[i], X, y, log_alpha, get_beta_jac_v,
+                self.dict_models[i], X, y, log_alpha, compute_beta_grad,
                 max_iter=max_iter, tol=tol)
             val += vali
             if gradi is not None:

@@ -7,16 +7,16 @@ from scipy.optimize import check_grad
 
 from sparse_ho import Forward, ImplicitForward, Implicit
 
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
-from sparse_ho.algo.implicit_forward import get_beta_jac_fast_iterdiff
-from sparse_ho.algo.implicit import get_beta_jac_t_v_implicit
+from sparse_ho.algo.forward import compute_beta
+from sparse_ho.algo.implicit_forward import get_bet_jac_implicit_forward
+from sparse_ho.algo.implicit import compute_beta_grad_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
 
 from sparse_ho.tests.common import (
     X, X_s, y, sigma_star, idx_train, idx_val,
     dict_log_alpha, models, custom_models, dict_cvxpy_func,
-    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_v,
+    dict_vals_cvxpy, dict_grads_cvxpy, dict_list_log_alphas, get_grad_outer,
     list_model_crit, list_model_names)
 
 # list of algorithms to be tested
@@ -41,14 +41,14 @@ def test_beta_jac(key):
         X_s = X_r
     else:
         X_s = X_c
-    supp1, dense1, jac1 = get_beta_jac_iterdiff(
+    supp1, dense1, jac1 = compute_beta(
         X, y, dict_log_alpha[key], tol=tol, model=models[key])
-    supp2, dense2, jac2 = get_beta_jac_fast_iterdiff(
+    supp2, dense2, jac2 = get_bet_jac_implicit_forward(
         X, y, dict_log_alpha[key], tol=tol, model=models[key], tol_jac=tol)
-    supp3, dense3, jac3 = get_beta_jac_iterdiff(
+    supp3, dense3, jac3 = compute_beta(
         X_s, y, dict_log_alpha[key], tol=tol,
         model=models[key])
-    supp4, dense4, jac4 = get_beta_jac_fast_iterdiff(
+    supp4, dense4, jac4 = get_bet_jac_implicit_forward(
         X_s, y, dict_log_alpha[key],
         tol=tol, model=models[key], tol_jac=tol)
 
@@ -64,8 +64,8 @@ def test_beta_jac(key):
     assert np.allclose(dense3, dense4)
     assert np.allclose(jac3, jac4, atol=1e-6)
 
-    get_beta_jac_t_v_implicit(
-        X, y, dict_log_alpha[key], get_v, model=models[key])
+    compute_beta_grad_implicit(
+        X, y, dict_log_alpha[key], get_grad_outer, model=models[key])
 
 
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
@@ -77,10 +77,10 @@ def test_beta_jac_custom(model_name):
         X_s = X_c
 
     for log_alpha in dict_list_log_alphas[model_name]:
-        supp, dense, jac = get_beta_jac_fast_iterdiff(
+        supp, dense, jac = get_bet_jac_implicit_forward(
             X_s, y, log_alpha,
             tol=tol, model=models[model_name], tol_jac=tol)
-        supp_custom, dense_custom, jac_custom = get_beta_jac_fast_iterdiff(
+        supp_custom, dense_custom, jac_custom = get_bet_jac_implicit_forward(
             X_s, y, log_alpha,
             tol=tol, model=custom_models[model_name], tol_jac=tol)
         assert np.all(supp == supp_custom)
@@ -109,7 +109,7 @@ def test_val_grad(model_name, criterion_name, algo):
     log_alpha = dict_log_alpha[model_name]
     model = models[model_name]
     val, grad = criterion.get_val_grad(
-        model, X, y, log_alpha, algo.get_beta_jac_v, tol=tol)
+        model, X, y, log_alpha, algo.compute_beta_grad, tol=tol)
     np.testing.assert_allclose(
         dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5, atol=1e-5)
     np.testing.assert_allclose(
@@ -136,12 +136,14 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
 
     def get_val(log_alpha):
         val, _ = criterion.get_val_grad(
-            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
+            model, X, y, np.squeeze(log_alpha), algo.compute_beta_grad,
+            tol=tol)
         return val
 
     def get_grad(log_alpha):
         _, grad = criterion.get_val_grad(
-            model, X, y, np.squeeze(log_alpha), algo.get_beta_jac_v, tol=tol)
+            model, X, y, np.squeeze(log_alpha), algo.compute_beta_grad,
+            tol=tol)
         return grad
 
     for log_alpha in dict_list_log_alphas[model_name]:

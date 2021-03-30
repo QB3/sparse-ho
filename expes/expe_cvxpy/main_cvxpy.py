@@ -51,14 +51,14 @@ def parallel_function(name_model, div_alpha):
     monitor = Monitor()
     val, grad = criterion.get_val_grad(
         dict_models[name_model], X[:, index_col], y, log_alpha,
-        algo.get_beta_jac_v, tol=tol, monitor=monitor)
+        algo.compute_beta_grad, tol=tol, monitor=monitor)
 
     criterion = HeldOutMSE(idx_train, idx_val)
     algo = Backward()
     monitor = Monitor()
     val, grad = criterion.get_val_grad(
         dict_models[name_model], X[:, index_col], y, log_alpha,
-        algo.get_beta_jac_v, tol=tol, monitor=monitor)
+        algo.compute_beta_grad, tol=tol, monitor=monitor)
 
     val_cvxpy, grad_cvxpy = dict_cvxpy[name_model](
         X[:, index_col], y, np.exp(log_alpha), idx_train, idx_val)
@@ -88,7 +88,7 @@ def parallel_function(name_model, div_alpha):
             monitor = Monitor()
             val, grad = criterion.get_val_grad(
                 dict_models[name_model], X[:, index_col], y,
-                log_alpha, algo.get_beta_jac_v,
+                log_alpha, algo.compute_beta_grad,
                 tol=tol, monitor=monitor)
             temp_fwd.append(monitor.times)
 
@@ -97,7 +97,7 @@ def parallel_function(name_model, div_alpha):
             monitor = Monitor()
             val, grad = criterion.get_val_grad(
                 dict_models[name_model], X[:, index_col], y,
-                log_alpha, algo.get_beta_jac_v,
+                log_alpha, algo.compute_beta_grad,
                 tol=tol, monitor=monitor)
             temp_bwd.append(monitor.times)
 

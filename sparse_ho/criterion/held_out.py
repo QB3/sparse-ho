@@ -4,7 +4,7 @@ from scipy.sparse import issparse
 
 from sparse_ho.utils import sigma, smooth_hinge
 from sparse_ho.utils import derivative_smooth_hinge
-from sparse_ho.algo.forward import get_beta_jac_iterdiff
+from sparse_ho.algo.forward import compute_beta
 from sparse_ho.criterion.base import BaseCriterion
 
 
@@ -64,7 +64,7 @@ class HeldOutMSE(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X[self.idx_train], y[self.idx_train], log_alpha, model,
             mask0=self.mask0, dense0=self.dense0, tol=tol,
             compute_jac=False)
@@ -79,7 +79,7 @@ class HeldOutMSE(BaseCriterion):
         return value_outer
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -93,8 +93,8 @@ class HeldOutMSE(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
@@ -106,12 +106,12 @@ class HeldOutMSE(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             return 2 * (X_val_m.T @ (X_val_m @ dense - y_val)) / len(y_val)
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
             X_train, y_train, log_alpha, model,
-            get_v, mask0=self.mask0, dense0=self.dense0,
+            get_grad_outer, mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
 
@@ -197,7 +197,7 @@ class HeldOutLogistic(BaseCriterion):
         tol: float, optional (default=1e-3)
             Tolerance for the inner problem.
         """
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X[self.idx_train], y[self.idx_train], log_alpha, model,
             mask0=self.mask0, dense0=self.dense0, tol=tol, compute_jac=False)
         val = self.get_val_outer(
@@ -211,7 +211,7 @@ class HeldOutLogistic(BaseCriterion):
         return val
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -225,8 +225,8 @@ class HeldOutLogistic(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
@@ -238,16 +238,16 @@ class HeldOutLogistic(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             temp = sigma(y_val * (X_val_m @ dense))
             v = X_val_m.T @ (y_val * (temp - 1))
             v /= len(y_val)
             return v
 
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X_train, y_train, log_alpha, model, get_v, mask0=self.mask0,
-            dense0=self.dense0,
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
+            X_train, y_train, log_alpha, model, get_grad_outer, mask0=self.
+            mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
 
@@ -327,7 +327,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         return np.sum(smooth_hinge(Xbeta_y)) / len(y)
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, max_iter=10000,
+            self, model, X, y, log_alpha, compute_beta_grad, max_iter=10000,
             tol=1e-5, monitor=None):
         """Get value and gradient of criterion.
 
@@ -341,8 +341,8 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         max_iter: int
             Maximum number of iteration for the inner problem.
         tol: float, optional (default=1e-3)
@@ -354,7 +354,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
         X_train, X_val = X[self.idx_train, :], X[self.idx_val, :]
         y_train, y_val = y[self.idx_train], y[self.idx_val]
 
-        def get_v(mask, dense):
+        def get_grad_outer(mask, dense):
             X_val_m = X_val[:, mask]
             Xbeta_y = y_val * (X_val_m @ dense)
             deriv = derivative_smooth_hinge(Xbeta_y)
@@ -368,8 +368,8 @@ class HeldOutSmoothedHinge(BaseCriterion):
             v /= len(self.idx_val)
             return v
 
-        mask, dense, grad, quantity_to_warm_start = get_beta_jac_v(
-            X_train, y_train, log_alpha, model, get_v,
+        mask, dense, grad, quantity_to_warm_start = compute_beta_grad(
+            X_train, y_train, log_alpha, model, get_grad_outer,
             mask0=self.mask0, dense0=self.dense0,
             quantity_to_warm_start=self.quantity_to_warm_start,
             max_iter=max_iter, tol=tol, full_jac_v=True)
@@ -402,7 +402,7 @@ class HeldOutSmoothedHinge(BaseCriterion):
             Tolerance for the inner problem.
         """
         # TODO add maxiter param for all get_val
-        mask, dense, _ = get_beta_jac_iterdiff(
+        mask, dense, _ = compute_beta(
             X, y, log_alpha, model,
             tol=tol, compute_jac=False)
         val = self.get_val_outer(

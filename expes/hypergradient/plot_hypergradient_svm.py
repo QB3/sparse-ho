@@ -58,7 +58,7 @@ criterion = HeldOutSmoothedHinge(idx_train, idx_val)
 algo = Implicit(criterion)
 model = SVM(estimator=clf)
 true_val, true_grad = criterion.get_val_grad(
-        model, X, y, logC, algo.get_beta_jac_v, tol=1e-14,
+        model, X, y, logC, algo.compute_beta_grad, tol=1e-14,
         monitor=true_monitor, max_iter=10_000)
 
 dict_res = {}
@@ -78,7 +78,7 @@ for max_iter in maxits:
                     tol_jac=1e-32, n_iter_jac=max_iter, use_stop_crit=False)
                 algo.max_iter = max_iter
                 val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.get_beta_jac_v, tol=1e-12,
+                        model, X, y, logC, algo.compute_beta_grad, tol=1e-12,
                         monitor=monitor, max_iter=max_iter)
             else:
                 if method == "forward":
@@ -94,7 +94,7 @@ for max_iter in maxits:
                 algo.max_iter = max_iter
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.get_beta_jac_v, tol=tol,
+                        model, X, y, logC, algo.compute_beta_grad, tol=tol,
                         monitor=monitor, max_iter=max_iter)
 
         dict_res[method, max_iter] = (

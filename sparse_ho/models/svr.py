@@ -3,6 +3,7 @@ from numpy.linalg import norm
 from numba import njit
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
+from scipy.sparse.linalg import LinearOperator
 
 
 from sparse_ho.models.base import BaseModel
@@ -368,8 +369,10 @@ class SVR(BaseModel):
         """
         return jac_v
 
-    def get_hessian(self, X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+    def get_mat_vec(self, X, y, mask, dense, log_alpha):
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
@@ -390,7 +393,12 @@ class SVR(BaseModel):
             self.dual_var[n_samples:(2 * n_samples)]
         full_supp = np.logical_and(dual_coef != 0, np.abs(dual_coef) != C)
 
-        return X[full_supp, :] @ X[full_supp, :].T
+        X_m = X[full_supp, :]
+        size_supp = X_m.shape[0]
+
+        def mv(v):
+            return X_m @ (X_m.T @ v)
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def get_dual_v(self, mask, dense, X, y, v, log_hyperparam):
         """TODO
@@ -409,8 +417,9 @@ class SVR(BaseModel):
         else:
             return np.zeros(X.shape[0])
 
-    def _get_jac_t_v(self, X, y, jac, mask, dense, hyperparam, v, n_samples):
+    def _get_grad(self, X, y, jac, mask, dense, hyperparam, v):
         C = hyperparam[0]
+        n_samples = X.shape[0]
         epsilon = hyperparam[1]
         alpha = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]

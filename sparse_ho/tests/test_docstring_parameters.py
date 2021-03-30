@@ -51,7 +51,7 @@ def get_name(func):
 
 # functions to ignore args / docstring of
 _docstring_ignores = [
-    ".*get_beta_jac_v$",
+    ".*compute_beta_grad$",
     ".*get_beta_jac$",
     ".*get_full_jac_obj$",
     ".*get_jac_obj$",

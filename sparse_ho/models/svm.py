@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse
+from scipy.sparse.linalg import LinearOperator
 
 from numba import njit
 
@@ -321,8 +322,10 @@ class SVM(BaseModel):
         # MM sorry I don't get what this does
         return jac_v
 
-    def get_hessian(self, X, y, mask, dense, log_C):
-        """Compute Hessian of datafit.
+    def get_mat_vec(self, X, y, mask, dense, log_C):
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
@@ -339,14 +342,17 @@ class SVM(BaseModel):
         """
         C = np.exp(log_C)
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
-        if issparse(X):
-            Xy = X[full_supp, :].multiply(y[full_supp, None])
-            return Xy @ Xy.T
-        else:
-            Xy = (y[full_supp] * X[full_supp, :].T)
-            return Xy.T @ Xy
 
-    def _get_jac_t_v(self, X, y, jac, mask, dense, C, v, n_samples):
+        X_m = X[full_supp, :]
+        y_m = y[full_supp]
+        size_supp = X_m.shape[0]
+
+        def mv(v):
+            return y_m * (X_m @ ((X_m.T @ (y_m * v))))
+
+        return LinearOperator((size_supp, size_supp), matvec=mv)
+
+    def _get_grad(self, X, y, jac, mask, dense, C, v):
         C = C[0]
         full_supp = np.logical_and(self.dual_var != 0, self.dual_var != C)
         maskC = self.dual_var == C

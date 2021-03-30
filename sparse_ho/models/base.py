@@ -8,5 +8,5 @@ class BaseModel(ABC):
         pass
 
     @abstractmethod
-    def get_hessian(cls, *args, **kwargs):
+    def get_mat_vec(cls, *args, **kwargs):
         return NotImplemented

@@ -9,7 +9,7 @@ from scipy.sparse import csc_matrix
 from sparse_ho.models import SVM
 # from cvxopt import spmatrix, matrix
 # from cvxopt import solvers
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.forward import compute_beta
 from sparse_ho.datasets.real import load_libsvm
 
 
@@ -81,7 +81,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     jac_star[np.isclose(beta_star, C)] = C
     primal_jac_star = np.sum(X.T.multiply(y * jac_star), axis=1)
     model = SVM(X, y, np.log(C), max_iter=max_iter, tol=tol)
-    list_beta, list_jac = get_beta_jac_iterdiff(
+    list_beta, list_jac = compute_beta(
         X, y, np.log(C), model, save_iterates=True, tol=1e-32,
         max_iter=max_iter, compute_jac=True)
 

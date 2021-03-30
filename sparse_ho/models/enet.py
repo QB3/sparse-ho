@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import issparse
+from scipy.sparse.linalg import LinearOperator
 
 from numba import njit
 
@@ -255,7 +256,7 @@ class ElasticNet(BaseModel):
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
+    def _get_grad(X, y, jac, mask, dense, alphas, v):
         return np.array([alphas[0] * np.sign(dense) @ jac,
                          alphas[1] * dense @ jac])
 
@@ -389,8 +390,10 @@ class ElasticNet(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_hessian(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+    def get_mat_vec(X, y, mask, dense, log_alpha):
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
@@ -405,10 +408,12 @@ class ElasticNet(BaseModel):
         log_alpha: ndarray, shape (2,)
             Logarithm of hyperparameter.
         """
-        n_samples = X.shape[0]
-        hessian = np.exp(log_alpha[1]) * np.eye(mask.sum()) + \
-            (1 / n_samples) * X[:, mask].T @ X[:, mask]
-        return hessian
+        X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
+
+        def mv(v):
+            return X_m.T @ (X_m @ v) / n_samples + np.exp(log_alpha[1]) * v
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.

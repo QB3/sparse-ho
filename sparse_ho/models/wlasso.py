@@ -3,7 +3,7 @@ from numba import njit
 from numpy.linalg import norm
 from scipy.sparse import issparse
 import scipy.sparse.linalg as slinalg
-
+from scipy.sparse.linalg import LinearOperator
 
 from sparse_ho.models.base import BaseModel
 from sparse_ho.utils import ST, init_dbeta0_new_p
@@ -213,10 +213,10 @@ class WeightedLasso(BaseModel):
         return jac_v[mask]
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
+    def _get_grad(X, y, jac, mask, dense, alphas, v):
         size_supp = mask.sum()
         jac_t_v = np.zeros(size_supp)
-        jac_t_v = n_samples * alphas[mask] * np.sign(dense) * jac
+        jac_t_v = alphas[mask] * np.sign(dense) * jac
         return jac_t_v
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -263,8 +263,10 @@ class WeightedLasso(BaseModel):
             return norm(X, axis=0) ** 2 / (X.shape[0])
 
     @staticmethod
-    def get_hessian(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+    def get_mat_vec(X, y, mask, dense, log_alpha):
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
@@ -279,10 +281,12 @@ class WeightedLasso(BaseModel):
         log_alpha: ndarray
             Logarithm of hyperparameter.
         """
-        # TODO no division by n_samples?
         X_m = X[:, mask]
-        hessian = X_m.T @ X_m
-        return hessian
+        n_samples, size_supp = X_m.shape
+
+        def mv(v):
+            return X_m.T @ (X_m @ v) / n_samples
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def _use_estimator(self, X, y, alpha, tol):
         self.estimator.set_params(tol=tol)

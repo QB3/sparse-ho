@@ -15,7 +15,7 @@ from sparse_ho.models import Lasso, SparseLogreg
 
 from celer import Lasso as Lasso_cel
 # from sparse_ho.utils import sigma
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.forward import compute_beta
 from sparse_ho.datasets.real import load_libsvm
 
 p_alphas = {}
@@ -101,8 +101,8 @@ def linear_cv(
         mask = np.array(mask)
         dense = beta_star[mask]
     # if model == "lasso":
-    v = - n_samples * alpha * np.sign(beta_star[mask])
-    mat_to_inv = model.get_hessian(mask, dense, np.log(alpha))
+    v = - alpha * np.sign(beta_star[mask])
+    mat_to_inv = model.get_mat_vec(mask, dense, np.log(alpha))
     # mat_to_inv = X[:, mask].T  @ X[:, mask]
 
     jac_temp = cg(mat_to_inv, v, tol=1e-10)
@@ -113,7 +113,7 @@ def linear_cv(
 
     log_alpha = np.log(alpha)
 
-    list_beta, list_jac = get_beta_jac_iterdiff(
+    list_beta, list_jac = compute_beta(
         X, y, log_alpha, model, save_iterates=True, tol=tol,
         max_iter=max_iter, compute_jac=compute_jac)
 

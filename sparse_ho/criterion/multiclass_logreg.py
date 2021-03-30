@@ -50,7 +50,8 @@ class LogisticMulticlass():
         self.n_samples, self.n_features = X.shape
 
     def get_val_grad(
-            self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+            self, model, X, y, log_alpha, compute_beta_grad, monitor,
+            tol=1e-3):
         """Get value and gradient of criterion.
 
         Parameters
@@ -63,8 +64,8 @@ class LogisticMulticlass():
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
@@ -114,7 +115,8 @@ class LogisticMulticlass():
         return val, grad
 
     def get_val(
-            self, model, X, y, log_alpha, get_beta_jac_v, monitor, tol=1e-3):
+            self, model, X, y, log_alpha, compute_beta_grad, monitor,
+            tol=1e-3):
         # TODO not the same as for other losses?
         """Get value of criterion.
 
@@ -128,8 +130,8 @@ class LogisticMulticlass():
             Observation vector.
         log_alpha: float or np.array
             Logarithm of hyperparameter.
-        get_beta_jac_v: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+        compute_beta_grad: callable
+            Returns the regression coefficients beta and the hypergradient.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)

@@ -1,10 +1,9 @@
 import numpy as np
 from numpy.linalg import norm
-from scipy.sparse import issparse, csc_matrix
 from numba import njit
+from scipy.sparse.linalg import LinearOperator
 
 from sparse_ho.utils import init_dbeta0_new, ST, sigma, dual_logreg
-
 from sparse_ho.models.base import BaseModel
 
 
@@ -247,8 +246,8 @@ class SparseLogreg(BaseModel):
         return alpha
 
     @staticmethod
-    def _get_jac_t_v(X, y, jac, mask, dense, alphas, v, n_samples):
-        return n_samples * alphas[mask] * np.sign(dense) @ jac
+    def _get_grad(X, y, jac, mask, dense, alphas, v):
+        return alphas[mask] * np.sign(dense) @ jac
 
     def proj_hyperparam(self, X, y, log_alpha):
         """Project hyperparameter on an admissible range of values.
@@ -363,8 +362,10 @@ class SparseLogreg(BaseModel):
         return jac.T @ v(mask, dense)
 
     @staticmethod
-    def get_hessian(X, y, mask, dense, log_alpha):
-        """Compute Hessian of datafit.
+    def get_mat_vec(X, y, mask, dense, log_alpha):
+        """Returns a LinearOperator computing the matrix vector product
+        with the Hessian of datafit. It is necessary to avoid storing a
+        potentially large matrix, and keep advantage of the sparsity of X.
 
         Parameters
         ----------
@@ -380,15 +381,14 @@ class SparseLogreg(BaseModel):
             Logarithm of hyperparameter.
         """
         X_m = X[:, mask]
+        n_samples, size_supp = X_m.shape
         a = y * (X_m @ dense)
-        temp = sigma(a) * (1 - sigma(a))
-        is_sparse = issparse(X)
-        if is_sparse:
-            hessian = csc_matrix(
-                X_m.T.multiply(temp)) @ X_m
-        else:
-            hessian = (X_m.T * temp) @ X_m
-        return hessian
+        grad_sigmoid = sigma(a) * (1 - sigma(a))
+
+        def mv(v):
+            return X_m.T @ (grad_sigmoid * (X_m @ v)) / n_samples
+
+        return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def generalized_supp(self, X, v, log_alpha):
         """Generalized support of iterate.
