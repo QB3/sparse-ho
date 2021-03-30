@@ -65,7 +65,7 @@ class LogisticMulticlass():
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+            Returns the regression coefficient beta and the hypergradient.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
@@ -131,7 +131,7 @@ class LogisticMulticlass():
         log_alpha: float or np.array
             Logarithm of hyperparameter.
         compute_beta_grad: callable
-            Returns the product of the transpoe of the Jacobian and a vector v.
+            Returns the regression coefficient beta and the hypergradient.
         monitor: instance of Monitor.
             Monitor.
         tol: float, optional (default=1e-3)
