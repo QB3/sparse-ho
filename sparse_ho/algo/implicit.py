@@ -13,11 +13,11 @@ class Implicit():
     Parameters
     ----------
     max_iter: int (default=100)
-        Maximum number of iteration for the inner solver
+        Maximum number of iteration for the inner solver.
     max_iter_lin_sys: int (default=100)
-        Maximum number of iteration for the resolution od the linear system
+        Maximum number of iteration for the resolution of the linear system.
     tol_lin_sys: float (default=1e-6)
-        Tolerance for the resolution of the linear system
+        Tolerance for the resolution of the linear system.
     """
 
     def __init__(self, max_iter=100, max_iter_lin_sys=100, tol_lin_sys=1e-6):
@@ -44,16 +44,18 @@ class Implicit():
             A model that follows the sparse_ho API.
         get_v: callable
             Function which return the values of the the vector v.
-        mask0: ndarray, shape (n_features,)
-            Boolean of active active for warm start.
-        dense0: ndarray, shape (n_features,)
-            Initial value of the value on the support for warm start.
+        mask0: ndarray, shape (mask.sum(),)
+            Boolean of active feature of the previous regression coefficient
+            beta for warm start.
+        dense0: ndarray, shape
+            Initial value of the previous regression coefficient
+            beta for warm start.
         quantity_to_warm_start: ndarray
             Previous solution of the linear system.
         max_iter: int
             Maximum number of iteration for the inner solver.
         tol: float
-            The tolerance for the optimization.
+            The tolerance for the inner optimization problem.
         full_jac_v: bool
             ?
         """
@@ -84,22 +86,24 @@ def compute_beta_grad_implicit(
         Observation vector.
     log_alpha: float or np.array, shape (n_features,)
         Logarithm of hyperparameter.
-    mask0: ndarray, shape (n_features,)
-        Boolean of active for warm start
-    dense0: ndarray, shape (n_features,)
-        Initial value of the value on the support for warm start.
+    mask0: ndarray, shape (mask.sum(),)
+        Boolean of active feature of the previous regression coefficient
+        beta for warm start.
+    dense0: ndarray, shape
+        Initial value of the previous regression coefficient
+        beta for warm start.
     tol: float
-        The tolerance for the optimization.
+        The tolerance for the inner optimization problem.
     model:  instance of ``sparse_ho.base.BaseModel``
         A model that follows the sparse_ho API.
     max_iter: int
-        Maximum number of iteration for the inner solver.
+        Maximum number of iterations for the inner solver.
     sol_lin_sys: ndarray
         Previous solution of the linear system for warm start.
     tol_lin_sys: float
         Tolerance for the resolution of the linear system.
     max_iter_lin_sys: int
-        Maximum number of iteration for the resolution od the linear system.
+        Maximum number of iterations for the resolution of the linear system.
     """
     alpha = np.exp(log_alpha)
     mask, dense, _ = compute_beta(
