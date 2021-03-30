@@ -1,0 +1,22 @@
+﻿sparse\_ho.optimizers.GradientDescent
+=====================================
+
+.. currentmodule:: sparse_ho.optimizers
+
+.. autoclass:: GradientDescent
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~GradientDescent.__init__
+   
+   
+
+   
+   
+   

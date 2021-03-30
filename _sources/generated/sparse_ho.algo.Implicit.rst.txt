@@ -1,7 +1,7 @@
-﻿sparse\_ho.Implicit
-===================
+﻿sparse\_ho.algo.Implicit
+========================
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
 .. autoclass:: Implicit
 

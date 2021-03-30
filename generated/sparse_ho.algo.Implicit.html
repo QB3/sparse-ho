@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparse_ho.grad_search &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.algo.Implicit &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -18,8 +18,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sparse_ho.hyperopt_wrapper" href="sparse_ho.hyperopt_wrapper.html" />
-    <link rel="prev" title="sparse_ho.Backward" href="sparse_ho.Backward.html" />
+    <link rel="next" title="sparse_ho.algo.ImplicitForward" href="sparse_ho.algo.ImplicitForward.html" />
+    <link rel="prev" title="sparse_ho.criterion.LogisticMulticlass" href="sparse_ho.criterion.LogisticMulticlass.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -93,40 +93,48 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="sparse-ho-grad-search">
-<h1>sparse_ho.grad_search<a class="headerlink" href="#sparse-ho-grad-search" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="sparse_ho.grad_search">
-<code class="sig-prename descclassname"><span class="pre">sparse_ho.</span></code><code class="sig-name descname"><span class="pre">grad_search</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">algo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monitor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.grad_search" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+  <div class="section" id="sparse-ho-algo-implicit">
+<h1>sparse_ho.algo.Implicit<a class="headerlink" href="#sparse-ho-algo-implicit" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="sparse_ho.algo.Implicit">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.algo.</span></code><code class="sig-name descname"><span class="pre">Implicit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter_lin_sys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_lin_sys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.algo.Implicit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm to compute the hypergradient using implicit differentiation.</p>
+<p>First the algorithm computes the regression coefficients beta, then the
+gradient is computed after resolution of a linear system on the generalized
+support of beta.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>algo: instance of BaseAlgo</strong></dt><dd><p>algorithm used to compute hypergradient.</p>
+<dt><strong>max_iter: int (default=100)</strong></dt><dd><p>Maximum number of iteration for the inner solver.</p>
 </dd>
-<dt><strong>criterion:  instance of BaseCriterion</strong></dt><dd><p>criterion to optimize during hyperparameter optimization
-(outer optimization problem).</p>
+<dt><strong>max_iter_lin_sys: int (default=100)</strong></dt><dd><p>Maximum number of iteration for the resolution of the linear system.</p>
 </dd>
-<dt><strong>model: instance of BaseModel</strong></dt><dd><p>model on which hyperparameter has to be selected
-(inner optimization problem).</p>
-</dd>
-<dt><strong>optimizer: instance of Optimizer</strong></dt><dd><p>optimizer used to minimize the criterion (outer optimization)</p>
-</dd>
-<dt><strong>X: array like of shape (n_samples, n_features)</strong></dt><dd><p>Design matrix.</p>
-</dd>
-<dt><strong>y: array like of shape (n_samples,)</strong></dt><dd><p>Target.</p>
-</dd>
-<dt><strong>alpha0: float</strong></dt><dd><p>initial value of the hyperparameter alpha.</p>
-</dd>
-<dt><strong>monitor: instance of Monitor</strong></dt><dd><p>used to store the value of the cross-validation function.</p>
+<dt><strong>tol_lin_sys: float (default=1e-6)</strong></dt><dd><p>Tolerance for the resolution of the linear system.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt>XXX missing</dt><dd></dd>
 </dl>
-</dd>
-</dl>
+<dl class="py method">
+<dt id="sparse_ho.algo.Implicit.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter_lin_sys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_lin_sys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.algo.Implicit.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.algo.Implicit.__init__" title="sparse_ho.algo.Implicit.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([max_iter, max_iter_lin_sys, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_beta_grad</span></code>(X, y, log_alpha, model, …)</p></td>
+<td><p>Compute beta and the hypergradient, with implicit differentiation.</p></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

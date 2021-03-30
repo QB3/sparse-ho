@@ -1,0 +1,22 @@
+﻿sparse\_ho.optimizers.LineSearch
+================================
+
+.. currentmodule:: sparse_ho.optimizers
+
+.. autoclass:: LineSearch
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LineSearch.__init__
+   
+   
+
+   
+   
+   

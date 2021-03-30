@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>sparse_ho.Forward &#8212; sparse-ho 0.1.dev documentation</title>
+    <title>sparse_ho.optimizers.LineSearch &#8212; sparse-ho 0.1.dev documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
@@ -18,8 +18,8 @@
     <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sparse_ho.Backward" href="sparse_ho.Backward.html" />
-    <link rel="prev" title="sparse_ho.ImplicitForward" href="sparse_ho.ImplicitForward.html" />
+    <link rel="next" title="sparse_ho.utils.Monitor" href="sparse_ho.utils.Monitor.html" />
+    <link rel="prev" title="sparse_ho.optimizers.GradientDescent" href="sparse_ho.optimizers.GradientDescent.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -93,30 +93,33 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="sparse-ho-forward">
-<h1>sparse_ho.Forward<a class="headerlink" href="#sparse-ho-forward" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sparse-ho-optimizers-linesearch">
+<h1>sparse_ho.optimizers.LineSearch<a class="headerlink" href="#sparse-ho-optimizers-linesearch" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="sparse_ho.Forward">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.</span></code><code class="sig-name descname"><span class="pre">Forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.Forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Algorithm to compute the hypergradient using forward differentiation of
-proximal coordinate descent.</p>
-<p>The algorithm jointly and iteratively computes the regression coefficients
-and the Jacobian using forward differentiation of proximal
-coordinate descent.</p>
+<dt id="sparse_ho.optimizers.LineSearch">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">sparse_ho.optimizers.</span></code><code class="sig-name descname"><span class="pre">LineSearch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.optimizers.LineSearch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gradient descent with line search for the outer problem.</p>
+<p>The code is taken from here:
+<a class="reference external" href="https://github.com/fabianp/hoag/blob/master/hoag/hoag.py">https://github.com/fabianp/hoag/blob/master/hoag/hoag.py</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>use_stop_crit: bool, optional (default=True)</strong></dt><dd><p>Use stopping criterion in hypergradient computation. If False,
-run to maximum number of iterations.</p>
+<dt><strong>n_outer: int, optional (default=100).</strong></dt><dd><p>number of maximum updates of alpha.</p>
 </dd>
-<dt><strong>verbose: bool, optional (default=False)</strong></dt><dd><p>Verbosity of the algorithm.</p>
+<dt><strong>verbose: bool, optional (default=False)</strong></dt><dd><p>Verbosity.</p>
+</dd>
+<dt><strong>tolerance_decrease: string, optional (default=”constant”)</strong></dt><dd><p>Tolerance decrease strategy for approximate gradient.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, optional (default=1e-5)</span></dt><dd><p>Tolerance for the inner optimization solver.</p>
+</dd>
+<dt><strong>t_max: float, optional (default=10000)</strong></dt><dd><p>Maximum running time threshold in seconds.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="sparse_ho.Forward.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_stop_crit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.Forward.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="sparse_ho.optimizers.LineSearch.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_decrease</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparse_ho.optimizers.LineSearch.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -127,11 +130,8 @@ run to maximum number of iterations.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.Forward.__init__" title="sparse_ho.Forward.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([use_stop_crit, verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#sparse_ho.optimizers.LineSearch.__init__" title="sparse_ho.optimizers.LineSearch.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([n_outer, verbose, …])</p></td>
 <td><p>Initialize self.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_beta_grad</span></code>(X, y, log_alpha, model, …)</p></td>
-<td><p>Compute beta and hypergradient, with forward differentiation of proximal coordinate descent.</p></td>
 </tr>
 </tbody>
 </table>

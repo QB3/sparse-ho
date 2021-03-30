@@ -1,7 +1,7 @@
-﻿sparse\_ho.Forward
-==================
+﻿sparse\_ho.algo.Forward
+=======================
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
 .. autoclass:: Forward
 

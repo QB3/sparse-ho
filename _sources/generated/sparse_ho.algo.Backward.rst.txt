@@ -1,7 +1,7 @@
-﻿sparse\_ho.Backward
-===================
+﻿sparse\_ho.algo.Backward
+========================
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
 .. autoclass:: Backward
 

@@ -95,7 +95,7 @@
       
   <div class="section" id="api-documentation">
 <span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
+<p><a class="reference internal" href="#module-sparse_ho" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
 <span class="target" id="module-sparse_ho"></span><div class="section" id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.models" title="sparse_ho.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.models</span></code></a>:</p>
@@ -106,22 +106,22 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.ElasticNet.html#sparse_ho.models.ElasticNet" title="sparse_ho.models.ElasticNet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElasticNet</span></code></a>([estimator])</p></td>
-<td><p>Sparse ho ElasticNet model (inner problem)</p></td>
+<td><p>Sparse ho ElasticNet model (inner problem).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.Lasso.html#sparse_ho.models.Lasso" title="sparse_ho.models.Lasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Lasso</span></code></a>([estimator])</p></td>
-<td><p>Linear Model trained with L1 prior as regularizer (aka the Lasso) The optimization objective for Lasso is: (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1</p></td>
+<td><p>Linear Model trained with L1 prior as regularizer (aka the Lasso).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SparseLogreg.html#sparse_ho.models.SparseLogreg" title="sparse_ho.models.SparseLogreg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SparseLogreg</span></code></a>([estimator])</p></td>
 <td><p>Sparse Logistic Regression classifier.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVM.html#sparse_ho.models.SVM" title="sparse_ho.models.SVM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVM</span></code></a>([estimator])</p></td>
-<td><p>The support vector Machine classifier without bias The optimization problem is solved in the dual: 1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i s.t 0 &lt;= r_i &lt;= C</p></td>
+<td><p>Support Vector Machine classifier without bias.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.models.SVR.html#sparse_ho.models.SVR" title="sparse_ho.models.SVR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVR</span></code></a>([estimator])</p></td>
-<td><p>The support vector regression without bias The optimization problem is solved in the dual.</p></td>
+<td><p>The support vector regression without bias.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.models.WeightedLasso.html#sparse_ho.models.WeightedLasso" title="sparse_ho.models.WeightedLasso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WeightedLasso</span></code></a>([estimator])</p></td>
-<td><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso)</p></td>
+<td><p>Linear Model trained with weighted L1 regularizer (aka weighted Lasso).</p></td>
 </tr>
 </tbody>
 </table>
@@ -158,23 +158,23 @@
 </div>
 <div class="section" id="algorithms">
 <h2>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
-<span class="target" id="module-0"></span><table class="longtable docutils align-default">
+<p><a class="reference internal" href="#module-sparse_ho.algo" title="sparse_ho.algo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.algo</span></code></a>:</p>
+<span class="target" id="module-sparse_ho.algo"></span><table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Implicit.html#sparse_ho.Implicit" title="sparse_ho.Implicit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Implicit</span></code></a>([max_iter, max_iter_lin_sys, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Implicit.html#sparse_ho.algo.Implicit" title="sparse_ho.algo.Implicit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Implicit</span></code></a>([max_iter, max_iter_lin_sys, …])</p></td>
 <td><p>Algorithm to compute the hypergradient using implicit differentiation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.ImplicitForward.html#sparse_ho.ImplicitForward" title="sparse_ho.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.algo.ImplicitForward.html#sparse_ho.algo.ImplicitForward" title="sparse_ho.algo.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
 <td><p>Algorithm to compute the hypergradient using implicit forward differentiation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.Forward.html#sparse_ho.Forward" title="sparse_ho.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([use_stop_crit, verbose])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Forward.html#sparse_ho.algo.Forward" title="sparse_ho.algo.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Algorithm to compute the hypergradient using forward differentiation of proximal coordinate descent.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.Backward.html#sparse_ho.Backward" title="sparse_ho.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([use_stop_crit, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Backward.html#sparse_ho.algo.Backward" title="sparse_ho.algo.Backward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Backward</span></code></a>([use_stop_crit, verbose])</p></td>
 <td><p>Algorithm to compute the hypergradient using backward differentiation.</p></td>
 </tr>
 </tbody>
@@ -182,13 +182,22 @@
 </div>
 <div class="section" id="optimizers">
 <h2>Optimizers<a class="headerlink" href="#optimizers" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="#module-1" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
-<span class="target" id="module-1"></span><table class="longtable docutils align-default">
+<p><a class="reference internal" href="#module-sparse_ho.optimizers" title="sparse_ho.optimizers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.optimizers</span></code></a>:</p>
+<span class="target" id="module-sparse_ho.optimizers"></span><table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.Adam.html#sparse_ho.optimizers.Adam" title="sparse_ho.optimizers.Adam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adam</span></code></a>([n_outer, epsilon, lr, beta_1, beta_2, …])</p></td>
+<td><p>ADAM optimizer for the outer problem.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.GradientDescent.html#sparse_ho.optimizers.GradientDescent" title="sparse_ho.optimizers.GradientDescent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientDescent</span></code></a>([n_outer, step_size, …])</p></td>
+<td><p>Gradient descent for the outer problem.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.LineSearch.html#sparse_ho.optimizers.LineSearch" title="sparse_ho.optimizers.LineSearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LineSearch</span></code></a>([n_outer, verbose, …])</p></td>
+<td><p>Gradient descent with line search for the outer problem.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -200,20 +209,6 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.grad_search.html#sparse_ho.grad_search" title="sparse_ho.grad_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grad_search</span></code></a>(algo, criterion, model, …)</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.hyperopt_wrapper.html#sparse_ho.hyperopt_wrapper" title="sparse_ho.hyperopt_wrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hyperopt_wrapper</span></code></a>(algo, criterion, model, X, …)</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
 </tbody>
 </table>
 </div>

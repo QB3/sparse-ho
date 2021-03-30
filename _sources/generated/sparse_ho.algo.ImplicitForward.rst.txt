@@ -1,7 +1,7 @@
-﻿sparse\_ho.ImplicitForward
-==========================
+﻿sparse\_ho.algo.ImplicitForward
+===============================
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
 .. autoclass:: ImplicitForward
 
