@@ -16,9 +16,9 @@ fig_dir_svg = "../../../CD_SUGAR/tex/journal/images/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'PCD Forward Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
-dict_method['sota'] = 'Imp. F. Iterdiff. + Lightning'
+dict_method["forward"] = 'Forward-mode PCD'
+dict_method["implicit"] = 'Implicit diff.'
+dict_method['sota'] = 'Implicit diff. + Lightning'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
@@ -29,13 +29,13 @@ dict_color["grid_search"] = current_palette[3]
 dict_color["backward"] = current_palette[9]
 dict_color["random"] = current_palette[5]
 dict_color["bayesian"] = current_palette[0]
-dict_color["implicit_forward"] = current_palette[2]
+dict_color["implicit"] = current_palette[2]
 dict_color["forward"] = current_palette[4]
 dict_color["sota"] = current_palette[1]
 
 dict_markevery = {}
 dict_markevery["forward"] = 2
-dict_markevery["implicit_forward"] = 1
+dict_markevery["implicit"] = 1
 dict_markevery["backward"] = 3
 dict_markevery["sota"] = 4
 
@@ -46,7 +46,7 @@ dict_div_alphas[100] = "10^2"
 
 dict_markers = {}
 dict_markers["forward"] = 'o'
-dict_markers["implicit_forward"] = 'X'
+dict_markers["implicit"] = 'X'
 dict_markers['sota'] = 'v'
 dict_markers['grid_search'] = 'd'
 dict_markers['bayesian'] = 'P'
@@ -91,7 +91,7 @@ dict_title["real-sim"] = "real-sim"
 # n_points = 5
 # dict_max_iter = {}
 # dict_max_iter["real-sim"] = np.linspace(5, 100, n_points, dtype=np.int)
-methods = ["implicit_forward", "sota", "forward"]
+methods = ["implicit", "sota", "forward"]
 
 list_datasets = ["rcv1_train", "real-sim"]
 

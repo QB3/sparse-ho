@@ -18,10 +18,12 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-32
-methods = ["ground_truth", "forward", "implicit_forward", "sota"]
+methods = ["implicit"]
+# methods = ["implicit", "sota"]
+# methods = ["ground_truth", "forward", "implicit_forward", "sota"]
 # div_alphas = [100]
-dataset_names = ["rcv1_train"]
 # dataset_names = ["real-sim"]
+dataset_names = ["rcv1_train"]
 
 n_points = 10
 dict_max_iter = {}
@@ -55,7 +57,7 @@ def parallel_function(
 
             monitor = Monitor()
             criterion = HeldOutSmoothedHinge(idx_train, idx_val)
-            model = SVM(estimator=None, max_iter=10_000)
+            model = SVM(estimator=None)
 
             if method == "ground_truth":
                 for file in os.listdir("results_svm/"):
@@ -65,7 +67,8 @@ def parallel_function(
                 clf = LinearSVC(
                         C=np.exp(logC), tol=1e-32, max_iter=10_000,
                         loss='hinge', permute=False)
-                algo = Implicit(criterion)
+                algo = Implicit(
+                    criterion, max_iter_lin_sys=1e5, tol_lin_sys=1e-32)
                 model.estimator = clf
                 val, grad = criterion.get_val_grad(
                         model, X, y, logC, algo.compute_beta_grad, tol=1e-14,
@@ -76,14 +79,17 @@ def parallel_function(
                         C=np.exp(logC), loss='hinge', max_iter=max_iter,
                         tol=1e-32, permute=False)
                     model.estimator = clf
-                    algo = ImplicitForward(
-                        tol_jac=1e-32, n_iter_jac=max_iter,
-                        use_stop_crit=False)
+                    algo = Implicit(
+                        max_iter_lin_sys=max_iter, tol_lin_sys=1e-32)
                 elif method == "forward":
                     algo = Forward(use_stop_crit=False)
                 elif method == "implicit_forward":
                     algo = ImplicitForward(
                         tol_jac=1e-8, n_iter_jac=max_iter, use_stop_crit=False)
+                elif method == "implicit":
+                    algo = Implicit(
+                        max_iter_lin_sys=max_iter, tol_lin_sys=1e-32,
+                        max_iter=max_iter)
                 else:
                     raise NotImplementedError
                 algo.max_iter = max_iter
