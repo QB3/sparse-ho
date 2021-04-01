@@ -430,10 +430,10 @@ class SVM(BaseModel):
         res = quadratic_term + linear_term
         return norm(res)
 
-    def _use_estimator(self, X, y, C, tol, max_iter):
+    def _use_estimator(self, X, y, C, tol):
         if self.estimator is None:
             raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(tol=tol, C=C, max_iter=max_iter)
+        self.estimator.set_params(tol=tol, C=C)
         self.estimator.fit(X, y)
         mask = self.estimator.coef_ != 0
         mask = mask[0, :]
