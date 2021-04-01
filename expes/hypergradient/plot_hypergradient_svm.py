@@ -13,30 +13,33 @@ from sparse_ho import ImplicitForward, Implicit
 from sparse_ho import Forward
 from sparse_ho.utils import Monitor
 
+# maxits = [5, 10, 25, 50, 75, 100, 500]
+# maxits = [5, 10, 25, 50]
 # maxits = [5, 10, 25, 50, 75, 100]
 maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
 # maxits = [5, 10, 25, 50, 75, 100, 500, 1000, 5000, 10_000]
-methods = ["forward", "implicit_forward", "sota"]
+methods = ["forward", "implicit", "sota"]
 
 dict_label = {}
 dict_label["forward"] = "forward"
 dict_label["implicit_forward"] = "Implicit"
+dict_label["implicit"] = "Implicit"
 dict_label["sota"] = "Implicit + sota"
 
 
 # logC = np.log(10000)
-logC = np.log(0.0008)
-# logC = np.log(0.15)
+logC = np.log(1.5)
+# logC = np.log(1e-9)
 
 tol = 1e-32
 
-dataset_name = "gisette"
+# dataset_name = "gisette"
 # dataset_name = "covtype"
-# dataset_name = "rcv1_train"
+dataset_name = "rcv1_train"
 # dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)
 y[y == 2] = -1  # for covtype
-X = X[:, :100]
+X = X[:, :1000]
 X = csr_matrix(X)  # very important for SVM
 my_bool = norm(X, axis=1) != 0
 X = X[my_bool, :]
@@ -52,13 +55,13 @@ idx_val = idx_val[0]
 
 true_monitor = Monitor()
 clf = LinearSVC(
-        C=np.exp(logC), tol=1e-32, max_iter=1_000, loss='hinge',
+        C=np.exp(logC), tol=1e-32, max_iter=30_000, loss='hinge',
         permute=False, verbose=True)
 criterion = HeldOutSmoothedHinge(idx_train, idx_val)
-algo = Implicit(criterion)
+algo = Implicit(criterion, tol_lin_sys=1e-32, max_iter_lin_sys=1000)
 model = SVM(estimator=clf)
 true_val, true_grad = criterion.get_val_grad(
-        model, X, y, logC, algo.compute_beta_grad, tol=1e-14,
+        model, X, y, logC, algo.compute_beta_grad, tol=1e-16,
         monitor=true_monitor, max_iter=10_000)
 
 dict_res = {}
@@ -67,18 +70,21 @@ for max_iter in maxits:
         print("Dataset %s, maxit %i" % (method, max_iter))
         for i in range(2):
             monitor = Monitor()
-            model = SVM(max_iter=max_iter)
+            model = SVM()
             criterion = HeldOutSmoothedHinge(idx_train, idx_val)
             if method == "sota":
                 clf = LinearSVC(
                     C=np.exp(logC), loss='hinge', max_iter=max_iter, tol=1e-32,
                     permute=False)
                 model.estimator = clf
-                algo = ImplicitForward(
-                    tol_jac=1e-32, n_iter_jac=max_iter, use_stop_crit=False)
+                algo = Implicit(
+                    max_iter=max_iter, max_iter_lin_sys=max_iter,
+                    tol_lin_sys=1e-32)
+                # algo = ImplicitForward(
+                #     tol_jac=1e-32, n_iter_jac=max_iter, use_stop_crit=False)
                 algo.max_iter = max_iter
                 val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.compute_beta_grad, tol=1e-12,
+                        model, X, y, logC, algo.compute_beta_grad, tol=1e-32,
                         monitor=monitor, max_iter=max_iter)
             else:
                 if method == "forward":
@@ -88,7 +94,7 @@ for max_iter in maxits:
                         tol_jac=1e-8, n_iter_jac=max_iter, max_iter=max_iter,
                         use_stop_crit=False)
                 elif method == "implicit":
-                    algo = Implicit(max_iter=1000)
+                    algo = Implicit(max_iter=max_iter, tol_lin_sys=1e-32)
                 else:
                     raise NotImplementedError
                 algo.max_iter = max_iter
