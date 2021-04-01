@@ -15,17 +15,18 @@ from sparse_ho.utils import Monitor
 
 
 tol = 1e-32
-methods = ["ground_truth"]
+# methods = ["implicit"]
+methods = ["celer"]
 div_alphas = [100]
 dataset_names = ["news20"]
-rep = 10
+n_points = 10
 dict_maxits = {}
-dict_maxits[("real-sim", 10)] = np.linspace(5, 50, rep, dtype=np.int)
-dict_maxits[("real-sim", 100)] = np.linspace(5, 200, rep, dtype=np.int)
-dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, rep, dtype=np.int)
-dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, rep, dtype=np.int)
-dict_maxits[("news20", 10)] = np.linspace(5, 1000, rep, dtype=np.int)
-dict_maxits[("news20", 100)] = np.linspace(5, 2500, rep, dtype=np.int)
+dict_maxits[("real-sim", 10)] = np.linspace(5, 50, n_points, dtype=np.int)
+dict_maxits[("real-sim", 100)] = np.linspace(5, 200, n_points, dtype=np.int)
+dict_maxits[("rcv1_train", 10)] = np.linspace(5, 150, n_points, dtype=np.int)
+dict_maxits[("rcv1_train", 100)] = np.linspace(5, 1000, n_points, dtype=np.int)
+dict_maxits[("news20", 10)] = np.linspace(5, 1000, n_points, dtype=np.int)
+dict_maxits[("news20", 100)] = np.linspace(5, 2500, n_points, dtype=np.int)
 
 
 def parallel_function(
@@ -35,9 +36,9 @@ def parallel_function(
     if dataset_name == "news20" and div_alpha == 100:
         rng = np.random.RandomState(42)
         y += rng.randn(n_samples) * 0.01
-    for maxit in dict_maxits[(dataset_name, div_alpha)]:
-        print("Dataset %s, maxit %i" % (method, maxit))
-        for i in range(2):
+    for max_iter in dict_maxits[(dataset_name, div_alpha)]:
+        print("Dataset %s, max_iter %i" % (method, max_iter))
+        for i in range(2):  # TODO to change this
             rng = np.random.RandomState(i)
             idx_train = rng.choice(n_samples, n_samples//2, replace=False)
             idx = np.arange(0, n_samples)
@@ -49,15 +50,17 @@ def parallel_function(
             if method == "celer":
                 clf = Lasso_celer(
                     alpha=np.exp(log_alpha), fit_intercept=False,
-                    tol=1e-12, max_iter=maxit)
-                model = Lasso(estimator=clf, max_iter=maxit)
+                    tol=1e-12, max_epochs=max_iter)
+                model = Lasso(estimator=clf)
                 criterion = HeldOutMSE(idx_train, idx_val)
-                algo = ImplicitForward(
-                    tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
-                algo.max_iter = maxit
+                algo = Implicit(
+                    tol_lin_sys=1e-32, max_iter_lin_sys=max_iter)
+                # algo = ImplicitForward(
+                #     tol_jac=1e-32, n_iter_jac=max_iter, use_stop_crit=False)
+                algo.max_iter = max_iter
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-12,
-                        monitor=monitor, max_iter=maxit)
+                        model, X, y, log_alpha, algo.compute_beta_grad,
+                        tol=1e-12, monitor=monitor, max_iter=max_iter)
             elif method == "ground_truth":
                 for file in os.listdir("results/"):
                     if file.startswith(
@@ -66,44 +69,48 @@ def parallel_function(
                         return
                 clf = Lasso_celer(
                         alpha=np.exp(log_alpha), fit_intercept=False,
-                        warm_start=True, tol=1e-14, max_iter=10000)
+                        warm_start=True, tol=1e-14)
                 criterion = HeldOutMSE(idx_train, idx_val)
                 if dataset_name == "news20":
-                    algo = ImplicitForward(tol_jac=1e-11, n_iter_jac=100000)
+                    algo = ImplicitForward(
+                        tol_jac=1e-11, n_iter_jac=100000,
+                        max_iter=max_iter)
                 else:
                     algo = Implicit(criterion)
-                model = Lasso(estimator=clf, max_iter=10000)
+                model = Lasso(estimator=clf)
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-14,
-                        monitor=monitor)
+                        model, X, y, log_alpha, algo.compute_beta_grad,
+                        tol=1e-14, monitor=monitor)
             else:
-                model = Lasso(max_iter=maxit)
+                model = Lasso()
                 criterion = HeldOutMSE(idx_train, idx_val)
                 if method == "forward":
                     algo = Forward(use_stop_crit=False)
                 elif method == "implicit_forward":
                     algo = ImplicitForward(
-                        tol_jac=1e-8, n_iter_jac=maxit, use_stop_crit=False)
+                        tol_jac=1e-8, n_iter_jac=max_iter, use_stop_crit=False,
+                        max_iter=max_iter)
                 elif method == "implicit":
-                    algo = Implicit(max_iter=1000)
+                    algo = Implicit(
+                        max_iter_lin_sys=max_iter, max_iter=max_iter)
                 elif method == "backward":
                     algo = Backward()
                 else:
                     raise NotImplementedError
-                algo.max_iter = maxit
+                algo.max_iter = max_iter
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(
                         model, X, y, log_alpha, algo.compute_beta_grad, tol=tol,
-                        monitor=monitor, max_iter=maxit)
+                        monitor=monitor, max_iter=max_iter)
 
         results = (
-            dataset_name, div_alpha, method, maxit,
+            dataset_name, div_alpha, method, max_iter,
             val, grad, monitor.times[0])
         df = pandas.DataFrame(results).transpose()
         df.columns = [
-            'dataset', 'div_alpha', 'method', 'maxit', 'val', 'grad', 'time']
+            'dataset', 'div_alpha', 'method', 'max_iter', 'val', 'grad', 'time']
         str_results = "results/hypergradient_%s_%i_%s_%i.pkl" % (
-            dataset_name, div_alpha, method, maxit)
+            dataset_name, div_alpha, method, max_iter)
         df.to_pickle(str_results)
 
 
