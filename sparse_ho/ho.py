@@ -58,14 +58,12 @@ def grad_search(
 
 
 def hyperopt_wrapper(
-        algo, criterion, model, X, y, alpha_min, alpha_max, monitor,
+        criterion, model, X, y, alpha_min, alpha_max, monitor,
         max_evals=50, tol=1e-5, random_state=42, t_max=100_000,
         method='bayesian', size_space=1):
     """
     Parameters
     ----------
-    algo: instance of BaseAlgo
-        algorithm used to compute hypergradient.
     criterion:  instance of BaseCriterion
         criterion to optimize during hyperparameter optimization
         (outer optimization problem).

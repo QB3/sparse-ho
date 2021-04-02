@@ -23,7 +23,7 @@ def plot_legend_apart(ax, figname, ncol=None, figwidth=10.67, fontsize=18):
     don't call plt.legend() at the end but this instead"""
     if ncol is None:
         ncol = len(ax.lines)
-    fig = plt.figure(figsize=(10.67, 3.5), constrained_layout=True)
+    fig = plt.figure(figsize=(figwidth, 3.5), constrained_layout=True)
     fig.legend(ax.lines, [line.get_label() for line in ax.lines], ncol=ncol,
                loc="upper center", fontsize=18)
     # fig = plt.figure(figsize=(30, 4), constrained_layout=True)
@@ -75,6 +75,8 @@ def round_up(n, decimals=0):
 
 dict_color_2Dplot = {
     'implicit_forward': 'Greens',
+    'implicit': 'Greens',
+    'implicit_approx': 'Greens',
     'implicit_forward_approx': 'Greens',
     'grid_search': 'Oranges',
     'random': 'Purples',
@@ -90,13 +92,15 @@ dict_color["bayesian"] = current_palette[0]
 dict_color["implicit_forward"] = current_palette[2]
 dict_color["implicit_forward_approx"] = current_palette[2]
 dict_color["forward"] = current_palette[4]
-dict_color["implicit"] = current_palette[1]
+dict_color["implicit"] = current_palette[2]
+dict_color["implicit_approx"] = current_palette[2]
 
 dict_method = {}
 dict_method["forward"] = 'F. Iterdiff.'
-dict_method["implicit_forward"] = '1st order'
-dict_method["implicit_forward_approx"] = '1st order approx'
-dict_method['implicit'] = 'Implicit'
+dict_method["implicit_forward"] = '1st-order'
+dict_method["implicit_forward_approx"] = '1st-order approx'
+dict_method["implicit_approx"] = '1st-order approx'
+dict_method['implicit'] = '1st-order'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
@@ -106,7 +110,9 @@ dict_method['backward'] = 'B. Iterdiff.'
 dict_markers = {}
 dict_markers["implicit_forward"] = 'X'
 dict_markers["implicit_forward_approx"] = 'x'
-dict_markers['implicit'] = 'v'
+dict_markers["implicit"] = 'X'
+dict_markers["implicit_approx"] = 'x'
+dict_markers['implicit'] = 'X'
 dict_markers['grid_search'] = '3'
 # dict_markers['grid_search'] = 'o'
 dict_markers['bayesian'] = 'P'
