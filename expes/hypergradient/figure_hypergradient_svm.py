@@ -2,7 +2,6 @@ import numpy as np
 import pandas
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 
 from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 from main_hypergradient_svm import dict_max_iter
@@ -18,7 +17,7 @@ current_palette = sns.color_palette("colorblind")
 dict_method = {}
 dict_method["forward"] = 'Forward-mode PCD'
 dict_method["implicit"] = 'Implicit diff.'
-dict_method['sota'] = 'Implicit diff. + Lightning'
+dict_method['sota'] = r'Implicit diff. + \texttt{Lightning}'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
@@ -79,7 +78,7 @@ epoch_lims["rcv1_train", 5] = 990
 ##############################################
 dict_xlim = {}
 dict_xlim["rcv1_train"] = 60
-dict_xlim["real-sim"] = 4
+dict_xlim["real-sim"] = 37
 ##############################################
 
 dict_title = {}
@@ -101,7 +100,6 @@ fig, axarr = plt.subplots(
     figsize=[10.67, 3])
 
 for idx1, dataset_name in enumerate(list_datasets):
-    all_max_iter = dict_max_iter[dataset_name]
 
     str_results = "results_svm/hypergradient_svm_%s_%s_%i.pkl" % (
         dataset_name, 'ground_truth', 5)
@@ -109,6 +107,7 @@ for idx1, dataset_name in enumerate(list_datasets):
     true_grad = df_data['grad'].to_numpy()[0]
 
     for method in methods:
+        all_max_iter = dict_max_iter[dataset_name, method]
         grads = np.zeros(len(all_max_iter))
         times = np.zeros(len(all_max_iter))
         for i, max_iter in enumerate(all_max_iter):
@@ -117,6 +116,7 @@ for idx1, dataset_name in enumerate(list_datasets):
             df_data = pandas.read_pickle(str_results)
             grads[i] = df_data['grad'].to_numpy()[0]
             times[i] = df_data['time'].to_numpy()[0]
+        # import ipdb; ipdb.set_trace()
         axarr[idx1].semilogy(
             times, np.abs(grads - true_grad), label=dict_method[method],
             color=dict_color[method], marker="o")

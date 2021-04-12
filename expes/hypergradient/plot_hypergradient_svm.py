@@ -15,10 +15,11 @@ from sparse_ho.utils import Monitor
 
 # maxits = [5, 10, 25, 50, 75, 100, 500]
 # maxits = [5, 10, 25, 50]
-# maxits = [5, 10, 25, 50, 75, 100]
-maxits = [5, 10, 25, 50, 75, 100, 500, 1000]
+maxits = [5, 10, 25, 50, 75, 100]
+# maxits = [5, 25, 50, 75, 100, 200, 300, 400]
 # maxits = [5, 10, 25, 50, 75, 100, 500, 1000, 5000, 10_000]
-methods = ["forward", "implicit", "sota"]
+methods = ["sota"]
+# methods = ["forward", "implicit", "sota"]
 
 dict_label = {}
 dict_label["forward"] = "forward"
@@ -28,18 +29,19 @@ dict_label["sota"] = "Implicit + sota"
 
 
 # logC = np.log(10000)
-logC = np.log(1.5)
+# logC = np.log(1.5)
+logC = np.log(0.2)
 # logC = np.log(1e-9)
 
 tol = 1e-32
 
 # dataset_name = "gisette"
 # dataset_name = "covtype"
-dataset_name = "rcv1_train"
-# dataset_name = "real-sim"
+# dataset_name = "rcv1_train"
+dataset_name = "real-sim"
 X, y = fetch_libsvm(dataset_name)
-y[y == 2] = -1  # for covtype
-X = X[:, :1000]
+# y[y == 2] = -1  # for covtype
+# X = X[:, :2000]
 X = csr_matrix(X)  # very important for SVM
 my_bool = norm(X, axis=1) != 0
 X = X[my_bool, :]
@@ -83,9 +85,9 @@ for max_iter in maxits:
                 # algo = ImplicitForward(
                 #     tol_jac=1e-32, n_iter_jac=max_iter, use_stop_crit=False)
                 algo.max_iter = max_iter
-                val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.compute_beta_grad, tol=1e-32,
-                        monitor=monitor, max_iter=max_iter)
+                # val, grad = criterion.get_val_grad(
+                #         model, X, y, logC, algo.compute_beta_grad, tol=1e-32,
+                #         monitor=monitor, max_iter=max_iter)
             else:
                 if method == "forward":
                     algo = Forward(use_stop_crit=False)
@@ -99,16 +101,16 @@ for max_iter in maxits:
                     raise NotImplementedError
                 algo.max_iter = max_iter
                 algo.use_stop_crit = False
-                val, grad = criterion.get_val_grad(
-                        model, X, y, logC, algo.compute_beta_grad, tol=tol,
-                        monitor=monitor, max_iter=max_iter)
+            val, grad = criterion.get_val_grad(
+                    model, X, y, logC, algo.compute_beta_grad, tol=tol,
+                    monitor=monitor, max_iter=max_iter)
 
         dict_res[method, max_iter] = (
             dataset_name, logC, method, max_iter,
             val, grad, monitor.times[0])
 
 fig_time, ax_time = plt.subplots()
-fig_iter, ax_iter = plt.subplots()
+# fig_iter, ax_iter = plt.subplots()
 
 for method in methods:
     grads = np.zeros(len(maxits))
@@ -120,16 +122,16 @@ for method in methods:
     ax_time.semilogy(
         times, np.abs(grads - true_grad), label=dict_label[method])
 
-    ax_iter.semilogy(
-        maxits, np.abs(grads - true_grad), label=dict_label[method])
+    # ax_iter.semilogy(
+    #     maxits, np.abs(grads - true_grad), label=dict_label[method])
 
 ax_time.set_xlabel("Time (s)")
 ax_time.set_ylabel("Grad - Grad Opt")
 ax_time.legend()
 
-ax_iter.set_xlabel("Iteration")
-ax_iter.set_ylabel("Grad - Grad Opt")
-ax_iter.legend()
+# ax_iter.set_xlabel("Iteration")
+# ax_iter.set_ylabel("Grad - Grad Opt")
+# ax_iter.legend()
 
-fig_iter.show()
+# fig_iter.show()
 fig_time.show()
