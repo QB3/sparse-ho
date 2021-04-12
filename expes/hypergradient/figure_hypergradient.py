@@ -8,8 +8,8 @@ from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 configure_plt()
 fontsize = 18
 
-save_fig = False
-# save_fig = True
+# save_fig = False
+save_fig = True
 
 fig_dir = "results/"
 fig_dir_svg = "results/"
@@ -91,7 +91,7 @@ time_lims["colon", 25] = (1e-1, 100)
 
 dict_title = {}
 dict_title["rcv1_train"] = "rcv1"
-dict_title["news20"] = "20news"
+dict_title["news20"] = "news20"
 dict_title["colon"] = "colon"
 dict_title["real-sim"] = "real-sim"
 
