@@ -5,8 +5,8 @@
 import os
 import numpy as np
 
-from sklearn.linear_model import Lasso, ElasticNet
-from celer import LogisticRegression
+from sklearn.linear_model import Lasso, ElasticNet, LogisticRegression
+# from celer import LogisticRegression
 from sklearn import datasets
 from sklearn.svm import l1_min_c
 # load diabetes dataset for regression model
@@ -45,11 +45,13 @@ dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 dict_alpha_max = {}
 dict_alpha_max["lasso"] = np.max(
         np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
+# dict_alpha_max["logreg"] = np.max(
+#         np.abs(dict_X["logreg"].T.dot(dict_y["logreg"]))) / 2
 dict_alpha_max["logreg"] = 1 / l1_min_c(
     dict_X['logreg'], dict_y['logreg'], fit_intercept=False, loss='log')
 dict_alpha_max["enet"] = dict_alpha_max["lasso"]
 # Setting grid of values for alpha
-n_alphas = 100
+n_alphas = 20
 p_alpha_min = 1e-5
 p_alphas = np.geomspace(1, p_alpha_min, n_alphas)
 
@@ -60,7 +62,8 @@ for name_model in name_models:
     coefs = []
 
     print("Starting path computation for ", name_model)
-    for alpha in alphas:
+    for i, alpha in enumerate(alphas):
+        print("%i / %i iteration" % (i+1, len(alphas)))
         if name_model == "lasso":
             dict_models[name_model].set_params(alpha=alpha)
         elif name_model == "enet":
