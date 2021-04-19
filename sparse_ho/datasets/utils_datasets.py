@@ -10,7 +10,16 @@ import pandas as pd
 
 
 def get_splits(X, y, train_size=0.333):
-    """TODO"""
+    """
+    Parameters
+    ----------
+    X: array-like, shape (n_samples, n_features)
+        Design matrix.
+    y: ndarray, shape (n_samples,)
+        Observation vector.
+    train_size: float
+        Proportion of the dataset to be used for the training
+    """
 
     idx_train, idx = train_test_split(
         np.arange(len(y)), stratify=y, train_size=train_size)
@@ -21,7 +30,22 @@ def get_splits(X, y, train_size=0.333):
 
 
 def clean_dataset(X, y, n_samples, n_features, seed=0):
-    """TODO"""
+    """Reduce the number of features and / or samples.
+    And remove lines or columns with only 0.
+
+    Parameters
+    ----------
+    X: array-like, shape (n_samples, n_features)
+        Design matrix.
+    y: ndarray, shape (n_samples,)
+        Observation vector.
+    n_samples: int
+        Number of samples to keep
+    n_features: int
+        Number of features to keep
+    seed: int
+        Seed for the random selection of the samples or features
+    """
     np.random.seed(seed)
     idx = np.random.choice(
         X.shape[0], min(n_samples, X.shape[0]), replace=False)
@@ -53,7 +77,14 @@ def clean_dataset(X, y, n_samples, n_features, seed=0):
 
 
 def alpha_max_multiclass(X, y):
-    """TODO"""
+    """
+    Parameters
+    ----------
+    X: array-like, shape (n_samples, n_features)
+        Design matrix.
+    y: ndarray, shape (n_samples,)
+        Observation vector.
+    """
     ypd = pd.DataFrame(y)
     one_hot_code = OneHotEncoder(sparse=False).fit_transform(ypd)
     n_classes = one_hot_code.shape[1]
