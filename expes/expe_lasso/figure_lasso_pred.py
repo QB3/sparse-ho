@@ -33,9 +33,7 @@ dict_marker_size['random'] = 5
 dict_marker_size['lhs'] = 4
 
 dict_s = {}
-dict_s["implicit_forward"] = 100
 dict_s["implicit"] = 100
-dict_s["implicit_forward_approx"] = 60
 dict_s["implicit_approx"] = 60
 dict_s['grid_search'] = 60
 dict_s['bayesian'] = 60

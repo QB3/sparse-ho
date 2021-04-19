@@ -108,14 +108,14 @@ for idx1, dataset_name in enumerate(list_datasets):
 
     for method in methods:
         all_max_iter = dict_max_iter[dataset_name, method]
-        grads = np.zeros(len(all_max_iter))
-        times = np.zeros(len(all_max_iter))
+        grads = np.zeros(len(all_max_iter) + 1)
+        times = np.zeros(len(all_max_iter) + 1)
         for i, max_iter in enumerate(all_max_iter):
             str_results = "results_svm/hypergradient_svm_%s_%s_%i.pkl" % (
                 dataset_name, method, max_iter)
             df_data = pandas.read_pickle(str_results)
-            grads[i] = df_data['grad'].to_numpy()[0]
-            times[i] = df_data['time'].to_numpy()[0]
+            grads[i + 1] = df_data['grad'].to_numpy()[0]
+            times[i + 1] = df_data['time'].to_numpy()[0]
         # import ipdb; ipdb.set_trace()
         axarr[idx1].semilogy(
             times, np.abs(grads - true_grad), label=dict_method[method],
@@ -123,7 +123,7 @@ for idx1, dataset_name in enumerate(list_datasets):
 
         axarr[idx1].set_title(dict_title[dataset_name], fontsize=fontsize)
         axarr[idx1].set_xlabel("Time (s)", fontsize=fontsize)
-        axarr[idx1].set_ylim((1e-14, 1e-2))
+        axarr[idx1].set_ylim((1e-14, 1e-1))
         axarr[idx1].set_xlim((0, dict_xlim[dataset_name]))
 
 fig.tight_layout()
