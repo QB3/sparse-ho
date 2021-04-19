@@ -38,7 +38,7 @@ dataset = 'rcv1'
 # dataset = 'simu'
 
 if dataset == 'rcv1':
-    X, y = fetch_libsvm('rcv1_train')
+    X, y = fetch_libsvm('rcv1.binary')
 else:
     X, y, _ = make_correlated_data(n_samples=1000, n_features=2000,
                                    random_state=0)
