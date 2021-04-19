@@ -56,7 +56,7 @@ for sparse logistic regression using a held-out test set.
 
     print(__doc__)
 
-    dataset = 'rcv1_train'
+    dataset = 'rcv1.binary'
     # dataset = 'simu'
 
     if dataset != 'simu':
@@ -120,7 +120,7 @@ for sparse logistic regression using a held-out test set.
     /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'crest_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
 
-    Dataset: rcv1_train
+    Dataset: rcv1.binary
 
 
 
@@ -279,7 +279,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.731 seconds)
+   **Total running time of the script:** ( 0 minutes  4.652 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_compare_optimizers.py:

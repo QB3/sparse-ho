@@ -60,7 +60,7 @@ for a Lasso using a full cross-validation score.
     dataset = 'simu'
 
     if dataset == 'rcv1':
-        X, y = fetch_libsvm('rcv1_train')
+        X, y = fetch_libsvm('rcv1.binary')
     else:
         X, y = make_regression(
             n_samples=500, n_features=1000, noise=40,
@@ -125,7 +125,7 @@ Cross-validation with scikit-learn
 
     scikit started
     [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   14.0s finished
+    ..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   11.7s finished
     scikit finished
 
 
@@ -233,8 +233,8 @@ Plot results
 
  .. code-block:: none
 
-    Time for grid search: 14.03 s
-    Time for grad search (sparse-ho): 2.00 s
+    Time for grid search: 11.72 s
+    Time for grad search (sparse-ho): 1.79 s
     Minimum outer criterion value with grid search: 1938.13556
     Minimum outer criterion value with grad search: 1937.83528
     /home/circleci/project/examples/plot_lassoCV.py:116: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
@@ -246,7 +246,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  16.420 seconds)
+   **Total running time of the script:** ( 0 minutes  13.922 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_lassoCV.py:

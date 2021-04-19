@@ -56,7 +56,7 @@ for sparse logistic regression using a held-out test set.
 
     print(__doc__)
 
-    dataset = 'rcv1_train'
+    dataset = 'rcv1.binary'
     # dataset = 'simu'
 
     if dataset != 'simu':
@@ -121,7 +121,7 @@ for sparse logistic regression using a held-out test set.
     /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'crest_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
 
-    Dataset: rcv1_train
+    Dataset: rcv1.binary
     Starting path computation...
 
 
@@ -269,7 +269,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 2.80 s
+    Time to compute grad search: 2.51 s
     /home/circleci/project/examples/plot_sparse_log_reg.py:128: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
       plt.plot(
 
@@ -279,7 +279,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.091 seconds)
+   **Total running time of the script:** ( 0 minutes  4.744 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:

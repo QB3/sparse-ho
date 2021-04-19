@@ -131,7 +131,7 @@ for an elastic-net using a held-out validation set.</p>
 <span class="n">dataset</span> <span class="o">=</span> <span class="s1">&#39;simu&#39;</span>
 
 <span class="k">if</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;rcv1&#39;</span><span class="p">:</span>
-    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <span class="n">fetch_libsvm</span><span class="p">(</span><span class="s1">&#39;rcv1_train&#39;</span><span class="p">)</span>
+    <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">=</span> <span class="n">fetch_libsvm</span><span class="p">(</span><span class="s1">&#39;rcv1.binary&#39;</span><span class="p">)</span>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">-=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a> <span class="o">/=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.linalg.html#numpy.linalg.norm" title="numpy.linalg.norm" class="sphx-glr-backref-module-numpy-linalg sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">y</span></a><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
@@ -241,8 +241,8 @@ Iteration 7/10 ||Value outer criterion: 2.30e+01 ||norm grad 1.45e+00
 Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
 Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
 Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
-Time grid search 9.968313
-Time grad-search 2.700800
+Time grid search 9.958134
+Time grad-search 2.345262
 Minimum grid search 2.258e+01
 Minimum grad search 2.257e+01
 </pre></div>
@@ -278,7 +278,7 @@ Minimum grad search 2.257e+01
 </pre></div>
 </div>
 <img alt="Elastic net held out prediction loss on test set" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_enet_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.450 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.986 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-enet-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3e228e68f223f1a9a886e27642bdca40/plot_held_out_enet.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_enet.py</span></code></a></p>
@@ -304,7 +304,7 @@ Minimum grad search 2.257e+01
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.3.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
     </p>
   </div>
 </footer>
