@@ -34,7 +34,7 @@ from sparse_ho.optimizers import LineSearch, GradientDescent, Adam
 
 print(__doc__)
 
-dataset = 'rcv1_train'
+dataset = 'rcv1.binary'
 # dataset = 'simu'
 
 if dataset != 'simu':

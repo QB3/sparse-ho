@@ -35,7 +35,7 @@ print(__doc__)
 dataset = 'simu'
 
 if dataset == 'rcv1':
-    X, y = fetch_libsvm('rcv1_train')
+    X, y = fetch_libsvm('rcv1.binary')
 else:
     X, y = make_regression(
         n_samples=1000, n_features=1000, noise=40, random_state=0)

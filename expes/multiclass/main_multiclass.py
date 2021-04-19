@@ -8,7 +8,8 @@ from celer import LogisticRegression
 from sparse_ho.models import SparseLogreg
 from sparse_ho.ho import grad_search, hyperopt_wrapper
 from sparse_ho.implicit_forward import ImplicitForward
-from sparse_ho.utils_datasets import clean_dataset, get_alpha_max, get_splits
+from sparse_ho.utils_datasets import (clean_dataset, alpha_max_multiclass,
+                                      get_splits)
 from sparse_ho.utils import Monitor
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho.optimizers import LineSearch
@@ -78,7 +79,7 @@ def parallel_function(
     # t_max = 3600
 
     X, y = clean_dataset(X, y, n_samples, n_features)
-    alpha_max, n_classes = get_alpha_max(X, y)
+    alpha_max, n_classes = alpha_max_multiclass(X, y)
     log_alpha_max = np.log(alpha_max)  # maybe to change alpha max value
 
     algo = ImplicitForward(None, n_iter_jac=2000)
