@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Lasso with Cross-validation &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -22,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -96,7 +97,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-lassocv-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="lasso-with-cross-validation">
+<section class="sphx-glr-example-title" id="lasso-with-cross-validation">
 <span id="sphx-glr-auto-examples-plot-lassocv-py"></span><h1>Lasso with Cross-validation<a class="headerlink" href="#lasso-with-cross-validation" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to perform hyperparameter optimization
 for a Lasso using a full cross-validation score.</p>
@@ -152,7 +153,7 @@ for a Lasso using a full cross-validation score.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting path computation...
 </pre></div>
 </div>
-<div class="section" id="cross-validation-with-scikit-learn">
+<section id="cross-validation-with-scikit-learn">
 <h2>Cross-validation with scikit-learn<a class="headerlink" href="#cross-validation-with-scikit-learn" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;scikit started&#39;</span><span class="p">)</span>
 
@@ -169,12 +170,12 @@ for a Lasso using a full cross-validation score.</p>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>scikit started
 [Parallel(n_jobs=1)]: Using backend SequentialBackend with 1 concurrent workers.
-..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   11.7s finished
+..................................................[Parallel(n_jobs=1)]: Done   5 out of   5 | elapsed:   22.0s finished
 scikit finished
 </pre></div>
 </div>
-</div>
-<div class="section" id="now-do-the-hyperparameter-optimization-with-implicit-differentiation">
+</section>
+<section id="now-do-the-hyperparameter-optimization-with-implicit-differentiation">
 <h2>Now do the hyperparameter optimization with implicit differentiation<a class="headerlink" href="#now-do-the-hyperparameter-optimization-with-implicit-differentiation" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">linear_model</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                        <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
@@ -203,8 +204,8 @@ scikit finished
 sparse-ho finished
 </pre></div>
 </div>
-</div>
-<div class="section" id="plot-results">
+</section>
+<section id="plot-results">
 <h2>Plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">objs</span></a> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">mse_path_</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -240,17 +241,16 @@ sparse-ho finished
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="plot lassoCV" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_lassoCV_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time for grid search: 11.72 s
-Time for grad search (sparse-ho): 1.79 s
+<img src="../_images/sphx_glr_plot_lassoCV_001.png" srcset="../_images/sphx_glr_plot_lassoCV_001.png" alt="plot lassoCV" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Time for grid search: 22.03 s
+Time for grad search (sparse-ho): 1.25 s
 Minimum outer criterion value with grid search: 1938.13556
 Minimum outer criterion value with grad search: 1937.83528
 /home/circleci/project/examples/plot_lassoCV.py:116: UserWarning: color is redundantly defined by the &#39;color&#39; keyword argument and the fmt string &quot;bo&quot; (-&gt; color=&#39;b&#39;). The keyword argument will take precedence.
   ax.plot(
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.922 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.910 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-lassocv-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/96ab415ed013f843e51c365fe008248c/plot_lassoCV.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_lassoCV.py</span></code></a></p>
@@ -260,8 +260,8 @@ Minimum outer criterion value with grad search: 1937.83528
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -276,7 +276,7 @@ Minimum outer criterion value with grad search: 1937.83528
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

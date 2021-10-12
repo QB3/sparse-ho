@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>API Documentation &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/style.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -24,9 +25,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -93,10 +94,10 @@
   <div class="row">
     <div class="body col-md-12 content" role="main">
       
-  <div class="section" id="api-documentation">
+  <section id="api-documentation">
 <span id="id1"></span><h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference internal" href="#module-sparse_ho" title="sparse_ho"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho</span></code></a>:</p>
-<span class="target" id="module-sparse_ho"></span><div class="section" id="models">
+<span class="target" id="module-sparse_ho"></span><section id="models">
 <h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.models" title="sparse_ho.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.models</span></code></a>:</p>
 <span class="target" id="module-sparse_ho.models"></span><table class="longtable docutils align-default">
@@ -125,8 +126,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="criterion">
+</section>
+<section id="criterion">
 <h2>Criterion<a class="headerlink" href="#criterion" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.criterion" title="sparse_ho.criterion"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.criterion</span></code></a>:</p>
 <span class="target" id="module-sparse_ho.criterion"></span><table class="longtable docutils align-default">
@@ -138,7 +139,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.CrossVal.html#sparse_ho.criterion.CrossVal" title="sparse_ho.criterion.CrossVal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CrossVal</span></code></a>(criterion[, cv])</p></td>
 <td><p>Cross-validation loss.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.FiniteDiffMonteCarloSure.html#sparse_ho.criterion.FiniteDiffMonteCarloSure" title="sparse_ho.criterion.FiniteDiffMonteCarloSure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FiniteDiffMonteCarloSure</span></code></a>(sigma[, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.FiniteDiffMonteCarloSure.html#sparse_ho.criterion.FiniteDiffMonteCarloSure" title="sparse_ho.criterion.FiniteDiffMonteCarloSure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FiniteDiffMonteCarloSure</span></code></a>(sigma[, ...])</p></td>
 <td><p>Smoothed version of the Stein Unbiased Risk Estimator (SURE).</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.criterion.HeldOutMSE.html#sparse_ho.criterion.HeldOutMSE" title="sparse_ho.criterion.HeldOutMSE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HeldOutMSE</span></code></a>(idx_train, idx_val)</p></td>
@@ -155,8 +156,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="algorithms">
+</section>
+<section id="algorithms">
 <h2>Algorithms<a class="headerlink" href="#algorithms" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.algo" title="sparse_ho.algo"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.algo</span></code></a>:</p>
 <span class="target" id="module-sparse_ho.algo"></span><table class="longtable docutils align-default">
@@ -165,10 +166,10 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Implicit.html#sparse_ho.algo.Implicit" title="sparse_ho.algo.Implicit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Implicit</span></code></a>([max_iter, max_iter_lin_sys, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Implicit.html#sparse_ho.algo.Implicit" title="sparse_ho.algo.Implicit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Implicit</span></code></a>([max_iter, max_iter_lin_sys, ...])</p></td>
 <td><p>Algorithm to compute the hypergradient using implicit differentiation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.algo.ImplicitForward.html#sparse_ho.algo.ImplicitForward" title="sparse_ho.algo.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.algo.ImplicitForward.html#sparse_ho.algo.ImplicitForward" title="sparse_ho.algo.ImplicitForward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImplicitForward</span></code></a>([tol_jac, max_iter, ...])</p></td>
 <td><p>Algorithm to compute the hypergradient using implicit forward differentiation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.algo.Forward.html#sparse_ho.algo.Forward" title="sparse_ho.algo.Forward"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Forward</span></code></a>([use_stop_crit, verbose])</p></td>
@@ -179,8 +180,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="optimizers">
+</section>
+<section id="optimizers">
 <h2>Optimizers<a class="headerlink" href="#optimizers" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.optimizers" title="sparse_ho.optimizers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.optimizers</span></code></a>:</p>
 <span class="target" id="module-sparse_ho.optimizers"></span><table class="longtable docutils align-default">
@@ -189,19 +190,19 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.Adam.html#sparse_ho.optimizers.Adam" title="sparse_ho.optimizers.Adam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adam</span></code></a>([n_outer, epsilon, lr, beta_1, beta_2, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.Adam.html#sparse_ho.optimizers.Adam" title="sparse_ho.optimizers.Adam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adam</span></code></a>([n_outer, epsilon, lr, beta_1, beta_2, ...])</p></td>
 <td><p>ADAM optimizer for the outer problem.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.GradientDescent.html#sparse_ho.optimizers.GradientDescent" title="sparse_ho.optimizers.GradientDescent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientDescent</span></code></a>([n_outer, step_size, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.GradientDescent.html#sparse_ho.optimizers.GradientDescent" title="sparse_ho.optimizers.GradientDescent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GradientDescent</span></code></a>([n_outer, step_size, ...])</p></td>
 <td><p>Gradient descent for the outer problem.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.LineSearch.html#sparse_ho.optimizers.LineSearch" title="sparse_ho.optimizers.LineSearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LineSearch</span></code></a>([n_outer, verbose, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/sparse_ho.optimizers.LineSearch.html#sparse_ho.optimizers.LineSearch" title="sparse_ho.optimizers.LineSearch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LineSearch</span></code></a>([n_outer, verbose, ...])</p></td>
 <td><p>Gradient descent with line search for the outer problem.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -211,8 +212,8 @@
 <tbody>
 </tbody>
 </table>
-</div>
-<div class="section" id="utils">
+</section>
+<section id="utils">
 <h2>Utils<a class="headerlink" href="#utils" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="#module-sparse_ho.utils" title="sparse_ho.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sparse_ho.utils</span></code></a>:</p>
 <span class="target" id="module-sparse_ho.utils"></span><table class="longtable docutils align-default">
@@ -226,8 +227,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -242,7 +243,7 @@
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

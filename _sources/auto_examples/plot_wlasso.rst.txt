@@ -374,9 +374,10 @@ MSE on validation set
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_wlasso_001.png
-    :alt: plot wlasso
-    :class: sphx-glr-single-img
+.. image-sg:: /auto_examples/images/sphx_glr_plot_wlasso_001.png
+   :alt: plot wlasso
+   :srcset: /auto_examples/images/sphx_glr_plot_wlasso_001.png
+   :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -394,7 +395,7 @@ MSE on validation set
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.985 seconds)
+   **Total running time of the script:** ( 0 minutes  8.797 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_wlasso.py:

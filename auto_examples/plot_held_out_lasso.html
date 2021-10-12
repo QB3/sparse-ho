@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Lasso with held-out test set &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -22,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -96,7 +97,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-held-out-lasso-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="lasso-with-held-out-test-set">
+<section class="sphx-glr-example-title" id="lasso-with-held-out-test-set">
 <span id="sphx-glr-auto-examples-plot-held-out-lasso-py"></span><h1>Lasso with held-out test set<a class="headerlink" href="#lasso-with-held-out-test-set" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to perform hyperparameter optimization
 for a Lasso using a held-out validation set.</p>
@@ -181,28 +182,28 @@ Downloading data from https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/bi
 
 
 file_sizes:   0%|                                   | 0.00/13.7M [00:00&lt;?, ?B/s]
-file_sizes:   0%|                           | 24.6k/13.7M [00:00&lt;02:09, 106kB/s]
-file_sizes:   0%|                           | 49.2k/13.7M [00:00&lt;02:08, 106kB/s]
-file_sizes:   1%|2                           | 106k/13.7M [00:00&lt;01:19, 171kB/s]
-file_sizes:   2%|4                           | 221k/13.7M [00:00&lt;00:45, 299kB/s]
-file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;00:24, 549kB/s]
-file_sizes:   7%|#7                         | 909k/13.7M [00:01&lt;00:12, 1.04MB/s]
-file_sizes:  13%|###4                      | 1.83M/13.7M [00:01&lt;00:05, 1.99MB/s]
-file_sizes:  27%|######9                   | 3.66M/13.7M [00:01&lt;00:02, 3.86MB/s]
-file_sizes:  38%|#########9                | 5.23M/13.7M [00:02&lt;00:01, 4.77MB/s]
-file_sizes:  50%|############8             | 6.81M/13.7M [00:02&lt;00:01, 5.39MB/s]
-file_sizes:  61%|###############8          | 8.38M/13.7M [00:02&lt;00:00, 5.82MB/s]
-file_sizes:  72%|##################8       | 9.95M/13.7M [00:02&lt;00:00, 6.11MB/s]
-file_sizes:  84%|#####################8    | 11.5M/13.7M [00:03&lt;00:00, 6.31MB/s]
-file_sizes:  95%|########################8 | 13.1M/13.7M [00:03&lt;00:00, 6.46MB/s]
-file_sizes: 100%|##########################| 13.7M/13.7M [00:03&lt;00:00, 4.22MB/s]
+file_sizes:   0%|                          | 24.6k/13.7M [00:00&lt;02:59, 76.5kB/s]
+file_sizes:   0%|                          | 49.2k/13.7M [00:00&lt;02:57, 77.3kB/s]
+file_sizes:   1%|2                          | 106k/13.7M [00:01&lt;02:40, 85.0kB/s]
+file_sizes:   2%|4                           | 221k/13.7M [00:01&lt;01:19, 169kB/s]
+file_sizes:   3%|9                           | 451k/13.7M [00:01&lt;00:39, 334kB/s]
+file_sizes:   7%|#8                          | 909k/13.7M [00:02&lt;00:19, 673kB/s]
+file_sizes:  13%|###4                      | 1.83M/13.7M [00:02&lt;00:08, 1.34MB/s]
+file_sizes:  27%|######9                   | 3.66M/13.7M [00:02&lt;00:03, 2.65MB/s]
+file_sizes:  38%|#########9                | 5.23M/13.7M [00:03&lt;00:02, 3.33MB/s]
+file_sizes:  50%|############8             | 6.81M/13.7M [00:03&lt;00:01, 3.84MB/s]
+file_sizes:  65%|################8         | 8.90M/13.7M [00:03&lt;00:01, 4.63MB/s]
+file_sizes:  76%|###################8      | 10.5M/13.7M [00:04&lt;00:00, 4.93MB/s]
+file_sizes:  88%|######################8   | 12.1M/13.7M [00:04&lt;00:00, 4.98MB/s]
+file_sizes:  95%|########################8 | 13.1M/13.7M [00:04&lt;00:00, 4.44MB/s]
+file_sizes: 100%|##########################| 13.7M/13.7M [00:04&lt;00:00, 2.88MB/s]
 Successfully downloaded file to /home/circleci/data/libsvm/binary/rcv1_train.binary.bz2
 Decompressing...
 Loading svmlight file...
 Starting path computation...
 </pre></div>
 </div>
-<div class="section" id="grid-search-with-scikit-learn">
+<section id="grid-search-with-scikit-learn">
 <h2>Grid search with scikit-learn<a class="headerlink" href="#grid-search-with-scikit-learn" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator</span> <span class="o">=</span> <span class="n">celer</span><span class="o">.</span><span class="n">Lasso</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -236,8 +237,8 @@ Iteration 10 / 10
 Grid search finished
 </pre></div>
 </div>
-</div>
-<div class="section" id="grad-search-with-sparse-ho">
+</section>
+<section id="grad-search-with-sparse-ho">
 <h2>Grad-search with sparse-ho<a class="headerlink" href="#grad-search-with-sparse-ho" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sparse-ho started&#39;</span><span class="p">)</span>
 
@@ -260,8 +261,8 @@ Grid search finished
 sparse-ho finished
 </pre></div>
 </div>
-</div>
-<div class="section" id="plot-results">
+</section>
+<section id="plot-results">
 <h2>Plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">p_alphas_grad</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">monitor_grad</span><span class="o">.</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas</span></a><span class="p">)</span> <span class="o">/</span> <span class="n">alpha_max</span>
 
@@ -297,18 +298,17 @@ sparse-ho finished
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="plot held out lasso" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_lasso_001.png" />
-<p class="sphx-glr-script-out">Out:</p>
+<img src="../_images/sphx_glr_plot_held_out_lasso_001.png" srcset="../_images/sphx_glr_plot_held_out_lasso_001.png" alt="plot held out lasso" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>sparse-ho finished
-Time for grid search: 14.55 s
-Time for grad search (sparse-ho): 15.39 s
+Time for grid search: 12.89 s
+Time for grad search (sparse-ho): 13.88 s
 Minimum outer criterion value with grid search: 0.21316
 Minimum outer criterion value with grad search: 0.21255
 /home/circleci/project/examples/plot_held_out_lasso.py:122: UserWarning: color is redundantly defined by the &#39;color&#39; keyword argument and the fmt string &quot;bo&quot; (-&gt; color=&#39;b&#39;). The keyword argument will take precedence.
   ax.plot(
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  41.673 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  46.345 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-lasso-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/9cae0174003295e3956dda3d3411fe08/plot_held_out_lasso.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_lasso.py</span></code></a></p>
@@ -318,8 +318,8 @@ Minimum outer criterion value with grad search: 0.21255
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -334,7 +334,7 @@ Minimum outer criterion value with grad search: 0.21255
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>

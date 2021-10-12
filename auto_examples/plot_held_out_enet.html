@@ -3,16 +3,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Elastic net with held-out test set &#8212; sparse-ho 0.1.dev documentation</title>
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/gallery-rendered-html.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
@@ -22,9 +23,9 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
 <script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
 <script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
 
   </head><body>
@@ -96,7 +97,7 @@
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-held-out-enet-py"><span class="std std-ref">here</span></a>
 to download the full example code</p>
 </div>
-<div class="sphx-glr-example-title section" id="elastic-net-with-held-out-test-set">
+<section class="sphx-glr-example-title" id="elastic-net-with-held-out-test-set">
 <span id="sphx-glr-auto-examples-plot-held-out-enet-py"></span><h1>Elastic net with held-out test set<a class="headerlink" href="#elastic-net-with-held-out-test-set" title="Permalink to this headline">¶</a></h1>
 <p>This example shows how to perform hyperparameter optimization
 for an elastic-net using a held-out validation set.</p>
@@ -164,7 +165,7 @@ for an elastic-net using a held-out validation set.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Starting path computation...
 </pre></div>
 </div>
-<div class="section" id="grid-search-with-scikit-learn">
+<section id="grid-search-with-scikit-learn">
 <h2>grid search with scikit-learn<a class="headerlink" href="#grid-search-with-scikit-learn" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Started grid search&quot;</span><span class="p">)</span>
 <span class="n">t_grid_search</span> <span class="o">=</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -202,8 +203,8 @@ Finished grid search
 Minimum outer criterion value with grid search 2.258e+01
 </pre></div>
 </div>
-</div>
-<div class="section" id="grad-search-with-sparse-ho">
+</section>
+<section id="grad-search-with-sparse-ho">
 <h2>Grad-search with sparse-ho<a class="headerlink" href="#grad-search-with-sparse-ho" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator</span> <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">ElasticNet</span><span class="p">(</span>
     <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -241,14 +242,14 @@ Iteration 7/10 ||Value outer criterion: 2.30e+01 ||norm grad 1.45e+00
 Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
 Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
 Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
-Time grid search 9.958134
-Time grad-search 2.345262
+Time grid search 9.274214
+Time grad-search 3.277312
 Minimum grid search 2.258e+01
 Minimum grad search 2.257e+01
 </pre></div>
 </div>
-</div>
-<div class="section" id="plot-results">
+</section>
+<section id="plot-results">
 <h2>Plot results<a class="headerlink" href="#plot-results" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmap</span> <span class="o">=</span> <span class="n">discrete_cmap</span><span class="p">(</span><span class="n">n_outer</span><span class="p">,</span> <span class="s1">&#39;Reds&#39;</span><span class="p">)</span>
 <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">X</span></a><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">Y</span></a> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.meshgrid" title="numpy.meshgrid" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas_l1</span></a> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">alphas_l2</span></a> <span class="o">/</span> <span class="n">alpha_max</span><span class="p">)</span>
@@ -277,8 +278,7 @@ Minimum grad search 2.257e+01
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="Elastic net held out prediction loss on test set" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_held_out_enet_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  12.986 seconds)</p>
+<img src="../_images/sphx_glr_plot_held_out_enet_001.png" srcset="../_images/sphx_glr_plot_held_out_enet_001.png" alt="Elastic net held out prediction loss on test set" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.591 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-held-out-enet-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/3e228e68f223f1a9a886e27642bdca40/plot_held_out_enet.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_held_out_enet.py</span></code></a></p>
@@ -288,8 +288,8 @@ Minimum grad search 2.257e+01
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -304,7 +304,7 @@ Minimum grad search 2.257e+01
     </p>
     <p>
         &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.2.0.<br/>
     </p>
   </div>
 </footer>
