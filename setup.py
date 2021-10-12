@@ -50,7 +50,7 @@ if __name__ == "__main__":
           platforms='any',
           packages=find_packages(),
           install_requires=[
-            "celer @ https://github.com/mathurinm/celer/archive/master.zip",
+            "celer @ https://github.com/mathurinm/celer/archive/main.zip",
             "download", "hyperopt",
             "libsvmdata", "matplotlib>=2.0.0", "numba",
             "numpy>=1.12", "scipy>=0.18.0",
