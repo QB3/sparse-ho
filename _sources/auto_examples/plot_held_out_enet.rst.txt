@@ -227,8 +227,8 @@ Grad-search with sparse-ho
     Iteration 8/10 ||Value outer criterion: 2.27e+01 ||norm grad 1.60e+00
     Iteration 9/10 ||Value outer criterion: 2.26e+01 ||norm grad 9.71e-02
     Iteration 10/10 ||Value outer criterion: 2.26e+01 ||norm grad 4.36e-02
-    Time grid search 9.274214
-    Time grad-search 3.277312
+    Time grid search 4.347393
+    Time grad-search 1.885905
     Minimum grid search 2.258e+01
     Minimum grad search 2.257e+01
 
@@ -285,7 +285,7 @@ Plot results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  13.591 seconds)
+   **Total running time of the script:** ( 0 minutes  6.886 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_held_out_enet.py:
