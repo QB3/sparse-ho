@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from sparse_ho.utils_plot import configure_plt
+from sparse_ho.utils_plot import configure_plt, plot_legend_apart
 
 # save_fig = True
 save_fig = False
@@ -26,7 +26,7 @@ Z = objs_grid
 levels = np.geomspace(0.2, 1, num=20)
 levels = np.round(levels, 2)
 
-fontsize = 15
+fontsize = 22
 
 plt.set_cmap(plt.cm.viridis)
 
@@ -70,31 +70,26 @@ color = [
 #################################################################
 # code for GRID SEARCH + GRAD SEARCH
 for i in np.arange(len(objs_grad)+1):
-    fig, ax = plt.subplots(1, 1)
+    fig, ax = plt.subplots(1, 1, constrained_layout=True)
     cp = ax.contourf(X, Y, Z.T, levels)
     ax.scatter(
-        X, Y, s=10, c="orange", marker="o", label="$0$ order (grid search)")
+        X, Y, s=10, c="orange", marker="o", label=r"$0$-order (grid-search)")
     cb = fig.colorbar(cp)
     for t in cb.ax.get_yticklabels():
         t.set_fontsize(fontsize)
-    # ax.plot(
-    #     p_alphas, objs, color=current_palette[0], linewidth=7.0)
-    # ax.plot(
-    #     p_alphas, objs, 'bo', label='0-order method',
-    #     color=current_palette[1], markersize=15)
     ax.scatter(
         alphas_grad[:i, 0]/alpha_max,
         alphas_grad[:i, 1]/alpha_max,
-        s=100, color=color[:i], marker="x", label="$1$st order")
+        s=100, color=color[:i], marker="X", label=r"$1$st-order")
     plt.xscale('log')
     plt.yscale('log')
     ax.set_xlim(alpha_1.min()/alpha_max, alpha_1.max()/alpha_max)
     ax.set_ylim(alpha_2.min()/alpha_max, alpha_2.max()/alpha_max)
     plt.xscale('log')
     plt.yscale('log')
-    fig.legend(loc=2, ncol=2, fontsize=fontsize, bbox_to_anchor=(0.125, 1))
-    ax.set_xlabel(r'$\lambda_1 / \lambda_\max$', fontsize=fontsize)
-    ax.set_ylabel(r'$\lambda_2 / \lambda_\max$', fontsize=fontsize)
+    # fig.legend(loc=2, ncol=2, fontsize=fontsize, bbox_to_anchor=(0.125, 1))
+    ax.set_xlabel(r'$\lambda_1 / \lambda_{\max}$', fontsize=fontsize)
+    ax.set_ylabel(r'$\lambda_2 / \lambda_{\max}$', fontsize=fontsize)
     # ax.set_xticklabels(fontsize=fontsize)
     plt.xticks(fontsize=fontsize)
     plt.yticks(fontsize=fontsize)
@@ -105,12 +100,30 @@ for i in np.arange(len(objs_grad)+1):
     #     r"$\|y^{\rm{val}} - X^{\rm{val}} \hat \beta^{(\lambda)} \|^2$",
     #     fontsize=28)
     # plt.tick_params(width=5)
-    # plt.legend(fontsize=17, loc=2)
+    # plt.legend(fontsize=fontsize, loc=2)
     # plt.tight_layout()
 
     if save_fig_grad:
         fig.savefig(
-            fig_dir + "grad_grid_search_real_sim_enet_%i.pdf" % i, bbox_inches="tight")
+            fig_dir + "grad_grid_search_real_sim_enet_%i.pdf" % i,
+            bbox_inches="tight")
         fig.savefig(
-            fig_dir_svg + "grad_grid_search_real_sim_enet_%i.svg" % i, bbox_inches="tight")
+            fig_dir_svg + "grad_grid_search_real_sim_enet_%i.svg" % i,
+            bbox_inches="tight")
     plt.show(block=False)
+    # if i == 1:
+    #     plot_legend_apart(
+    #         ax, fig_dir + "grad_grid_search_real_sim_enet_legend.pdf")
+
+if save_fig_grad:
+    fig, ax = plt.subplots(2, 2, constrained_layout=True, figsize=[10.67, 3])
+    ax[0, 0].plot(
+        np.linspace(0, 5),
+        np.linspace(0, 5), label=r"$0$-order", marker="o", color="orange")
+    ax[0, 0].plot(
+        np.linspace(0, 5),
+        np.linspace(0, 5), label=r"$1$st-order", marker="X", color=color[0])
+
+    plot_legend_apart(
+        ax[0, 0], fig_dir + "grad_grid_search_real_sim_enet_legend.pdf",
+        figwidth=10.67)
