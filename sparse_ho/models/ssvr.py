@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.core.fromnumeric import size
 from numpy.linalg import norm
 import scipy.sparse.linalg as slinalg
 from numba import njit
@@ -12,7 +11,7 @@ from scipy.sparse import issparse
 @njit
 def _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign):
     dF = sign * np.array([np.sum(dbeta[:, 0].T * X[j1, :]),
-                           np.sum(dbeta[:, 1].T * X[j1, :])])
+                          np.sum(dbeta[:, 1].T * X[j1, :])])
     ddual_var_old = ddual_var[j2, :].copy()
     dzj = ddual_var[j2, :] - dF / L[j1]
     ddual_var[j2, :] = ind_box(zj, C) * dzj
@@ -35,7 +34,8 @@ def _update_beta_jac_bcd_aux(X, y, epsilon, beta, dbeta, dual_var, ddual_var,
     dual_var[j2] = proj_box_svm(zj, C / n_samples)
     beta += sign * ((dual_var[j2] - dual_var_old) * X[j1, :])
     if compute_jac:
-        _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C / n_samples, j1, j2, sign)
+        _compute_jac_aux(X, epsilon, dbeta, ddual_var,
+                         zj, L, C / n_samples, j1, j2, sign)
 
 
 @njit
@@ -138,7 +138,7 @@ class SimplexSVR(BaseModel):
             else:
                 dual_var = self.dual_var
                 beta = X.T @ (dual_var[0:n_samples] -
-                            dual_var[n_samples:(2 * n_samples)])
+                              dual_var[n_samples:(2 * n_samples)])
                 beta += dual_var[(2 * n_samples):(2 * n_samples + n_features)]
                 beta += dual_var[-1]
         return beta, dual_var
@@ -259,10 +259,10 @@ class SimplexSVR(BaseModel):
 
     def _get_pobj(self, dual_var, X, beta, hyperparam, y):
         n_samples = X.shape[0]
-        obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] / n_samples * np.sum(np.maximum(
-            np.abs(X @ beta - y) - hyperparam[1], 0))
+        obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] / n_samples * np.sum(
+            np.maximum(np.abs(X @ beta - y) - hyperparam[1], 0))
         return obj_prim
-    
+
     @staticmethod
     def _get_dobj(dual_var, X, beta, hyperparam, y):
         n_samples = X.shape[0]
@@ -311,11 +311,14 @@ class SimplexSVR(BaseModel):
         sign = np.zeros(dual_var.shape[0])
         bool_temp = np.isclose(dual_var[0:(2 * n_samples + n_features)], 0.0)
         sign[0:(2 * n_samples + n_features)][bool_temp] = -1.0
-        sign[0:(2 * n_samples)][np.isclose(dual_var[0:(2 * n_samples)], C / n_samples)] = 1.0
+        sign[0:(2 * n_samples)][np.isclose(
+            dual_var[0:(2 * n_samples)], C / n_samples)] = 1.0
         ddual_var = np.zeros((dual_var.shape[0], 2))
         if np.any(sign == 1.0):
-            ddual_var[sign == 1.0, 0] = np.repeat(C / n_samples, (sign == 1).sum())
-            ddual_var[sign == 1.0, 1] = np.repeat(0, (sign == 1).sum())
+            ddual_var[sign == 1.0, 0] = np.repeat(
+                C / n_samples, (sign == 1).sum())
+            ddual_var[sign == 1.0, 1] = np.repeat(
+                0, (sign == 1).sum())
         self.ddual_var = ddual_var
         self.dbeta = X.T @ (
             ddual_var[0:n_samples, :] -
@@ -336,7 +339,8 @@ class SimplexSVR(BaseModel):
         gen_supp = np.zeros(length_dual)
         bool_temp = dual_var[0:(2 * n_samples + n_features)] == 0.0
         gen_supp[0:(2 * n_samples + n_features)][bool_temp] = -1.0
-        gen_supp[0:(2 * n_samples)][dual_var[0:(2 * n_samples)] == C / n_samples] = 1.0
+        is_right_border = dual_var[0:(2 * n_samples)] == C / n_samples
+        gen_supp[0:(2 * n_samples)][is_right_border] = 1.0
         for j in np.arange(0, length_dual)[gen_supp == 0.0]:
             if j < (2 * n_samples):
                 if j < n_samples:
@@ -376,7 +380,8 @@ class SimplexSVR(BaseModel):
         gen_supp = np.zeros(dual_var.shape[0])
         bool_temp = dual_var[0:(2 * n_samples + n_features)] == 0.0
         gen_supp[0:(2 * n_samples + n_features)][bool_temp] = -1.0
-        gen_supp[0:(2 * n_samples)][dual_var[0:(2 * n_samples)] == C / n_samples] = 1.0
+        is_right_border = dual_var[0:(2 * n_samples)] == C / n_samples
+        gen_supp[0:(2 * n_samples)][is_right_border] = 1.0
 
         iter = np.arange(0, (2 * n_samples + n_features + 1))[gen_supp == 0.0]
         for j in iter:
@@ -484,8 +489,8 @@ class SimplexSVR(BaseModel):
             np.logical_or(
                 np.isclose(alpha, 0),
                 np.isclose(np.abs(alpha), C / n_samples)))
-        mask0 = np.logical_not(np.isclose(self.dual_var[(2 * n_samples):
-                              (2 * n_samples + n_features)], 0))
+        mask0 = np.logical_not(np.isclose(
+            self.dual_var[(2 * n_samples):(2 * n_samples + n_features)], 0))
         return v[np.hstack((full_supp, mask0, True))]
 
     def proj_hyperparam(self, X, y, log_hyperparam):
@@ -544,8 +549,9 @@ class SimplexSVR(BaseModel):
         sub_id = np.zeros((mask0.sum(), n_features))
         sub_id[:, mask0] = 1.0
         X_m = np.concatenate((X[full_supp, :],
-                                  -sub_id, -np.ones((1, n_features))), axis=0)
+                              -sub_id, -np.ones((1, n_features))), axis=0)
         size_supp = X_m.shape[0]
+
         def mv(v):
             return X_m @ (X_m.T @ v)
         return LinearOperator((size_supp, size_supp), matvec=mv)
@@ -560,4 +566,3 @@ class SimplexSVR(BaseModel):
         mask = self.estimator.coef_ != 0
         dense = self.estimator.coef_[mask]
         return mask, dense, None
-

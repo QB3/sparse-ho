@@ -86,7 +86,7 @@ def test_beta_jac_custom(model_name):
         assert np.all(supp == supp_custom)
         assert np.allclose(dense, dense_custom)
         assert np.allclose(jac, jac_custom)
-        
+
 
 @pytest.mark.parametrize('model_name,criterion_name', list_model_crit)
 @pytest.mark.parametrize('algo', list_algos)
