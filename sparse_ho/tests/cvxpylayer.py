@@ -281,7 +281,7 @@ def ssvr_cvxpy(X, y, hyperparam, idx_train, idx_val):
 
     # set up objective
     loss = cp.sum_squares(beta_cp) / 2
-    reg = C_cp * cp.sum(xi_cp + xi_star_cp)
+    reg = C_cp / n_samples_train * cp.sum(xi_cp + xi_star_cp)
     objective = loss + reg
     # define constraints
     constraints = [ytrain - Xtrain @ beta_cp <= epsilon_cp + xi_cp,

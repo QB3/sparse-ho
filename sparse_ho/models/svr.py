@@ -355,7 +355,7 @@ class SVR(BaseModel):
         jac: TODO
         v: TODO
         """
-        return jac.T @ v(mask, dense)
+        return jac[mask].T @ v(mask, dense)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
