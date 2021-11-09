@@ -14,11 +14,11 @@ from sparse_ho.utils import proj_box_svm, ind_box
 def _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign):
     dF = sign * np.array([np.sum(dbeta[:, 0].T * X[j1, :]),
                           np.sum(dbeta[:, 1].T * X[j1, :])])
+    dF[1] += epsilon
     ddual_var_old = ddual_var[j2, :].copy()
     dzj = ddual_var[j2, :] - dF / L[j1]
     ddual_var[j2, :] = ind_box(zj, C) * dzj
     ddual_var[j2, 0] += C * (C <= zj)
-    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
     dbeta[:, 0] += sign * (ddual_var[j2, 0] -
                            ddual_var_old[0]) * X[j1, :]
     dbeta[:, 1] += sign * (ddual_var[j2, 1] -
@@ -48,11 +48,11 @@ def _compute_jac_aux_sparse(
 
     dF = sign * np.array([np.sum(dbeta[idx_nz, 0].T * Xjs),
                           np.sum(dbeta[idx_nz, 1].T * Xjs)])
+    dF[1] += epsilon
     ddual_var_old = ddual_var[j2, :].copy()
     dzj = ddual_var[j2, :] - dF / L[j1]
     ddual_var[j2, :] = ind_box(zj, C) * dzj
     ddual_var[j2, 0] += C * (C <= zj)
-    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
     dbeta[idx_nz, 0] += sign * (ddual_var[j2, 0] -
                                 ddual_var_old[0]) * Xjs
     dbeta[idx_nz, 1] += sign * (ddual_var[j2, 1] -
