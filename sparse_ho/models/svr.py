@@ -169,6 +169,7 @@ class SVR(BaseModel):
                                             beta, dbeta, dual_var, ddual_var,
                                             L, C, j1, j2, sign, compute_jac)
 
+    @staticmethod
     def _get_pobj0(self, dual_var, beta, hyperparam, y):
         n_samples = len(y)
         obj_prim = hyperparam[0] * np.sum(np.maximum(
