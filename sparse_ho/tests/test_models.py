@@ -22,12 +22,12 @@ from sparse_ho.tests.common import (
 # list of algorithms to be tested
 list_algos = [
     Forward(),
-    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
+    ImplicitForward(tol_jac=1e-16, n_iter_jac=1000),
     Implicit()
     # Backward()  # XXX to fix
 ]
 
-tol = 1e-15
+tol = 1e-14
 X_r = X_s.tocsr()
 X_c = X_s
 
@@ -173,6 +173,6 @@ if __name__ == "__main__":
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("svr", "MSE", algo)
-        test_check_grad_sparse_ho('ssvr', 'MSE', algo)
-        test_beta_jac('ssvr')
+        test_val_grad("lasso", "MSE", algo)
+        test_check_grad_sparse_ho('lasso', 'MSE', algo)
+        test_beta_jac('lasso')
