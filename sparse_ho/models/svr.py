@@ -399,7 +399,11 @@ class SVR(BaseModel):
         n_samples = X.shape[0]
         dual_coef = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(dual_coef != 0, np.abs(dual_coef) != C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(dual_coef), 0)),
+            np.logical_not(
+                np.isclose(np.abs(dual_coef), C)))
 
         X_m = X[full_supp, :]
         size_supp = X_m.shape[0]
@@ -431,8 +435,12 @@ class SVR(BaseModel):
         epsilon = hyperparam[1]
         alpha = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
-        maskC = np.abs(alpha) == C
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
+        maskC = np.isclose(np.abs(alpha), C)
         hessian = X[full_supp, :] @ X[maskC, :].T
         hessian_vec = hessian @ alpha[maskC]
         jac_t_v = hessian_vec.T @ jac
@@ -459,7 +467,11 @@ class SVR(BaseModel):
         C = np.exp(log_hyperparam[0])
         alpha = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -488,8 +500,12 @@ class SVR(BaseModel):
         dalpha = ddual_var[0:n_samples, 0] - \
             ddual_var[n_samples:(2 * n_samples), 0]
 
-        maskC = np.abs(alpha) == C
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
+        maskC = np.isclose(np.abs(alpha), C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
 
         alphaX = dalpha[full_supp].T @ Xs[full_supp, :]
         quadratic_term = alphaX.T @ alphaX
