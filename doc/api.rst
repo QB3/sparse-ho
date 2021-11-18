@@ -29,6 +29,7 @@ Models
    SparseLogreg
    SVM
    SVR
+   SimplexSVR
    WeightedLasso
 
 

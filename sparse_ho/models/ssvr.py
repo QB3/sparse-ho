@@ -84,18 +84,14 @@ def _update_beta_jac_bcd_aux_sparse(data, indptr, indices, y, epsilon, beta,
 class SimplexSVR(BaseModel):
     """The simplex support vector regression without bias
     The optimization problem is solved in the dual.
+
     It solves the SVR with probability vector constraints:
     sum_i beta_i = 1
-    beta_i >= 0.
+    beta_i >= 0
 
     Parameters
     ----------
-    log_C : float
-        logarithm of the hyperparameter C
-    max_iter : int
-        maximum number of epochs for the coordinate descent
-        algorithm
-    estimator: instance of ``sklearn.base.BaseEstimator``
+    estimator: sklearn
         An estimator that follows the scikit-learn API.
     """
 
@@ -147,12 +143,7 @@ class SimplexSVR(BaseModel):
     def _update_beta_jac_bcd(
             X, y, beta, dbeta, dual_var, ddual_var,
             hyperparam, L, compute_jac=True):
-        """
-            beta : primal variable of the svm
-            r : dual used for cheap updates
-            dbeta : jacobian of the primal variables
-            dr : jacobian of the dual variables
-        """
+
         C = hyperparam[0]
         epsilon = hyperparam[1]
         n_samples, n_features = X.shape
@@ -419,6 +410,18 @@ class SimplexSVR(BaseModel):
 
     @staticmethod
     def get_L(X):
+        """Compute Lipschitz constant of datafit.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+
+        Returns
+        -------
+        L: float
+            The Lipschitz constant.
+        """
         if issparse(X):
             return slinalg.norm(X, axis=1) ** 2
         else:
@@ -426,26 +429,95 @@ class SimplexSVR(BaseModel):
 
     @staticmethod
     def reduce_X(X, mask):
+        """Reduce design matrix to generalized support.
+
+        Parameters
+        ----------
+        X : array-like, shape (n_samples, n_features)
+            Design matrix.
+        mask : ndarray, shape (n_features,)
+            Generalized support.
+        """
         return X[:, mask]
 
     @staticmethod
     def reduce_y(y, mask):
+        """Reduce observation vector to generalized support.
+
+        Parameters
+        ----------
+        y : ndarray, shape (n_samples,)
+            Observation vector.
+        mask : ndarray, shape (n_features,)  TODO shape n_samples right?
+            Generalized support.
+        """
         return y
 
     def sign(self, x, log_hyperparams):
+        """Get sign of iterate. Here sign means -1.0 if the iterate is 0,
+        1.0 if it is equal to C / n_samples.
+
+        Parameters
+        ----------
+        x : ndarray, shape TODO
+        log_hyperparams : ndarray, shape (2, )
+            Logarithm of hyperparameter C and epsilon.
+        """
         sign = np.zeros(x.shape[0])
         sign[np.isclose(x, 0.0)] = -1.0
         sign[np.isclose(x, np.exp(log_hyperparams[0]) / self.n_samples)] = 1.0
         return sign
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
+        """Compute hypergradient.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        jac: TODO
+        v: TODO
+        """
         return jac.T @ v(mask, dense)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
+        """TODO
+
+        Parameters
+        ----------
+        mask: TODO
+        jac_v: TODO
+        n_features: int
+            Number of features.
+        """
         return jac_v
 
     def get_dual_v(self, mask, dense, X, y, v, log_hyperparam):
+        """Compute the dual of v
+
+        Parameters
+        ----------
+        mask: ndarray, shape (n_features,)
+            Mask corresponding to non zero entries of beta.
+        dense: ndarray, shape (mask.sum(),)
+            Non zero entries of beta.
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        v: TODO.
+
+        log_hyperparam:
+            ndarray, shape (2, )
+            Logarithm of hyperparameter C and epsilon.
+        """
         full_v = np.zeros(X.shape[1])
         full_v[mask] = v
         if v.shape[0] != 0:
@@ -480,6 +552,21 @@ class SimplexSVR(BaseModel):
         return np.array([jac_t_v, jac_t_v2])
 
     def generalized_supp(self, X, v, log_hyperparam):
+        """Generalized support of iterate.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        v: TODO.
+
+        log_hyperparam: ndarray, shape (2, )
+            Logarithm of hyperparameter C and epsilon.
+
+        Returns
+        -------
+        TODO
+        """
         n_samples, n_features = X.shape
         C = np.exp(log_hyperparam[0])
         alpha = self.dual_var[0:n_samples] -\
@@ -493,10 +580,27 @@ class SimplexSVR(BaseModel):
         return v[np.hstack((full_supp, mask0, True))]
 
     def proj_hyperparam(self, X, y, log_hyperparam):
+        """Project hyperparameter on an admissible range of values.
+
+        Parameters
+        ----------
+        X: array-like, shape (n_samples, n_features)
+            Design matrix.
+        y: ndarray, shape (n_samples,)
+            Observation vector.
+        log_hyperparam: ndarray, shape (2, )
+            Logarithm of hyperparameters C and epsilon.
+
+        Returns
+        -------
+        log_hyperparam: float
+            Logarithm of projected hyperparameters.
+        """
         return np.clip(log_hyperparam, -16, [10, 10.0])
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
                     dbeta, dual_var, ddual_var, hyperparam):
+
         n_features = dbeta.shape[0]
         C = hyperparam[0]
         alpha = dual_var[0:n_samples] - dual_var[n_samples:(2 * n_samples)]
