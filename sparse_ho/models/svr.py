@@ -175,14 +175,20 @@ class SVR(BaseModel):
             np.abs(y) - hyperparam[1], np.zeros(n_samples)))
         return obj_prim
 
-    def _get_pobj(self, dual_var, X, beta, hyperparam, y):
+    @staticmethod
+    def _get_pobj(dual_var, X, beta, hyperparam, y):
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(X @ beta - y) - hyperparam[1], np.zeros(n_samples)))
+        return obj_prim
+
+    @staticmethod
+    def _get_dobj(dual_var, X, beta, hyperparam, y):
+        n_samples = X.shape[0]
         obj_dual = 0.5 * beta.T @ beta + hyperparam[1] * np.sum(dual_var)
         obj_dual -= np.sum(y * (dual_var[0:n_samples] -
                                 dual_var[n_samples:(2 * n_samples)]))
-        return (obj_dual + obj_prim)
+        return -obj_dual
 
     @staticmethod
     def _get_jac(dbeta, mask):
