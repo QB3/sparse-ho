@@ -27,7 +27,7 @@ list_algos = [
     # Backward()  # XXX to fix
 ]
 
-tol = 1e-15
+tol = 1e-13
 X_r = X_s.tocsr()
 X_c = X_s
 
@@ -173,6 +173,6 @@ if __name__ == "__main__":
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("ssvr", "MSE", algo)
-        test_check_grad_sparse_ho('ssvr', 'MSE', algo)
-        test_beta_jac('ssvr')
+        test_val_grad("svr", "MSE", algo)
+        test_check_grad_sparse_ho('svr', 'MSE', algo)
+        test_beta_jac('svr')
