@@ -148,6 +148,7 @@ def get_only_jac(
             model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, dual_var,
                               ddual_var, alpha))
         if use_stop_crit and i > 1:
+            print(np.abs(objs[-2] - objs[-1]))
             if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
                 break
     return dbeta
