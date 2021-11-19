@@ -110,15 +110,15 @@ def test_warm_start(model_name):
             reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
             _, dual_var = model._init_beta_dual_var(X_s, y, mask, dense)
-            jac = get_only_jac(
+            jac, n_iter = get_only_jac(
                 model.reduce_X(X_s, mask), model.reduce_y(y, mask), dual_var,
                 reduce_alpha, model.sign(dense, log_alpha), dbeta=dbeta0_new,
                 niter_jac=5000, tol_jac=1e-13, model=model, mask=mask,
-                dense=dense)
+                dense=dense, return_iter=True)
             if i == 0:
-                np.testing.assert_array_less(2, get_only_jac.n_iter)
+                np.testing.assert_array_less(2, n_iter)
             else:
-                assert get_only_jac.n_iter == 2
+                assert n_iter == 2
 
 
 @pytest.mark.parametrize('model_name,criterion_name', list_model_crit)
