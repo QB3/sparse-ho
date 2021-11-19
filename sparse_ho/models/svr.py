@@ -169,15 +169,13 @@ class SVR(BaseModel):
                                             beta, dbeta, dual_var, ddual_var,
                                             L, C, j1, j2, sign, compute_jac)
 
-    @staticmethod
-    def _get_pobj0(dual_var, beta, hyperparam, y):
+    def _get_pobj0(self, dual_var, beta, hyperparam, y):
         n_samples = len(y)
         obj_prim = hyperparam[0] * np.sum(np.maximum(
             np.abs(y) - hyperparam[1], np.zeros(n_samples)))
         return obj_prim
 
-    @staticmethod
-    def _get_pobj(dual_var, X, beta, hyperparam, y):
+    def _get_pobj(self, dual_var, X, beta, hyperparam, y):
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(X @ beta - y) - hyperparam[1], np.zeros(n_samples)))
@@ -195,8 +193,7 @@ class SVR(BaseModel):
     def _get_jac(dbeta, mask):
         return dbeta[mask, :]
 
-    @staticmethod
-    def _init_dbeta0(mask, mask0, jac0):
+    def _init_dbeta0(self, mask, mask0, jac0):
         size_mat = mask.sum()
         if jac0 is not None:
             mask_both = np.logical_and(mask0, mask)
@@ -286,8 +283,7 @@ class SVR(BaseModel):
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def get_L(X):
+    def get_L(self, X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
@@ -331,7 +327,7 @@ class SVR(BaseModel):
         """
         return y
 
-    def sign(self, x, log_hyperparams):
+    def sign(self, beta, log_hyperparams):
         """Get sign of iterate.
 
         Parameters
@@ -340,10 +336,9 @@ class SVR(BaseModel):
         log_hyperparams : ndarray, shape TODO
         """
         # TODO harmonize with other models
-        # TODO why x not beta?
-        sign = np.zeros_like(x)
-        sign[np.isclose(x, 0.0)] = -1.0
-        sign[np.isclose(x, np.exp(log_hyperparams[0]))] = 1.0
+        sign = np.zeros_like(beta)
+        sign[np.isclose(beta, 0.0)] = -1.0
+        sign[np.isclose(beta, np.exp(log_hyperparams[0]))] = 1.0
         return sign
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -362,7 +357,7 @@ class SVR(BaseModel):
         jac: TODO
         v: TODO
         """
-        return jac[mask].T @ v(mask, dense)
+        return jac.T @ v(mask, dense)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):

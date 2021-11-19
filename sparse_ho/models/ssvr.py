@@ -1,87 +1,14 @@
 import numpy as np
 from numpy.linalg import norm
-import scipy.sparse.linalg as slinalg
 from numba import njit
 from scipy.sparse.linalg import LinearOperator
-from sparse_ho.models.base import BaseModel
-from sparse_ho.utils import proj_box_svm, ind_box
-from scipy.sparse import issparse
+from sparse_ho.models import SVR
+from sparse_ho.models.svr import (
+    _compute_jac_aux, _compute_jac_aux_sparse,
+    _update_beta_jac_bcd_aux, _update_beta_jac_bcd_aux_sparse)
 
 
-@njit
-def _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign):
-    dF = sign * np.array([np.sum(dbeta[:, 0].T * X[j1, :]),
-                          np.sum(dbeta[:, 1].T * X[j1, :])])
-    dF[1] += epsilon
-    ddual_var_old = ddual_var[j2, :].copy()
-    dzj = ddual_var[j2, :] - dF / L[j1]
-    ddual_var[j2, :] = ind_box(zj, C) * dzj
-    ddual_var[j2, 0] += C * (C <= zj)
-    dbeta[:, 0] += sign * (ddual_var[j2, 0] -
-                           ddual_var_old[0]) * X[j1, :]
-    dbeta[:, 1] += sign * (ddual_var[j2, 1] -
-                           ddual_var_old[1]) * X[j1, :]
-
-
-@njit
-def _update_beta_jac_bcd_aux(X, y, epsilon, beta, dbeta, dual_var, ddual_var,
-                             L, C, j1, j2, sign, compute_jac):
-    n_samples = X.shape[0]
-    F = sign * np.sum(beta * X[j1, :]) + epsilon - sign * y[j1]
-    dual_var_old = dual_var[j2]
-    zj = dual_var[j2] - F / L[j1]
-    dual_var[j2] = proj_box_svm(zj, C / n_samples)
-    beta += sign * ((dual_var[j2] - dual_var_old) * X[j1, :])
-    if compute_jac:
-        _compute_jac_aux(X, epsilon, dbeta, ddual_var,
-                         zj, L, C / n_samples, j1, j2, sign)
-
-
-@njit
-def _compute_jac_aux_sparse(
-        data, indptr, indices, epsilon, dbeta, ddual_var, zj, L, C,
-        j1, j2, sign):
-    # get the i-st row of X in sparse format
-    Xjs = data[indptr[j1]:indptr[j1+1]]
-    # get the non zero indices
-    idx_nz = indices[indptr[j1]:indptr[j1+1]]
-
-    dF = sign * np.array([np.sum(dbeta[idx_nz, 0].T * Xjs),
-                          np.sum(dbeta[idx_nz, 1].T * Xjs)])
-    dF[1] += epsilon
-    ddual_var_old = ddual_var[j2, :].copy()
-    dzj = ddual_var[j2, :] - dF / L[j1]
-    ddual_var[j2, :] = ind_box(zj, C) * dzj
-    ddual_var[j2, 0] += C * (C <= zj)
-
-    dbeta[idx_nz, 0] += sign * (ddual_var[j2, 0] -
-                                ddual_var_old[0]) * Xjs
-    dbeta[idx_nz, 1] += sign * (ddual_var[j2, 1] -
-                                ddual_var_old[1]) * Xjs
-
-
-@njit
-def _update_beta_jac_bcd_aux_sparse(data, indptr, indices, y, epsilon, beta,
-                                    dbeta, dual_var, ddual_var,
-                                    L, C, j1, j2, sign, compute_jac):
-    n_samples = (dual_var.shape[0] - beta.shape[0] - 1) // 2
-    # get the i-st row of X in sparse format
-    Xjs = data[indptr[j1]:indptr[j1+1]]
-    # get the non zero indices
-    idx_nz = indices[indptr[j1]:indptr[j1+1]]
-
-    F = sign * np.sum(beta[idx_nz] * Xjs) + epsilon - sign * y[j1]
-    dual_var_old = dual_var[j2]
-    zj = dual_var[j2] - F / L[j1]
-    dual_var[j2] = proj_box_svm(zj, C / n_samples)
-    beta[idx_nz] += sign * (dual_var[j2] - dual_var_old) * Xjs
-    if compute_jac:
-        _compute_jac_aux_sparse(
-            data, indptr, indices, epsilon, dbeta, ddual_var, zj,
-            L, C / n_samples, j1, j2, sign)
-
-
-class SimplexSVR(BaseModel):
+class SimplexSVR(SVR):
     """The simplex support vector regression without bias
     The optimization problem is solved in the dual.
 
@@ -96,10 +23,7 @@ class SimplexSVR(BaseModel):
     """
 
     def __init__(self, estimator=None):
-        self.estimator = estimator
-        self.dual = True
-        self.dual_var = None
-        self.ddual_var = None
+        super().__init__(estimator)
 
     def _init_dbeta_ddual_var(self, X, y, dense0=None,
                               mask0=None, jac0=None, compute_jac=True):
@@ -156,7 +80,7 @@ class SimplexSVR(BaseModel):
 
                 _update_beta_jac_bcd_aux(
                     X, y, epsilon, beta, dbeta, dual_var,
-                    ddual_var, L, C, j1, j2, sign, compute_jac)
+                    ddual_var, L, C / n_samples, j1, j2, sign, compute_jac)
             else:
                 if j < (2 * n_samples + n_features):
                     F = beta[j - (2 * n_samples)]
@@ -207,7 +131,7 @@ class SimplexSVR(BaseModel):
                 _update_beta_jac_bcd_aux_sparse(
                     data, indptr, indices, y, epsilon,
                     beta, dbeta, dual_var, ddual_var,
-                    L, C, j1, j2, sign, compute_jac)
+                    L, C / n_samples, j1, j2, sign, compute_jac)
 
             else:
                 if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
@@ -243,15 +167,10 @@ class SimplexSVR(BaseModel):
                         dbeta[:, 1] -= (ddual_var_old[1] - ddual_var[-1, 1])
 
     def _get_pobj0(self, dual_var, beta, hyperparam, y):
-        obj_prim = hyperparam[0] / self.n_samples * np.sum(np.maximum(
-            np.abs(y) - hyperparam[1], 0))
-        return obj_prim
+        return super()._get_pobj0(dual_var, beta, hyperparam, y)
 
     def _get_pobj(self, dual_var, X, beta, hyperparam, y):
-        n_samples = X.shape[0]
-        obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] / n_samples * np.sum(
-            np.maximum(np.abs(X @ beta - y) - hyperparam[1], 0))
-        return obj_prim
+        return super()._get_pobj(dual_var, X, beta, hyperparam, y)
 
     @staticmethod
     def _get_dobj(dual_var, X, beta, hyperparam, y):
@@ -267,26 +186,8 @@ class SimplexSVR(BaseModel):
     def _get_jac(dbeta, mask):
         return dbeta[mask, :]
 
-    @staticmethod
-    def _init_dbeta0(mask, mask0, jac0):
-        size_mat = mask.sum()
-        if jac0 is not None:
-            mask_both = np.logical_and(mask0, mask)
-            size_mat = mask.sum()
-            dbeta0_new = np.zeros((size_mat, 2))
-            count = 0
-            count_old = 0
-            n_features = mask.shape[0]
-            for j in range(n_features):
-                if mask_both[j]:
-                    dbeta0_new[count, :] = jac0[count_old, :]
-                if mask0[j]:
-                    count_old += 1
-                if mask[j]:
-                    count += 1
-        else:
-            dbeta0_new = np.zeros((size_mat, 2))
-        return dbeta0_new
+    def _init_dbeta0(self, mask, mask0, jac0):
+        return super()._init_dbeta0(mask, mask0, jac0)
 
     def _init_dbeta(self, n_features):
         if self.dbeta is not None:
@@ -340,7 +241,7 @@ class SimplexSVR(BaseModel):
 
                 _compute_jac_aux(
                     X, epsilon, dbeta, ddual_var, dual_var[j2], L,
-                    C, j1, j2, sign)
+                    C / n_samples, j1, j2, sign)
             else:
                 if j < (2 * n_samples + n_features):
                     dF = dbeta[j - (2 * n_samples)]
@@ -383,7 +284,7 @@ class SimplexSVR(BaseModel):
 
                 _compute_jac_aux_sparse(
                     data, indptr, indices, epsilon, dbeta, ddual_var,
-                    dual_var[j2], L, C, j1, j2, sign)
+                    dual_var[j2], L, C / n_samples, j1, j2, sign)
 
             else:
                 if j >= (2 * n_samples) and j < (2 * n_samples + n_features):
@@ -408,8 +309,7 @@ class SimplexSVR(BaseModel):
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def get_L(X):
+    def get_L(self, X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
@@ -422,10 +322,7 @@ class SimplexSVR(BaseModel):
         L: float
             The Lipschitz constant.
         """
-        if issparse(X):
-            return slinalg.norm(X, axis=1) ** 2
-        else:
-            return norm(X, axis=1) ** 2
+        return super().get_L(X)
 
     @staticmethod
     def reduce_X(X, mask):
@@ -453,20 +350,17 @@ class SimplexSVR(BaseModel):
         """
         return y
 
-    def sign(self, x, log_hyperparams):
+    def sign(self, beta, log_hyperparams):
         """Get sign of iterate. Here sign means -1.0 if the iterate is 0,
         1.0 if it is equal to C / n_samples.
 
         Parameters
         ----------
-        x : ndarray, shape TODO
+        beta : ndarray, shape TODO
         log_hyperparams : ndarray, shape (2, )
             Logarithm of hyperparameter C and epsilon.
         """
-        sign = np.zeros(x.shape[0])
-        sign[np.isclose(x, 0.0)] = -1.0
-        sign[np.isclose(x, np.exp(log_hyperparams[0]) / self.n_samples)] = 1.0
-        return sign
+        return super().sign(beta, log_hyperparams)
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
         """Compute hypergradient.
@@ -484,7 +378,7 @@ class SimplexSVR(BaseModel):
         jac: TODO
         v: TODO
         """
-        return jac.T @ v(mask, dense)
+        return super().get_jac_v(X, y, mask, dense, jac, v)
 
     @staticmethod
     def get_full_jac_v(mask, jac_v, n_features):
@@ -596,7 +490,7 @@ class SimplexSVR(BaseModel):
         log_hyperparam: float
             Logarithm of projected hyperparameters.
         """
-        return np.clip(log_hyperparam, -16, [10, 10.0])
+        return super().proj_hyperparam(X, y, log_hyperparam)
 
     def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
                     dbeta, dual_var, ddual_var, hyperparam):
@@ -660,12 +554,4 @@ class SimplexSVR(BaseModel):
         return LinearOperator((size_supp, size_supp), matvec=mv)
 
     def _use_estimator(self, X, y, hyperparam, tol, max_iter):
-        if self.estimator is None:
-            raise ValueError("You did not pass a solver with sklearn API")
-        self.estimator.set_params(
-            epsilon=hyperparam[1], tol=tol, C=hyperparam[0],
-            fit_intercept=False, max_iter=max_iter)
-        self.estimator.fit(X, y)
-        mask = self.estimator.coef_ != 0
-        dense = self.estimator.coef_[mask]
-        return mask, dense, None
+        return super()._use_estimator(X, y, hyperparam, tol, max_iter)
