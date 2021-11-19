@@ -332,7 +332,7 @@ class SVR(BaseModel):
 
         Parameters
         ----------
-        x : ndarray, shape TODO
+        beta : ndarray, shape TODO
         log_hyperparams : ndarray, shape TODO
         """
         # TODO harmonize with other models
