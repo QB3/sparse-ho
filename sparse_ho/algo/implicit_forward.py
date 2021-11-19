@@ -145,10 +145,10 @@ def get_only_jac(
             model._update_only_jac(
                 Xs, y, dual_var, dbeta, ddual_var, L, alpha, sign_beta)
         objs.append(
-            model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, dual_var,
+            model.get_jac_residual_norm(Xs, y, n_samples, sign_beta, dbeta, dual_var,
                               ddual_var, alpha))
         if use_stop_crit and i > 1:
             if (np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac
-                    or objs[-1] == 0.0):
+                    or objs[-1] < 1e-10):
                 break
     return dbeta
