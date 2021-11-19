@@ -149,6 +149,8 @@ def get_only_jac(
                 Xs, y, n_samples, sign_beta, dbeta, dual_var,
                 ddual_var, alpha))
         if use_stop_crit and i > 1:
+            # relative stopping criterion for the computation of the jacobian
+            # and absolute stopping criterion to handle warm start
             if (np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac
                     or objs[-1] < 1e-10):
                 break
