@@ -119,7 +119,7 @@ def get_bet_jac_implicit_forward(
 def get_only_jac(
         Xs, y, dual_var, alpha, sign_beta, dbeta=None, niter_jac=100,
         tol_jac=1e-4, model="lasso", mask=None, dense=None, verbose=False,
-        use_stop_crit=True, return_iter=False):
+        use_stop_crit=True):
     n_samples, n_features = Xs.shape
 
     L = model.get_L(Xs)
@@ -155,7 +155,5 @@ def get_only_jac(
             if (rel_tol < np.abs(residual_norm[-1]) * tol_jac
                     or residual_norm[-1] < 1e-10):
                 break
-    if return_iter:
-        return dbeta, i
-    else:
-        return dbeta
+    get_only_jac.n_iter = i
+    return dbeta
