@@ -433,7 +433,7 @@ class ElasticNet(BaseModel):
         return v
 
     def get_jac_residual_norm(self, Xs, ys, n_samples, beta, dbeta, dual_var,
-                    ddual_var, alpha):
+                              ddual_var, alpha):
         res1 = (1 / n_samples) * ddual_var[:, 0].T @ ddual_var[:, 0] + \
             alpha[1] * dbeta[:, 0].T @ dbeta[:, 0] + alpha[0] * \
             np.sign(beta) @ dbeta[:, 0]
