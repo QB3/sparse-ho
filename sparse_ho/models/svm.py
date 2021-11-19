@@ -408,7 +408,7 @@ class SVM(BaseModel):
         # TODO harmonize C vs alpha, OK for alpha everywhere for me (MM)
         return np.clip(log_alpha, -16, 4)
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
                     ddual_var, C):
         maskC = dual_var == C
         full_supp = np.logical_and(dual_var != 0, dual_var != C)
