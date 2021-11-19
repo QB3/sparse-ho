@@ -91,7 +91,8 @@ def test_beta_jac_custom(model_name):
 
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
 def test_warm_start(model_name):
-    """Check that using sk or celer yields the same solution as sparse ho"""
+    """Check that warm start leads to only 2 iterations
+    in Jacobian computation"""
     if model_name in ("svm", "svr", "ssvr"):
         X_s = X_r
     else:
@@ -115,7 +116,7 @@ def test_warm_start(model_name):
                 niter_jac=5000, tol_jac=1e-13, model=model, mask=mask,
                 dense=dense)
             if i == 0:
-                assert get_only_jac.n_iter > 2
+                np.testing.assert_array_less(2, get_only_jac.n_iter)
             else:
                 assert get_only_jac.n_iter == 2
 
