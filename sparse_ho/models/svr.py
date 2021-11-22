@@ -14,11 +14,11 @@ from sparse_ho.utils import proj_box_svm, ind_box
 def _compute_jac_aux(X, epsilon, dbeta, ddual_var, zj, L, C, j1, j2, sign):
     dF = sign * np.array([np.sum(dbeta[:, 0].T * X[j1, :]),
                           np.sum(dbeta[:, 1].T * X[j1, :])])
+    dF[1] += epsilon
     ddual_var_old = ddual_var[j2, :].copy()
     dzj = ddual_var[j2, :] - dF / L[j1]
     ddual_var[j2, :] = ind_box(zj, C) * dzj
     ddual_var[j2, 0] += C * (C <= zj)
-    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
     dbeta[:, 0] += sign * (ddual_var[j2, 0] -
                            ddual_var_old[0]) * X[j1, :]
     dbeta[:, 1] += sign * (ddual_var[j2, 1] -
@@ -48,11 +48,11 @@ def _compute_jac_aux_sparse(
 
     dF = sign * np.array([np.sum(dbeta[idx_nz, 0].T * Xjs),
                           np.sum(dbeta[idx_nz, 1].T * Xjs)])
+    dF[1] += epsilon
     ddual_var_old = ddual_var[j2, :].copy()
     dzj = ddual_var[j2, :] - dF / L[j1]
     ddual_var[j2, :] = ind_box(zj, C) * dzj
     ddual_var[j2, 0] += C * (C <= zj)
-    ddual_var[j2, 1] -= epsilon * ind_box(zj, C) / L[j1]
     dbeta[idx_nz, 0] += sign * (ddual_var[j2, 0] -
                                 ddual_var_old[0]) * Xjs
     dbeta[idx_nz, 1] += sign * (ddual_var[j2, 1] -
@@ -179,17 +179,21 @@ class SVR(BaseModel):
         n_samples = X.shape[0]
         obj_prim = 0.5 * norm(beta) ** 2 + hyperparam[0] * np.sum(np.maximum(
             np.abs(X @ beta - y) - hyperparam[1], np.zeros(n_samples)))
+        return obj_prim
+
+    @staticmethod
+    def _get_dobj(dual_var, X, beta, hyperparam, y):
+        n_samples = X.shape[0]
         obj_dual = 0.5 * beta.T @ beta + hyperparam[1] * np.sum(dual_var)
         obj_dual -= np.sum(y * (dual_var[0:n_samples] -
                                 dual_var[n_samples:(2 * n_samples)]))
-        return (obj_dual + obj_prim)
+        return -obj_dual
 
     @staticmethod
     def _get_jac(dbeta, mask):
         return dbeta[mask, :]
 
-    @staticmethod
-    def _init_dbeta0(mask, mask0, jac0):
+    def _init_dbeta0(self, mask, mask0, jac0):
         size_mat = mask.sum()
         if jac0 is not None:
             mask_both = np.logical_and(mask0, mask)
@@ -279,8 +283,7 @@ class SVR(BaseModel):
     def _reduce_alpha(alpha, mask):
         return alpha
 
-    @staticmethod
-    def get_L(X):
+    def get_L(self, X):
         """Compute Lipschitz constant of datafit.
 
         Parameters
@@ -324,19 +327,18 @@ class SVR(BaseModel):
         """
         return y
 
-    def sign(self, x, log_hyperparams):
+    def sign(self, beta, log_hyperparams):
         """Get sign of iterate.
 
         Parameters
         ----------
-        x : ndarray, shape TODO
+        beta : ndarray, shape TODO
         log_hyperparams : ndarray, shape TODO
         """
         # TODO harmonize with other models
-        # TODO why x not beta?
-        sign = np.zeros_like(x)
-        sign[np.isclose(x, 0.0)] = -1.0
-        sign[np.isclose(x, np.exp(log_hyperparams[0]))] = 1.0
+        sign = np.zeros_like(beta)
+        sign[np.isclose(beta, 0.0)] = -1.0
+        sign[np.isclose(beta, np.exp(log_hyperparams[0]))] = 1.0
         return sign
 
     def get_jac_v(self, X, y, mask, dense, jac, v):
@@ -392,7 +394,11 @@ class SVR(BaseModel):
         n_samples = X.shape[0]
         dual_coef = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(dual_coef != 0, np.abs(dual_coef) != C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(dual_coef), 0)),
+            np.logical_not(
+                np.isclose(np.abs(dual_coef), C)))
 
         X_m = X[full_supp, :]
         size_supp = X_m.shape[0]
@@ -424,8 +430,12 @@ class SVR(BaseModel):
         epsilon = hyperparam[1]
         alpha = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
-        maskC = np.abs(alpha) == C
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
+        maskC = np.isclose(np.abs(alpha), C)
         hessian = X[full_supp, :] @ X[maskC, :].T
         hessian_vec = hessian @ alpha[maskC]
         jac_t_v = hessian_vec.T @ jac
@@ -452,7 +462,11 @@ class SVR(BaseModel):
         C = np.exp(log_hyperparam[0])
         alpha = self.dual_var[0:n_samples] - \
             self.dual_var[n_samples:(2 * n_samples)]
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
         return v[full_supp]
 
     def proj_hyperparam(self, X, y, log_alpha):
@@ -481,8 +495,12 @@ class SVR(BaseModel):
         dalpha = ddual_var[0:n_samples, 0] - \
             ddual_var[n_samples:(2 * n_samples), 0]
 
-        maskC = np.abs(alpha) == C
-        full_supp = np.logical_and(alpha != 0, np.abs(alpha) != C)
+        maskC = np.isclose(np.abs(alpha), C)
+        full_supp = np.logical_and(
+            np.logical_not(
+                np.isclose(np.abs(alpha), 0)),
+            np.logical_not(
+                np.isclose(np.abs(alpha), C)))
 
         alphaX = dalpha[full_supp].T @ Xs[full_supp, :]
         quadratic_term = alphaX.T @ alphaX

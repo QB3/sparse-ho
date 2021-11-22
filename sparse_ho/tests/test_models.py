@@ -23,12 +23,12 @@ from sparse_ho.tests.common import (
 # list of algorithms to be tested
 list_algos = [
     Forward(),
-    ImplicitForward(tol_jac=1e-16, n_iter_jac=5000),
+    ImplicitForward(tol_jac=1e-8, n_iter_jac=5000),
     Implicit()
     # Backward()  # XXX to fix
 ]
 
-tol = 1e-15
+tol = 1e-14
 X_r = X_s.tocsr()
 X_c = X_s
 
@@ -126,8 +126,6 @@ def test_warm_start(model_name):
 def test_val_grad(model_name, criterion_name, algo):
     """Check that all methods return the same gradient, comparing to cvxpylayer
     """
-    if model_name == 'svr':
-        pytest.xfail("svr needs to be fixed")
 
     if criterion_name == 'logistic':
         pytest.xfail("cvxpylayer seems broken for logistic")
@@ -161,9 +159,6 @@ def test_check_grad_sparse_ho(model_name, criterion, algo):
     elif criterion == 'logistic':
         criterion = HeldOutLogistic(idx_train, idx_val)
 
-    if model_name == 'svr':
-        pytest.xfail("svr needs to be fixed")
-
     model = models[model_name]
     log_alpha = dict_log_alpha[model_name]
 
@@ -190,9 +185,6 @@ def test_check_grad_logreg_cvxpy(model_name):
     pytest.xfail("cvxpylayer seems broken for logistic")
     cvxpy_func = dict_cvxpy_func[model_name]
 
-    if model_name == 'svr':
-        pytest.xfail("svr needs to be fixed")
-
     def get_val(log_alpha):
         val_cvxpy, _ = cvxpy_func(
             X, y, np.exp(log_alpha), idx_train, idx_val)
@@ -214,6 +206,6 @@ if __name__ == "__main__":
     print("#" * 30)
     for algo in list_algos:
         print("#" * 20)
-        test_val_grad("svr", "MSE", algo)
+        test_val_grad("lasso", "MSE", algo)
         test_check_grad_sparse_ho('lasso', 'MSE', algo)
         test_beta_jac('lasso')

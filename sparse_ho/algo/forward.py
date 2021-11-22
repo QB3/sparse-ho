@@ -184,7 +184,6 @@ def compute_beta(
                 dual_gap = pobj[-1] - dobj
                 if verbose:
                     print("dual gap %.2e" % dual_gap)
-                assert dual_gap >= -100 * np.finfo('float').eps * dobj
                 if verbose:
                     print("gap %.2e" % dual_gap)
                 if dual_gap < pobj0 * tol:
