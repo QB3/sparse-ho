@@ -408,8 +408,8 @@ class SparseLogreg(BaseModel):
         """
         return v
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
-                    ddual_var, alpha):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta,
+                              dbeta, dual_var, ddual_var, alpha):
         return(
             norm(ddual_var.T @ ddual_var +
                  n_samples * alpha * sign_beta @ dbeta))

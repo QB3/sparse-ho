@@ -8,7 +8,8 @@ from scipy.optimize import check_grad
 from sparse_ho import Forward, ImplicitForward, Implicit
 
 from sparse_ho.algo.forward import compute_beta
-from sparse_ho.algo.implicit_forward import get_bet_jac_implicit_forward
+from sparse_ho.algo.implicit_forward import (get_bet_jac_implicit_forward,
+                                             get_only_jac)
 from sparse_ho.algo.implicit import compute_beta_grad_implicit
 from sparse_ho.criterion import (
     HeldOutMSE, FiniteDiffMonteCarloSure, HeldOutLogistic)
@@ -71,7 +72,7 @@ def test_beta_jac(key):
 @pytest.mark.parametrize('model_name', list(custom_models.keys()))
 def test_beta_jac_custom(model_name):
     """Check that using sk or celer yields the same solution as sparse ho"""
-    if model_name == "svm" or model_name == "svr" or model_name == "ssvr":
+    if model_name in ("svm", "svr", "ssvr"):
         X_s = X_r
     else:
         X_s = X_c
@@ -86,6 +87,38 @@ def test_beta_jac_custom(model_name):
         assert np.all(supp == supp_custom)
         assert np.allclose(dense, dense_custom)
         assert np.allclose(jac, jac_custom)
+
+
+@pytest.mark.parametrize('model_name', list(custom_models.keys()))
+def test_warm_start(model_name):
+    """Check that warm start leads to only 2 iterations
+    in Jacobian computation"""
+    if model_name in ("svm", "svr", "ssvr"):
+        X_s = X_r
+    else:
+        X_s = X_c
+    model = models[model_name]
+
+    for log_alpha in dict_list_log_alphas[model_name]:
+        mask, dense, jac = None, None, None
+        for i in range(2):
+            mask, dense, _ = compute_beta(
+                X_s, y, log_alpha, tol=tol,
+                mask0=mask, dense0=dense, jac0=jac,
+                max_iter=5000, compute_jac=False, model=model)
+            dbeta0_new = model._init_dbeta0(mask, mask, jac)
+            reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
+
+            _, dual_var = model._init_beta_dual_var(X_s, y, mask, dense)
+            jac = get_only_jac(
+                model.reduce_X(X_s, mask), model.reduce_y(y, mask), dual_var,
+                reduce_alpha, model.sign(dense, log_alpha), dbeta=dbeta0_new,
+                niter_jac=5000, tol_jac=1e-13, model=model, mask=mask,
+                dense=dense)
+            if i == 0:
+                np.testing.assert_array_less(2, get_only_jac.n_iter)
+            else:
+                assert get_only_jac.n_iter == 2
 
 
 @pytest.mark.parametrize('model_name,criterion_name', list_model_crit)
