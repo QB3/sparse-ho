@@ -1,0 +1,33 @@
+﻿sparse\_ho.models.SimplexSVR
+============================
+
+.. currentmodule:: sparse_ho.models
+
+.. autoclass:: SimplexSVR
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SimplexSVR.__init__
+      ~SimplexSVR.generalized_supp
+      ~SimplexSVR.get_L
+      ~SimplexSVR.get_dual_v
+      ~SimplexSVR.get_full_jac_v
+      ~SimplexSVR.get_jac_residual_norm
+      ~SimplexSVR.get_jac_v
+      ~SimplexSVR.get_mat_vec
+      ~SimplexSVR.proj_hyperparam
+      ~SimplexSVR.reduce_X
+      ~SimplexSVR.reduce_y
+      ~SimplexSVR.sign
+   
+   
+
+   
+   
+   

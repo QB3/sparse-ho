@@ -26,6 +26,7 @@ Models
 
    ElasticNet
    Lasso
+   SimplexSVR
    SparseLogreg
    SVM
    SVR
