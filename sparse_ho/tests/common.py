@@ -43,7 +43,7 @@ tab = np.linspace(1, 1000, n_features)
 dict_log_alpha["wLasso"] = log_alpha + np.log(tab / tab.max())
 dict_log_alpha["logreg"] = (log_alpha - np.log(2))
 dict_log_alpha["svm"] = 1e-4
-dict_log_alpha["svr"] = np.log(np.array([1e-1, 1e-1]))
+dict_log_alpha["svr"] = np.log(np.array([1e-2, 1e-1]))
 dict_log_alpha["ssvr"] = np.log(np.array([0.01, 0.1]))
 
 # Set models to be tested
@@ -110,8 +110,8 @@ dict_list_log_alphas["svr"] = [
         np.log(np.geomspace(1e-2, 1e-1, num=5)))]
 dict_list_log_alphas["ssvr"] = [
     np.array(i) for i in itertools.product(
-        np.log(np.geomspace(1e-2, 1e-1, num=5)),
-        np.log(np.geomspace(1e-2, 1e-1, num=5)))]
+        np.log(np.geomspace(0.01, 0.1, num=5)),
+        np.log(np.geomspace(0.01, 0.1, num=5)))]
 
 
 def get_grad_outer(mask, dense):

@@ -167,10 +167,14 @@ class SimplexSVR(SVR):
                         dbeta[:, 1] -= (ddual_var_old[1] - ddual_var[-1, 1])
 
     def _get_pobj0(self, dual_var, beta, hyperparam, y):
-        return super()._get_pobj0(dual_var, beta, hyperparam, y)
+        hyperparameters = hyperparam.copy()
+        hyperparameters[0] /= len(y)
+        return super()._get_pobj0(dual_var, beta, hyperparameters, y)
 
     def _get_pobj(self, dual_var, X, beta, hyperparam, y):
-        return super()._get_pobj(dual_var, X, beta, hyperparam, y)
+        hyperparameters = hyperparam.copy()
+        hyperparameters[0] /= len(y)
+        return super()._get_pobj(dual_var, X, beta, hyperparameters, y)
 
     @staticmethod
     def _get_dobj(dual_var, X, beta, hyperparam, y):
@@ -492,8 +496,8 @@ class SimplexSVR(SVR):
         """
         return super().proj_hyperparam(X, y, log_hyperparam)
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
-                    dbeta, dual_var, ddual_var, hyperparam):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta,
+                              dbeta, dual_var, ddual_var, hyperparam):
 
         n_features = dbeta.shape[0]
         C = hyperparam[0]
