@@ -54,7 +54,7 @@ _docstring_ignores = [
     ".*compute_beta_grad$",
     ".*get_beta_jac$",
     ".*get_full_jac_obj$",
-    ".*get_jac_obj$",
+    ".*get_jac_residual_norm$",
 ]
 _tab_ignores = []
 

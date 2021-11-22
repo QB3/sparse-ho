@@ -488,8 +488,8 @@ class SVR(BaseModel):
         """
         return np.clip(log_alpha, -16, [5, 2])
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta,
-                    dbeta, dual_var, ddual_var, hyperparam):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta,
+                              dbeta, dual_var, ddual_var, hyperparam):
         C = hyperparam[0]
         alpha = dual_var[0:n_samples] - dual_var[n_samples:(2 * n_samples)]
         dalpha = ddual_var[0:n_samples, 0] - \
