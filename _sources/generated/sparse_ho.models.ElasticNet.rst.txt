@@ -18,7 +18,7 @@
       ~ElasticNet.get_L
       ~ElasticNet.get_beta
       ~ElasticNet.get_full_jac_v
-      ~ElasticNet.get_jac_obj
+      ~ElasticNet.get_jac_residual_norm
       ~ElasticNet.get_jac_v
       ~ElasticNet.get_mask_jac_v
       ~ElasticNet.get_mat_vec

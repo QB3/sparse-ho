@@ -18,7 +18,7 @@
       ~SVM.get_L
       ~SVM.get_dual_v
       ~SVM.get_full_jac_v
-      ~SVM.get_jac_obj
+      ~SVM.get_jac_residual_norm
       ~SVM.get_jac_v
       ~SVM.get_mat_vec
       ~SVM.proj_hyperparam
