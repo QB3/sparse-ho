@@ -8,7 +8,7 @@ from mne.datasets import sample
 from mne.viz import plot_sparse_source_estimates
 
 from sparse_ho.utils import Monitor
-from sparse_ho.models import wLasso, Lasso
+from sparse_ho.models import WeightedLasso, Lasso
 from sparse_ho.criterion import SURE
 from sparse_ho.implicit_forward import ImplicitForward
 from sparse_ho.ho import grad_search
@@ -143,7 +143,7 @@ def solver(
 
     if model == "wlasso":
         log_alpha0 = log_alpha0 * np.ones(n_features)
-        model = wLasso(X_train, y_train, log_alpha0)
+        model = WeightedLasso(X_train, y_train, log_alpha0)
     else:
         model = Lasso(X_train, y_train, log_alpha0)
 
