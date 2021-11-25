@@ -6,12 +6,13 @@ import numpy as np
 import mne
 from mne.datasets import sample
 from mne.viz import plot_sparse_source_estimates
-
+from celer import Lasso as celer_Lasso
 from sparse_ho.utils import Monitor
 from sparse_ho.models import WeightedLasso, Lasso
-from sparse_ho.criterion import SURE
-from sparse_ho.implicit_forward import ImplicitForward
+from sparse_ho.criterion import FiniteDiffMonteCarloSure
+from sparse_ho import ImplicitForward
 from sparse_ho.ho import grad_search
+from sparse_ho.optimizers import GradientDescent
 
 
 ###############################################################################
@@ -135,30 +136,35 @@ def solver(
     alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
     alpha0 = p_alpha0 * alpha_max
     # alpha0 = 0.7 * alpha_max
-    log_alpha0 = np.log(alpha0)
+    # log_alpha0 = np.log(alpha0)
 
     tol = 1e-9
     criterion = "sure"
     n_outer = 10
 
+    estimator = celer_Lasso(fit_intercept=False, max_iter=100, warm_start=True)
     if model == "wlasso":
-        log_alpha0 = log_alpha0 * np.ones(n_features)
-        model = WeightedLasso(X_train, y_train, log_alpha0)
+        alpha0 = alpha0 * np.ones(n_features)
+        model = WeightedLasso(estimator=estimator)
+
     else:
-        model = Lasso(X_train, y_train, log_alpha0)
+        model = Lasso(estimator=estimator)
 
     sigma = 1 / np.sqrt(nave)
-    criterion = SURE(X_train, y_train, model, sigma)
+    criterion = FiniteDiffMonteCarloSure(sigma=sigma)
     algo = ImplicitForward(criterion)
-    monitor_grad = Monitor()
-    grad_search(
-        algo, log_alpha0, monitor_grad, n_outer=n_outer, tol=tol)
+    optimizer = GradientDescent(
+        n_outer=100, tol=1e-7, verbose=True, p_grad_norm=1.9)
+    monitor = Monitor()
+    grad_search(algo, criterion, model, optimizer,
+                X_train, y_train, alpha0, monitor)
+    # TODO is this on the correct data?
 
     X = criterion.dense0[:, np.newaxis] * np.ones((1, n_times))
     active_set = criterion.mask0
     X /= alpha_max_old
 
-    return X, active_set, monitor_grad
+    return X, active_set, monitor
 
 
 if __name__ == '__main__':
