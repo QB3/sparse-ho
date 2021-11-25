@@ -178,7 +178,8 @@ if __name__ == '__main__':
     # Read noise covariance matrix
     noise_cov = mne.read_cov(cov_fname)
     # Handling average file
-    evoked = mne.read_evokeds(ave_fname, condition=condition, baseline=(None, 0))
+    evoked = mne.read_evokeds(
+        ave_fname, condition=condition, baseline=(None, 0))
     evoked.crop(tmin=0.04, tmax=0.18)
 
     evoked = evoked.pick_types(eeg=False, meg=True)
@@ -190,7 +191,7 @@ if __name__ == '__main__':
         evoked, forward, noise_cov, loose, depth, model="wlasso")
     print("Value of objectives:")
     print(monitor.objs)
-    ###############################################################################
+    ###########################################################################
     # View in 2D and 3D ("glass" brain like 3D plot)
     plot_sparse_source_estimates(
         forward['src'], stc_wlasso, bgcolor=(1, 1, 1), opacity=0.1)
