@@ -1,4 +1,4 @@
-"""A docstring."""
+"""A docstring. TODO"""
 
 import mne
 
@@ -6,15 +6,14 @@ from surfer import Brain
 from mayavi import mlab
 
 from mne.datasets import sample
-# from mne.viz import plot_sparse_source_estimates
 
 from plot_meg_example import apply_solver
 
 
 def plot_blob(
-        stc, subject="sample", surface="inflated", s=14, save_fname="",
+        stc, subject="sample", surface="inflated", s=14,
         data_path=sample.data_path(), subject_name='/subjects',
-        fig_dir="", figsize=(800, 800), event_id=1):
+        figsize=(800, 800), event_id=1):
 
     subjects_dir = data_path + subject_name
     list_hemi = ["lh", "rh"]
@@ -31,16 +30,6 @@ def plot_blob(
                 surf.x[sources], surf.y[sources],
                 surf.z[sources], color=(1, 0, 0),
                 scale_factor=s, opacity=1., transparent=True)
-        if save_fname:
-            fname = fig_dir + hemi + save_fname
-            print(fname)
-            if event_id == 1 or event_id == 2:
-                brain.save_montage(fname, order=['lat'])
-            else:
-                brain.save_montage(fname, order=['lat'])
-                # brain.save_montage(fname, order=['ven'])
-
-            # mlab.savefig(fname)
             figure = mlab.gcf()
             mlab.close(figure)
 
@@ -71,16 +60,13 @@ forward = mne.read_forward_solution(fwd_fname)
 loose, depth = 0., .8  # corresponds to free orientation
 
 models = ["lasso", "wlasso"]
-for model in models:
+for model_name in models:
     stc, monitor = apply_solver(
-        evoked, forward, noise_cov, loose, depth, model=model)
+        evoked, forward, noise_cov, loose, depth, model_name=model_name)
     print("Value of objectives:")
     print(monitor.objs)
 
-    fig_dir = "../../CD_SUGAR/tex/slides_qbe_long/prebuiltimages/"
-    save_fname = "%s.png" % model
-
-    plot_blob(stc, fig_dir=fig_dir, save_fname=save_fname)
+    plot_blob(stc)
 
     ###########################################################################
     # View in 2D and 3D ("glass" brain like 3D plot)
