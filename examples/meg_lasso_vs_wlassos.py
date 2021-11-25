@@ -4,7 +4,7 @@ from surfer import Brain
 from mayavi import mlab
 
 from mne.datasets import sample
-from mne.viz import plot_sparse_source_estimates
+# from mne.viz import plot_sparse_source_estimates
 
 from plot_meg_example import apply_solver
 

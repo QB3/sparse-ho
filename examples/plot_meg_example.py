@@ -29,7 +29,7 @@ def apply_solver(
       the data
     - to take into account the noise covariance and do the spatial whitening
     - to apply loose orientation constraint as MNE solvers
-    - to apply a weigthing of the columns of the forward operator as in the
+    - to apply a weighting of the columns of the forward operator as in the
       weighted Minimum Norm formulation in order to limit the problem
       of depth bias.
 
@@ -85,10 +85,8 @@ def apply_solver(
 
     X, active_set, monitor = solver(
         M, gain, n_orient, evoked.nave, p_alpha0=p_alpha0, model=model)
-    # X, active_set, monitor = solver(M, gain, n_orient, )
     X = _reapply_source_weighting(X, source_weighting, active_set)
 
-    # import ipdb; ipdb.set_trace()
     stc = _make_sparse_stc(X, active_set, forward, tmin=evoked.times[0],
                            tstep=1. / evoked.info['sfreq'])
 
