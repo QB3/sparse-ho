@@ -152,9 +152,9 @@ def solver(
 
     sigma = 1 / np.sqrt(nave)
     criterion = FiniteDiffMonteCarloSure(sigma=sigma)
-    algo = ImplicitForward(criterion)
+    algo = ImplicitForward(tol_jac=1e-9)
     optimizer = GradientDescent(
-        n_outer=100, tol=1e-7, verbose=True, p_grad_norm=1.9)
+        n_outer=20, tol=1e-7, verbose=True, p_grad_norm=1.9)
     monitor = Monitor()
     grad_search(algo, criterion, model, optimizer,
                 X_train, y_train, alpha0, monitor)
