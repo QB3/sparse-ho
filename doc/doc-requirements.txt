@@ -1,4 +1,6 @@
 numpydoc
+mne
+pooch
 sphinx-bootstrap-theme
 pillow
 sphinx-gallery

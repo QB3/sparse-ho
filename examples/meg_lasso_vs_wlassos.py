@@ -1,3 +1,5 @@
+"""A docstring."""
+
 import mne
 
 from surfer import Brain
