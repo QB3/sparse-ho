@@ -142,7 +142,6 @@ for idx, dataset in enumerate(dataset_names):
 
     for i, (time, obj, method, tol) in enumerate(
             zip(times, objs, methods, tols)):
-        # import ipdb; ipdb.set_trace()
         marker = dict_markers[method]
         obj = [np.min(obj[:k]) for k in np.arange(len(obj)) + 1]
         lines.append(

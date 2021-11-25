@@ -9,7 +9,7 @@ from scipy.sparse import csc_matrix
 from sparse_ho.models import SVM
 # from cvxopt import spmatrix, matrix
 # from cvxopt import solvers
-from sparse_ho.forward import get_beta_jac_iterdiff
+from sparse_ho.forward import compute_beta
 from sparse_ho.datasets.real import load_libsvm
 
 
@@ -67,7 +67,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     temp3[np.isclose(beta_star, C)] = np.ones(
         (np.isclose(beta_star, C)).sum()) * C
     # temp3 = temp3[full_supp]
-    # import ipdb; ipdb.set_trace()
     v = temp3[full_supp] - yX[full_supp, :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
@@ -82,7 +81,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     jac_star[np.isclose(beta_star, C)] = C
     primal_jac_star = np.sum(X.T.multiply(y * jac_star), axis=1)
     model = SVM(X, y, np.log(C), max_iter=max_iter, tol=tol)
-    list_beta, list_jac = get_beta_jac_iterdiff(
+    list_beta, list_jac = compute_beta(
         X, y, np.log(C), model, save_iterates=True, tol=1e-32,
         max_iter=max_iter, compute_jac=True)
 
@@ -95,7 +94,6 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
         full_supp = np.logical_and(np.logical_not(np.isclose(list_beta[i, :], 0)), np.logical_not(np.isclose(list_beta[i, :], C)))
-        # import ipdb; ipdb.set_trace()
         if not np.all(full_supp == full_supp_star):
             supp_id = i + 1
             break

@@ -3,94 +3,30 @@ sparse-ho
 
 |image0| |image1|
 
-sparse-ho stands for "sparse hyperparameter optimization". This code aims to offer
-a efficient solution to the problem of hyperparameter setting for sparse models such as Lasso.
-Contrarily to grid search, the proposed method can handle efficiently many hyperparameters.
+`sparse-ho` stands for "sparse hyperparameter optimization".
+This package implements efficient hyperparameter tuning for sparse machine learning models.
+It supports models such as the Lasso, the Weighted Lasso, multiclass sparse Logistic regression, SVM, etc.
 
-This package implements the implicit forward differentiation algorithm, a fast algorithm to
-compute the Jacobian of the Lasso as described in `this paper <https://arxiv.org/pdf/2002.08943.pdf>`_.
+Relying on a first order algorithm for bilevel optimization, ``sparse-ho``'s performances scales gracefully with the number of hyperparameters to tune.
 
-It also implements a large number of competitors, such as the forward differentiation, the backward differentiation, and the implicit differentiation.
+In order to benchmark performances, the package also implements alternatives such as forward or backward differentiation.
+
+Documentation
+-------------
+
+Please visit `https://qb3.github.io/sparse-ho`_ for the latest version of the documentation.
 
 
 Install
 -------
 
-To be able to run the experiments  you should install the conda environment:
 
-::
-
-    conda env create -f environment.yml
-    conda activate sparse-ho-env
-
-(you may need to open  fresh new terminal).
-
-To be able to run the code you first need to run, in the folder that contains
-the setup.py file (root folder):
+To run the code you first need to clone the repository, and then run, in the folder containing
+the ``setup.py`` file (root folder):
 
 ::
 
     pip install -e .
-
-
-You should now be able to run a first example which reproduces Figure 1:
-
-::
-
-    ipython -i examples/plot_time_to_compute_single_gradient.py
-
-If you want to compare methods to solve the whole hyperparameter optimization
-problem, you can run the example:
-
-::
-
-    ipython -i examples/plot_friendly_example.py
-
-in particular you can play with the parameters of the bayesian solver in
-the implicit_forward/bayesian.py file.
-
-You should now be able to play with the methods and the estimators.
-
-
-Reproduce all experiments
-=========================
-
-Scripts to reproduce all the experiments: Figure 2, 3, 4, 5.
-
-Be careful, you may want to run these scripts on a server with multiple CPUs.
-
-All the figures of the paper can be reproduced.
-
-What is needed is in the implicit_forward/expes folder:
-
-- Figure 2:
-
-::
-
-    run main_lasso_pred.py
-    ipython -i plot_lasso_pred.py
-
-- Figure 3:
-
-::
-
-    run main_lasso_est.py
-    ipython -i plot_lasso_est.py
-
-- Figure 4:
-
-::
-
-    run main_wLasso.py
-    ipython -i plot_wLasso.py
-
-- Figure 5 in Appendix:
-
-::
-
-    run main_mcp_pred.py
-    ipython -i plot_mcp_pred.py
-
 
 
 Cite
@@ -100,19 +36,22 @@ If you use this code, please cite:
 
 ::
 
-    @article{bertrand2020implicit,
-    title={Implicit differentiation of Lasso-type models for hyperparameter optimization},
-    author={Bertrand, Quentin and Klopfenstein, Quentin and Blondel, Mathieu and Vaiter, Samuel and Gramfort, Alexandre and Salmon, Joseph},
-    journal={arXiv preprint arXiv:2002.08943},
-    year={2020}
+    @inproceedings{bertrand2020implicit,
+        title={Implicit differentiation of Lasso-type models for hyperparameter optimization},
+        author={Bertrand, Q. and Klopfenstein, Q. and Blondel, M. and Vaiter, S. and Gramfort, A. and Salmon, J.},
+        booktitle={ICML},
+        year={2020},
     }
 
 
-ArXiv links:
+Code to reproduce the figures of the paper is in the ``expes`` folder.
+
+
+ArXiv link:
 
 - https://arxiv.org/pdf/2002.08943.pdf
 
-.. |image0| image:: https://travis-ci.org/QB3/sparse-ho.svg?branch=master
-   :target: https://travis-ci.org/QB3/sparse-ho/
+.. |image0| image:: https://github.com/QB3/sparse-ho/workflows/build/badge.svg?branch=master
+   :target: https://github.com/QB3/sparse-ho/actions?query=workflow%3Abuild
 .. |image1| image:: https://codecov.io/gh/QB3/sparse-ho/branch/master/graphs/badge.svg?branch=master
-   :target: https://codecov.io/gh/mathurinm/QB3/sparse-ho
+   :target: https://app.codecov.io/gh/qb3/sparse-ho

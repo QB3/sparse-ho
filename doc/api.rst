@@ -24,9 +24,14 @@ Models
 .. autosummary::
    :toctree: generated/
 
+   ElasticNet
    Lasso
-   wLasso
+   SimplexSVR
+   SparseLogreg
    SVM
+   SVR
+   WeightedLasso
+
 
 
 Criterion
@@ -43,28 +48,51 @@ Criterion
 .. autosummary::
    :toctree: generated/
 
-   CV
-   SURE
-   Logistic
+   CrossVal
+   FiniteDiffMonteCarloSure
+   HeldOutMSE
+   HeldOutSmoothedHinge
+   HeldOutLogistic
+   LogisticMulticlass
 
 
 Algorithms
 ==========
 
-:py:mod:`sparse_ho`:
+:py:mod:`sparse_ho.algo`:
 
-.. currentmodule:: sparse_ho
+.. currentmodule:: sparse_ho.algo
 
-.. automodule:: sparse_ho
+.. automodule:: sparse_ho.algo
    :no-members:
    :no-inherited-members:
 
 .. autosummary::
    :toctree: generated/
 
+   Implicit
    ImplicitForward
    Forward
    Backward
+
+
+Optimizers
+==========
+
+:py:mod:`sparse_ho.optimizers`:
+
+.. currentmodule:: sparse_ho.optimizers
+
+.. automodule:: sparse_ho.optimizers
+   :no-members:
+   :no-inherited-members:
+
+.. autosummary::
+   :toctree: generated/
+
+   Adam
+   GradientDescent
+   LineSearch
 
 Functions
 =========
@@ -73,27 +101,7 @@ Functions
    :toctree: generated/
 
    grad_search
-   grad_search_wolfe
-
-
-Datasets
-========
-
-:py:mod:`sparse_ho.datasets`:
-
-.. currentmodule:: sparse_ho.datasets
-
-.. automodule:: sparse_ho.datasets
-   :no-members:
-   :no-inherited-members:
-
-.. autosummary::
-   :toctree: generated/
-
-   get_synt_data
-   get_rcv1
-   get_leukemia
-   get_20newsgroup
+   hyperopt_wrapper
 
 
 Utils
@@ -111,4 +119,3 @@ Utils
    :toctree: generated/
 
    Monitor
-   WarmStart
