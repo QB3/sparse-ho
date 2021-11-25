@@ -8,6 +8,7 @@ from mne.viz import plot_sparse_source_estimates
 
 from meg_utils import apply_solver
 
+mne.viz.set_3d_backend("pyvistaqt")
 
 data_path = sample.data_path()
 fwd_fname = data_path + '/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif'
