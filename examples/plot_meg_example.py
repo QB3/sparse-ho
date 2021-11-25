@@ -6,6 +6,10 @@ import numpy as np
 import mne
 from mne.datasets import sample
 from mne.viz import plot_sparse_source_estimates
+from mne.inverse_sparse.mxne_inverse import (_prepare_gain, is_fixed_orient,
+                                             _reapply_source_weighting,
+                                             _make_sparse_stc)
+
 from celer import Lasso as celer_Lasso
 from sparse_ho.utils import Monitor
 from sparse_ho.models import WeightedLasso, Lasso
@@ -63,11 +67,6 @@ def apply_solver(
     stc : instance of SourceEstimate
         The source estimates.
     """
-    # Import the necessary private functions
-    from mne.inverse_sparse.mxne_inverse import \
-        (_prepare_gain, is_fixed_orient,
-         _reapply_source_weighting, _make_sparse_stc)
-
     all_ch_names = evoked.ch_names
 
     # Handle depth weighting and whitening (here is no weights)
@@ -98,33 +97,7 @@ def apply_solver(
 # Define your solver
 
 def solver(
-        y_train, X_train, n_orient, nave, p_alpha0=0.7, model="wlasso"):
-    """Run L2 penalized regression and keep 10 strongest locations.
-
-    Parameters
-    ----------
-    M : array, shape (n_channels, n_times)
-        The whitened data.
-    G : array, shape (n_channels, n_dipoles)
-        The gain matrix a.k.a. the forward operator. The number of locations
-        is n_dipoles / n_orient. n_orient will be 1 for a fixed orientation
-        constraint or 3 when using a free orientation model.
-    n_orient : int
-        Can be 1 or 3 depending if one works with fixed or free orientations.
-        If n_orient is 3, then ``G[:, 2::3]`` corresponds to the dipoles that
-        are normal to the cortex.
-    nave : int
-        The number of epochs averaged.
-
-    Returns
-    -------
-    X : array, (n_active_dipoles, n_times)
-        The time series of the dipoles in the active set.
-    active_set : array (n_dipoles)
-        Array of bool. Entry j is True if dipole j is in the active set.
-        We have ``X_full[active_set] == X`` where X_full is the full X matrix
-        such that ``M = G X_full``.
-    """
+        y_train, X_train, n_orient, nave, p_alpha0=0.7, model_name="wlasso"):
     n_times = y_train.shape[1]
     idx_max = np.argmax(np.sum(y_train ** 2, axis=0))
     y_train = y_train[:, idx_max]
@@ -135,15 +108,9 @@ def solver(
 
     alpha_max = (np.abs(X_train.T @ y_train)).max() / n_samples
     alpha0 = p_alpha0 * alpha_max
-    # alpha0 = 0.7 * alpha_max
-    # log_alpha0 = np.log(alpha0)
-
-    tol = 1e-9
-    criterion = "sure"
-    n_outer = 10
 
     estimator = celer_Lasso(fit_intercept=False, max_iter=100, warm_start=True)
-    if model == "wlasso":
+    if model_name == "wlasso":
         alpha0 = alpha0 * np.ones(n_features)
         model = WeightedLasso(estimator=estimator)
 
