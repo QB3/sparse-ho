@@ -1,5 +1,9 @@
 """"
-Apply weighted lasso to find MEG sources
+=======================================
+Finding MEG sources with weighted Lasso
+=======================================
+
+This example compares the Lasso and Weighted Lasso on real MEG data.
 """
 
 import mne
