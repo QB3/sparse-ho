@@ -55,8 +55,10 @@ jobs:
               echo "wget done"
               chmod +x ~/miniconda.sh
               echo "chmod done"
+              echo "echo hello" >> test.sh
+              bash test.sh
               ls -la -hr
-              bash miniconda.sh -b -p $HOME/miniconda -u
+              bash miniconda.sh -b -u
               echo "done"
 
         - run:
