@@ -8,7 +8,7 @@ from celer import Lasso as celer_Lasso
 from sparse_ho.utils import Monitor
 from sparse_ho.models import WeightedLasso, Lasso
 from sparse_ho.criterion import FiniteDiffMonteCarloSure
-from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import GradientDescent
 
@@ -113,9 +113,9 @@ def solver(
 
     sigma = 1 / np.sqrt(nave)
     criterion = FiniteDiffMonteCarloSure(sigma=sigma)
-    algo = ImplicitForward(tol_jac=1e-9)
+    algo = Implicit()
     optimizer = GradientDescent(
-        n_outer=20, tol=1e-7, verbose=True, p_grad_norm=1.9)
+        n_outer=5, tol=1e-7, verbose=True, p_grad_norm=1.9)
     monitor = Monitor()
     grad_search(algo, criterion, model, optimizer,
                 X_train, y_train, alpha0, monitor)
