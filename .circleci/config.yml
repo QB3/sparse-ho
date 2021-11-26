@@ -63,7 +63,7 @@ jobs:
             name: Get Python running
             command: |
               export PATH="$HOME/miniconda3/bin:$PATH"
-              conda create -y --name=mne --channel=conda-forge mne
+              conda create -y --name=mne --channel=conda-forge scipy
               conda activate mne
               python -m pip install -U pip
               python -m pip install -U -r requirements.txt
