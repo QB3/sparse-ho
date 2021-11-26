@@ -3,6 +3,7 @@ jobs:
     build_docs:
       docker:
         - image: cimg/python:3.9.9
+        entrypoint: [ "/bin/bash", "-l", "-c" ]
       steps:
         - checkout
         - run:
@@ -59,7 +60,7 @@ jobs:
               bash test.sh
               lscpu
               sha256sum ./anaconda.sh
-              bash -l -c ./anaconda.sh -b -u
+              bash ./anaconda.sh -b -u
               echo "done"
 
         - run:
