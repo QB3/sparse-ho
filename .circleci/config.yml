@@ -58,6 +58,7 @@ jobs:
               echo "echo hello" >> test.sh
               bash test.sh
               lscpu
+              sha256sum ./anaconda.sh
               source ./anaconda.sh -b -u
               echo "done"
 
