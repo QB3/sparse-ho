@@ -3,10 +3,10 @@
 Weighted Lasso versus Lasso on MEG
 ==================================
 
-This example compares the Lasso and Weighted Lasso on real MEG data.
-While the the bias of the Lasso leads to optimal coefficients with a lot of
+This example compares the Lasso and the weighted Lasso on real MEG data.
+While the bias of the Lasso leads to optimal coefficients with a lot of
 sources in the brain, the weighted Lasso is able to recover 1 source per
-hemisphere in the brain.
+hemisphere in the brain, as expected from a neuroscience point of view.
 """
 
 # Authors: Mathurin Massias <mathurin.massas@gmail.com>
@@ -46,12 +46,8 @@ loose, depth = 0., .8  # corresponds to free orientation
 
 models = ["lasso", "wlasso"]
 for model_name in models:
-    stc, monitor = apply_solver(
-        evoked, forward, noise_cov, loose, depth, model_name=model_name)
-    print("Value of objectives:")
-    print(monitor.objs)
-
-    ###########################################################################
-    # View in 2D and 3D ("glass" brain like 3D plot)
+    stc = apply_solver(
+        evoked, forward, noise_cov, loose, depth, model_name=model_name)[0]
+    # Plot glass brain
     plot_sparse_source_estimates(
         forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
