@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: cimg/python:3.9.9
+        - image: continuum/miniconda3
       steps:
         - checkout
         - run:
@@ -46,20 +46,6 @@ jobs:
               sudo apt update
               sudo apt install xvfb
               /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
-
-        - run:
-            name: Setup Miniconda
-            command: |
-              cd $HOME
-              wget "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh" -O miniconda.sh
-              echo "wget done"
-              chmod +x ~/miniconda.sh
-              echo "chmod done"
-              echo "echo hello" >> test.sh
-              bash test.sh
-              lscpu
-              source ./miniconda.sh -b -u
-              echo "done"
 
         - run:
             name: Get Python running
