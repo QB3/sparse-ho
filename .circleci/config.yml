@@ -56,7 +56,7 @@ jobs:
               echo "wget done"
               chmod +x ./anaconda.sh
               echo "chmod done"
-              pwd
+              df /home/circleci/anaconda.sh
               mount
               lscpu
               sha256sum ./anaconda.sh
