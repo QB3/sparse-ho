@@ -52,14 +52,17 @@ jobs:
             name: Setup Miniconda
             command: |
               cd $HOME
-              wget "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh" -O anaconda.sh
-              chmod +x ./anaconda.sh
-              bash anaconda.sh -b -u
+              wget "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh" -O miniconda.sh
+              chmod +x ./miniconda.sh
+              bash miniconda.sh -bu
               echo "done"
+              export PATH="$HOME/miniconda3/bin:$PATH"
+              echo $PATH
 
         - run:
             name: Get Python running
             command: |
+              echo $PATH
               conda create --name=mne --channel=conda-forge mne
               conda activate mne
               python -m pip install -U pip
