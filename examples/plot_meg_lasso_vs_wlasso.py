@@ -1,9 +1,21 @@
-"""A docstring. TODO"""
+"""
+==================================
+Weighted Lasso versus Lasso on MEG
+==================================
+
+This example compares the weighted lasso to the Lasso
+"""
+
+# Authors: Mathurin Massias <mathurin.massas@gmail.com>
+#
+# License: BSD (3-clause)
 
 import mne
 
 from surfer import Brain
 from mayavi import mlab
+from mne.viz import plot_sparse_source_estimates
+
 
 from mne.datasets import sample
 
@@ -70,5 +82,5 @@ for model_name in models:
 
     ###########################################################################
     # View in 2D and 3D ("glass" brain like 3D plot)
-    # plot_sparse_source_estimates(
-    #     forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
+    plot_sparse_source_estimates(
+        forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)

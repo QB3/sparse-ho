@@ -28,17 +28,21 @@ jobs:
 
         # If all keys are in the same command only one is restored
         # thx @mathurinm
-        # - restore_cache:
-        #     keys:
-        #       - data-cache-0
+        - restore_cache:
+            keys:
+              - data-cache-0
 
-        # - restore_cache:
-        #     keys:
-        #       - pip-cache
+                - restore_cache:
+            keys:
+              - mne-cache
 
-        # - restore_cache:
-        #     keys:
-        #       - sparse_ho_data
+        - restore_cache:
+            keys:
+              - pip-cache
+
+        - restore_cache:
+            keys:
+              - sparse_ho_data
 
         - run:
             name: Spin up Xvfb
@@ -70,6 +74,7 @@ jobs:
               python -m pip install -e .
               pip install sphinx-bootstrap-theme
               mamba install -y -c conda-forge numpydoc pillow sphinx-gallery pyqt pyvista pyvistaqt
+
         - save_cache:
             key: pip-cache
             paths:
