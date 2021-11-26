@@ -41,12 +41,12 @@ jobs:
         #     keys:
         #       - sparse_ho_data
 
-        - run:
-            name: Spin up Xvfb
-            command: |
-              sudo apt update
-              sudo apt install xvfb
-              /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
+        # - run:
+        #     name: Spin up Xvfb
+        #     command: |
+        #       sudo apt update
+        #       sudo apt install xvfb
+        #       /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
 
         - run:
             name: Setup Miniconda
