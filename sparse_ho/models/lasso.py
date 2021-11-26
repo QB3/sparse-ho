@@ -11,7 +11,8 @@ from sparse_ho.models.base import BaseModel
 
 
 class Lasso(BaseModel):
-    """Linear Model trained with L1 prior as regularizer (aka the Lasso)
+    """Linear Model trained with L1 prior as regularizer (aka the Lasso).
+
     The optimization objective for Lasso is:
     (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
 
@@ -411,7 +412,7 @@ class Lasso(BaseModel):
         """
         return v
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta,
-                    dual_var, ddual_var, alpha):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta, dbeta,
+                              dual_var, ddual_var, alpha):
         return norm(ddual_var.T @ ddual_var +
                     n_samples * alpha * sign_beta @ dbeta)

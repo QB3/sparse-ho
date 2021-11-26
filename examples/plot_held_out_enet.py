@@ -40,7 +40,7 @@ dataset = 'simu'
 dataset = 'simu'
 
 if dataset == 'rcv1':
-    X, y = fetch_libsvm('rcv1_train')
+    X, y = fetch_libsvm('rcv1.binary')
     y -= y.mean()
     y /= np.linalg.norm(y)
 else:

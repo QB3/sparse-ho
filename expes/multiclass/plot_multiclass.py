@@ -12,7 +12,7 @@ from sparse_ho.optimizers import GradientDescent
 from sparse_ho.ho import grad_search, hyperopt_wrapper
 from sparse_ho.utils import Monitor
 from sparse_ho.datasets.utils_datasets import (
-    get_alpha_max, clean_dataset, get_splits)
+    alpha_max_multiclass, clean_dataset, get_splits)
 
 
 # load data
@@ -43,7 +43,7 @@ logit_multiclass = LogisticMulticlass(
     idx_train, idx_val, algo, idx_test=idx_test)
 
 
-alpha_max, n_classes = get_alpha_max(X, y)
+alpha_max, n_classes = alpha_max_multiclass(X, y)
 tol = 1e-5
 
 

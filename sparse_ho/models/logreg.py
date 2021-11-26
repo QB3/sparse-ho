@@ -9,6 +9,7 @@ from sparse_ho.models.base import BaseModel
 
 class SparseLogreg(BaseModel):
     """Sparse Logistic Regression classifier.
+
     The objective function is:
 
     sum_1^n_samples log(1 + e^{-y_i x_i^T w}) + 1. / C * ||w||_1
@@ -407,8 +408,8 @@ class SparseLogreg(BaseModel):
         """
         return v
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
-                    ddual_var, alpha):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta,
+                              dbeta, dual_var, ddual_var, alpha):
         return(
             norm(ddual_var.T @ ddual_var +
                  n_samples * alpha * sign_beta @ dbeta))

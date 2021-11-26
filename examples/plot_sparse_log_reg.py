@@ -34,7 +34,7 @@ from sparse_ho.utils_plot import discrete_cmap
 
 print(__doc__)
 
-dataset = 'rcv1_train'
+dataset = 'rcv1.binary'
 # dataset = 'simu'
 
 if dataset != 'simu':

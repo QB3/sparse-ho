@@ -124,7 +124,7 @@ def get_only_jac(
 
     L = model.get_L(Xs)
 
-    objs = []
+    residual_norm = []
 
     if hasattr(model, 'dual'):
         ddual_var = model._init_ddual_var(dbeta, Xs, y, sign_beta, alpha)
@@ -144,10 +144,18 @@ def get_only_jac(
         else:
             model._update_only_jac(
                 Xs, y, dual_var, dbeta, ddual_var, L, alpha, sign_beta)
-        objs.append(
-            model.get_jac_obj(Xs, y, n_samples, sign_beta, dbeta, dual_var,
-                              ddual_var, alpha))
+        residual_norm.append(
+            model.get_jac_residual_norm(
+                Xs, y, n_samples, sign_beta, dbeta, dual_var,
+                ddual_var, alpha))
         if use_stop_crit and i > 1:
-            if np.abs(objs[-2] - objs[-1]) < np.abs(objs[-1]) * tol_jac:
+            # relative stopping criterion for the computation of the jacobian
+            # and absolute stopping criterion to handle warm start
+            rel_tol = np.abs(residual_norm[-2] - residual_norm[-1])
+            if (rel_tol < np.abs(residual_norm[-1]) * tol_jac
+                    or residual_norm[-1] < 1e-10):
                 break
+    # HACK we only need this for one test, do not rely on it
+    get_only_jac.n_iter = i
+
     return dbeta

@@ -43,6 +43,13 @@ If you use this code, please cite:
         year={2020},
     }
 
+    @article{bertrand2021implicit,
+        title={Implicit differentiation for fast hyperparameter selection in non-smooth convex learning},
+        author={Bertrand, Q. and Klopfenstein, Q. and Massias, M. and Blondel, M. and Vaiter, S. and Gramfort, A. and Salmon, S.},
+        journal={arXiv preprint arXiv:2105.01637},
+        year={2021}
+    }
+
 
 Code to reproduce the figures of the paper is in the ``expes`` folder.
 
@@ -50,6 +57,7 @@ Code to reproduce the figures of the paper is in the ``expes`` folder.
 ArXiv link:
 
 - https://arxiv.org/pdf/2002.08943.pdf
+- https://arxiv.org/pdf/2105.01637.pdf
 
 .. |image0| image:: https://github.com/QB3/sparse-ho/workflows/build/badge.svg?branch=master
    :target: https://github.com/QB3/sparse-ho/actions?query=workflow%3Abuild

@@ -8,7 +8,8 @@ from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import LogisticMulticlass
 from sparse_ho import ImplicitForward
 from sparse_ho.utils import Monitor
-from sparse_ho.datasets.utils_datasets import (get_alpha_max, clean_dataset)
+from sparse_ho.datasets.utils_datasets import (
+    alpha_max_multiclass, clean_dataset)
 
 
 # load data
@@ -24,7 +25,7 @@ X, y = clean_dataset(X, y, n_samples, n_features)
 idx_train = np.arange(len(y) // 2)
 idx_val = np.arange(len(y) // 2, len(y))
 
-alpha_max, n_classes = get_alpha_max(X, y)
+alpha_max, n_classes = alpha_max_multiclass(X, y)
 tol = 1e-8
 
 n_classes = np.unique(y).shape[0]

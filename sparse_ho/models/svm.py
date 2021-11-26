@@ -12,10 +12,11 @@ from sparse_ho.utils import init_dbeta0_new
 
 
 class SVM(BaseModel):
-    """The support vector Machine classifier without bias
+    """Support Vector Machine classifier without bias.
+
     The optimization problem is solved in the dual:
-    1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
-    s.t 0 <= r_i <= C
+        1/2 r^T(y * X)(y * X)^T r - sum_i^n r_i
+        s.t 0 <= r_i <= C
 
     Parameters
     ----------
@@ -407,8 +408,8 @@ class SVM(BaseModel):
         # TODO harmonize C vs alpha, OK for alpha everywhere for me (MM)
         return np.clip(log_alpha, -16, 4)
 
-    def get_jac_obj(self, Xs, ys, n_samples, sign_beta, dbeta, dual_var,
-                    ddual_var, C):
+    def get_jac_residual_norm(self, Xs, ys, n_samples, sign_beta,
+                              dbeta, dual_var, ddual_var, C):
         maskC = dual_var == C
         full_supp = np.logical_and(dual_var != 0, dual_var != C)
         if issparse(Xs):
