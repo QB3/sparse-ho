@@ -1,9 +1,9 @@
 """Utility files for the MEG data examples."""
 
 import numpy as np
-from mne.inverse_sparse.mxne_inverse import (_prepare_gain, is_fixed_orient,
-                                             _reapply_source_weighting,
-                                             _make_sparse_stc)
+from mne.inverse_sparse.mxne_inverse import (
+    _prepare_gain, is_fixed_orient, _reapply_source_weighting,
+    _make_sparse_stc)
 from celer import Lasso as celer_Lasso
 from sparse_ho.utils import Monitor
 from sparse_ho.models import WeightedLasso, Lasso
@@ -119,7 +119,6 @@ def solver(
     monitor = Monitor()
     grad_search(algo, criterion, model, optimizer,
                 X_train, y_train, alpha0, monitor)
-    # TODO is this on the correct data?
 
     X = criterion.dense0[:, np.newaxis] * np.ones((1, n_times))
     active_set = criterion.mask0

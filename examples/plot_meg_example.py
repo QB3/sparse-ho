@@ -18,14 +18,7 @@ data_path = sample.data_path()
 fwd_fname = data_path + '/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif'
 ave_fname = data_path + '/MEG/sample/sample_audvis-ave.fif'
 cov_fname = data_path + '/MEG/sample/sample_audvis-shrunk-cov.fif'
-subjects_dir = data_path + '/subjects'
-# condition = 'Right Auditory'
 condition = 'Left Auditory'
-
-if condition == 'Left Auditory':
-    tmax = 0.18
-else:
-    tmax = 0.15
 
 # Read noise covariance matrix
 noise_cov = mne.read_cov(cov_fname)
