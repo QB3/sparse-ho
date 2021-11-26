@@ -21,6 +21,9 @@ class Implicit():
         Maximum number of iteration for the resolution of the linear system.
     tol_lin_sys: float (default=1e-6)
         Tolerance for the resolution of the linear system.
+    use_stop_crit: bool (default=True)
+        Wether or not to use the stopping criterion with the our inner solvers.
+        This is useful for experiments to see the linear conv of the Jacobian.
     """
 
     def __init__(
