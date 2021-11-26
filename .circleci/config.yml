@@ -3,7 +3,7 @@ jobs:
     build_docs:
       docker:
         - image: cimg/python:3.9.9
-          entrypoint: /bin/bash -l -c
+        entrypoint: [ "/bin/bash", "-l", "-c" ]
       steps:
         - checkout
         - run:
@@ -56,11 +56,11 @@ jobs:
               echo "wget done"
               chmod +x ./anaconda.sh
               echo "chmod done"
-              echo "echo hello" >> test.sh
-              bash test.sh
+              pwd
+              mount
               lscpu
               sha256sum ./anaconda.sh
-              bash ./anaconda.sh -b -u
+              bash ./anaconda.sh -h
               echo "done"
 
         - run:
