@@ -24,7 +24,7 @@ from sklearn.datasets import make_regression
 from sklearn.linear_model import LassoCV
 from sklearn.model_selection import KFold
 
-from sparse_ho import ImplicitForward, grad_search
+from sparse_ho import Implicit, grad_search
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
 from sparse_ho.optimizers import GradientDescent
@@ -83,7 +83,7 @@ criterion = HeldOutMSE(None, None)
 alpha0 = 0.9 * alpha_max
 monitor_grad = Monitor()
 cross_val_criterion = CrossVal(criterion, cv=kf)
-algo = ImplicitForward()
+algo = Implicit()
 optimizer = GradientDescent(n_outer=10, tol=tol)
 grad_search(
     algo, cross_val_criterion, model, optimizer, X, y, alpha0,

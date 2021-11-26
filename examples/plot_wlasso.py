@@ -26,7 +26,7 @@ from celer.datasets import make_correlated_data
 
 from sparse_ho.models import WeightedLasso
 from sparse_ho.criterion import HeldOutMSE, CrossVal
-from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import GradientDescent
@@ -79,7 +79,7 @@ estimator = Lasso(fit_intercept=False, max_iter=100, warm_start=True)
 model = WeightedLasso(estimator=estimator)
 sub_criterion = HeldOutMSE(idx_train, idx_val)
 criterion = CrossVal(sub_criterion, cv=cv)
-algo = ImplicitForward()
+algo = Implicit()
 monitor = Monitor()
 optimizer = GradientDescent(
     n_outer=100, tol=1e-7, verbose=True, p_grad_norm=1.9)

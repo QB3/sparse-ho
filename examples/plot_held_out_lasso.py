@@ -24,7 +24,7 @@ from libsvmdata.datasets import fetch_libsvm
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.utils import Monitor
 from sparse_ho.utils_plot import discrete_cmap
 from sparse_ho.ho import grad_search
@@ -87,7 +87,7 @@ print('sparse-ho started')
 t0 = time.time()
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward()
+algo = Implicit()
 monitor_grad = Monitor()
 optimizer = LineSearch(n_outer=10, tol=tol)
 grad_search(
