@@ -11,39 +11,36 @@ This example compares the weighted lasso to the Lasso
 # License: BSD (3-clause)
 
 import mne
-
-from surfer import Brain
-from mayavi import mlab
+# from surfer import Brain
+# from mayavi import mlab
 from mne.viz import plot_sparse_source_estimates
-
-
 from mne.datasets import sample
 
-from plot_meg_example import apply_solver
+from meg_utils import apply_solver
 
 
-def plot_blob(
-        stc, subject="sample", surface="inflated", s=14,
-        data_path=sample.data_path(), subject_name='/subjects',
-        figsize=(800, 800), event_id=1):
+# def plot_blob(
+#         stc, subject="sample", surface="inflated", s=14,
+#         data_path=sample.data_path(), subject_name='/subjects',
+#         figsize=(800, 800), event_id=1):
 
-    subjects_dir = data_path + subject_name
-    list_hemi = ["lh", "rh"]
+#     subjects_dir = data_path + subject_name
+#     list_hemi = ["lh", "rh"]
 
-    for i, hemi in enumerate(list_hemi):
-        figure = mlab.figure(size=figsize)
-        brain = Brain(
-            subject, hemi, surface, subjects_dir=subjects_dir,
-            offscreen=False, figure=figure)
-        surf = brain.geo[hemi]
-        sources_h = stc.vertices[i]  # 0 for lh, 1 for rh
-        for sources in sources_h:
-            mlab.points3d(
-                surf.x[sources], surf.y[sources],
-                surf.z[sources], color=(1, 0, 0),
-                scale_factor=s, opacity=1., transparent=True)
-            figure = mlab.gcf()
-            mlab.close(figure)
+#     for i, hemi in enumerate(list_hemi):
+#         figure = mlab.figure(size=figsize)
+#         brain = Brain(
+#             subject, hemi, surface, subjects_dir=subjects_dir,
+#             offscreen=False, figure=figure)
+#         surf = brain.geo[hemi]
+#         sources_h = stc.vertices[i]  # 0 for lh, 1 for rh
+#         for sources in sources_h:
+#             mlab.points3d(
+#                 surf.x[sources], surf.y[sources],
+#                 surf.z[sources], color=(1, 0, 0),
+#                 scale_factor=s, opacity=1., transparent=True)
+#             figure = mlab.gcf()
+#             mlab.close(figure)
 
 
 data_path = sample.data_path()
@@ -78,7 +75,7 @@ for model_name in models:
     print("Value of objectives:")
     print(monitor.objs)
 
-    plot_blob(stc)
+    # plot_blob(stc)
 
     ###########################################################################
     # View in 2D and 3D ("glass" brain like 3D plot)
