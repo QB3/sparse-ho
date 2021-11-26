@@ -53,14 +53,8 @@ jobs:
             command: |
               cd $HOME
               wget "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh" -O anaconda.sh
-              echo "wget done"
               chmod +x ./anaconda.sh
-              echo "chmod done"
-              df /home/circleci/anaconda.sh
-              mount
-              lscpu
-              sha256sum ./anaconda.sh
-              bash ./anaconda.sh -h
+              bash anaconda.sh -bu
               echo "done"
 
         - run:
