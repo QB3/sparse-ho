@@ -115,7 +115,7 @@ def solver(
     criterion = FiniteDiffMonteCarloSure(sigma=sigma)
     algo = Implicit()
     optimizer = GradientDescent(
-        n_outer=5, tol=1e-7, verbose=True, p_grad_norm=1.9)
+        n_outer=4, tol=1e-7, verbose=True, p_grad_norm=1.9)
     monitor = Monitor()
     grad_search(algo, criterion, model, optimizer,
                 X_train, y_train, alpha0, monitor)
