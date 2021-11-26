@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: continuum/miniconda3
+        - image: continuumio/miniconda3
       steps:
         - checkout
         - run:
