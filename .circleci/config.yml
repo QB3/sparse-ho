@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: continuumio/miniconda3
+        - image: circleci/python:3.8.1-buster
       steps:
         - checkout
         - run:
@@ -46,8 +46,20 @@ jobs:
               /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
 
         - run:
+          name: Setup Miniconda
+          command: |
+            apt update
+            apt install -y wget
+            cd $HOME
+            wget "https://repo.anaconda.com/miniconda/Miniconda3-4.7.10-Linux-x86_64.sh" -O miniconda.sh
+            printf '%s' "8a324adcc9eaf1c09e22a992bb6234d91a94146840ee6b11c114ecadafc68121  miniconda.sh" | sha256sum -c
+            bash miniconda.sh -b -p $HOME/miniconda
+
+        - run:
             name: Get Python running
             command: |
+              conda create --name=mne --channel=conda-forge mne
+              conda activate mne
               python -m pip install -U pip
               python -m pip install -U -r requirements.txt
               python -m pip install -U-r doc/doc-requirements.txt
