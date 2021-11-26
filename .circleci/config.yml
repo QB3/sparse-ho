@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: continuumio/miniconda3
+        - image: cimg/python:3.9.9
       steps:
         - checkout
         - run:
@@ -28,17 +28,17 @@ jobs:
 
         # If all keys are in the same command only one is restored
         # thx @mathurinm
-        - restore_cache:
-            keys:
-              - data-cache-0
+        # - restore_cache:
+        #     keys:
+        #       - data-cache-0
 
-        - restore_cache:
-            keys:
-              - pip-cache
+        # - restore_cache:
+        #     keys:
+        #       - pip-cache
 
-        - restore_cache:
-            keys:
-              - sparse_ho_data
+        # - restore_cache:
+        #     keys:
+        #       - sparse_ho_data
 
         - run:
             name: Spin up Xvfb
@@ -46,6 +46,20 @@ jobs:
               sudo apt update
               sudo apt install xvfb
               /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
+
+        - run:
+            name: Setup Miniconda
+            command: |
+              cd $HOME
+              wget "https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh" -O anaconda.sh
+              echo "wget done"
+              chmod +x ./anaconda.sh
+              echo "chmod done"
+              echo "echo hello" >> test.sh
+              bash test.sh
+              lscpu
+              source ./anaconda.sh -b -u
+              echo "done"
 
         - run:
             name: Get Python running
