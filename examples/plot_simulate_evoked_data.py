@@ -21,6 +21,7 @@ from plot_meg_example import apply_solver
 
 print(__doc__)
 
+mne.viz.set_3d_backend("pyvistaqt")
 ###############################################################################
 # Load real data as templates
 data_path = sample.data_path()

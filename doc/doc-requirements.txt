@@ -3,4 +3,7 @@ mne
 pooch
 sphinx-bootstrap-theme
 pillow
+pyvista
+pyvistaqt
+pyqt5
 sphinx-gallery
