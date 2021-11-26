@@ -68,11 +68,9 @@ jobs:
               python -m pip install -U pip
               python -m pip install -U -r requirements.txt
               python -m pip install -e .
-              mamba install -y -c conda-forge numpydoc sphinx-bootstrap-theme pillow sphinx-gallery pyqt
+              pip install sphinx-bootstrap-theme
+              mamba install -y -c conda-forge numpydoc pillow sphinx-gallery pyqt pyvista pyvistaqt
               sudo apt-get update
-              sudo apt-get install libxcb-icccm4 libxcb-image0
-              sudo apt-get install libxcb-icccm4 libxcb-image0 libxcb-keysyms1
-
               sudo apt-get install libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0
         - save_cache:
             key: pip-cache
@@ -94,7 +92,7 @@ jobs:
               export PATH="$HOME/miniconda3/bin:$PATH"
               cd doc;
               make clean;
-              export QT_DEBUG_PLUGINS=1; make SPHINXOPTS=-v html;
+              export QT_DEBUG_PLUGINS=1; make SPHINXOPTS=-v html
 
 
         - save_cache:
