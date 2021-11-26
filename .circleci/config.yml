@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: circleci/python:3.8.1-buster
+        - image: continuumio/miniconda3
       steps:
         - checkout
         - run:
@@ -48,9 +48,9 @@ jobs:
         - run:
             name: Get Python running
             command: |
-              python -m pip install --user --upgrade --progress-bar off pip
-              python -m pip install --user --upgrade --progress-bar off -r requirements.txt
-              python -m pip install --user --upgrade --progress-bar off -r doc/doc-requirements.txt
+              python -m pip install -U pip
+              python -m pip install -U -r requirements.txt
+              python -m pip install -U-r doc/doc-requirements.txt
               python -m pip install --user --upgrade -e .
 
         - save_cache:
