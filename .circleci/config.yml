@@ -58,7 +58,7 @@ jobs:
               echo "echo hello" >> test.sh
               bash test.sh
               lscpu
-              source miniconda.sh -b -u
+              source ./miniconda.sh -b -u
               echo "done"
 
         - run:
