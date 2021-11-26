@@ -32,7 +32,7 @@ jobs:
             keys:
               - data-cache-0
 
-                - restore_cache:
+        - restore_cache:
             keys:
               - mne-cache
 
