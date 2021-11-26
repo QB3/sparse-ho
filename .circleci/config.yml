@@ -62,7 +62,7 @@ jobs:
         - run:
             name: Get Python running
             command: |
-              echo $PATH
+              export PATH="$HOME/miniconda3/bin:$PATH"
               conda create --name=mne --channel=conda-forge mne
               conda activate mne
               python -m pip install -U pip
@@ -79,6 +79,7 @@ jobs:
         - run:
             name: Check installation
             command: |
+               export PATH="$HOME/miniconda3/bin:$PATH"
                which python
                python -c "import sparse_ho"
 
@@ -86,6 +87,7 @@ jobs:
         - run:
             name: make html
             command: |
+              export PATH="$HOME/miniconda3/bin:$PATH"
               cd doc;
               make clean;
               make SPHINXOPTS=-v html;
