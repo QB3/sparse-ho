@@ -59,7 +59,7 @@ jobs:
               bash test.sh
               lscpu
               sha256sum ./anaconda.sh
-              source ./anaconda.sh -b -u
+              bash -l -c ./anaconda.sh -b -u
               echo "done"
 
         - run:
