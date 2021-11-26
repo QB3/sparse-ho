@@ -188,7 +188,7 @@ Grid-search
     Iteration 19 / 20
     Iteration 20 / 20
     scikit finished
-    Time to compute grad search: 1.04 s
+    Time to compute grad search: 1.00 s
 
 
 
@@ -270,7 +270,7 @@ Grad-search
 
     sparse-ho started
     sparse-ho finished
-    Time to compute grad search: 2.08 s
+    Time to compute grad search: 1.80 s
     /home/circleci/project/examples/plot_sparse_log_reg.py:128: UserWarning: color is redundantly defined by the 'color' keyword argument and the fmt string "bo" (-> color='b'). The keyword argument will take precedence.
       plt.plot(
 
@@ -280,7 +280,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.573 seconds)
+   **Total running time of the script:** ( 0 minutes  3.377 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_sparse_log_reg.py:
