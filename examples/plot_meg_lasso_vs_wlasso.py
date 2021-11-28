@@ -10,8 +10,11 @@ hemisphere in the brain, as expected from a neuroscience point of view.
 """
 
 # Authors: Mathurin Massias <mathurin.massas@gmail.com>
+#          Alexandre Gramfort <alexandre.gramfort@inria.fr>
 #
 # License: BSD (3-clause)
+
+# sphinx_gallery_thumbnail_number = 4
 
 import mne
 from mne.viz import plot_sparse_source_estimates
@@ -32,22 +35,33 @@ if condition == 'Left Auditory':
 else:
     tmax = 0.15
 
-# Read noise covariance matrix
+# %%
+# Read noise covariance matrix and evoked data
 noise_cov = mne.read_cov(cov_fname)
-# Handling average file
 evoked = mne.read_evokeds(ave_fname, condition=condition, baseline=(None, 0))
 evoked.crop(tmin=0.04, tmax=0.18)
 
+# Crop data around the period of interest
 evoked = evoked.pick_types(eeg=False, meg=True)
+
+# %%
 # Handling forward solution
 forward = mne.read_forward_solution(fwd_fname)
 
 loose, depth = 0., .8  # corresponds to free orientation
 
-models = ["lasso", "wlasso"]
-for model_name in models:
-    stc = apply_solver(
-        evoked, forward, noise_cov, loose, depth, model_name=model_name)[0]
-    # Plot glass brain
-    plot_sparse_source_estimates(
-        forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
+# %%
+# Run estimation with Lasso
+stc = apply_solver(
+    evoked, forward, noise_cov, loose, depth, model_name="lasso")[0]
+# Plot glass brain
+plot_sparse_source_estimates(
+    forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
+
+# %%
+# Run estimation with Weighted Lasso
+stc = apply_solver(
+    evoked, forward, noise_cov, loose, depth, model_name="wlasso")[0]
+# Plot glass brain
+plot_sparse_source_estimates(
+    forward['src'], stc, bgcolor=(1, 1, 1), opacity=0.1)
