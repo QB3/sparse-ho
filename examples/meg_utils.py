@@ -103,7 +103,8 @@ def solver(
     alpha0 = p_alpha0 * alpha_max
 
     estimator = celer_Lasso(
-        fit_intercept=False, max_iter=100, warm_start=True, tol=1e-3)
+        fit_intercept=False, max_iter=100, warm_start=True,
+        normalize="deprecated", tol=1e-3)
     if model_name == "wlasso":
         alpha0 = alpha0 * np.ones(n_features)
         model = WeightedLasso(estimator=estimator)
