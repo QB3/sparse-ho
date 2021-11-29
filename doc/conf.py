@@ -190,11 +190,22 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+scrapers = ('matplotlib',)
+try:
+    import mne
+    import pyvista
+    mne.viz.set_3d_backend('pyvistaqt')
+    pyvista.OFF_SCREEN = False
+    scrapers += ('pyvista',)
+except:
+    pass
+
 sphinx_gallery_conf = {
     'doc_module': ('sparse_ho',),
     'reference_url': dict(sparse_ho=None),
     'examples_dirs': '../examples',
     'gallery_dirs': 'auto_examples',
+    'image_scrapers': scrapers,
     'reference_url': {
         'numpy': 'http://docs.scipy.org/doc/numpy-1.9.1',
         'scipy': 'http://docs.scipy.org/doc/scipy-0.17.0/reference',
