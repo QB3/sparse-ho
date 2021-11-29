@@ -72,6 +72,7 @@ jobs:
 
               python -m pip install -U pip
               python -m pip install -U -r requirements.txt
+              python -m pip install --user --upgrade --progress-bar off -r doc/doc-requirements.txt
               python -m pip install -e .
               pip install sphinx-bootstrap-theme
               mamba install -y -c conda-forge numpydoc pillow sphinx-gallery pyqt pyvista pyvistaqt
