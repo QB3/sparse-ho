@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: cimg/python:3.9.9
+        - image: circleci/python:3.8.5-buster
       steps:
         - checkout
         - run:
@@ -49,7 +49,8 @@ jobs:
             command: |
               sudo apt update
               sudo apt install xvfb
-              /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
+              echo "export DISPLAY=:99" >> $BASH_ENV
+              /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset -nolisten tcp -nolisten unix
 
         - run:
             name: Setup Miniconda
