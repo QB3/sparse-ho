@@ -33,9 +33,6 @@ from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import GradientDescent
 
 
-"""Utility files for the MEG data examples."""
-
-
 def apply_solver(
         evoked, forward, noise_cov, loose=0.2, depth=0.8, p_alpha0=0.7,
         model_name="wlasso"):
