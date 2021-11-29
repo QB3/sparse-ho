@@ -2,7 +2,7 @@ version: 2
 jobs:
     build_docs:
       docker:
-        - image: cimg/python:3.9.9
+        - image: circleci/python:3.8.5-buster
       steps:
         - checkout
         - run:
