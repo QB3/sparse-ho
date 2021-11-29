@@ -31,13 +31,6 @@ def apply_solver(
 
     Parameters
     ----------
-    XXXXXXXXXXXXXXXX Solver is not a parameter of the function, TODO
-    solver : callable
-        The solver takes 3 parameters: data M, gain matrix G, number of
-        dipoles orientations per location (1 or 3). A solver shall return
-        2 variables: X which contains the time series of the active dipoles
-        and an active set which is a boolean mask to specify what dipoles are
-        present in X.
     evoked : instance of mne.Evoked
         The evoked data
     forward : instance of Forward
@@ -53,6 +46,10 @@ def apply_solver(
         space and set to 1.0 for volumic or discrete source space.
     depth : None | float in [0, 1]
         Depth weighting coefficients. If None, no depth weighting is performed.
+    p_alpha0 : float (default=0.7)
+        Proportion of alpha_max for the initial point alpha0.
+    model_name : string (default="wlasso")
+        Name of the model to use, "lasso" or "wLasso" in this case.
 
     Returns
     -------
@@ -62,7 +59,7 @@ def apply_solver(
     all_ch_names = evoked.ch_names
 
     # Handle depth weighting and whitening (here is no weights)
-    forward, gain, gain_info, whitener, source_weighting, mask = _prepare_gain(
+    forward, gain, gain_info, whitener, source_weighting, _ = _prepare_gain(
         forward, evoked.info, noise_cov, pca=False, depth=depth,
         loose=0, weights=None, weights_min=None, rank=None)
 
