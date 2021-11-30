@@ -115,6 +115,9 @@ jobs:
             name: deploy
             command: |
               if [[ ${CIRCLE_BRANCH} == "master" ]]; then
+                which python
+                which pip
+                export PATH="$HOME/miniconda3/bin:$PATH"
                 set -e
                 mkdir -p ~/.ssh
                 echo -e "Host *\nStrictHostKeyChecking no" > ~/.ssh/config
