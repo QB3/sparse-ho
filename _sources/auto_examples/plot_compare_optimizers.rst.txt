@@ -95,29 +95,29 @@ for sparse logistic regression using a held-out test set.
 
  .. code-block:: none
 
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'rocket' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'rocket' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'rocket_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'rocket_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'mako' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'mako' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'mako_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'mako_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'icefire' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'icefire' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'icefire_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'icefire_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'vlag' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'vlag' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'vlag_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'vlag_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'flare' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'flare' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'flare_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'flare_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'crest' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1582: UserWarning: Trying to register the cmap 'crest' which already exists.
       mpl_cm.register_cmap(_name, _cmap)
-    /home/circleci/.local/lib/python3.8/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'crest_r' which already exists.
+    /home/circleci/miniconda3/lib/python3.9/site-packages/seaborn/cm.py:1583: UserWarning: Trying to register the cmap 'crest_r' which already exists.
       mpl_cm.register_cmap(_name + "_r", _cmap_r)
 
     Dataset: rcv1.binary
@@ -280,7 +280,7 @@ Grad-search
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.416 seconds)
+   **Total running time of the script:** ( 0 minutes  2.602 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_compare_optimizers.py:

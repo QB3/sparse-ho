@@ -158,6 +158,27 @@ can be done with the sparse_ho library.
    :hidden:
 
    /auto_examples/plot_held_out_enet
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example compares the Lasso and the weighted Lasso on real MEG data. While the bias of the ...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_meg_lasso_vs_wlasso_thumb.png
+     :alt: Weighted Lasso versus Lasso on MEG
+
+     :ref:`sphx_glr_auto_examples_plot_meg_lasso_vs_wlasso.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_meg_lasso_vs_wlasso
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

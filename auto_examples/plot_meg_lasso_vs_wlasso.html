@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Weighted Lasso versus Lasso on MEG &#8212; sparse-ho 0.1.dev documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          sparse-ho</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.1.dev</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="https://github.com/QB3/sparse-ho">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/QB3/sparse-ho/">Fork sparse-ho on Github</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-plot-meg-lasso-vs-wlasso-py"><span class="std std-ref">here</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="weighted-lasso-versus-lasso-on-meg">
+<span id="sphx-glr-auto-examples-plot-meg-lasso-vs-wlasso-py"></span><h1>Weighted Lasso versus Lasso on MEG<a class="headerlink" href="#weighted-lasso-versus-lasso-on-meg" title="Permalink to this headline">¶</a></h1>
+<p>This example compares the Lasso and the weighted Lasso on real MEG data.
+While the bias of the Lasso leads to optimal coefficients with a lot of
+sources in the brain, the weighted Lasso is able to recover 1 source per
+hemisphere in the brain, as expected from a neuroscience point of view.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Mathurin Massias &lt;mathurin.massas@gmail.com&gt;</span>
+<span class="c1">#          Alexandre Gramfort &lt;alexandre.gramfort@inria.fr&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># License: BSD (3-clause)</span>
+
+<span class="c1"># sphinx_gallery_thumbnail_number = 4</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">mne</span>
+<span class="kn">from</span> <span class="nn">mne.viz</span> <span class="kn">import</span> <span class="n">plot_sparse_source_estimates</span>
+<span class="kn">from</span> <span class="nn">mne.datasets</span> <span class="kn">import</span> <span class="n">sample</span>
+
+<span class="kn">from</span> <span class="nn">mne.inverse_sparse.mxne_inverse</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_prepare_gain</span><span class="p">,</span> <span class="n">is_fixed_orient</span><span class="p">,</span> <span class="n">_reapply_source_weighting</span><span class="p">,</span>
+    <span class="n">_make_sparse_stc</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">celer</span> <span class="kn">import</span> <span class="n">Lasso</span> <span class="k">as</span> <span class="n">celer_Lasso</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.utils</span> <span class="kn">import</span> <span class="n">Monitor</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.models</span> <span class="kn">import</span> <span class="n">WeightedLasso</span><span class="p">,</span> <span class="n">Lasso</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.criterion</span> <span class="kn">import</span> <span class="n">FiniteDiffMonteCarloSure</span>
+<span class="kn">from</span> <span class="nn">sparse_ho</span> <span class="kn">import</span> <span class="n">Implicit</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.ho</span> <span class="kn">import</span> <span class="n">grad_search</span>
+<span class="kn">from</span> <span class="nn">sparse_ho.optimizers</span> <span class="kn">import</span> <span class="n">GradientDescent</span>
+
+
+<span class="k">def</span> <span class="nf">apply_solver</span><span class="p">(</span>
+        <span class="n">evoked</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">loose</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">p_alpha0</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;wlasso&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Call a custom solver on evoked data.</span>
+
+<span class="sd">    This function does all the necessary computation:</span>
+
+<span class="sd">    - to select the channels in the forward given the available ones in</span>
+<span class="sd">      the data</span>
+<span class="sd">    - to take into account the noise covariance and do the spatial whitening</span>
+<span class="sd">    - to apply loose orientation constraint as MNE solvers</span>
+<span class="sd">    - to apply a weighting of the columns of the forward operator as in the</span>
+<span class="sd">      weighted Minimum Norm formulation in order to limit the problem</span>
+<span class="sd">      of depth bias.</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    evoked : instance of mne.Evoked</span>
+<span class="sd">        The evoked data</span>
+<span class="sd">    forward : instance of Forward</span>
+<span class="sd">        The forward solution.</span>
+<span class="sd">    noise_cov : instance of Covariance</span>
+<span class="sd">        The noise covariance.</span>
+<span class="sd">    loose : float in [0, 1] | &#39;auto&#39;</span>
+<span class="sd">        Value that weights the source variances of the dipole components</span>
+<span class="sd">        that are parallel (tangential) to the cortical surface. If loose</span>
+<span class="sd">        is 0 then the solution is computed with fixed orientation.</span>
+<span class="sd">        If loose is 1, it corresponds to free orientations.</span>
+<span class="sd">        The default value (&#39;auto&#39;) is set to 0.2 for surface-oriented source</span>
+<span class="sd">        space and set to 1.0 for volumic or discrete source space.</span>
+<span class="sd">    depth : None | float in [0, 1]</span>
+<span class="sd">        Depth weighting coefficients. If None, no depth weighting is performed.</span>
+<span class="sd">    p_alpha0 : float (default=0.7)</span>
+<span class="sd">        Proportion of alpha_max for the initial point alpha0.</span>
+<span class="sd">    model_name : string (default=&quot;wlasso&quot;)</span>
+<span class="sd">        Name of the model to use, &quot;lasso&quot; or &quot;wLasso&quot; in this case.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stc : instance of SourceEstimate</span>
+<span class="sd">        The source estimates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_ch_names</span> <span class="o">=</span> <span class="n">evoked</span><span class="o">.</span><span class="n">ch_names</span>
+
+    <span class="c1"># Handle depth weighting and whitening (here is no weights)</span>
+    <span class="n">forward</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">gain_info</span><span class="p">,</span> <span class="n">whitener</span><span class="p">,</span> <span class="n">source_weighting</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_prepare_gain</span><span class="p">(</span>
+        <span class="n">forward</span><span class="p">,</span> <span class="n">evoked</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">pca</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+        <span class="n">loose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Select channels of interest</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_ch_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">gain_info</span><span class="p">[</span><span class="s1">&#39;ch_names&#39;</span><span class="p">]]</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">evoked</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">sel</span><span class="p">]</span>
+
+    <span class="c1"># Whiten data</span>
+    <span class="n">M</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.dot" title="numpy.dot" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">dot</span></a><span class="p">(</span><span class="n">whitener</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+
+    <span class="n">n_orient</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">is_fixed_orient</span><span class="p">(</span><span class="n">forward</span><span class="p">)</span> <span class="k">else</span> <span class="mi">3</span>
+
+    <span class="n">X</span><span class="p">,</span> <span class="n">active_set</span><span class="p">,</span> <span class="n">monitor</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span>
+        <span class="n">M</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">n_orient</span><span class="p">,</span> <span class="n">evoked</span><span class="o">.</span><span class="n">nave</span><span class="p">,</span> <span class="n">p_alpha0</span><span class="o">=</span><span class="n">p_alpha0</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">_reapply_source_weighting</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">source_weighting</span><span class="p">,</span> <span class="n">active_set</span><span class="p">)</span>
+
+    <span class="n">stc</span> <span class="o">=</span> <span class="n">_make_sparse_stc</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">active_set</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-class"><span class="n">evoked</span><span class="o">.</span><span class="n">times</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                           <span class="n">tstep</span><span class="o">=</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">evoked</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;sfreq&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">stc</span><span class="p">,</span> <span class="n">monitor</span>
+</pre></div>
+</div>
+<p>Define your solver</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">solver</span><span class="p">(</span>
+        <span class="n">y_train</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">n_orient</span><span class="p">,</span> <span class="n">nave</span><span class="p">,</span> <span class="n">p_alpha0</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;wlasso&quot;</span><span class="p">):</span>
+    <span class="n">n_times</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">idx_max</span> <span class="o">=</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.argmax" title="numpy.argmax" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">argmax</span></a><span class="p">(</span><a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.sum" title="numpy.sum" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><span class="n">y_train</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[:,</span> <span class="n">idx_max</span><span class="p">]</span>
+
+    <span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">alpha_max_old</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y_train</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="n">n_samples</span>
+    <span class="n">X_train</span> <span class="o">/=</span> <span class="n">alpha_max_old</span>
+
+    <span class="n">alpha_max</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">y_train</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">/</span> <span class="n">n_samples</span>
+    <span class="n">alpha0</span> <span class="o">=</span> <span class="n">p_alpha0</span> <span class="o">*</span> <span class="n">alpha_max</span>
+
+    <span class="n">estimator</span> <span class="o">=</span> <span class="n">celer_Lasso</span><span class="p">(</span>
+        <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_name</span> <span class="o">==</span> <span class="s2">&quot;wlasso&quot;</span><span class="p">:</span>
+        <span class="n">alpha0</span> <span class="o">=</span> <span class="n">alpha0</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ones" title="numpy.ones" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">WeightedLasso</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">)</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.sqrt" title="numpy.sqrt" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="n">nave</span><span class="p">)</span>
+    <span class="n">criterion</span> <span class="o">=</span> <span class="n">FiniteDiffMonteCarloSure</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">algo</span> <span class="o">=</span> <span class="n">Implicit</span><span class="p">()</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">GradientDescent</span><span class="p">(</span>
+        <span class="n">n_outer</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p_grad_norm</span><span class="o">=</span><span class="mf">1.9</span><span class="p">)</span>
+    <span class="n">monitor</span> <span class="o">=</span> <span class="n">Monitor</span><span class="p">()</span>
+    <span class="n">grad_search</span><span class="p">(</span><span class="n">algo</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">alpha0</span><span class="p">,</span> <span class="n">monitor</span><span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">criterion</span><span class="o">.</span><span class="n">dense0</span><span class="p">[:,</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/arrays.html#numpy.newaxis" title="numpy.newaxis" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-data"><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span></a><span class="p">]</span> <span class="o">*</span> <a href="http://docs.scipy.org/doc/numpy-1.9.1/reference/generated/numpy.html#numpy.ones" title="numpy.ones" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-np-function"><span class="n">np</span><span class="o">.</span><span class="n">ones</span></a><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_times</span><span class="p">))</span>
+    <span class="n">active_set</span> <span class="o">=</span> <span class="n">criterion</span><span class="o">.</span><span class="n">mask0</span>
+    <span class="n">X</span> <span class="o">/=</span> <span class="n">alpha_max_old</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">active_set</span><span class="p">,</span> <span class="n">monitor</span>
+
+
+<span class="n">data_path</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">data_path</span><span class="p">()</span>
+<span class="n">fwd_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif&#39;</span>
+<span class="n">ave_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/MEG/sample/sample_audvis-ave.fif&#39;</span>
+<span class="n">cov_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s1">&#39;/MEG/sample/sample_audvis-shrunk-cov.fif&#39;</span>
+<span class="n">condition</span> <span class="o">=</span> <span class="s1">&#39;Left Auditory&#39;</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using default location ~/mne_data for sample...
+Attempting to create new mne-python configuration file:
+/home/circleci/.mne/mne-python.json
+</pre></div>
+</div>
+<p>Read noise covariance matrix and evoked data</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">noise_cov</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_cov</span><span class="p">(</span><span class="n">cov_fname</span><span class="p">)</span>
+<span class="n">evoked</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_evokeds</span><span class="p">(</span><span class="n">ave_fname</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">condition</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">evoked</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">tmin</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mf">0.18</span><span class="p">)</span>
+
+<span class="c1"># Crop data around the period of interest</span>
+<span class="n">evoked</span> <span class="o">=</span> <span class="n">evoked</span><span class="o">.</span><span class="n">pick_types</span><span class="p">(</span><span class="n">eeg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">meg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>    365 x 365 full covariance (kind = 1) found.
+    Read a total of 4 projection items:
+        PCA-v1 (1 x 102) active
+        PCA-v2 (1 x 102) active
+        PCA-v3 (1 x 102) active
+        Average EEG reference (1 x 59) active
+Reading /home/circleci/mne_data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+    Read a total of 4 projection items:
+        PCA-v1 (1 x 102) active
+        PCA-v2 (1 x 102) active
+        PCA-v3 (1 x 102) active
+        Average EEG reference (1 x 60) active
+    Found the data of interest:
+        t =    -199.80 ...     499.49 ms (Left Auditory)
+        0 CTF compensation matrices available
+        nave = 55 - aspect type = 100
+Projections have already been applied. Setting proj attribute to True.
+Applying baseline correction (mode: mean)
+Removing projector &lt;Projection | Average EEG reference, active : True, n_channels : 60&gt;
+</pre></div>
+</div>
+<p>Handling forward solution</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forward</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_forward_solution</span><span class="p">(</span><span class="n">fwd_fname</span><span class="p">)</span>
+
+<span class="n">loose</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">.8</span>  <span class="c1"># corresponds to free orientation</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Reading forward solution from /home/circleci/mne_data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif...
+    Reading a source space...
+    Computing patch statistics...
+    Patch information added...
+    Distance information added...
+    [done]
+    Reading a source space...
+    Computing patch statistics...
+    Patch information added...
+    Distance information added...
+    [done]
+    2 source spaces read
+    Desired named matrix (kind = 3523) not available
+    Read MEG forward solution (7498 sources, 306 channels, free orientations)
+    Desired named matrix (kind = 3523) not available
+    Read EEG forward solution (7498 sources, 60 channels, free orientations)
+    MEG and EEG forward solutions combined
+    Source spaces transformed to the forward solution coordinate frame
+</pre></div>
+</div>
+<p>Run estimation with Lasso</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stc</span> <span class="o">=</span> <span class="n">apply_solver</span><span class="p">(</span>
+    <span class="n">evoked</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">loose</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;lasso&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Plot glass brain</span>
+<span class="n">plot_sparse_source_estimates</span><span class="p">(</span>
+    <span class="n">forward</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">],</span> <span class="n">stc</span><span class="p">,</span> <span class="n">bgcolor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_001.png" srcset="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_001.png" alt="plot meg lasso vs wlasso" class = "sphx-glr-single-img"/><img src="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_002.png" srcset="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_002.png" alt="plot meg lasso vs wlasso" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Converting forward solution to fixed orientation
+    Average patch normals will be employed in the rotation to the local surface coordinates....
+    Converting to surface-based source orientations...
+    [done]
+info[&quot;bads&quot;] and noise_cov[&quot;bads&quot;] do not match, excluding bad channels from both
+Computing inverse operator with 305 channels.
+    305 out of 366 channels remain after picking
+Selected 305 channels
+Creating the depth weighting matrix...
+Whitening the forward solution.
+    Created an SSP operator (subspace dimension = 3)
+Computing rank from covariance with rank=None
+    Using tolerance 3.5e-13 (2.2e-16 eps * 305 dim * 5.2  max singular value)
+    Estimated rank (mag + grad): 302
+    MEG: rank 302 computed from 305 data channels with 3 projectors
+    Setting small MEG eigenvalues to zero (without PCA)
+Creating the source covariance matrix
+Adjusting source covariance matrix.
+Iteration 1/4 ||Value outer criterion: 3.75e+01 ||norm grad 2.05e+01
+Iteration 2/4 ||Value outer criterion: 9.09e+00 ||norm grad 4.12e+00
+Iteration 3/4 ||Value outer criterion: 7.16e+00 ||norm grad 2.73e-01
+Iteration 4/4 ||Value outer criterion: 5.64e+00 ||norm grad 2.90e-02
+Total number of active sources: 150
+
+((vtkmodules.vtkRenderingOpenGL2.vtkOpenGLActor)0x7f1a619aa280, PolyData (0x7f1a619aa3a0)
+  N Cells:  16384
+  N Points: 312273
+  X Bounds: -1.164e+01, 1.050e+01
+  Y Bounds: -1.070e+01, 1.754e+01
+  Z Bounds: 2.075e+00, 2.232e+01
+  N Arrays: 1
+)
+</pre></div>
+</div>
+<p>Run estimation with Weighted Lasso</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stc</span> <span class="o">=</span> <span class="n">apply_solver</span><span class="p">(</span>
+    <span class="n">evoked</span><span class="p">,</span> <span class="n">forward</span><span class="p">,</span> <span class="n">noise_cov</span><span class="p">,</span> <span class="n">loose</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;wlasso&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># Plot glass brain</span>
+<span class="n">plot_sparse_source_estimates</span><span class="p">(</span>
+    <span class="n">forward</span><span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">],</span> <span class="n">stc</span><span class="p">,</span> <span class="n">bgcolor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_003.png" srcset="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_003.png" alt="plot meg lasso vs wlasso" class = "sphx-glr-single-img"/><img src="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_004.png" srcset="../_images/sphx_glr_plot_meg_lasso_vs_wlasso_004.png" alt="plot meg lasso vs wlasso" class = "sphx-glr-single-img"/><p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Converting forward solution to fixed orientation
+    Average patch normals will be employed in the rotation to the local surface coordinates....
+    Converting to surface-based source orientations...
+    [done]
+info[&quot;bads&quot;] and noise_cov[&quot;bads&quot;] do not match, excluding bad channels from both
+Computing inverse operator with 305 channels.
+    305 out of 366 channels remain after picking
+Selected 305 channels
+Creating the depth weighting matrix...
+Whitening the forward solution.
+    Created an SSP operator (subspace dimension = 3)
+Computing rank from covariance with rank=None
+    Using tolerance 3.5e-13 (2.2e-16 eps * 305 dim * 5.2  max singular value)
+    Estimated rank (mag + grad): 302
+    MEG: rank 302 computed from 305 data channels with 3 projectors
+    Setting small MEG eigenvalues to zero (without PCA)
+Creating the source covariance matrix
+Adjusting source covariance matrix.
+Iteration 1/4 ||Value outer criterion: 3.75e+01 ||norm grad 2.05e+01
+Iteration 2/4 ||Value outer criterion: 2.68e+01 ||norm grad 2.20e+01
+Iteration 3/4 ||Value outer criterion: 1.59e+01 ||norm grad 7.05e-01
+Iteration 4/4 ||Value outer criterion: 1.54e+01 ||norm grad 4.88e-02
+Total number of active sources: 2
+
+((vtkmodules.vtkRenderingOpenGL2.vtkOpenGLActor)0x7f1a64002160, PolyData (0x7f1a640093a0)
+  N Cells:  16384
+  N Points: 312273
+  X Bounds: -1.164e+01, 1.050e+01
+  Y Bounds: -1.070e+01, 1.754e+01
+  Z Bounds: 2.075e+00, 2.232e+01
+  N Arrays: 1
+)
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  8.100 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-meg-lasso-vs-wlasso-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/712efb677cca408dd66f6a775d1a504c/plot_meg_lasso_vs_wlasso.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_meg_lasso_vs_wlasso.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/23ad6b5ffff55a51e347ab3138bf9e18/plot_meg_lasso_vs_wlasso.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_meg_lasso_vs_wlasso.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020-2020, sparse-ho contributors.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.1.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
