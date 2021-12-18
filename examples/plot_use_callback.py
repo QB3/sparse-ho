@@ -21,7 +21,7 @@ from sklearn.datasets import make_regression
 
 from sparse_ho.models import Lasso
 from sparse_ho.criterion import HeldOutMSE
-from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.utils import Monitor
 from sparse_ho.ho import grad_search
 from sparse_ho.optimizers import LineSearch
@@ -70,7 +70,7 @@ def callback(val, grad, mask, dense, alpha):
 # ---------------------------------------
 model = Lasso(estimator=estimator)
 criterion = HeldOutMSE(idx_train, idx_val)
-algo = ImplicitForward()
+algo = Implicit()
 # use Monitor(callback) with your custom callback
 monitor = Monitor(callback=callback)
 optimizer = LineSearch(n_outer=30)

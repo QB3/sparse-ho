@@ -14,8 +14,8 @@ fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'PCD Forward Iterdiff'
-dict_method["backward"] = 'PCD Backward Iterdiff'
+dict_method["forward"] = 'Forward-mode PCD'
+dict_method["backward"] = 'Reverse-mode PCD'
 dict_method['cvxpy'] = 'Cvxpylayers'
 
 dict_div_alphas = {}

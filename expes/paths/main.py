@@ -6,6 +6,7 @@ import os
 import numpy as np
 
 from sklearn.linear_model import Lasso, ElasticNet, LogisticRegression
+# from celer import LogisticRegression
 from sklearn import datasets
 from sklearn.svm import l1_min_c
 # load diabetes dataset for regression model
@@ -23,16 +24,20 @@ dict_y["lasso"] = y
 dict_y["enet"] = y
 # load iris for classification model
 
-dict_X["logreg"] = X
-dict_y["logreg"] = (y > 100) * 1.0
+# dict_X["logreg"] = X
+# dict_y["logreg"] = (y > 100) * 1.0
+dict_X["logreg"], dict_y["logreg"] = datasets.load_diabetes(return_X_y=True)
+dict_X["logreg"] = dict_X["logreg"][:, :10]
 
-name_models = ["lasso", "enet", "logreg"]
+# name_models = ["lasso", "enet"]
+name_models = ["logreg"]
 
 dict_models = {}
-dict_models["lasso"] = Lasso(fit_intercept=False, warm_start=False)
+dict_models["lasso"] = Lasso(
+    fit_intercept=False, warm_start=False)
 dict_models["logreg"] = LogisticRegression(
     penalty="l1", fit_intercept=False, warm_start=False, solver='liblinear',
-    max_iter=10000, tol=1e-9)
+    tol=1e-9, verbose=True)
 dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 
 # Compute alpha_max
@@ -40,10 +45,13 @@ dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 dict_alpha_max = {}
 dict_alpha_max["lasso"] = np.max(
         np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
-dict_alpha_max["logreg"] = 1 / l1_min_c(dict_X['logreg'], dict_y['logreg'])
+# dict_alpha_max["logreg"] = np.max(
+#         np.abs(dict_X["logreg"].T.dot(dict_y["logreg"]))) / 2
+dict_alpha_max["logreg"] = 1 / l1_min_c(
+    dict_X['logreg'], dict_y['logreg'], fit_intercept=False, loss='log')
 dict_alpha_max["enet"] = dict_alpha_max["lasso"]
 # Setting grid of values for alpha
-n_alphas = 1000
+n_alphas = 20
 p_alpha_min = 1e-5
 p_alphas = np.geomspace(1, p_alpha_min, n_alphas)
 
@@ -54,7 +62,8 @@ for name_model in name_models:
     coefs = []
 
     print("Starting path computation for ", name_model)
-    for alpha in alphas:
+    for i, alpha in enumerate(alphas):
+        print("%i / %i iteration" % (i+1, len(alphas)))
         if name_model == "lasso":
             dict_models[name_model].set_params(alpha=alpha)
         elif name_model == "enet":

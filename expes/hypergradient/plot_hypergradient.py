@@ -54,8 +54,8 @@ for maxit in maxits:
                     tol_jac=1e-32, n_iter_jac=maxit, use_stop_crit=False)
                 algo.max_iter = maxit
                 val, grad = criterion.get_val_grad(
-                        model, X, y, log_alpha, algo.compute_beta_grad, tol=1e-12,
-                        monitor=monitor, max_iter=maxit)
+                        model, X, y, log_alpha, algo.compute_beta_grad,
+                        tol=1e-12, monitor=monitor, max_iter=maxit)
             else:
                 model = Lasso(max_iter=maxit)
                 criterion = HeldOutMSE(idx_train, idx_val)
@@ -70,7 +70,7 @@ for maxit in maxits:
                 elif method == "backward":
                     algo = Backward()
                 else:
-                    1 / 0
+                    raise NotImplementedError()
                 algo.max_iter = maxit
                 algo.use_stop_crit = False
                 val, grad = criterion.get_val_grad(

@@ -12,12 +12,15 @@ dict_title["lasso"] = "Lasso"
 dict_title["enet"] = "Elastic net"
 dict_title["logreg"] = "Sparse logistic regression"
 
+# save_fig = True
+save_fig = False
+
 model_names = ["lasso", "enet", "logreg"]
 
 plt.close('all')
 fig, axarr = plt.subplots(
     1, len(model_names), sharex=True, sharey=False,
-    figsize=[10.67, 3.5], constrained_layout=True)
+    figsize=[10.67, 2.5], constrained_layout=True)
 # check
 # loading results
 for i, model_name in enumerate(model_names):
@@ -38,7 +41,6 @@ for i, model_name in enumerate(model_names):
 
 axarr[0].set_ylabel("Coefficient " + r"$\hat{\beta}^{(\lambda)}$",
                     fontsize=fontsize)
-save_fig = True
 
 if save_fig:
     fig_dir = "../../../CD_SUGAR/tex/journal/prebuiltimages/"

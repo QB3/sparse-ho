@@ -18,7 +18,7 @@ algorithms = ['grid_search10', 'random', 'bayesian', 'grad_search']
 dict_title = {}
 dict_title['grid_search10'] = 'Grid-search'
 dict_title['random'] = 'Random-search'
-dict_title['bayesian'] = 'Bayesian'
+dict_title['bayesian'] = 'SMBO'
 dict_title['grad_search'] = '1st order method'
 
 plt.close('all')

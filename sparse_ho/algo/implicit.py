@@ -21,12 +21,18 @@ class Implicit():
         Maximum number of iteration for the resolution of the linear system.
     tol_lin_sys: float (default=1e-6)
         Tolerance for the resolution of the linear system.
+    use_stop_crit: bool (default=True)
+        Wether or not to use the stopping criterion with the our inner solvers.
+        This is useful for experiments to see the linear conv of the Jacobian.
     """
 
-    def __init__(self, max_iter=100, max_iter_lin_sys=100, tol_lin_sys=1e-6):
+    def __init__(
+            self, max_iter=100, max_iter_lin_sys=100, tol_lin_sys=1e-6,
+            use_stop_crit=True):
         self.max_iter = max_iter
         self.max_iter_lin_sys = max_iter_lin_sys
         self.tol_lin_sys = tol_lin_sys
+        self.use_stop_crit = use_stop_crit
 
     def compute_beta_grad(
             self, X, y, log_alpha, model, get_grad_outer, mask0=None,
@@ -65,7 +71,8 @@ class Implicit():
             X, y, log_alpha, get_grad_outer, mask0=mask0, dense0=dense0,
             max_iter=max_iter, tol=tol, sol_lin_sys=quantity_to_warm_start,
             tol_lin_sys=self.tol_lin_sys,
-            max_iter_lin_sys=self.max_iter_lin_sys, model=model)
+            max_iter_lin_sys=self.max_iter_lin_sys, model=model,
+            use_stop_crit=self.use_stop_crit)
 
         if full_jac_v:
             jac_v = model.get_full_jac_v(mask, jac_v, X.shape[1])
@@ -76,7 +83,7 @@ class Implicit():
 def compute_beta_grad_implicit(
         X, y, log_alpha, get_grad_outer, mask0=None, dense0=None, tol=1e-3,
         model="lasso", max_iter=1000, sol_lin_sys=None,
-        tol_lin_sys=1e-6, max_iter_lin_sys=100):
+        tol_lin_sys=1e-6, max_iter_lin_sys=100, use_stop_crit=True):
     """Compute beta and the hypergradient with implicit differentiation.
 
     The hypergradient computation is done in 3 steps:
@@ -117,7 +124,8 @@ def compute_beta_grad_implicit(
     alpha = np.exp(log_alpha)
     mask, dense, _ = compute_beta(
         X, y, log_alpha, mask0=mask0, dense0=dense0,
-        tol=tol, max_iter=max_iter, compute_jac=False, model=model)
+        tol=tol, max_iter=max_iter, compute_jac=False, model=model,
+        use_stop_crit=use_stop_crit)
     n_features = X.shape[1]
 
     mat_to_inv = model.get_mat_vec(X, y, mask, dense, log_alpha)

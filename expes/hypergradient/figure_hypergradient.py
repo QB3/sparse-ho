@@ -16,14 +16,14 @@ fig_dir_svg = "results/"
 
 current_palette = sns.color_palette("colorblind")
 dict_method = {}
-dict_method["forward"] = 'PCD Forward Iterdiff.'
-dict_method["implicit_forward"] = 'Imp. F. Iterdiff.'
-dict_method['celer'] = 'Imp. F. Iterdiff. + Celer'
+dict_method["forward"] = 'Forward-mode PCD'
+dict_method["implicit_forward"] = 'Implicit diff.'
+dict_method['celer'] = 'Implicit diff. + Celer'
 dict_method['grid_search'] = 'Grid-search'
 dict_method['bayesian'] = 'Bayesian'
 dict_method['random'] = 'Random-search'
 dict_method['hyperopt'] = 'Random-search'
-dict_method['backward'] = 'B. Iterdiff.'
+dict_method['backward'] = 'Reverse mode.'
 
 dict_color = {}
 dict_color["grid_search"] = current_palette[3]
@@ -91,7 +91,7 @@ time_lims["colon", 25] = (1e-1, 100)
 
 dict_title = {}
 dict_title["rcv1_train"] = "rcv1"
-dict_title["news20"] = "20news"
+dict_title["news20"] = "news20"
 dict_title["colon"] = "colon"
 dict_title["real-sim"] = "real-sim"
 

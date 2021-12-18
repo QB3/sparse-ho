@@ -27,7 +27,7 @@ from sparse_ho.ho import grad_search
 from sparse_ho.utils import Monitor
 from sparse_ho.models import SparseLogreg
 from sparse_ho.criterion import HeldOutLogistic
-from sparse_ho import ImplicitForward
+from sparse_ho import Implicit
 from sparse_ho.grid_search import grid_search
 from sparse_ho.optimizers import GradientDescent
 from sparse_ho.utils_plot import discrete_cmap
@@ -101,7 +101,7 @@ model = SparseLogreg(estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 
 monitor_grad = Monitor()
-algo = ImplicitForward(tol_jac=tol, n_iter_jac=1000)
+algo = Implicit()
 
 optimizer = GradientDescent(n_outer=10, tol=tol)
 grad_search(
