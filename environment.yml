@@ -2,7 +2,7 @@ name: sparse-ho-env
 
 dependencies:
     - ipython
-    - numpy
+    - numpy==1.21
     - scipy>=1.4.1
     - scikit-learn>=0.21
     - numba
@@ -16,3 +16,4 @@ dependencies:
         - cvxpy
         - torch
         - cvxpylayers
+        - git+https://github.com/mathurinm/celer.git

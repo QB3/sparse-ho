@@ -53,6 +53,6 @@ if __name__ == "__main__":
               "celer",
               "download", "hyperopt",
               "libsvmdata", "matplotlib>=2.0.0", "numba",
-              "numpy", "scipy>=0.18.0",
+              "numpy==1.21", "scipy>=0.18.0",
               "scikit-learn>=0.21", "seaborn>=0.7", ]
           )

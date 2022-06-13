@@ -26,7 +26,6 @@ jobs:
         conda env create --file environment.yml
         conda activate sparse-ho-env
         pip install -e .
-        pip install -U numpy  # update for celer
 
     - name: test
       run: |
