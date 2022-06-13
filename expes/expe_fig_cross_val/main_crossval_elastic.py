@@ -3,7 +3,7 @@
 
 import itertools
 import numpy as np
-import sklearn
+import celer
 
 from libsvmdata import fetch_libsvm
 from sklearn.datasets import make_regression
@@ -45,7 +45,7 @@ algorithms = ['grad_search']
 max_evals = 25
 print("Starting path computation...")
 for algorithm in algorithms:
-    estimator = sklearn.linear_model.ElasticNet(
+    estimator = celer.ElasticNet(
         fit_intercept=False, max_iter=3_000, warm_start=True, tol=tol)
 
     print('%s started' % algorithm)

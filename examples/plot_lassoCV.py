@@ -62,7 +62,7 @@ print('scikit started')
 t0 = time.time()
 reg = LassoCV(
     cv=kf, verbose=True, tol=tol, fit_intercept=False,
-    alphas=alphas, max_iter=1e5).fit(X, y)
+    alphas=alphas, max_iter=100_000).fit(X, y)
 reg.score(X, y)
 t_sk = time.time() - t0
 
@@ -73,7 +73,7 @@ print('scikit finished')
 # --------------------------------------------------------------------
 
 estimator = sklearn.linear_model.Lasso(fit_intercept=False,
-                                       warm_start=True, max_iter=1e5)
+                                       warm_start=True, max_iter=100_000)
 
 print('sparse-ho started')
 

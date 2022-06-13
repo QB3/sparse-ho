@@ -16,7 +16,7 @@ for an elastic-net using a held-out validation set.
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import linear_model
+import celer
 from libsvmdata.datasets import fetch_libsvm
 from celer.datasets import make_correlated_data
 from sklearn.metrics import mean_squared_error
@@ -65,7 +65,7 @@ results = np.zeros((n_grid, n_grid))
 tol = 1e-5
 max_iter = 10_000
 
-estimator = linear_model.ElasticNet(
+estimator = celer.ElasticNet(
     fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
 
 ##############################################################################
@@ -89,7 +89,7 @@ print("Minimum outer criterion value with grid search %0.3e" % results.min())
 ##############################################################################
 # Grad-search with sparse-ho
 # --------------------------
-estimator = linear_model.ElasticNet(
+estimator = celer.ElasticNet(
     fit_intercept=False, max_iter=max_iter, warm_start=True)
 print("Started grad-search")
 t_grad_search = - time.time()

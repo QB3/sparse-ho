@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from scipy.sparse import csc_matrix
-from sklearn import linear_model
+import celer
 from sklearn.model_selection import KFold
 import celer
 from celer.datasets import make_correlated_data
@@ -32,7 +32,7 @@ alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 alphas = alpha_max * np.geomspace(1, 0.1)
 alpha_min = 0.0001 * alpha_max
 
-estimator = linear_model.Lasso(
+estimator = celer.Lasso(
     fit_intercept=False, max_iter=10000, warm_start=True)
 model = Lasso(estimator=estimator)
 
@@ -66,12 +66,12 @@ def test_cross_val_criterion(model_name, XX):
         monitor_grid, max_evals=n_alphas, tol=tol)
 
     if model_name.startswith("lasso"):
-        reg = linear_model.LassoCV(
+        reg = celer.LassoCV(
             cv=kf, verbose=True, tol=tol, fit_intercept=False,
             alphas=np.geomspace(alpha_max, alpha_min, num=n_alphas),
             max_iter=max_iter).fit(X, y)
     else:
-        reg = linear_model.LogisticRegressionCV(
+        reg = celer.LogisticRegressionCV(
             cv=kf, verbose=True, tol=tol, fit_intercept=False,
             Cs=len(idx_train) / np.geomspace(
                 alpha_max, alpha_min, num=n_alphas),
