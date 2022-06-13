@@ -2,7 +2,7 @@ name: sparse-ho-env
 
 dependencies:
     - ipython
-    - numpy>=1.12
+    - numpy
     - scipy>=1.4.1
     - scikit-learn>=0.21
     - numba
