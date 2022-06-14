@@ -142,10 +142,10 @@ def test_val_grad(model_name, criterion_name, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.compute_beta_grad, tol=tol)
     np.testing.assert_allclose(
-        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5, atol=1e-5)
+        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-4, atol=1e-4)
     np.testing.assert_allclose(
         dict_grads_cvxpy[model_name, criterion_name], grad,
-        rtol=1e-5, atol=1e-5)
+        rtol=1e-4, atol=1e-4)
 
 
 @pytest.mark.parametrize('model_name,criterion', list_model_crit)
