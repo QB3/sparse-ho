@@ -23,9 +23,8 @@ jobs:
       run: |
         pip install -U pip
         eval "$(conda shell.bash hook)"
-        conda env create --file environment.yml python=3.8
+        conda env create --file environment.yml
         conda activate sparse-ho-env
-        pip install --index-url https://test.pypi.org/simple/ celer==0.7.1dev0 --extra-index-url https://pypi.org/simple/
         pip install -e .
 
     - name: test
