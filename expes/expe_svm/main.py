@@ -36,8 +36,7 @@ def parallel_function(
         tolerance_decrease='exponential'):
 
     # load data
-    X_train, X_val, X_test, y_train, y_val, y_test = get_data(
-        dataset_name, csr=True)
+    X_train, X_val, X_test, y_train, y_val, y_test = get_data(dataset_name, csr=True)
     n_samples, n_features = X_train.shape
     print('n_samples', n_samples)
     print('n_features', n_features)
@@ -53,7 +52,8 @@ def parallel_function(
         size_loop = 1
     else:
         size_loop = 1
-    model = SVM(X_train, y_train, logC, max_iter=10000, tol=tol)
+    model = SVM(
+        X_train, y_train, logC, max_iter=10000, tol=tol)
     for i in range(size_loop):
         monitor = Monitor()
 
