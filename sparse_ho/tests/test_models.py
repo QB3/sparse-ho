@@ -105,7 +105,7 @@ def test_warm_start(model_name):
             mask, dense, _ = compute_beta(
                 X_s, y, log_alpha, tol=tol,
                 mask0=mask, dense0=dense, jac0=jac,
-                max_iter=5000, compute_jac=False, model=model)
+                max_iter=5_000, compute_jac=False, model=model)
             dbeta0_new = model._init_dbeta0(mask, mask, jac)
             reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 
@@ -142,10 +142,10 @@ def test_val_grad(model_name, criterion_name, algo):
     val, grad = criterion.get_val_grad(
         model, X, y, log_alpha, algo.compute_beta_grad, tol=tol)
     np.testing.assert_allclose(
-        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-5, atol=1e-5)
+        dict_vals_cvxpy[model_name, criterion_name], val, rtol=1e-3, atol=1e-3)
     np.testing.assert_allclose(
         dict_grads_cvxpy[model_name, criterion_name], grad,
-        rtol=1e-5, atol=1e-5)
+        rtol=1e-3, atol=1e-3)
 
 
 @pytest.mark.parametrize('model_name,criterion', list_model_crit)

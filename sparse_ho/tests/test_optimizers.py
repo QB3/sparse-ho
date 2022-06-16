@@ -35,7 +35,7 @@ alpha0 = p_alpha * alpha_max
 
 log_alphas = np.log(alpha_max * np.geomspace(1, 0.1))
 tol = 1e-16
-max_iter = 1000
+max_iter = 1_000
 
 # dict_log_alpha0 = {}
 # dict_log_alpha0["lasso"] = log_alpha

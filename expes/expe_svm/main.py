@@ -53,7 +53,7 @@ def parallel_function(
     else:
         size_loop = 1
     model = SVM(
-        X_train, y_train, logC, max_iter=10000, tol=tol)
+        X_train, y_train, logC, max_iter=10_000, tol=tol)
     for i in range(size_loop):
         monitor = Monitor()
 

@@ -70,7 +70,7 @@ def linear_cv(
     if model_name == "lasso":
         clf = Lasso_cel(
             alpha=alpha, fit_intercept=False, warm_start=True,
-            tol=tol * norm(y) ** 2 / 2, max_iter=10000)
+            tol=tol * norm(y) ** 2 / 2, max_iter=10_000)
         clf.fit(X, y)
         beta_star = clf.coef_
         mask = beta_star != 0

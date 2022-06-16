@@ -29,7 +29,7 @@ alpha_max = np.max(
 alpha0 = alpha_max / 10
 
 tol = 1e-7
-max_iter = 1e5
+max_iter = 100_000
 
 
 estimator = linear_model.Lasso(

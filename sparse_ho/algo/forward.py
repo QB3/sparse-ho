@@ -75,7 +75,7 @@ class Forward():
 
 def compute_beta(
         X, y, log_alpha, model, mask0=None, dense0=None, jac0=None,
-        max_iter=1000, tol=1e-3, compute_jac=True, return_all=False,
+        max_iter=1_000, tol=1e-3, compute_jac=True, return_all=False,
         save_iterates=False, verbose=False, use_stop_crit=True, gap_freq=10):
     """
     Parameters

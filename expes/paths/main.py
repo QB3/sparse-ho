@@ -32,14 +32,14 @@ dict_models = {}
 dict_models["lasso"] = Lasso(fit_intercept=False, warm_start=False)
 dict_models["logreg"] = LogisticRegression(
     penalty="l1", fit_intercept=False, warm_start=False, solver='liblinear',
-    max_iter=10000, tol=1e-9)
+    max_iter=10_000, tol=1e-9)
 dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 
 # Compute alpha_max
 
 dict_alpha_max = {}
 dict_alpha_max["lasso"] = np.max(
-        np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
+    np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
 dict_alpha_max["logreg"] = 1 / l1_min_c(dict_X['logreg'], dict_y['logreg'])
 dict_alpha_max["enet"] = dict_alpha_max["lasso"]
 # Setting grid of values for alpha

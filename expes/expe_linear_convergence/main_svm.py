@@ -39,7 +39,7 @@ max_iters["real-sim"] = 50
 #     return SP
 
 
-def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
+def linear_cv(dataset_name, max_iter=1_000, tol=1e-3, compute_jac=True):
     max_iter = max_iters[dataset_name]
     X, y = load_libsvm(dataset_name)
     X = X.tocsr()
@@ -57,7 +57,8 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     beta_star = np.abs(clf.dual_coef_[0])
     primal_star = np.sum(X.T.multiply(y * beta_star), axis=1)
     # full_supp = np.logical_and(beta_star > 0, beta_star < C)
-    full_supp = np.logical_and(np.logical_not(np.isclose(beta_star, 0)), np.logical_not(np.isclose(beta_star, C)))
+    full_supp = np.logical_and(np.logical_not(np.isclose(
+        beta_star, 0)), np.logical_not(np.isclose(beta_star, C)))
     # Q = (X.multiply(y[:, np.newaxis]))  @  (X.multiply(y[:, np.newaxis])).T
     yX = X.multiply(y[:, np.newaxis])
     yX = yX.tocsr()
@@ -67,7 +68,8 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     temp3[np.isclose(beta_star, C)] = np.ones(
         (np.isclose(beta_star, C)).sum()) * C
     # temp3 = temp3[full_supp]
-    v = temp3[full_supp] - yX[full_supp, :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
+    v = temp3[full_supp] - yX[full_supp,
+                              :] @ (yX[np.isclose(beta_star, C), :].T @ temp3[np.isclose(beta_star, C)])
     # v = np.array((np.eye(n_samples, n_samples) - Q)[np.ix_(full_supp, np.isclose(beta_star, C))] @ (np.ones((np.isclose(beta_star, C)).sum()) * C))
     # v = np.squeeze(v)
     temp = yX[full_supp, :] @ yX[full_supp, :].T
@@ -90,10 +92,12 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     diff_beta = norm(M - primal_star, axis=0)
     diff_jac = norm(M_jac - primal_jac_star, axis=0)
     full_supp_star = full_supp
-    full_supp_star = np.logical_and(np.logical_not(np.isclose(list_beta[-1], 0)), np.logical_not(np.isclose(list_beta[-1], C)))
+    full_supp_star = np.logical_and(np.logical_not(np.isclose(
+        list_beta[-1], 0)), np.logical_not(np.isclose(list_beta[-1], C)))
     n_iter = list_beta.shape[0]
     for i in np.arange(n_iter)[::-1]:
-        full_supp = np.logical_and(np.logical_not(np.isclose(list_beta[i, :], 0)), np.logical_not(np.isclose(list_beta[i, :], C)))
+        full_supp = np.logical_and(np.logical_not(np.isclose(
+            list_beta[i, :], 0)), np.logical_not(np.isclose(list_beta[i, :], C)))
         if not np.all(full_supp == full_supp_star):
             supp_id = i + 1
             break
@@ -103,7 +107,7 @@ def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
 
 # parameter of the algo
 tol = 1e-32
-max_iter = 10000
+max_iter = 10_000
 
 print("enter sequential")
 backend = 'loky'

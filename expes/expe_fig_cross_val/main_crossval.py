@@ -36,7 +36,7 @@ alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 
 
 tol = 1e-3
-max_iter = 1e5
+max_iter = 100_000
 
 algorithms = ['bayesian']
 # ['grid_search100', 'grid_search10', 'grad_search', 'random', 'bayesian']
@@ -45,7 +45,7 @@ p_alpha_min = 1 / 10_000
 print("Starting path computation...")
 for algorithm in algorithms:
     estimator = celer.Lasso(
-        fit_intercept=False, max_iter=1000, warm_start=True, tol=tol,
+        fit_intercept=False, max_iter=1_000, warm_start=True, tol=tol,
         verbose=True)
 
     print('%s started' % algorithm)
@@ -56,7 +56,8 @@ for algorithm in algorithms:
     monitor = Monitor()
     cross_val_criterion = CrossVal(criterion, cv=kf)
     algo = ImplicitForward()
-    optimizer = GradientDescent(n_outer=10, tol=tol, verbose=True, p_grad_norm=1)
+    optimizer = GradientDescent(
+        n_outer=10, tol=tol, verbose=True, p_grad_norm=1)
     # optimizer = LineSearch(n_outer=10, tol=tol, verbose=True)
     if algorithm == 'grad_search':
         grad_search(
