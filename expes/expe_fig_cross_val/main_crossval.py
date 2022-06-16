@@ -36,7 +36,7 @@ alpha_max = np.max(np.abs(X.T.dot(y))) / n_samples
 
 
 tol = 1e-3
-max_iter = 1e5
+max_iter = 100_000
 
 algorithms = ['bayesian']
 # ['grid_search100', 'grid_search10', 'grad_search', 'random', 'bayesian']
