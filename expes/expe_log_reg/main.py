@@ -69,8 +69,7 @@ def parallel_function(
         monitor = Monitor()
 
         if method == "implicit_forward":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = ImplicitForward(criterion, tol_jac=1e-5, n_iter_jac=100)
             _, _, _ = grad_search(
                 algo=algo, verbose=False,
@@ -80,8 +79,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "forward":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -91,8 +89,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "implicit":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Implicit(criterion)
             _, _, _ = grad_search(
                 algo=algo,
@@ -102,8 +99,7 @@ def parallel_function(
                 tolerance_decrease=tolerance_decrease)
 
         elif method == "grid_search":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             # log_alpha_min = np.log(alpha_min)
             log_alphas = np.log(np.geomspace(alpha_max, alpha_min, num=100))
@@ -113,8 +109,7 @@ def parallel_function(
             print(log_alpha_opt)
 
         elif method == "random":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(alpha_min)
             log_alpha_opt, min_g_func = grid_search(
@@ -123,8 +118,7 @@ def parallel_function(
             print(log_alpha_opt)
 
         elif method == "lhs":
-            criterion = HeldOutLogistic(
-                X_val, y_val, model, X_test=X_test, y_test=y_test)
+            criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
             algo = Forward(criterion)
             log_alpha_min = np.log(alpha_min)
             log_alpha_opt, min_g_func = grid_search(
