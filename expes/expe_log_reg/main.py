@@ -64,7 +64,7 @@ def parallel_function(
     else:
         size_loop = 2
     model = SparseLogreg(
-        X_train, y_train, max_iter=1_000, log_alpha_max=log_alpha_max)
+        X_train, y_train, max_iter=1000, log_alpha_max=log_alpha_max)
     for i in range(size_loop):
         monitor = Monitor()
 
