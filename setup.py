@@ -50,9 +50,9 @@ if __name__ == "__main__":
           platforms='any',
           packages=find_packages(),
           install_requires=[
-              "celer",
-              "download", "hyperopt",
-              "libsvmdata", "matplotlib>=2.0.0", "numba",
-              "numpy", "scipy>=0.18.0",
-              "scikit-learn>=0.21", "seaborn>=0.7", ]
+            "celer",
+            "download", "hyperopt",
+            "libsvmdata", "matplotlib>=2.0.0", "numba",
+            "numpy", "scipy>=0.18.0",
+            "scikit-learn>=0.21", "seaborn>=0.7", ]
           )
