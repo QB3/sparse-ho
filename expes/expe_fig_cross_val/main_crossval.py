@@ -45,7 +45,7 @@ p_alpha_min = 1 / 10_000
 print("Starting path computation...")
 for algorithm in algorithms:
     estimator = celer.Lasso(
-        fit_intercept=False, max_iter=1_000, warm_start=True, tol=tol,
+        fit_intercept=False, max_iter=1000, warm_start=True, tol=tol,
         verbose=True)
 
     print('%s started' % algorithm)

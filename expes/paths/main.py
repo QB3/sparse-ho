@@ -32,7 +32,7 @@ dict_models = {}
 dict_models["lasso"] = Lasso(fit_intercept=False, warm_start=False)
 dict_models["logreg"] = LogisticRegression(
     penalty="l1", fit_intercept=False, warm_start=False, solver='liblinear',
-    max_iter=10_000, tol=1e-9)
+    max_iter=10000, tol=1e-9)
 dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 
 # Compute alpha_max

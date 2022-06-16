@@ -39,7 +39,7 @@ max_iters["real-sim"] = 50
 #     return SP
 
 
-def linear_cv(dataset_name, max_iter=1_000, tol=1e-3, compute_jac=True):
+def linear_cv(dataset_name, max_iter=1000, tol=1e-3, compute_jac=True):
     max_iter = max_iters[dataset_name]
     X, y = load_libsvm(dataset_name)
     X = X.tocsr()
@@ -107,7 +107,7 @@ def linear_cv(dataset_name, max_iter=1_000, tol=1e-3, compute_jac=True):
 
 # parameter of the algo
 tol = 1e-32
-max_iter = 10_000
+max_iter = 10000
 
 print("enter sequential")
 backend = 'loky'

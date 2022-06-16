@@ -30,7 +30,7 @@ log_alphas = np.log(alphas)
 tol = 1e-5
 
 # grid search
-model = SparseLogreg(X_train, y_train, log_alphas[0], max_iter=1_000)
+model = SparseLogreg(X_train, y_train, log_alphas[0], max_iter=1000)
 criterion = HeldOutLogistic(X_val, y_val, model, X_test=X_test, y_test=y_test)
 algo = Forward(criterion)
 monitor_grid_sk = Monitor()

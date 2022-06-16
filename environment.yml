@@ -16,4 +16,3 @@ dependencies:
         - cvxpy
         - torch
         - cvxpylayers
-        - git+https://github.com/mathurinm/celer.git

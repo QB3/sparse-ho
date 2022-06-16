@@ -105,7 +105,7 @@ def test_warm_start(model_name):
             mask, dense, _ = compute_beta(
                 X_s, y, log_alpha, tol=tol,
                 mask0=mask, dense0=dense, jac0=jac,
-                max_iter=5_000, compute_jac=False, model=model)
+                max_iter=5000, compute_jac=False, model=model)
             dbeta0_new = model._init_dbeta0(mask, mask, jac)
             reduce_alpha = model._reduce_alpha(np.exp(log_alpha), mask)
 

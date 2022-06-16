@@ -51,7 +51,7 @@ models["lasso_custom"] = Lasso(estimator=celer.Lasso(
 def test_cross_val_criterion(model_name, XX):
     model = models[model_name]
     alpha_min = alpha_max / 10
-    max_iter = 10_000
+    max_iter = 10000
     n_alphas = 10
     kf = KFold(n_splits=5, shuffle=True, random_state=56)
 
