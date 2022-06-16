@@ -1,7 +1,7 @@
 import time
 from sparse_ho.datasets.real import get_data
 import numpy as np
-from sklearn.linear_model import ElasticNet as ElasticNet_sk
+from celer import ElasticNet as ElasticNet_celer
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -56,7 +56,7 @@ for i in range(n_grid):
     print("lambda %i / %i" % (i, n_grid))
     for j in range(n_grid):
         print("lambda %i / %i" % (j, n_grid))
-        clf = ElasticNet_sk(
+        clf = ElasticNet_celer(
             alpha=(alphas_1[i] + alphas_2[j]), fit_intercept=False,
             l1_ratio=alphas_1[i] / (alphas_1[i] + alphas_2[j]),
             tol=tol, max_iter=max_iter, warm_start=True)

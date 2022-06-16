@@ -66,7 +66,7 @@ tol = 1e-5
 max_iter = 10_000
 
 estimator = celer.ElasticNet(
-    fit_intercept=False, tol=tol, max_iter=max_iter, warm_start=True)
+    fit_intercept=False, tol=tol, max_iter=50, warm_start=True)
 
 ##############################################################################
 # grid search with scikit-learn
@@ -90,7 +90,7 @@ print("Minimum outer criterion value with grid search %0.3e" % results.min())
 # Grad-search with sparse-ho
 # --------------------------
 estimator = celer.ElasticNet(
-    fit_intercept=False, max_iter=max_iter, warm_start=True)
+    fit_intercept=False, max_iter=50, warm_start=True)
 print("Started grad-search")
 t_grad_search = - time.time()
 monitor = Monitor()

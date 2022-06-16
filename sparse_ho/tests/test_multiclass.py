@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn
-from sklearn.linear_model import LogisticRegression
+from celer import LogisticRegression
 
 from libsvmdata.datasets import fetch_libsvm
 

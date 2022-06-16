@@ -52,7 +52,7 @@ alpha_max = np.max(np.abs(X[idx_train, :].T @ y[idx_train])) / len(idx_train)
 alpha0 = alpha_max / 10
 
 estimator = celer.Lasso(
-    fit_intercept=False, max_iter=100_000, warm_start=True)
+    fit_intercept=False, max_iter=50, warm_start=True)
 
 #############################################################################
 # Call back definition
