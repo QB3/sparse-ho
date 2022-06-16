@@ -1,6 +1,5 @@
 import numpy as np
-import sklearn
-from celer import LogisticRegression
+import sklearn.linear_model
 
 from libsvmdata.datasets import fetch_libsvm
 
@@ -32,9 +31,9 @@ n_classes = np.unique(y).shape[0]
 
 max_iter = 10000
 algo = ImplicitForward(n_iter_jac=1000)
-estimator = LogisticRegression(
+estimator = sklearn.linear_model.LogisticRegression(
     solver='saga', penalty='l1', max_iter=max_iter,
-    fit_intercept=False, warm_start=True)
+    random_state=42, fit_intercept=False, warm_start=True)
 
 model = SparseLogreg(estimator=estimator)
 logit_multiclass = LogisticMulticlass(
@@ -51,7 +50,7 @@ def test_our_vs_sklearn():
     for i in range(n_alphas):
         # one versus all (ovr) logreg from scikit learn
         p_alpha = p_alphas[:, i]
-        lr = LogisticRegression(
+        lr = sklearn.linear_model.LogisticRegression(
             solver='saga', multi_class='ovr', penalty='l1', max_iter=max_iter,
             random_state=42, fit_intercept=False, warm_start=True,
             C=1 / (alpha_max * p_alpha[0] * len(idx_train)), tol=tol)

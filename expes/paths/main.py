@@ -5,7 +5,8 @@
 import os
 import numpy as np
 
-from celer import Lasso, ElasticNet, LogisticRegression
+from celer import Lasso, ElasticNet
+from sklearn.linear_model import LogisticRegression
 from sklearn import datasets
 from sklearn.svm import l1_min_c
 # load diabetes dataset for regression model

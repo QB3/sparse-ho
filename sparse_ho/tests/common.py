@@ -74,7 +74,7 @@ dict_cvxpy_func = {
     'svm': svm_cvxpy,
     'svr': svr_cvxpy,
     'ssvr': ssvr_cvxpy
-    }
+}
 
 dict_vals_cvxpy = {}
 dict_grads_cvxpy = {}
@@ -128,6 +128,6 @@ list_model_crit = [
     ('svm', 'MSE'),
     ('svr', 'MSE'),
     ('ssvr', 'MSE')
-    ]
+]
 
 list_model_names = ["lasso", "enet", "wLasso", "logreg", "svm", "svr", "ssvr"]

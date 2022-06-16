@@ -19,7 +19,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_classification
-from celer import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 from libsvmdata.datasets import fetch_libsvm
 
 from sparse_ho import ImplicitForward
