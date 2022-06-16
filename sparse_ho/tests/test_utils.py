@@ -33,7 +33,7 @@ max_iter = 100_000
 
 
 estimator = celer.Lasso(
-    fit_intercept=False, max_iter=max_iter, warm_start=True)
+    fit_intercept=False, max_iter=50, warm_start=True)
 
 
 objs = []

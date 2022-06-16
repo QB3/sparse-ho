@@ -3,7 +3,7 @@ import numpy as np
 from scipy.sparse import csc_matrix
 import celer
 from sklearn.model_selection import KFold
-import celer
+
 import sklearn.linear_model
 from celer.datasets import make_correlated_data
 
