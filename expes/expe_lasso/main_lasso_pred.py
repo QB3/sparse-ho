@@ -80,7 +80,7 @@ def parallel_function(
 
     if model_name == "lasso":
         estimator = celer.Lasso(
-            fit_intercept=False, max_iter=100, warm_start=True, tol=tol)
+            fit_intercept=False, max_iter=50, warm_start=True, tol=tol)
         model = Lasso(estimator=estimator)
     elif model_name == "logreg":
         model = SparseLogreg(estimator=estimator)

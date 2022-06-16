@@ -46,7 +46,7 @@ max_evals = 25
 print("Starting path computation...")
 for algorithm in algorithms:
     estimator = celer.ElasticNet(
-        fit_intercept=False, max_iter=3_000, warm_start=True, tol=tol)
+        fit_intercept=False, max_iter=50, warm_start=True, tol=tol)
 
     print('%s started' % algorithm)
 

@@ -50,7 +50,7 @@ alphas = [np.array(i) for i in product(alpha1D, alpha1D)]
 tol = 1e-3
 
 estimator = celer.ElasticNet(
-    fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
+    fit_intercept=False, max_iter=50, warm_start=True, tol=tol)
 
 
 dict_monitor = {}
