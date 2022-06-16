@@ -34,7 +34,7 @@ max_iter = 10000
 algo = ImplicitForward(n_iter_jac=1000)
 estimator = LogisticRegression(
     solver='saga', penalty='l1', max_iter=max_iter,
-    random_state=42, fit_intercept=False, warm_start=True)
+    fit_intercept=False, warm_start=True)
 
 model = SparseLogreg(estimator=estimator)
 logit_multiclass = LogisticMulticlass(
