@@ -46,7 +46,7 @@ alpha_min = alpha_max / 10_000
 tol = 1e-8
 
 estimator = celer.Lasso(
-    fit_intercept=False, max_iter=100, warm_start=True, tol=tol)
+    fit_intercept=False, max_iter=50, warm_start=True, tol=tol)
 
 
 dict_monitor = {}

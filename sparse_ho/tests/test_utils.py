@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 from sklearn.model_selection import train_test_split
-from sklearn import linear_model
+import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.models import Lasso
@@ -32,8 +32,8 @@ tol = 1e-7
 max_iter = 100_000
 
 
-estimator = linear_model.Lasso(
-    fit_intercept=False, max_iter=max_iter, warm_start=True)
+estimator = celer.Lasso(
+    fit_intercept=False, max_iter=50, warm_start=True)
 
 
 objs = []

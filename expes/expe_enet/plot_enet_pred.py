@@ -10,7 +10,7 @@ from itertools import product
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn import linear_model
+import celer
 from sklearn.datasets import make_regression
 from sklearn.model_selection import KFold
 from libsvmdata import fetch_libsvm
@@ -49,8 +49,8 @@ alphas = [np.array(i) for i in product(alpha1D, alpha1D)]
 
 tol = 1e-3
 
-estimator = linear_model.ElasticNet(
-    fit_intercept=False, max_iter=1000, warm_start=True, tol=tol)
+estimator = celer.ElasticNet(
+    fit_intercept=False, max_iter=50, warm_start=True, tol=tol)
 
 
 dict_monitor = {}
@@ -72,11 +72,11 @@ for algo_name in all_algo_name:
     if algo_name.startswith('implicit_forward'):
         if algo_name == "implicit_forward_approx":
             optimizer = GradientDescent(
-               n_outer=30, p_grad_norm=1., verbose=True, tol=tol,
-               tol_decrease="geom")
+                n_outer=30, p_grad_norm=1., verbose=True, tol=tol,
+                tol_decrease="geom")
         else:
             optimizer = GradientDescent(
-               n_outer=30, p_grad_norm=1., verbose=True, tol=tol)
+                n_outer=30, p_grad_norm=1., verbose=True, tol=tol)
         grad_search(
             algo, criterion, model, optimizer, X, y, alpha0,
             monitor)
@@ -114,7 +114,7 @@ dict_colors = {
     'implicit_forward_approx':  'OrRd',
     'grid_search': 'Reds',
     'bayesian': 'Blues'
-    }
+}
 
 ##############################################################
 

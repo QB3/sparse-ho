@@ -3,7 +3,7 @@ from joblib import Parallel, delayed
 import pandas
 from itertools import product
 from libsvmdata.datasets import fetch_libsvm
-from celer import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 
 from sparse_ho.models import SparseLogreg
 from sparse_ho.ho import grad_search, hyperopt_wrapper

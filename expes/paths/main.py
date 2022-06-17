@@ -5,7 +5,8 @@
 import os
 import numpy as np
 
-from sklearn.linear_model import Lasso, ElasticNet, LogisticRegression
+from celer import Lasso, ElasticNet
+from sklearn.linear_model import LogisticRegression
 from sklearn import datasets
 from sklearn.svm import l1_min_c
 # load diabetes dataset for regression model
@@ -39,7 +40,7 @@ dict_models["enet"] = ElasticNet(fit_intercept=False, warm_start=False)
 
 dict_alpha_max = {}
 dict_alpha_max["lasso"] = np.max(
-        np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
+    np.abs(dict_X["lasso"].T.dot(dict_y["lasso"]))) / n_samples
 dict_alpha_max["logreg"] = 1 / l1_min_c(dict_X['logreg'], dict_y['logreg'])
 dict_alpha_max["enet"] = dict_alpha_max["lasso"]
 # Setting grid of values for alpha

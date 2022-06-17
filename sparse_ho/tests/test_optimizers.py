@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 import pytest
-from sklearn import linear_model
+import celer
 from celer.datasets import make_correlated_data
 
 from sparse_ho.utils import Monitor
@@ -46,7 +46,7 @@ models = [
     Lasso(estimator=None),
 ]
 
-estimator = linear_model.Lasso(
+estimator = celer.Lasso(
     fit_intercept=False, max_iter=1000, warm_start=True)
 models_custom = [
     Lasso(estimator=estimator),

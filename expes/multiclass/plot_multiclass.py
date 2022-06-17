@@ -1,7 +1,7 @@
 import numpy as np
 
 from libsvmdata.datasets import fetch_libsvm
-from celer import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 # from sklearn.linear_model import LogisticRegression
 
 from sparse_ho.models import SparseLogreg
