@@ -68,7 +68,7 @@ alphas = alpha_max * p_alphas
 # -----------
 
 estimator = LogisticRegression(
-    penalty='l1', fit_intercept=False, max_iter=max_iter)
+    penalty='l1', fit_intercept=False, max_iter=max_iter, solver='liblinear')
 model = SparseLogreg(estimator=estimator)
 criterion = HeldOutLogistic(idx_train, idx_val)
 monitor_grid = Monitor()
