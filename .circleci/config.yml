@@ -70,8 +70,8 @@ jobs:
               conda config --add channels conda-forge
               conda config --set channel_priority strict
               conda install -y -c conda-forge mamba
-              # mamba install -y -c conda-forge mne-base
-              mamba install mne mne-base mne-installer-menus
+              mamba install -y -c conda-forge mne-base
+              # mamba install mne mne-base mne-installer-menus
 
               python -m pip install -U pip
               python -m pip install -U -r requirements.txt
