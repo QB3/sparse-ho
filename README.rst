@@ -14,7 +14,7 @@ In order to benchmark performances, the package also implements alternatives suc
 Documentation
 -------------
 
-Please visit `https://qb3.github.io/sparse-ho`_ for the latest version of the documentation.
+Please visit `https://qb3.github.io/sparse-ho <https://qb3.github.io/sparse-ho>`_ for the latest version of the documentation.
 
 
 Install
